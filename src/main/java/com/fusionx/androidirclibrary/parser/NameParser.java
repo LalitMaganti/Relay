@@ -23,8 +23,8 @@ package com.fusionx.androidirclibrary.parser;
 
 import com.fusionx.androidirclibrary.Channel;
 import com.fusionx.androidirclibrary.ChannelUser;
+import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.UserChannelInterface;
-import com.fusionx.androidirclibrary.communication.MessageSender;
 import com.fusionx.androidirclibrary.constants.UserLevelEnum;
 import com.fusionx.androidirclibrary.event.Event;
 import com.fusionx.androidirclibrary.util.IRCUtils;
@@ -35,13 +35,13 @@ class NameParser {
 
     private final UserChannelInterface mUserChannelInterface;
 
+    private final Server mServer;
+
     private Channel mChannel;
 
-    private final String mServerTitle;
-
-    NameParser(UserChannelInterface userChannelInterface, final String serverTitle) {
+    NameParser(UserChannelInterface userChannelInterface, final Server server) {
         mUserChannelInterface = userChannelInterface;
-        mServerTitle = serverTitle;
+        mServer = server;
     }
 
     Event parseNameReply(final ArrayList<String> parsedArray) {
@@ -59,8 +59,8 @@ class NameParser {
 
     Event parseNameFinished() {
         mChannel.getUsers().addMarked();
-        final MessageSender sender = MessageSender.getSender(mServerTitle);
-        final Event event = sender.sendGenericChannelEvent(mChannel, "", true);
+        final Event event = mServer.getServerSenderBus().sendGenericChannelEvent(mChannel,
+                "", true);
         mChannel = null;
         return event;
     }
@@ -68,10 +68,10 @@ class NameParser {
     ChannelUser getNickFromNameReply(final String rawNameNick) {
         final char firstChar = rawNameNick.charAt(0);
         final UserLevelEnum mode = UserLevelEnum.getLevelFromPrefix(firstChar);
-        mChannel.onIncrementUserType(mode);
         final ChannelUser user = mUserChannelInterface.getUser(mode == UserLevelEnum.NONE ?
                 rawNameNick : rawNameNick.substring(1));
         user.putMode(mChannel, mode);
+        mChannel.onIncrementUserType(mode);
         return user;
     }
 }

@@ -6,5 +6,6 @@ public class DisconnectEvent extends ServerEvent {
 
     public DisconnectEvent(String message, final boolean retryPending) {
         super(message);
+        this.retryPending = retryPending;
     }
 }

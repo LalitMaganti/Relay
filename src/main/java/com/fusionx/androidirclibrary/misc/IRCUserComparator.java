@@ -51,25 +51,15 @@ public class IRCUserComparator implements Comparator<ChannelUser> {
             return 1;
         }
 
-        if (firstUserMode.equals(secondUserMode) /*&&
-                MiscUtils.isUserOwnerOrVoice(firstUserMode)*/) {
+        if (firstUserMode.equals(secondUserMode)) {
             final String firstRemoved = user1.getNick();
             final String secondRemoved = user2.getNick();
 
             return firstRemoved.compareToIgnoreCase(secondRemoved);
-        } else if (firstUserMode.equals(UserLevelEnum.OP)) {
+        } else if (firstUserMode.ordinal() > secondUserMode.ordinal()) {
             return -1;
-        } else if (secondUserMode.equals(UserLevelEnum.OP)) {
-            return 1;
-        } else if (firstUserMode.equals(UserLevelEnum.VOICE)) {
-            return -1;
-        } else if (secondUserMode.equals(UserLevelEnum.VOICE)) {
-            return 1;
         } else {
-            final String firstRemoved = user1.getNick();
-            final String secondRemoved = user2.getNick();
-
-            return firstRemoved.compareToIgnoreCase(secondRemoved);
+            return 1;
         }
     }
 }

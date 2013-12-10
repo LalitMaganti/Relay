@@ -26,6 +26,7 @@ import com.fusionx.androidirclibrary.ServerConfiguration;
 import com.fusionx.androidirclibrary.misc.InterfaceHolders;
 
 import android.os.Handler;
+import android.os.Looper;
 
 public class ServerConnection extends Thread {
 
@@ -33,12 +34,30 @@ public class ServerConnection extends Thread {
 
     private final BaseConnection mConnection;
 
-    private final Handler mHandler;
+    private final Handler mUiThreadHandler;
+
+    private Handler mServerHandler;
 
     ServerConnection(final ServerConfiguration configuration, final Handler handler) {
+        final Thread thread = new Thread() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                mServerHandler = new Handler();
+                Looper.loop();
+            }
+
+            @Override
+            public void interrupt() {
+                super.interrupt();
+
+                Looper.myLooper().quitSafely();
+            }
+        };
+        thread.start();
         mServer = new Server(configuration.getTitle(), this);
         mConnection = new BaseConnection(configuration, mServer);
-        mHandler = handler;
+        mUiThreadHandler = handler;
     }
 
     @Override
@@ -46,7 +65,7 @@ public class ServerConnection extends Thread {
         try {
             mConnection.connectToServer();
         } catch (final Exception ex) {
-            mHandler.post(new Runnable() {
+            mUiThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     throw new RuntimeException(ex);
@@ -55,15 +74,23 @@ public class ServerConnection extends Thread {
         }
     }
 
-    public void disconnectFromServer() {
-        final String status = mServer.getStatus();
+    public void onDisconnect() {
+        mServerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                final String status = mServer.getStatus();
+                if (status.equals(InterfaceHolders.getEventResponses().getConnectedStatus())) {
+                    mConnection.onDisconnect();
+                } else if (isAlive()) {
+                    interrupt();
+                    mConnection.closeSocket();
+                }
+            }
+        });
+    }
 
-        if (status.equals(InterfaceHolders.getEventResponses().getConnectedStatus())) {
-            mConnection.onDisconnect();
-        } else if (isAlive()) {
-            interrupt();
-            mConnection.closeSocket();
-        }
+    public Handler getServerHandler() {
+        return mServerHandler;
     }
 
     public Server getServer() {

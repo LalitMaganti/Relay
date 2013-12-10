@@ -2,7 +2,7 @@ package com.fusionx.androidirclibrary.parser;
 
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.ServerConfiguration;
-import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.communication.ServerSenderBus;
 import com.fusionx.androidirclibrary.constants.ServerReplyCodes;
 import com.fusionx.androidirclibrary.util.IRCUtils;
 import com.fusionx.androidirclibrary.writers.ServerWriter;
@@ -12,8 +12,8 @@ import java.util.ArrayList;
 class CapParser {
 
     static void parseCommand(final ArrayList<String> parsedArray, final ServerConfiguration
-            configuration, final Server server, final MessageSender sender) {
-        final ServerWriter writer = server.getWriter();
+            configuration, final Server server, final ServerSenderBus sender,
+            final ServerWriter writer) {
         final String command = parsedArray.get(0);
         if (command.equals("AUTHENTICATE")) {
             writer.sendSaslAuthentication(configuration.getSaslUsername(),
@@ -35,7 +35,7 @@ class CapParser {
     }
 
     static void parseCode(final int code, final ArrayList<String> parsedArray,
-            final MessageSender sender, final Server server) {
+            final ServerSenderBus sender, final Server server, final ServerWriter writer) {
         switch (code) {
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String successful = parsedArray.get(3);
@@ -53,7 +53,6 @@ class CapParser {
             default:
                 return;
         }
-        final ServerWriter writer = server.getWriter();
         writer.sendEndCap();
     }
 }

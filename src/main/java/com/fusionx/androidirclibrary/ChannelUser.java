@@ -2,6 +2,7 @@ package com.fusionx.androidirclibrary;
 
 import com.fusionx.androidirclibrary.collection.UpdateableTreeSet;
 import com.fusionx.androidirclibrary.constants.UserLevelEnum;
+import com.fusionx.androidirclibrary.misc.InterfaceHolders;
 import com.fusionx.androidirclibrary.util.ColourParserUtils;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -27,7 +28,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         mChannelSpannedMap = new HashMap<Channel, Spanned>();
         mServer = userChannelInterface.getServer();
 
-        // Checkable interface impl
+        // Checkable interface
         mChecked = false;
     }
 
@@ -118,9 +119,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                         channel.getUsers().update(this, new ImmutablePair<Channel,
                                 UserLevelEnum>(channel, levelEnum));
                     } else {
-                        channel.getUsers()
-                                .update(this, new ImmutablePair<Channel, UserLevelEnum>(channel,
-                                        UserLevelEnum.NONE));
+                        channel.getUsers().update(this, new ImmutablePair<Channel,
+                                UserLevelEnum>(channel, UserLevelEnum.NONE));
                     }
                     break;
             }
@@ -136,13 +136,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
             formattedSenderNick = sendingUser.getPrettyNick(channel);
         }
 
-        return "";//String.format(context.getString(R.string.parser_mode_changed), mode,
-        //getColorfulNick(), formattedSenderNick);
-    }
-
-    @Override
-    public void update() {
-        throw new RuntimeException();
+        return InterfaceHolders.getEventResponses().getModeChangedMessage(mode,
+                getColorfulNick(), formattedSenderNick);
     }
 
     @Override

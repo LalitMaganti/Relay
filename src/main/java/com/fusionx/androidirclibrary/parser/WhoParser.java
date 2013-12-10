@@ -23,8 +23,8 @@ package com.fusionx.androidirclibrary.parser;
 
 import com.fusionx.androidirclibrary.Channel;
 import com.fusionx.androidirclibrary.ChannelUser;
+import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.UserChannelInterface;
-import com.fusionx.androidirclibrary.communication.MessageSender;
 import com.fusionx.androidirclibrary.event.Event;
 
 import java.util.ArrayList;
@@ -35,11 +35,11 @@ class WhoParser {
 
     private Channel mWhoChannel;
 
-    private final String mServerTitle;
+    private final Server mServer;
 
-    WhoParser(UserChannelInterface userChannelInterface, final String serverTitle) {
+    WhoParser(UserChannelInterface userChannelInterface, final Server server) {
         mUserChannelInterface = userChannelInterface;
-        mServerTitle = serverTitle;
+        mServer = server;
     }
 
     Event parseWhoReply(final ArrayList<String> parsedArray) {
@@ -53,8 +53,8 @@ class WhoParser {
 
     Event parseWhoFinished() {
         if (mWhoChannel != null && mWhoChannel.getUsers() != null) {
-            final MessageSender sender = MessageSender.getSender(mServerTitle);
-            final Event event = sender.sendGenericChannelEvent(mWhoChannel, "", true);
+            final Event event = mServer.getServerSenderBus().sendGenericChannelEvent
+                    (mWhoChannel, "", true);
             mWhoChannel = null;
             return event;
         } else {

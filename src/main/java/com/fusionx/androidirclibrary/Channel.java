@@ -21,11 +21,14 @@
 
 package com.fusionx.androidirclibrary;
 
+import com.google.common.collect.ImmutableList;
+
 import com.fusionx.androidirclibrary.collection.UserListTreeSet;
 import com.fusionx.androidirclibrary.constants.UserLevelEnum;
 import com.fusionx.androidirclibrary.event.ChannelEvent;
 import com.fusionx.androidirclibrary.misc.InterfaceHolders;
-import com.fusionx.androidirclibrary.writers.ChannelWriter;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -33,12 +36,14 @@ import java.util.List;
 
 public class Channel {
 
+    // Static stuff
+    private final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',
+            '+', '!');
+
     /**
      * Name of the channel
      */
     private final String mName;
-
-    private final ChannelWriter mWriter;
 
     private final UserChannelInterface mUserChannelInterface;
 
@@ -56,7 +61,6 @@ public class Channel {
     Channel(final String channelName, final UserChannelInterface
             userChannelInterface) {
         mName = channelName;
-        mWriter = new ChannelWriter(userChannelInterface.getOutputStream(), this);
         mUserChannelInterface = userChannelInterface;
         mBuffer = new ArrayList<Message>();
         mNumberOfUsers = new EnumMap<UserLevelEnum, Integer>(UserLevelEnum.class);
@@ -70,6 +74,15 @@ public class Channel {
         mBuffer.add(new Message(message));
     }
 
+    public static boolean isChannelPrefix(char firstCharacter) {
+        return channelPrefixes.contains(firstCharacter);
+    }
+
+    /**
+     * Returns a list of all the users currently in the channel
+     *
+     * @return - list of users currently in the channel
+     */
     public UserListTreeSet getUsers() {
         return mUserChannelInterface.getAllUsersInChannel(this);
     }
@@ -80,10 +93,10 @@ public class Channel {
     }
 
     public void onChannelEvent(final ChannelEvent event) {
-        //if ((!event.userListChanged || !AppPreferences.hideUserMessages) && StringUtils
-        //        .isNotEmpty(event.message)) {
-        mBuffer.add(new Message(event.message));
-        //}
+        if ((!event.userListChanged || InterfaceHolders.getPreferences()
+                .shouldLogUserListChanges()) && StringUtils.isNotEmpty(event.message)) {
+            mBuffer.add(new Message(event.message));
+        }
     }
 
     public int getNumberOfUsers() {
@@ -126,13 +139,14 @@ public class Channel {
         }
     }
 
-    // Getters and setters
-    public String getName() {
+    @Override
+    public String toString() {
         return mName;
     }
 
-    public ChannelWriter getWriter() {
-        return mWriter;
+    // Getters and setters
+    public String getName() {
+        return mName;
     }
 
     public List<Message> getBuffer() {

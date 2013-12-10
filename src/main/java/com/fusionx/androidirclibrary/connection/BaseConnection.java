@@ -24,7 +24,10 @@ package com.fusionx.androidirclibrary.connection;
 import com.fusionx.androidirclibrary.AppUser;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.ServerConfiguration;
-import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.communication.ServerSenderBus;
+import com.fusionx.androidirclibrary.event.JoinEvent;
+import com.fusionx.androidirclibrary.event.NickChangeEvent;
+import com.fusionx.androidirclibrary.event.QuitEvent;
 import com.fusionx.androidirclibrary.misc.InterfaceHolders;
 import com.fusionx.androidirclibrary.parser.ServerConnectionParser;
 import com.fusionx.androidirclibrary.parser.ServerLineParser;
@@ -48,7 +51,7 @@ import javax.net.ssl.SSLSocketFactory;
  *
  * @author Lalit Maganti
  */
-public class BaseConnection {
+class BaseConnection {
 
     private final Server server;
 
@@ -78,12 +81,11 @@ public class BaseConnection {
     void connectToServer() {
         reconnectAttempts = 0;
 
-        final MessageSender sender = MessageSender.getSender(server.getTitle());
         connect();
 
         while (isReconnectNeeded()) {
-            sender.sendGenericServerEvent(server, "Trying to reconnect to the server in 5 " +
-                    "seconds.");
+            server.getServerSenderBus().sendGenericServerEvent(server,
+                    "Trying to reconnect to the server in 5 seconds.");
             try {
                 Thread.sleep(5000);
             } catch (final InterruptedException e) {
@@ -95,38 +97,42 @@ public class BaseConnection {
             ++reconnectAttempts;
         }
 
-        sender.sendDisconnect(server, "Disconnected from the server", false);
+        server.getServerSenderBus().sendDisconnect(server, "Disconnected from the server",
+                false);
     }
 
     /**
      * Called by the connectToServer method ONLY
      */
     private void connect() {
-        final MessageSender sender = MessageSender.getSender(server.getTitle());
+        final ServerSenderBus sender = server.getServerSenderBus();
         try {
             setupSocket();
-            setupServer();
+            final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());
+            final ServerWriter serverWriter = server.onOutputStreamCreated(writer);
+
+            server.setStatus(InterfaceHolders.getEventResponses().getConnectingStatus());
 
             if (serverConfiguration.isSaslAvailable()) {
                 // By sending this line, the server *should* wait until we end the CAP stuff with CAP
                 // END
-                server.getWriter().getSupportedCapabilities();
+                serverWriter.getSupportedCapabilities();
             }
 
             if (StringUtils.isNotEmpty(serverConfiguration.getServerPassword())) {
-                server.getWriter().sendServerPassword(serverConfiguration.getServerPassword());
+                serverWriter.sendServerPassword(serverConfiguration.getServerPassword());
             }
 
-            server.getWriter().changeNick(serverConfiguration.getNickStorage().getFirstChoiceNick
-                    ());
-            server.getWriter().sendUser(serverConfiguration.getServerUserName(), "8", "*",
+            serverWriter.changeNick(new NickChangeEvent("", serverConfiguration.getNickStorage()
+                    .getFirstChoiceNick()));
+            serverWriter.sendUser(serverConfiguration.getServerUserName(),
                     StringUtils.isNotEmpty(serverConfiguration.getRealName()) ?
                             serverConfiguration.getRealName() : "HoloIRC");
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
                     .getInputStream()));
             final String nick = ServerConnectionParser.parseConnect(server, serverConfiguration,
-                    reader);
+                    reader, serverWriter);
 
             onConnected(sender);
 
@@ -141,19 +147,19 @@ public class BaseConnection {
 
                 // Identifies with NickServ if the password exists
                 if (StringUtils.isNotEmpty(serverConfiguration.getNickservPassword())) {
-                    server.getWriter().sendNickServPassword(serverConfiguration
+                    serverWriter.sendNickServPassword(serverConfiguration
                             .getNickservPassword());
                 }
 
                 // Automatically join the channels specified in the configuration
                 for (String channelName : serverConfiguration.getAutoJoinChannels()) {
-                    server.getWriter().joinChannel(channelName);
+                    server.getServerReceiverBus().post(new JoinEvent(channelName));
                 }
 
                 // Initialise the parser used to parse any lines from the server
                 final ServerLineParser parser = new ServerLineParser(server, this);
                 // Loops forever until broken
-                parser.parseMain(reader);
+                parser.parseMain(reader, serverWriter);
 
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used
@@ -172,7 +178,7 @@ public class BaseConnection {
         if (!mUserDisconnected) {
             // We are disconnected :( - close up shop
             server.setStatus(InterfaceHolders.getEventResponses().getDisconnectedStatus());
-            server.cleanup();
+            server.onCleanup();
             closeSocket();
         }
     }
@@ -182,31 +188,20 @@ public class BaseConnection {
      */
     private void setupSocket() throws IOException {
         final SSLSocketFactory sslSocketFactory = SSLUtils.getCorrectSSLSocketFactory
-                (serverConfiguration.isSslAcceptAllCertificates());
+                (serverConfiguration.shouldAcceptAllSSLCertificates());
 
         final InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),
                 serverConfiguration.getPort());
 
-        mSocket = serverConfiguration.isSsl() ? sslSocketFactory.createSocket() : new Socket();
+        mSocket = serverConfiguration.isSslEnabled() ? sslSocketFactory.createSocket() : new Socket();
         mSocket.setKeepAlive(true);
         mSocket.connect(address, 5000);
     }
 
     /**
-     * Called to setup the server
-     */
-    private void setupServer() throws IOException {
-        final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());
-        server.setWriter(new ServerWriter(writer));
-
-        server.setStatus(InterfaceHolders.getEventResponses().getConnectingStatus());
-        server.setupUserChannelInterface(writer);
-    }
-
-    /**
      * Called when we are connected to the server
      */
-    private void onConnected(final MessageSender sender) {
+    private void onConnected(final ServerSenderBus sender) {
         // We are connected
         server.setStatus(InterfaceHolders.getEventResponses().getConnectedStatus());
         sender.sendConnected(server, serverConfiguration.getUrl());
@@ -218,7 +213,8 @@ public class BaseConnection {
     public void onDisconnect() {
         mUserDisconnected = true;
         server.setStatus(InterfaceHolders.getEventResponses().getDisconnectedStatus());
-        server.getWriter().quitServer(InterfaceHolders.getPreferences().getQuitReason());
+        server.getServerSenderBus().post(new QuitEvent(InterfaceHolders.getPreferences()
+                .getQuitReason()));
     }
 
     /**

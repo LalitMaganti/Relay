@@ -23,9 +23,11 @@ package com.fusionx.androidirclibrary.parser;
 
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.ServerConfiguration;
-import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.communication.ServerSenderBus;
 import com.fusionx.androidirclibrary.constants.ServerCommands;
+import com.fusionx.androidirclibrary.event.NickChangeEvent;
 import com.fusionx.androidirclibrary.misc.CoreListener;
+import com.fusionx.androidirclibrary.misc.NickStorage;
 import com.fusionx.androidirclibrary.util.IRCUtils;
 import com.fusionx.androidirclibrary.writers.ServerWriter;
 
@@ -49,36 +51,37 @@ public class ServerConnectionParser {
     private static int suffix = 0;
 
     public static String parseConnect(final Server server, final ServerConfiguration
-            configuration, final BufferedReader reader) throws IOException {
+            configuration, final BufferedReader reader, final ServerWriter writer)
+            throws IOException {
 
         String line;
         suffix = 0;
         triedSecondNick = false;
         triedThirdNick = false;
-        final MessageSender sender = MessageSender.getSender(server.getTitle());
+        final ServerSenderBus sender = server.getServerSenderBus();
 
         while ((line = reader.readLine()) != null) {
             final ArrayList<String> parsedArray = IRCUtils.splitRawLine(line, true);
             String s = parsedArray.get(0);
             if (s.equals(ServerCommands.Ping)) {// Immediately return
                 final String source = parsedArray.get(1);
-                CoreListener.respondToPing(server.getWriter(), source);
+                CoreListener.respondToPing(writer, source);
             } else if (s.equals(ServerCommands.Error)) {// We are finished - the server has
                 // kicked us out for some reason
                 return null;
             } else if (s.equals(ServerCommands.Authenticate)) {
-                CapParser.parseCommand(parsedArray, configuration, server, sender);
+                CapParser.parseCommand(parsedArray, configuration, server, sender, writer);
             } else {
                 if (StringUtils.isNumeric(parsedArray.get(1))) {
                     final String nick = parseConnectionCode(configuration.isNickChangable(),
                             parsedArray, sender, server,
-                            configuration.getNickStorage(), line);
+                            configuration.getNickStorage(), writer);
                     if (nick != null) {
                         return nick;
                     }
                 } else {
                     parseConnectionCommand(parsedArray, configuration, sender,
-                            server, line);
+                            server, writer);
                 }
             }
         }
@@ -86,13 +89,10 @@ public class ServerConnectionParser {
     }
 
     private static String parseConnectionCode(final boolean canChangeNick,
-            final ArrayList<String> parsedArray,
-            final MessageSender sender,
-            final Server server,
-            final ServerConfiguration.NickStorage nickStorage,
-            final String rawLine) {
+            final ArrayList<String> parsedArray, final ServerSenderBus sender,
+            final Server server, final NickStorage nickStorage,
+            final ServerWriter writer) {
         final int code = Integer.parseInt(parsedArray.get(1));
-        final ServerWriter writer = server.getWriter();
         switch (code) {
             case RPL_WELCOME:
                 // We are now logged in.
@@ -101,29 +101,31 @@ public class ServerConnectionParser {
                 return nick;
             case ERR_NICKNAMEINUSE:
                 if (!triedSecondNick && StringUtils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
-                    writer.changeNick(nickStorage.getSecondChoiceNick());
+                    server.getServerReceiverBus().post(new NickChangeEvent("", nickStorage
+                            .getSecondChoiceNick()));
                     triedSecondNick = true;
                 } else if (!triedThirdNick && StringUtils.isNotEmpty(nickStorage
                         .getThirdChoiceNick())) {
-                    writer.changeNick(nickStorage.getThirdChoiceNick());
+                    server.getServerReceiverBus().post(new NickChangeEvent("",
+                            nickStorage.getThirdChoiceNick()));
                     triedThirdNick = true;
                 } else {
                     if (canChangeNick) {
                         ++suffix;
-                        writer.changeNick(nickStorage.getFirstChoiceNick() + suffix);
+                        server.getServerReceiverBus().post(new NickChangeEvent("",
+                                nickStorage.getFirstChoiceNick() + suffix));
                     } else {
                         sender.sendNickInUseMessage(server);
                     }
                 }
                 break;
             case ERR_NONICKNAMEGIVEN:
-                writer.changeNick(nickStorage.getFirstChoiceNick());
+                server.getServerReceiverBus().post(new NickChangeEvent("",
+                        nickStorage.getFirstChoiceNick()));
                 break;
             default:
                 if (saslCodes.contains(code)) {
-                    CapParser.parseCode(code, parsedArray, sender, server);
-                    //} else if (DEBUG) {
-                    //    Log.v(LOG_TAG, rawLine);
+                    CapParser.parseCode(code, parsedArray, sender, server, writer);
                 }
                 break;
         }
@@ -131,18 +133,15 @@ public class ServerConnectionParser {
     }
 
     private static void parseConnectionCommand(final ArrayList<String> parsedArray,
-            final ServerConfiguration configuration,
-            final MessageSender sender, final Server server,
-            final String rawLine) {
-        String s = parsedArray.get(1).toUpperCase();
+            final ServerConfiguration configuration, final ServerSenderBus sender,
+            final Server server, final ServerWriter writer) {
+        final String s = parsedArray.get(1).toUpperCase();
         if (s.equals(ServerCommands.Notice)) {
             IRCUtils.removeFirstElementFromList(parsedArray, 3);
             sender.sendGenericServerEvent(server, parsedArray.get(0));
         } else if (s.equals(ServerCommands.Cap)) {
             IRCUtils.removeFirstElementFromList(parsedArray, 3);
-            CapParser.parseCommand(parsedArray, configuration, server, sender);
-            //} else  (DEBUG) {
-            //        Log.v(LOG_TAG, rawLine);
+            CapParser.parseCommand(parsedArray, configuration, server, sender, writer);
         }
     }
 

@@ -1,10 +1,8 @@
 package com.fusionx.androidirclibrary.event;
 
-public class PrivateMessageEvent extends Event {
+public class PrivateMessageEvent extends PrivateEvent {
 
-    public final String nick;
-
-    public PrivateMessageEvent(String nick) {
-        this.nick = nick;
+    public PrivateMessageEvent(String nick, final String message, final boolean newPrivateMessage) {
+        super(nick, message, newPrivateMessage);
     }
 }

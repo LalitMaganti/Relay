@@ -21,14 +21,17 @@
 
 package com.fusionx.androidirclibrary;
 
-import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.communication.ServerReceiverBus;
+import com.fusionx.androidirclibrary.communication.ServerSenderBus;
 import com.fusionx.androidirclibrary.connection.ServerConnection;
 import com.fusionx.androidirclibrary.event.Event;
 import com.fusionx.androidirclibrary.event.ServerEvent;
 import com.fusionx.androidirclibrary.misc.InterfaceHolders;
 import com.fusionx.androidirclibrary.misc.ServerCache;
 import com.fusionx.androidirclibrary.util.IRCUtils;
+import com.fusionx.androidirclibrary.writers.ChannelWriter;
 import com.fusionx.androidirclibrary.writers.ServerWriter;
+import com.fusionx.androidirclibrary.writers.UserWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,11 +44,7 @@ public class Server {
 
     private final String mTitle;
 
-    private final ServerConnection mWrapper;
-
-    private ServerWriter mWriter;
-
-    private UserChannelInterface mUserChannelInterface;
+    private final UserChannelInterface mUserChannelInterface;
 
     private AppUser mUser;
 
@@ -53,16 +52,20 @@ public class Server {
 
     private String mStatus;
 
-    private boolean mCached;
-
     private final ServerCache mServerCache;
 
-    public Server(final String serverTitle, final ServerConnection wrapper) {
+    private final ServerSenderBus mServerSenderBus;
+
+    private final ServerReceiverBus mServerReceiverBus;
+
+    public Server(final String serverTitle, final ServerConnection connection) {
         mTitle = serverTitle;
-        mWrapper = wrapper;
         mBuffer = new ArrayList<Message>();
         mStatus = "Disconnected";
         mServerCache = new ServerCache();
+        mServerSenderBus = new ServerSenderBus();
+        mServerReceiverBus = new ServerReceiverBus(connection);
+        mUserChannelInterface = new UserChannelInterface(this);
     }
 
     public void onServerEvent(final ServerEvent event) {
@@ -75,43 +78,31 @@ public class Server {
 
     public Event onPrivateMessage(final PrivateMessageUser userWhoIsNotUs,
             final String message, final boolean weAreSending) {
-        final MessageSender sender = MessageSender.getSender(mTitle);
         final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
-        if (!mUser.isPrivateMessageOpen(userWhoIsNotUs)) {
+        final boolean doesPrivateMessageExist = mUser.isPrivateMessageOpen(userWhoIsNotUs);
+        if (!doesPrivateMessageExist) {
             mUser.createPrivateMessage(userWhoIsNotUs);
-
-            if (StringUtils.isNotEmpty(message)) {
-                sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
-            }
-
-            return sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
+        }
+        if (!weAreSending || InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
+            return mServerSenderBus.sendPrivateMessage(userWhoIsNotUs, sendingUser, message,
+                    !doesPrivateMessageExist);
         } else {
-            if (StringUtils.isNotEmpty(message)) {
-                return sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
-            } else {
-                return new Event(userWhoIsNotUs.getNick());
-            }
+            return new Event("");
         }
     }
 
     public Event onPrivateAction(final PrivateMessageUser userWhoIsNotUs, final String action,
             final boolean weAreSending) {
-        final MessageSender sender = MessageSender.getSender(mTitle);
         final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
-        if (!mUser.isPrivateMessageOpen(userWhoIsNotUs)) {
+        final boolean doesPrivateMessageExist = mUser.isPrivateMessageOpen(userWhoIsNotUs);
+        if (!doesPrivateMessageExist) {
             mUser.createPrivateMessage(userWhoIsNotUs);
-
-            if (StringUtils.isNotEmpty(action)) {
-                sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
-            }
-
-            return sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
+        }
+        if (!weAreSending || InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
+            return mServerSenderBus.sendPrivateAction(userWhoIsNotUs, sendingUser, action,
+                    !doesPrivateMessageExist);
         } else {
-            if (StringUtils.isNotEmpty(action)) {
-                return sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
-            } else {
-                return new Event(userWhoIsNotUs.getNick());
-            }
+            return new Event("");
         }
     }
 
@@ -128,16 +119,10 @@ public class Server {
 
     public boolean isConnected() {
         return mStatus.equals(InterfaceHolders.getEventResponses().getConnectedStatus());
-        //context.getString(R.string.status_connected));
     }
 
-    public void disconnectFromServer() {
-        mWrapper.disconnectFromServer();
-    }
-
-    public void cleanup() {
-        mWriter = null;
-        mUserChannelInterface = null;
+    public void onCleanup() {
+        mUserChannelInterface.onCleanup();
         mUser = null;
     }
 
@@ -146,21 +131,23 @@ public class Server {
         return (o instanceof Server) && ((Server) o).getTitle().equals(mTitle);
     }
 
-    public void setupUserChannelInterface(final OutputStreamWriter streamWriter) {
-        mUserChannelInterface = new UserChannelInterface(streamWriter, this);
+    /**
+     * Sets up the writers based on the output stream passed into the method
+     *
+     * @param writer - the which the writers will use
+     * @return  - the server writer created from the OutputStreamWriter
+     */
+    public ServerWriter onOutputStreamCreated(final OutputStreamWriter writer) {
+        final ServerWriter serverWriter = new ServerWriter(writer);
+        mServerReceiverBus.register(serverWriter);
+        mServerReceiverBus.register(new ChannelWriter(writer));
+        mServerReceiverBus.register(new UserWriter(writer));
+        return serverWriter;
     }
 
     // Getters and Setters
     public List<Message> getBuffer() {
         return mBuffer;
-    }
-
-    public ServerWriter getWriter() {
-        return mWriter;
-    }
-
-    public void setWriter(final ServerWriter writer) {
-        mWriter = writer;
     }
 
     public UserChannelInterface getUserChannelInterface() {
@@ -175,7 +162,7 @@ public class Server {
         mUser = user;
     }
 
-    public String getTitle() {
+    String getTitle() {
         return mTitle;
     }
 
@@ -187,15 +174,15 @@ public class Server {
         mStatus = status;
     }
 
-    public boolean isCached() {
-        return mCached;
-    }
-
-    public void setCached(final boolean cached) {
-        mCached = cached;
-    }
-
     public ServerCache getServerCache() {
         return mServerCache;
+    }
+
+    public ServerReceiverBus getServerReceiverBus() {
+        return mServerReceiverBus;
+    }
+
+    public ServerSenderBus getServerSenderBus() {
+        return mServerSenderBus;
     }
 }

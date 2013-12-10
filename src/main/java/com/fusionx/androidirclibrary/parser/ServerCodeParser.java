@@ -24,7 +24,7 @@ package com.fusionx.androidirclibrary.parser;
 import com.fusionx.androidirclibrary.Channel;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.UserChannelInterface;
-import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.communication.ServerSenderBus;
 import com.fusionx.androidirclibrary.event.ChannelEvent;
 import com.fusionx.androidirclibrary.event.Event;
 import com.fusionx.androidirclibrary.misc.InterfaceHolders;
@@ -56,14 +56,14 @@ class ServerCodeParser {
 
     private final Server mServer;
 
-    private final MessageSender mSender;
+    private final ServerSenderBus mServerSenderBus;
 
     ServerCodeParser(final ServerLineParser parser) {
         mServer = parser.getServer();
         mUserChannelInterface = mServer.getUserChannelInterface();
-        mWhoParser = new WhoParser(mUserChannelInterface, mServer.getTitle());
-        mNameParser = new NameParser(mUserChannelInterface, mServer.getTitle());
-        mSender = MessageSender.getSender(mServer.getTitle());
+        mWhoParser = new WhoParser(mUserChannelInterface, mServer);
+        mNameParser = new NameParser(mUserChannelInterface, mServer);
+        mServerSenderBus = mServer.getServerSenderBus();
     }
 
     /**
@@ -87,13 +87,13 @@ class ServerCodeParser {
             case RPL_MOTD:
                 final String motdline = message.substring(1).trim();
                 //if (AppPreferences.motdAllowed) {
-                return mSender.sendGenericServerEvent(mServer, motdline);
+                return mServerSenderBus.sendGenericServerEvent(mServer, motdline);
             //} else {
             //    return new Event(motdline);
             //}
             case RPL_ENDOFMOTD:
                 //if (AppPreferences.motdAllowed) {
-                return mSender.sendGenericServerEvent(mServer, message);
+                return mServerSenderBus.sendGenericServerEvent(mServer, message);
             //} else {
             //    return new Event(message);
             //}
@@ -106,9 +106,9 @@ class ServerCodeParser {
             case RPL_ENDOFWHO:
                 return mWhoParser.parseWhoFinished();
             case ERR_NICKNAMEINUSE:
-                return mSender.sendNickInUseMessage(mServer);
+                return mServerSenderBus.sendNickInUseMessage(mServer);
             default:
-                return parseFallThroughCode(code, message, rawLine, parsedArray);
+                return parseFallThroughCode(code, message, parsedArray);
         }
     }
 
@@ -129,21 +129,19 @@ class ServerCodeParser {
         final String eventMessage = InterfaceHolders.getEventResponses().getInitialTopicMessage
                 (channel.getTopic(), nick);
 
-        return mSender.sendGenericChannelEvent(channel, eventMessage, false);
+        return mServerSenderBus.sendGenericChannelEvent(channel, eventMessage, false);
     }
 
-    private Event parseFallThroughCode(final int code, final String message, final String rawLine,
+    private Event parseFallThroughCode(final int code, final String message,
             final ArrayList<String> parsedArray) {
         if (genericCodes.contains(code)) {
-            return mSender.sendGenericServerEvent(mServer, message);
+            return mServerSenderBus.sendGenericServerEvent(mServer, message);
         } else if (whoisCodes.contains(code)) {
-            return mSender.sendSwitchToServerEvent(mServer, IRCUtils.convertArrayListToString
-                    (parsedArray));
+            return mServerSenderBus
+                    .sendSwitchToServerEvent(mServer, IRCUtils.convertArrayListToString
+                            (parsedArray));
         } else if (doNothingCodes.contains(code)) {
             return new Event(message);
-            //} else if (DEBUG) {
-            // Not sure what to do here - TODO
-            //    Log.v(LOG_TAG, rawLine);
         }
         return new Event(message);
     }

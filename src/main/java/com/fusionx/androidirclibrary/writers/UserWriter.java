@@ -21,24 +21,24 @@
 
 package com.fusionx.androidirclibrary.writers;
 
-import com.fusionx.androidirclibrary.PrivateMessageUser;
+import com.fusionx.androidirclibrary.event.PrivateActionEvent;
+import com.fusionx.androidirclibrary.event.PrivateMessageEvent;
+import com.squareup.otto.Subscribe;
 
 import java.io.OutputStreamWriter;
 
 public class UserWriter extends RawWriter {
-
-    private final PrivateMessageUser mUser;
-
-    public UserWriter(OutputStreamWriter writer, final PrivateMessageUser user) {
+    public UserWriter(OutputStreamWriter writer) {
         super(writer);
-        mUser = user;
     }
 
-    public void sendMessage(String message) {
-        writeLineToServer(String.format(WriterCommands.PRIVMSG, mUser.getNick(), message));
+    @Subscribe
+    public void sendMessage(final PrivateMessageEvent event) {
+        writeLineToServer(String.format(WriterCommands.PRIVMSG, event.userNick, event.message));
     }
 
-    public void sendAction(String action) {
-        writeLineToServer(String.format(WriterCommands.Action, mUser.getNick(), action));
+    @Subscribe
+    public void sendAction(final PrivateActionEvent event) {
+        writeLineToServer(String.format(WriterCommands.Action, event.userNick, event.message));
     }
 }

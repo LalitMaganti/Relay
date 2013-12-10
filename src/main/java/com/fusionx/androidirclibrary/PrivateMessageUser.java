@@ -1,8 +1,7 @@
 package com.fusionx.androidirclibrary;
 
-import com.fusionx.androidirclibrary.event.UserEvent;
+import com.fusionx.androidirclibrary.event.PrivateEvent;
 import com.fusionx.androidirclibrary.util.IRCUtils;
-import com.fusionx.androidirclibrary.writers.UserWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,11 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class PrivateMessageUser extends User {
-
-    /**
-     * This is the object that allows sending of messages directly to the server
-     */
-    private final UserWriter mWriter;
 
     /**
      * Contains a copy of the messages when the conversation is not displayed to the user
@@ -27,15 +21,8 @@ public final class PrivateMessageUser extends User {
      */
     private boolean mCached;
 
-    /**
-     * Constructor
-     *
-     * @param nick                 - the nickname of the user we're having the conversation with
-     * @param userChannelInterface - a copy of the user channel interface
-     */
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
-        mWriter = new UserWriter(userChannelInterface.getOutputStream(), this);
     }
 
     @Override
@@ -48,7 +35,7 @@ public final class PrivateMessageUser extends User {
         }
     }
 
-    public void onUserEvent(final UserEvent event) {
+    public void onUserEvent(final PrivateEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
             synchronized (mBuffer) {
                 mBuffer.add(new Message(event.message));
@@ -57,10 +44,6 @@ public final class PrivateMessageUser extends User {
     }
 
     // Getters and Setters
-    public UserWriter getWriter() {
-        return mWriter;
-    }
-
     public List<Message> getBuffer() {
         return mBuffer;
     }

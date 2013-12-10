@@ -29,6 +29,7 @@ import com.fusionx.androidirclibrary.event.Event;
 import com.fusionx.androidirclibrary.event.QuitEvent;
 import com.fusionx.androidirclibrary.misc.CoreListener;
 import com.fusionx.androidirclibrary.util.IRCUtils;
+import com.fusionx.androidirclibrary.writers.ServerWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,10 +59,11 @@ public class ServerLineParser {
      *
      * @param reader - the reader associated with the server stream
      */
-    public void parseMain(final BufferedReader reader) throws IOException {
+    public void parseMain(final BufferedReader reader, final ServerWriter writer)
+            throws IOException {
         String line;
         while ((line = reader.readLine()) != null && !mBaseConnection.isUserDisconnected()) {
-            final Event quit = parseLine(line);
+            final Event quit = parseLine(line, writer);
             if (quit instanceof QuitEvent || quit instanceof ErrorEvent) {
                 return;
             }
@@ -72,14 +74,15 @@ public class ServerLineParser {
      * Parses a line from the server
      *
      * @param rawLine - the raw line from the server
+     * @param writer  -
      * @return - returns a boolean which indicates whether the server has disconnected
      */
-    Event parseLine(final String rawLine) {
+    Event parseLine(final String rawLine, final ServerWriter writer) {
         final ArrayList<String> parsedArray = IRCUtils.splitRawLine(rawLine, true);
         String s = parsedArray.get(0);
         if (s.equals(ServerCommands.Ping)) {// Immediately return
             final String source = parsedArray.get(1);
-            CoreListener.respondToPing(mServer.getWriter(), source);
+            CoreListener.respondToPing(writer, source);
             return new Event(rawLine);
         } else if (s.equals(ServerCommands.Error)) {
             // We are finished - the server has kicked us

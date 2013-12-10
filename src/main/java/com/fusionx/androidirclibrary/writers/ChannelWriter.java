@@ -21,7 +21,10 @@
 
 package com.fusionx.androidirclibrary.writers;
 
-import com.fusionx.androidirclibrary.Channel;
+import com.fusionx.androidirclibrary.event.ActionEvent;
+import com.fusionx.androidirclibrary.event.MessageEvent;
+import com.fusionx.androidirclibrary.event.PartEvent;
+import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,29 +32,25 @@ import java.io.OutputStreamWriter;
 
 public class ChannelWriter extends RawWriter {
 
-    private final Channel mChannel;
-
-    public ChannelWriter(OutputStreamWriter out, Channel channel) {
+    public ChannelWriter(OutputStreamWriter out) {
         super(out);
-        mChannel = channel;
     }
 
-    public void sendMessage(final String message) {
-        writeLineToServer(String.format(WriterCommands.PRIVMSG, mChannel.getName(), message));
+    @Subscribe
+    public void sendMessage(final MessageEvent event) {
+        writeLineToServer(String.format(WriterCommands.PRIVMSG, event.channelName, event.message));
     }
 
-    public void sendAction(final String action) {
-        final String s = String.format(WriterCommands.Action, mChannel.getName(), action);
-        writeLineToServer(s);
+    @Subscribe
+    public void sendAction(final ActionEvent event) {
+        writeLineToServer(String.format(WriterCommands.Action, event.channelName, event.message));
     }
 
-    public void partChannel(final String reason) {
-        writeLineToServer(StringUtils.isEmpty(reason) ?
-                String.format(WriterCommands.Part, mChannel.getName()) :
-                String.format(WriterCommands.PartWithReason, mChannel.getName(), reason).trim());
-    }
-
-    public void sendWho() {
-        writeLineToServer(String.format(WriterCommands.WHO, mChannel.getName()));
+    @Subscribe
+    public void partChannel(final PartEvent event) {
+        writeLineToServer(StringUtils.isEmpty(event.channelName) ?
+                String.format(WriterCommands.Part, event.channelName) :
+                String.format(WriterCommands.PartWithReason, event.channelName, event.reason)
+                        .trim());
     }
 }

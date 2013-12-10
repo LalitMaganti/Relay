@@ -1,26 +1,6 @@
-/*
-    HoloIRC - an IRC client for Android
-
-    Copyright 2013 Lalit Maganti
-
-    This file is part of HoloIRC.
-
-    HoloIRC is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HoloIRC is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.fusionx.androidirclibrary.communication;
 
+import com.fusionx.androidirclibrary.AppUser;
 import com.fusionx.androidirclibrary.Channel;
 import com.fusionx.androidirclibrary.ChannelUser;
 import com.fusionx.androidirclibrary.PrivateMessageUser;
@@ -33,72 +13,48 @@ import com.fusionx.androidirclibrary.event.JoinEvent;
 import com.fusionx.androidirclibrary.event.KickEvent;
 import com.fusionx.androidirclibrary.event.NickInUseEvent;
 import com.fusionx.androidirclibrary.event.PartEvent;
+import com.fusionx.androidirclibrary.event.PrivateActionEvent;
+import com.fusionx.androidirclibrary.event.PrivateEvent;
 import com.fusionx.androidirclibrary.event.PrivateMessageEvent;
 import com.fusionx.androidirclibrary.event.ServerEvent;
 import com.fusionx.androidirclibrary.event.SwitchToServerEvent;
-import com.fusionx.androidirclibrary.event.UserEvent;
 import com.fusionx.androidirclibrary.misc.InterfaceHolders;
 import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
-import java.util.HashMap;
+import android.os.Handler;
+import android.os.Looper;
 
-public class MessageSender {
+public class ServerSenderBus extends Bus {
 
-    private static final HashMap<String, MessageSender> mSenderMap = new HashMap<String,
-            MessageSender>();
+    private final Handler mMainThread = new Handler(Looper.getMainLooper());
 
     private boolean mDisplayed;
 
-    private ServerToFrontEndBus mBus;
-
-    private String mServerName;
-
-    private MessageSender() {
+    public ServerSenderBus() {
+        super(ThreadEnforcer.ANY);
     }
 
-    public static MessageSender getSender(final String serverName, final boolean nullable) {
-        synchronized (mSenderMap) {
-            MessageSender sender = mSenderMap.get(serverName);
-            if (sender == null && !nullable) {
-                sender = new MessageSender();
-                sender.mServerName = serverName;
-                sender.mBus = new ServerToFrontEndBus(sender);
-                mSenderMap.put(serverName, sender);
-            }
-            return sender;
+    @Override
+    public void post(final Object event) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            super.post(event);
+        } else {
+            mMainThread.post(new Runnable() {
+                @Override
+                public void run() {
+                    ServerSenderBus.super.post(event);
+                }
+            });
         }
-    }
-
-    public static MessageSender getSender(final String serverName) {
-        return getSender(serverName, false);
-    }
-
-    public static void clear() {
-        synchronized (mSenderMap) {
-            mSenderMap.clear();
-        }
-    }
-
-    public Bus getBus() {
-        return mBus;
-    }
-
-    void removeSender() {
-        synchronized (mSenderMap) {
-            mSenderMap.remove(mServerName);
-        }
-    }
-
-    public void setDisplayed(final boolean toast) {
-        mDisplayed = toast;
     }
 
     /**
      * Start of sending messages
      */
     private void sendServerEvent(final Server server, final ServerEvent event) {
-        if (server.isCached()) {
-            mBus.post(event);
+        if (server.getServerCache().isCached()) {
+            post(event);
         } else {
             server.onServerEvent(event);
         }
@@ -106,22 +62,22 @@ public class MessageSender {
 
     private void sendChannelEvent(final Channel channel, final ChannelEvent event) {
         if (channel.isCached()) {
-            mBus.post(event);
+            post(event);
         } else {
             channel.onChannelEvent(event);
         }
     }
 
-    private void sendUserEvent(final PrivateMessageUser user, final UserEvent event) {
+    private void sendUserEvent(final PrivateMessageUser user, final PrivateEvent event) {
         if (user.isCached()) {
-            mBus.post(event);
+            post(event);
         } else {
             user.onUserEvent(event);
         }
     }
 
     /*
-    End of internal methods
+     * End of internal methods
      */
 
     // Generic events start
@@ -138,63 +94,36 @@ public class MessageSender {
         sendChannelEvent(channel, event);
         return event;
     }
-
-    private UserEvent sendGenericUserEvent(final PrivateMessageUser user, final String message) {
-        final UserEvent privateMessageEvent = new UserEvent(user.getNick(), message);
-        sendUserEvent(user, privateMessageEvent);
-        return privateMessageEvent;
-    }
-
     // Generic events end
-    public DisconnectEvent sendDisconnect(final Server server,
+
+    public void sendDisconnect(final Server server,
             final String disconnectLine, final boolean retryPending) {
         final DisconnectEvent event = new DisconnectEvent(disconnectLine, retryPending);
         sendServerEvent(server, event);
-        return event;
-    }
-
-    public PrivateMessageEvent sendNewPrivateMessage(final String nick) {
-        final PrivateMessageEvent event = new PrivateMessageEvent(nick);
-        mBus.post(event);
-        return event;
     }
 
     public JoinEvent sendChanelJoined(final String channelName) {
         final JoinEvent event = new JoinEvent(channelName);
-        mBus.post(event);
+        post(event);
         return event;
     }
 
-    public PartEvent sendChanelParted(final String channelName) {
+    public void sendChanelParted(final String channelName) {
         final PartEvent event = new PartEvent(channelName);
-        mBus.post(event);
-        return event;
+        post(event);
     }
 
-    public KickEvent sendKicked(final String channelName) {
+    public void sendKicked(final String channelName) {
         final KickEvent event = new KickEvent(channelName);
-        mBus.post(event);
-        return event;
+        post(event);
     }
 
-    public UserEvent sendPrivateAction(final PrivateMessageUser user, final User sendingUser,
-            final String rawAction) {
-        final String message = InterfaceHolders.getEventResponses().getActionMessage(sendingUser
-                .getColorfulNick(), rawAction);
-        // TODO - change this to be specific for PMs
-        if (sendingUser.equals(user)) {
-            mention(user.getNick());
-        }
-        return sendGenericUserEvent(user, message);
-    }
-
-    public ChannelEvent sendChannelAction(final String userNick,
-            final Channel channel, final ChannelUser sendingUser,
-            final String rawAction) {
+    public ChannelEvent sendChannelAction(final AppUser user, final Channel channel,
+            final ChannelUser sendingUser, final String rawAction) {
         String finalMessage = InterfaceHolders.getEventResponses().getActionMessage(sendingUser
                 .getPrettyNick(channel), rawAction);
-        if (rawAction.toLowerCase().contains(userNick.toLowerCase())) {
-            mention(channel.getName());
+        if (rawAction.toLowerCase().contains(user.getNick().toLowerCase())) {
+            onUserMentioned(channel.getName());
             finalMessage = "<b>" + finalMessage + "</b>";
         }
         return sendGenericChannelEvent(channel, finalMessage, false);
@@ -208,22 +137,45 @@ public class MessageSender {
      * @param sending    - the user who is sending the message - it may be us or it may be the other
      *                   user
      * @param rawMessage - the message being sent
+     * @param newMessage - whether this conversation was open prior to this point
      */
-    public UserEvent sendPrivateMessage(final PrivateMessageUser user, final User sending,
-            final String rawMessage) {
-        final String message = ""; //String.format(mContext.getString(R.string.parser_message),
-        //sending.getColorfulNick(), rawMessage);
+    public PrivateEvent sendPrivateMessage(final PrivateMessageUser user, final User sending,
+            final String rawMessage, final boolean newMessage) {
+        final String message = InterfaceHolders.getEventResponses().getMessage(sending
+                .getColorfulNick(), rawMessage);
         // TODO - change this to be specific for PMs
-        mention(user.getNick());
-        return sendGenericUserEvent(user, message);
+        onUserMentioned(user.getNick());
+        final PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(user.getNick(),
+                message, newMessage);
+        sendUserEvent(user, privateMessageEvent);
+        return privateMessageEvent;
     }
 
-    public ChannelEvent sendMessageToChannel(final String userNick, final Channel channel,
-            final String sendingNick, final String rawMessage) {
-        String preMessage = InterfaceHolders.getEventResponses().getMessage(sendingNick,
+    public PrivateEvent sendPrivateAction(final PrivateMessageUser user, final User sendingUser,
+            final String rawAction, final boolean newMessage) {
+        final String message = InterfaceHolders.getEventResponses().getActionMessage(sendingUser
+                .getColorfulNick(), rawAction);
+        // TODO - change this to be specific for PMs
+        if (sendingUser.equals(user)) {
+            onUserMentioned(user.getNick());
+        }
+        final PrivateActionEvent privateMessageEvent = new PrivateActionEvent(user.getNick(),
+                message, newMessage);
+        sendUserEvent(user, privateMessageEvent);
+        return privateMessageEvent;
+    }
+
+    public ChannelEvent sendMessageToChannel(final AppUser user, final Channel channel,
+            final ChannelUser channelUser, final String rawMessage) {
+        return sendMessageToChannel(user, channel, channelUser.getBracketedNick(channel),
                 rawMessage);
-        if (rawMessage.toLowerCase().contains(userNick.toLowerCase())) {
-            mention(channel.getName());
+    }
+
+    public ChannelEvent sendMessageToChannel(final AppUser user, final Channel channel,
+            final String nick, final String rawMessage) {
+        String preMessage = InterfaceHolders.getEventResponses().getMessage(nick, rawMessage);
+        if (rawMessage.toLowerCase().contains(user.getNick().toLowerCase())) {
+            onUserMentioned(channel.getName());
             preMessage = "<b>" + preMessage + "</b>";
         }
         return sendGenericChannelEvent(channel, preMessage, false);
@@ -246,7 +198,12 @@ public class MessageSender {
         sendServerEvent(server, event);
     }
 
-    void mention(final String messageDestination) {
+    public void sendInviteEvent(Server server, String channelName) {
+        // TODO figure out what to do here
+    }
+
+    // TODO - fix this
+    void onUserMentioned(final String messageDestination) {
     /*    if (mDisplayed) {
             mBus.post(new MentionEvent(messageDestination));
         } else {
@@ -273,7 +230,8 @@ public class MessageSender {
         }*/
     }
 
-    public void sendInviteEvent(Server server, String channelName) {
-        // TODO figure out what to do here
+    // Getters and setters
+    public void setDisplayed(final boolean toast) {
+        mDisplayed = toast;
     }
 }

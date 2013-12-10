@@ -21,6 +21,15 @@
 
 package com.fusionx.androidirclibrary.writers;
 
+import com.fusionx.androidirclibrary.event.Event;
+import com.fusionx.androidirclibrary.event.JoinEvent;
+import com.fusionx.androidirclibrary.event.ModeEvent;
+import com.fusionx.androidirclibrary.event.NickChangeEvent;
+import com.fusionx.androidirclibrary.event.QuitEvent;
+import com.fusionx.androidirclibrary.event.VersionEvent;
+import com.fusionx.androidirclibrary.event.WhoisEvent;
+import com.squareup.otto.Subscribe;
+
 import org.apache.commons.lang3.StringUtils;
 
 import android.util.Base64;
@@ -33,20 +42,24 @@ public class ServerWriter extends RawWriter {
         super(out);
     }
 
-    public void sendUser(String userName, String hostName, String serverName, String realName) {
-        writeLineToServer("USER " + userName + " " + hostName + " " + serverName + " :" + realName);
+    public void sendUser(String userName, String realName) {
+        writeLineToServer("USER " + userName + " 8 * :" + realName);
     }
 
-    public void changeNick(final String nick) {
-        writeLineToServer("NICK " + nick);
+    @Subscribe
+    public void changeNick(final NickChangeEvent nickChangeEvent) {
+        writeLineToServer("NICK " + nickChangeEvent.newNick);
     }
 
-    public void joinChannel(final String channelName) {
-        writeLineToServer("JOIN " + channelName);
+    @Subscribe
+    public void joinChannel(final JoinEvent joinEvent) {
+        writeLineToServer("JOIN " + joinEvent.channelToJoin);
     }
 
-    public void quitServer(final String reason) {
-        writeLineToServer(StringUtils.isEmpty(reason) ? "QUIT" : "QUIT :" + reason);
+    @Subscribe
+    public void quitServer(final QuitEvent quitEvent) {
+        writeLineToServer(StringUtils.isEmpty(quitEvent.reason) ? "QUIT" : "QUIT :" + quitEvent
+                .reason);
     }
 
     public void pongServer(final String absoluteURL) {
@@ -61,12 +74,14 @@ public class ServerWriter extends RawWriter {
         writeLineToServer("NICKSERV IDENTIFY " + password);
     }
 
-    public void sendChannelMode(final String channel, final String mode, final String userNick) {
-        writeLineToServer("MODE " + channel + " " + mode + " " + userNick);
+    @Subscribe
+    public void sendChannelMode(final ModeEvent event) {
+        writeLineToServer("MODE " + event.channel + " " + event.mode + " " + event.nick);
     }
 
-    public void sendWhois(final String userNick) {
-        writeLineToServer("WHOIS " + userNick);
+    @Subscribe
+    public void sendWhois(final WhoisEvent event) {
+        writeLineToServer("WHOIS " + event.baseMessage);
     }
 
     public void getSupportedCapabilities() {
@@ -85,8 +100,10 @@ public class ServerWriter extends RawWriter {
         writeLineToServer("AUTHENTICATE PLAIN");
     }
 
-    public void sendVersion(final String requestingUser, final String version) {
-        writeLineToServer("PRIVMSG " + requestingUser + " :\u0001VERSION " + version + "\u0001");
+    @Subscribe
+    public void sendVersion(final VersionEvent event) {
+        writeLineToServer("PRIVMSG " + event.askingUser + " :\u0001VERSION " + event.version +
+                "\u0001");
     }
 
     public void sendSaslAuthentication(final String saslUsername, final String saslPassword) {
@@ -99,9 +116,10 @@ public class ServerWriter extends RawWriter {
      * This is a very advanced feature that should only be called when the user specifically
      * requests it using a /raw command or is a / message that we don't know how to parse
      *
-     * @param rawLine - the line to send to the server
+     * @param event - the event with the raw line that you want to send
      */
-    public void sendRawLineToServer(final String rawLine) {
-        writeLineToServer(rawLine);
+    @Subscribe
+    public void sendRawLineToServer(final Event event) {
+        writeLineToServer(event.baseMessage);
     }
 }

@@ -30,8 +30,7 @@ public class AppUser extends ChannelUser {
 
     private final List<PrivateMessageUser> mPrivateMessages;
 
-    public AppUser(final String nick,
-            final UserChannelInterface userChannelInterface) {
+    public AppUser(final String nick, final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
         userChannelInterface.putAppUser(this);
 

@@ -25,7 +25,6 @@ import com.fusionx.androidirclibrary.collection.UserListTreeSet;
 import com.fusionx.androidirclibrary.misc.IRCUserComparator;
 import com.fusionx.androidirclibrary.util.IRCUtils;
 
-import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -37,13 +36,10 @@ public final class UserChannelInterface {
 
     private final Map<Channel, UserListTreeSet> mChannelToUserMap;
 
-    private final OutputStreamWriter mOutputStream;
-
     private final Server mServer;
 
 
-    public UserChannelInterface(final OutputStreamWriter outputStream, final Server server) {
-        mOutputStream = outputStream;
+    public UserChannelInterface(final Server server) {
         mServer = server;
         mUserToChannelMap = new HashMap<ChannelUser, LinkedHashSet<Channel>>();
         mChannelToUserMap = new HashMap<Channel, UserListTreeSet>();
@@ -170,11 +166,12 @@ public final class UserChannelInterface {
     }
 
     // Getters and setters
-    OutputStreamWriter getOutputStream() {
-        return mOutputStream;
-    }
-
     Server getServer() {
         return mServer;
+    }
+
+    public void onCleanup() {
+        mUserToChannelMap.clear();
+        mChannelToUserMap.clear();
     }
 }
