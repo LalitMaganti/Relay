@@ -76,7 +76,7 @@ public class BaseConnection {
             ++reconnectAttempts;
         }
 
-        server.getServerSenderBus().sendDisconnect(server, "Disconnected from the server",
+        server.getServerSenderBus().onDisconnected(server, "Disconnected from the server",
                 false);
     }
 
@@ -144,14 +144,14 @@ public class BaseConnection {
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
                 if (isReconnectNeeded()) {
-                    sender.sendDisconnect(server, "Disconnected from the server", true);
+                    sender.onDisconnected(server, "Disconnected from the server", true);
                 }
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
             if (isReconnectNeeded()) {
-                sender.sendDisconnect(server, ex.getMessage(), true);
+                sender.onDisconnected(server, ex.getMessage(), true);
             }
         }
         if (!mUserDisconnected) {

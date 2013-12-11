@@ -26,14 +26,14 @@ class ServerCommandParser {
 
     private final ServerSenderBus mServerSenderBus;
 
-    ServerCommandParser(ServerLineParser parser) {
+    ServerCommandParser(final ServerLineParser parser) {
         mServer = parser.getServer();
         mUserChannelInterface = mServer.getUserChannelInterface();
         mServerSenderBus = mServer.getServerSenderBus();
     }
 
     // The server is sending a command to us - parse what it is
-    Event parseCommand(final ArrayList<String> parsedArray, final String rawLine) {
+    Event onParseServerCommand(final ArrayList<String> parsedArray, final String rawLine) {
         final String rawSource = parsedArray.get(0);
         final String command = parsedArray.get(1).toUpperCase();
 
@@ -41,188 +41,41 @@ class ServerCommandParser {
             final String message = parsedArray.get(3);
             if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
                 final String strippedMessage = message.substring(1, message.length() - 1);
-                return parseCTCPCommand(parsedArray, strippedMessage, rawSource);
+                return onCTCP(parsedArray, strippedMessage, rawSource);
             } else {
-                return parsePRIVMSGCommand(parsedArray, rawSource);
+                return onPRIVMSG(parsedArray, rawSource);
             }
         } else if (command.equals(ServerCommands.Join)) {
-            return parseChannelJoin(parsedArray, rawSource);
+            return onChannelJoin(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Notice)) {
             final String message = parsedArray.get(3);
             if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
                 final String strippedMessage = message.substring(1, message.length() - 1);
-                return parseCTCPCommand(parsedArray, strippedMessage, rawSource);
+                return onCTCP(parsedArray, strippedMessage, rawSource);
             } else {
-                return parseNotice(parsedArray, rawSource);
+                return onNotice(parsedArray, rawSource);
             }
         } else if (command.equals(ServerCommands.Part)) {
-            return parseChannelPart(parsedArray, rawSource);
+            return onChannelPart(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Mode)) {
-            return parseModeChange(parsedArray, rawSource);
+            return onModeChanged(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Quit)) {
-            return parseServerQuit(parsedArray, rawSource);
+            return onQuit(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Nick)) {
-            return parseNickChange(parsedArray, rawSource);
+            return onNickChange(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Topic)) {
-            return parseTopicChange(parsedArray, rawSource);
+            return onChannelTopicChanged(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Kick)) {
-            return parseKick(parsedArray, rawSource);
+            return onChannelKick(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Invite)) {
-            return parseInvite(parsedArray, rawSource);
+            return onChannelInvite(parsedArray, rawSource);
         } else {
             // Not sure what to do here - TODO
             return new Event(rawLine);
         }
     }
 
-    private Event parseInvite(ArrayList<String> parsedArray, String rawSource) {
-        final String invitingNick = IRCUtils.getNickFromRaw(rawSource);
-        if (parsedArray.get(2).equals(mServer.getUser().getNick())) {
-            final String channelName = parsedArray.get(3);
-            mServerSenderBus.sendInviteEvent(mServer, channelName);
-        } else {
-            // TODO - fix up what should happen here
-        }
-        return null;
-    }
-
-    private Event parseKick(ArrayList<String> parsedArray, String rawSource) {
-        final String channelName = parsedArray.get(2);
-        final String kickedNick = parsedArray.get(3);
-
-        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
-        final ChannelUser kickedUser = mUserChannelInterface.getUser(kickedNick);
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
-        if (kickedUser.equals(mServer.getUser())) {
-            final String reason = parsedArray.size() == 5 ?
-                    parsedArray.get(4).replace("\"", "") : "";
-            final String message = InterfaceHolders.getEventResponses()
-                    .getOnUserKickedMessage(channel.getName(), user.getPrettyNick(channel),
-                            reason);
-            final Event event = mServerSenderBus.sendGenericServerEvent(mServer, message);
-
-            mServerSenderBus.sendKicked(channel.getName());
-            mUserChannelInterface.removeChannel(channel);
-            return event;
-        } else {
-            final String reason = parsedArray.size() == 5 ?
-                    parsedArray.get(4).replace("\"", "") : "";
-            final String message = InterfaceHolders.getEventResponses().getUserKickedMessage
-                    (kickedUser.getPrettyNick(channel), user.getPrettyNick(channel), reason);
-
-            channel.onDecrementUserType(user.getChannelPrivileges(channel));
-
-            final Event event = mServerSenderBus
-                    .sendGenericChannelEvent(channel, message, true);
-            mUserChannelInterface.decoupleUserAndChannel(kickedUser, channel);
-            return event;
-        }
-    }
-
-    private Event parseNotice(final ArrayList<String> parsedArray, final String rawSource) {
-        final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
-        final String recipient = parsedArray.get(2);
-        final String notice = parsedArray.get(3);
-
-        final String formattedNotice = InterfaceHolders.getEventResponses().getNoticeMessage
-                (sendingUser, notice);
-        if (Channel.isChannelPrefix(recipient.charAt(0))) {
-            return mServerSenderBus
-                    .sendGenericChannelEvent(mUserChannelInterface.getChannel(recipient),
-                            formattedNotice, false);
-        } else if (recipient.equals(mServer.getUser().getNick())) {
-            final PrivateMessageUser user = mServer.getPrivateMessageUser(sendingUser);
-            if (mServer.getUser().isPrivateMessageOpen(user)) {
-                return mServer.onPrivateMessage(user, notice, false);
-            } else {
-                return mServerSenderBus.sendSwitchToServerEvent(mServer, formattedNotice);
-            }
-        } else {
-            return new Event("unknown");
-        }
-    }
-
-    private Event parseCTCPCommand(final ArrayList<String> parsedArray, final String message,
-            final String rawSource) {
-        // TODO - THIS IS INCOMPLETE
-        if (message.startsWith("ACTION")) {
-            return parseAction(parsedArray, rawSource);
-        } else if (message.startsWith("VERSION")) {
-            final String nick = IRCUtils.getNickFromRaw(rawSource);
-            // TODO - get the version from the app
-            mServer.getServerReceiverBus().post(new VersionEvent(nick, mServer.toString()));
-            return new Event(rawSource);
-        } else {
-            return new Event("");
-        }
-    }
-
-    private Event parsePRIVMSGCommand(final ArrayList<String> parsedArray, final String rawSource) {
-        final String nick = IRCUtils.getNickFromRaw(rawSource);
-        final String message = parsedArray.get(3);
-
-        // TODO - optimize this
-        if (!InterfaceHolders.getPreferences().shouldIgnoreUser(nick)) {
-            final String recipient = parsedArray.get(2);
-            if (Channel.isChannelPrefix(recipient.charAt(0))) {
-                return parseChannelPRIVMSGCommand(nick, recipient, message);
-            } else {
-                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
-                return mServer.onPrivateMessage(sendingUser, message, false);
-            }
-        } else {
-            return new Event(message);
-        }
-    }
-
-    private ChannelEvent parseChannelPRIVMSGCommand(String sendingNick, String channelName,
-            String message) {
-        final ChannelUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
-        if (sendingUser == null) {
-            // This occurs very rarely - ZNC buffer playbacks will go to this route since ZNC
-            // returns a nick of ***
-            return mServerSenderBus.sendMessageToChannel(mServer.getUser(), channel,
-                    sendingNick, message);
-        } else {
-            return mServerSenderBus.sendMessageToChannel(mServer.getUser(), channel,
-                    sendingUser, message);
-        }
-    }
-
-    private Event parseAction(ArrayList<String> parsedArray, String rawSource) {
-        final String nick = IRCUtils.getNickFromRaw(rawSource);
-        final String action = parsedArray.get(3).replace("ACTION ", "");
-
-        if (!InterfaceHolders.getPreferences().shouldIgnoreUser(nick)) {
-            final String recipient = parsedArray.get(2);
-            if (Channel.isChannelPrefix(recipient.charAt(0))) {
-                final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
-                return mServerSenderBus.sendChannelAction(mServer.getUser(),
-                        mUserChannelInterface.getChannel(recipient), sendingUser, action);
-            } else {
-                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
-                return mServer.onPrivateAction(sendingUser, action, false);
-            }
-        } else {
-            return new Event(action);
-        }
-    }
-
-    private ChannelEvent parseTopicChange(final ArrayList<String> parsedArray,
-            final String rawSource) {
-        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
-        final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
-        final String setterNick = user.getPrettyNick(channel);
-        final String newTopic = parsedArray.get(3);
-
-        final String message = InterfaceHolders.getEventResponses().getTopicChangedMessage
-                (setterNick, channel.getTopic(), newTopic);
-        channel.setTopic(newTopic);
-        return mServerSenderBus.sendGenericChannelEvent(channel, message, false);
-    }
-
-    private Event parseNickChange(ArrayList<String> parsedArray, String rawSource) {
+    private Event onNickChange(ArrayList<String> parsedArray, String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Set<Channel> channels = user.getChannels();
         final String oldNick = user.getColorfulNick();
@@ -240,7 +93,7 @@ class ServerCommandParser {
         return new Event(user.getNick());
     }
 
-    private Event parseModeChange(final ArrayList<String> parsedArray, final String rawSource) {
+    private Event onModeChanged(final ArrayList<String> parsedArray, final String rawSource) {
         final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String mode = parsedArray.get(3);
@@ -255,11 +108,10 @@ class ServerCommandParser {
                 return new Event(mode);
             } else if (messageLength == 5) {
                 // User specified - therefore user mode in channel is being changed
-                final String userRecipient = parsedArray.get(4);
-                final ChannelUser user = mUserChannelInterface.getUserFromRaw(userRecipient);
+                final String nick = IRCUtils.getNickFromRaw(parsedArray.get(4));
+                final ChannelUser user = mUserChannelInterface.getUserIfExists(nick);
                 if (user != null) {
-                    final String message = user.onModeChange(sendingUser, channel,
-                            mode);
+                    final String message = user.onModeChange(sendingUser, channel, mode);
                     return mServerSenderBus.sendGenericChannelEvent(channel, message, true);
                 } else {
                     return new Event("");
@@ -279,44 +131,81 @@ class ServerCommandParser {
         }
     }
 
-    private Event parseChannelJoin(final ArrayList<String> parsedArray, final String rawSource) {
-        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
-        final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
-        mUserChannelInterface.coupleUserAndChannel(user, channel);
+    private Event onNotice(final ArrayList<String> parsedArray, final String rawSource) {
+        final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
+        final String recipient = parsedArray.get(2);
+        final String notice = parsedArray.get(3);
 
-        if (user.equals(mServer.getUser())) {
-            return mServerSenderBus.sendChanelJoined(channel.getName());
+        final String formattedNotice = InterfaceHolders.getEventResponses().getNoticeMessage
+                (sendingUser, notice);
+        if (Channel.isChannelPrefix(recipient.charAt(0))) {
+            final Channel channel = mUserChannelInterface.getChannel(recipient);
+            return mServerSenderBus.sendGenericChannelEvent(channel, formattedNotice, false);
+        } else if (recipient.equals(mServer.getUser().getNick())) {
+            final PrivateMessageUser user = mServer.getPrivateMessageUser(sendingUser);
+            if (mServer.getUser().isPrivateMessageOpen(user)) {
+                return mServer.onPrivateMessage(user, notice, false);
+            } else {
+                return mServerSenderBus.sendSwitchToServerEvent(mServer, formattedNotice);
+            }
         } else {
-            final String message = InterfaceHolders.getEventResponses().getJoinMessage(user
-                    .getPrettyNick(channel));
-            return mServerSenderBus.sendGenericChannelEvent(channel, message, true);
+            return new Event("unknown");
         }
     }
 
-    private Event parseChannelPart(final ArrayList<String> parsedArray, final String rawSource) {
-        final String channelName = parsedArray.get(2);
-
-        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
-        if (user.equals(mServer.getUser())) {
-            mServerSenderBus.sendChanelParted(channel.getName());
-            mUserChannelInterface.removeChannel(channel);
-            return new Event(channelName);
+    // CTCP starts here
+    private Event onCTCP(final ArrayList<String> parsedArray, final String message,
+            final String rawSource) {
+        // TODO - THIS IS INCOMPLETE
+        if (message.startsWith("ACTION")) {
+            return onParseAction(parsedArray, rawSource);
+        } else if (message.startsWith("VERSION")) {
+            final String nick = IRCUtils.getNickFromRaw(rawSource);
+            // TODO - get the version from the app
+            mServer.getServerReceiverBus().post(new VersionEvent(nick, mServer.toString()));
+            return new Event(rawSource);
         } else {
-            final String reason = parsedArray.size() == 4 ?
-                    parsedArray.get(3).replace("\"", "") : "";
-            final String message = InterfaceHolders.getEventResponses().getPartMessage
-                    (user.getPrettyNick(channel), reason);
-            final Event event = mServerSenderBus
-                    .sendGenericChannelEvent(channel, message, true);
-            mUserChannelInterface.decoupleUserAndChannel(user, channel);
-
-            channel.onDecrementUserType(user.getChannelPrivileges(channel));
-            return event;
+            return new Event("");
         }
     }
 
-    private Event parseServerQuit(final ArrayList<String> parsedArray, final String rawSource) {
+    private Event onParseAction(final ArrayList<String> parsedArray, final String rawSource) {
+        final String nick = IRCUtils.getNickFromRaw(rawSource);
+        final String action = parsedArray.get(3).replace("ACTION ", "");
+
+        if (!InterfaceHolders.getPreferences().shouldIgnoreUser(nick)) {
+            final String recipient = parsedArray.get(2);
+            if (Channel.isChannelPrefix(recipient.charAt(0))) {
+                return onParseChannelAction(recipient, nick, action);
+            } else {
+                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
+                return mServer.onPrivateAction(sendingUser, action, false);
+            }
+        } else {
+            return new Event(action);
+        }
+    }
+    // CTCP ends here
+
+    private Event onPRIVMSG(final ArrayList<String> parsedArray, final String rawSource) {
+        final String nick = IRCUtils.getNickFromRaw(rawSource);
+        final String message = parsedArray.get(3);
+
+        // TODO - optimize this
+        if (!InterfaceHolders.getPreferences().shouldIgnoreUser(nick)) {
+            final String recipient = parsedArray.get(2);
+            if (Channel.isChannelPrefix(recipient.charAt(0))) {
+                return parseChannelMessage(nick, recipient, message);
+            } else {
+                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
+                return mServer.onPrivateMessage(sendingUser, message, false);
+            }
+        } else {
+            return new Event(message);
+        }
+    }
+
+    private Event onQuit(final ArrayList<String> parsedArray, final String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         if (user.equals(mServer.getUser())) {
             // TODO - improve this
@@ -336,4 +225,131 @@ class ServerCommandParser {
             return new Event(rawSource);
         }
     }
+
+    // Channel parsing starts here
+    private ChannelEvent parseChannelMessage(final String sendingNick,
+            final String channelName, final String message) {
+        final ChannelUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        // This occurs rarely - usually on ZNCs - for example the ZNC buffer starts with a
+        // PRIVMSG from the nick ***. Also if someone said something on the channel during
+        // the buffer but is not in the channel now then this will also happen
+        if (sendingUser == null) {
+            return mServerSenderBus.onChannelMessage(mServer.getUser(), channel,
+                    sendingNick, message);
+        } else {
+            return mServerSenderBus.onChannelMessage(mServer.getUser(), channel,
+                    sendingUser, message);
+        }
+    }
+
+    private Event onParseChannelAction(final String channelName, final String userNick,
+            final String action) {
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final ChannelUser sendingUser = mUserChannelInterface.getUserIfExists(userNick);
+        // This occurs rarely - usually on ZNCs. Also if someone performed an action on the
+        // channel during the buffer but is not in the channel now then this will also happen
+        if (sendingUser == null) {
+            return mServerSenderBus.onChannelAction(mServer.getUser(), channel,
+                    userNick, action);
+        } else {
+            return mServerSenderBus.onChannelAction(mServer.getUser(), channel,
+                    sendingUser, action);
+        }
+    }
+
+    private ChannelEvent onChannelTopicChanged(final ArrayList<String> parsedArray,
+            final String rawSource) {
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
+        final String setterNick = user.getPrettyNick(channel);
+        final String newTopic = parsedArray.get(3);
+
+        final String message = InterfaceHolders.getEventResponses().getTopicChangedMessage
+                (setterNick, channel.getTopic(), newTopic);
+        channel.setTopic(newTopic);
+        return mServerSenderBus.sendGenericChannelEvent(channel, message, false);
+    }
+
+    private Event onChannelJoin(final ArrayList<String> parsedArray, final String rawSource) {
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
+        mUserChannelInterface.coupleUserAndChannel(user, channel);
+
+        if (user.equals(mServer.getUser())) {
+            return mServerSenderBus.onChannelJoined(channel.getName());
+        } else {
+            final String message = InterfaceHolders.getEventResponses().getJoinMessage(user
+                    .getPrettyNick(channel));
+            return mServerSenderBus.sendGenericChannelEvent(channel, message, true);
+        }
+    }
+
+    private Event onChannelPart(final ArrayList<String> parsedArray, final String rawSource) {
+        final String channelName = parsedArray.get(2);
+
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        if (user.equals(mServer.getUser())) {
+            mServerSenderBus.onChannelParted(channel.getName());
+            mUserChannelInterface.removeChannel(channel);
+            return new Event(channelName);
+        } else {
+            final String reason = parsedArray.size() == 4 ?
+                    parsedArray.get(3).replace("\"", "") : "";
+            final String message = InterfaceHolders.getEventResponses().getPartMessage
+                    (user.getPrettyNick(channel), reason);
+            final Event event = mServerSenderBus
+                    .sendGenericChannelEvent(channel, message, true);
+            mUserChannelInterface.decoupleUserAndChannel(user, channel);
+
+            channel.onDecrementUserType(user.getChannelPrivileges(channel));
+            return event;
+        }
+    }
+
+    private Event onChannelKick(ArrayList<String> parsedArray, String rawSource) {
+        final String channelName = parsedArray.get(2);
+        final String kickedNick = parsedArray.get(3);
+
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final ChannelUser kickedUser = mUserChannelInterface.getUser(kickedNick);
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        if (kickedUser.equals(mServer.getUser())) {
+            final String reason = parsedArray.size() == 5 ?
+                    parsedArray.get(4).replace("\"", "") : "";
+            final String message = InterfaceHolders.getEventResponses()
+                    .getOnUserKickedMessage(channel.getName(), user.getPrettyNick(channel),
+                            reason);
+            final Event event = mServerSenderBus.sendGenericServerEvent(mServer, message);
+
+            mServerSenderBus.onKicked(channel.getName());
+            mUserChannelInterface.removeChannel(channel);
+            return event;
+        } else {
+            final String reason = parsedArray.size() == 5 ?
+                    parsedArray.get(4).replace("\"", "") : "";
+            final String message = InterfaceHolders.getEventResponses().getUserKickedMessage
+                    (kickedUser.getPrettyNick(channel), user.getPrettyNick(channel), reason);
+
+            channel.onDecrementUserType(user.getChannelPrivileges(channel));
+
+            final Event event = mServerSenderBus
+                    .sendGenericChannelEvent(channel, message, true);
+            mUserChannelInterface.decoupleUserAndChannel(kickedUser, channel);
+            return event;
+        }
+    }
+
+    private Event onChannelInvite(ArrayList<String> parsedArray, String rawSource) {
+        final String invitingNick = IRCUtils.getNickFromRaw(rawSource);
+        if (parsedArray.get(2).equals(mServer.getUser().getNick())) {
+            final String channelName = parsedArray.get(3);
+            mServerSenderBus.sendInviteEvent(mServer, channelName);
+        } else {
+            // TODO - fix up what should happen here
+        }
+        return null;
+    }
+    // Channel parsing ends here
 }

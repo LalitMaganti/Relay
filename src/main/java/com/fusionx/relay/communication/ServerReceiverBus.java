@@ -99,7 +99,7 @@ public class ServerReceiverBus extends Bus {
 
         if (InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
             final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
-            getServer().getServerSenderBus().sendMessageToChannel(getServer().getUser(), channel,
+            getServer().getServerSenderBus().onChannelMessage(getServer().getUser(), channel,
                     getServer().getUser(), message);
         }
     }
@@ -109,7 +109,7 @@ public class ServerReceiverBus extends Bus {
 
         if (InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
             final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
-            getServer().getServerSenderBus().sendChannelAction(getServer().getUser(), channel,
+            getServer().getServerSenderBus().onChannelAction(getServer().getUser(), channel,
                     getServer().getUser(), action);
         }
     }

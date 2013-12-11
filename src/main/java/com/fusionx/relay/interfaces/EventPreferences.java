@@ -19,4 +19,6 @@ public interface EventPreferences {
     public boolean shouldLogUserListChanges();
 
     public boolean shouldSendSelfMessageEvent();
+
+    public boolean isMOTDShown();
 }

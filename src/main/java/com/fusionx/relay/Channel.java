@@ -44,12 +44,12 @@ public class Channel {
         mBuffer = new ArrayList<Message>();
         mNumberOfUsers = new EnumMap<UserLevelEnum, Integer>(UserLevelEnum.class);
 
-        for (UserLevelEnum levelEnum : UserLevelEnum.values()) {
+        for (final UserLevelEnum levelEnum : UserLevelEnum.values()) {
             mNumberOfUsers.put(levelEnum, 0);
         }
 
-        final String message = InterfaceHolders.getEventResponses().getJoinMessage
-                (mUserChannelInterface.getServer().getUser().getColorfulNick());
+        final String userNick = mUserChannelInterface.getServer().getUser().getColorfulNick();
+        final String message = InterfaceHolders.getEventResponses().getJoinMessage(userNick);
         mBuffer.add(new Message(message));
     }
 

@@ -69,9 +69,9 @@ public class ServerLineParser {
             return new ErrorEvent(rawLine);
         } else {// Check if the second thing is a code or a command
             if (StringUtils.isNumeric(parsedArray.get(1))) {
-                return mCodeParser.parseCode(parsedArray, rawLine);
+                return mCodeParser.onParseCode(parsedArray, rawLine);
             } else {
-                return mCommandParser.parseCommand(parsedArray, rawLine);
+                return mCommandParser.onParseServerCommand(parsedArray, rawLine);
             }
         }
     }

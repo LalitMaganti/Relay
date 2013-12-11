@@ -16,7 +16,7 @@ class WhoParser {
 
     private final Server mServer;
 
-    WhoParser(UserChannelInterface userChannelInterface, final Server server) {
+    WhoParser(final UserChannelInterface userChannelInterface, final Server server) {
         mUserChannelInterface = userChannelInterface;
         mServer = server;
     }

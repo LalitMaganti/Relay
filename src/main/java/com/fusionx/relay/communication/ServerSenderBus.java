@@ -96,37 +96,59 @@ public class ServerSenderBus extends Bus {
     }
     // Generic events end
 
-    public void sendDisconnect(final Server server,
+    public void onDisconnected(final Server server,
             final String disconnectLine, final boolean retryPending) {
         final DisconnectEvent event = new DisconnectEvent(disconnectLine, retryPending);
         sendServerEvent(server, event);
     }
 
-    public JoinEvent sendChanelJoined(final String channelName) {
+    public JoinEvent onChannelJoined(final String channelName) {
         final JoinEvent event = new JoinEvent(channelName);
         post(event);
         return event;
     }
 
-    public void sendChanelParted(final String channelName) {
+    public void onChannelParted(final String channelName) {
         final PartEvent event = new PartEvent(channelName);
         post(event);
     }
 
-    public void sendKicked(final String channelName) {
+    public void onKicked(final String channelName) {
         final KickEvent event = new KickEvent(channelName);
         post(event);
     }
 
-    public ChannelEvent sendChannelAction(final AppUser user, final Channel channel,
-            final ChannelUser sendingUser, final String rawAction) {
-        String finalMessage = InterfaceHolders.getEventResponses().getActionMessage(sendingUser
-                .getPrettyNick(channel), rawAction);
+    public ChannelEvent onChannelMessage(final AppUser user, final Channel channel,
+            final ChannelUser channelUser, final String rawMessage) {
+        return onChannelMessage(user, channel, channelUser.getBracketedNick(channel),
+                rawMessage);
+    }
+
+    public ChannelEvent onChannelMessage(final AppUser user, final Channel channel,
+            final String nick, final String rawMessage) {
+        String preMessage = InterfaceHolders.getEventResponses().getMessage(nick, rawMessage);
+        if (rawMessage.toLowerCase().contains(user.getNick().toLowerCase())) {
+            onUserMentioned(channel.getName());
+            preMessage = "<b>" + preMessage + "</b>";
+        }
+        return sendGenericChannelEvent(channel, preMessage, false);
+    }
+
+    public ChannelEvent onChannelAction(final AppUser user, final Channel channel,
+            final String nick, final String rawAction) {
+        String finalMessage = InterfaceHolders.getEventResponses()
+                .getActionMessage(nick, rawAction);
         if (rawAction.toLowerCase().contains(user.getNick().toLowerCase())) {
             onUserMentioned(channel.getName());
             finalMessage = "<b>" + finalMessage + "</b>";
         }
         return sendGenericChannelEvent(channel, finalMessage, false);
+    }
+
+    public ChannelEvent onChannelAction(final AppUser user, final Channel channel,
+            final ChannelUser sendingUser, final String rawAction) {
+        final String nick = sendingUser.getPrettyNick(channel);
+        return onChannelAction(user, channel, nick, rawAction);
     }
 
     /**
@@ -163,22 +185,6 @@ public class ServerSenderBus extends Bus {
                 message, newMessage);
         sendUserEvent(user, privateMessageEvent);
         return privateMessageEvent;
-    }
-
-    public ChannelEvent sendMessageToChannel(final AppUser user, final Channel channel,
-            final ChannelUser channelUser, final String rawMessage) {
-        return sendMessageToChannel(user, channel, channelUser.getBracketedNick(channel),
-                rawMessage);
-    }
-
-    public ChannelEvent sendMessageToChannel(final AppUser user, final Channel channel,
-            final String nick, final String rawMessage) {
-        String preMessage = InterfaceHolders.getEventResponses().getMessage(nick, rawMessage);
-        if (rawMessage.toLowerCase().contains(user.getNick().toLowerCase())) {
-            onUserMentioned(channel.getName());
-            preMessage = "<b>" + preMessage + "</b>";
-        }
-        return sendGenericChannelEvent(channel, preMessage, false);
     }
 
     public NickInUseEvent sendNickInUseMessage(final Server server) {

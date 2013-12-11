@@ -15,11 +15,14 @@ import java.util.Set;
 
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
 
+    final Server mServer;
+
     private final HashMap<Channel, UserLevelEnum> mUserLevelMap;
 
     private final HashMap<Channel, Spanned> mChannelSpannedMap;
 
-    final Server mServer;
+    // Checkable interface
+    private boolean mChecked;
 
     public ChannelUser(final String nick, final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
@@ -72,7 +75,12 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public char getUserPrefix(final Channel channel) {
-        return mUserLevelMap.get(channel).getPrefix();
+        final UserLevelEnum levelEnum = mUserLevelMap.get(channel);
+        if (levelEnum != null) {
+            return mUserLevelMap.get(channel).getPrefix();
+        } else {
+            return '\0';
+        }
     }
 
     public Set<Channel> getChannels() {
@@ -163,17 +171,14 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         }
     }
 
-    // Checkable interface
-    private boolean mChecked;
+    @Override
+    public boolean isChecked() {
+        return mChecked;
+    }
 
     @Override
     public void setChecked(boolean b) {
         mChecked = b;
-    }
-
-    @Override
-    public boolean isChecked() {
-        return mChecked;
     }
 
     @Override
