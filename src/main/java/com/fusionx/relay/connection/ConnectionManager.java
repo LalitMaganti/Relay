@@ -13,10 +13,10 @@ import java.util.Iterator;
 
 public class ConnectionManager {
 
+    private static ConnectionManager sConnectionManager;
+
     private final HashMap<String, ServerConnection> mServerMap
             = new HashMap<String, ServerConnection>();
-
-    private static ConnectionManager sConnectionManager;
 
     private ConnectionManager() {
     }
@@ -24,14 +24,14 @@ public class ConnectionManager {
     /**
      * Returns a singleton connection manager which is lazily created
      *
-     * @param responses   - a concrete implementation of the {@link com.fusionx.relay
+     * @param responses   a concrete implementation of the {@link com.fusionx.relay
      *                    .interfaces.EventResponses interface}
-     * @param preferences - a concrete implementation of the {@link com.fusionx.relay
+     * @param preferences a concrete implementation of the {@link com.fusionx.relay
      *                    .interfaces.EventPreferences interface}
      * @return the connection manager which was created
      */
-    public static ConnectionManager getConnectionManager(EventResponses responses,
-            EventPreferences preferences) {
+    public static ConnectionManager getConnectionManager(final EventResponses responses,
+            final EventPreferences preferences) {
         if (sConnectionManager == null) {
             sConnectionManager = new ConnectionManager();
             InterfaceHolders.onInterfaceReceived(preferences, responses);
@@ -42,14 +42,14 @@ public class ConnectionManager {
     /**
      * Creates a connection with the IRC server and tries to connect to it
      *
-     * @param configuration - the configuration you want to connect with
-     * @param errorHandler  - a handler object which will be used if an error occurs on the
+     * @param configuration the configuration you want to connect with
+     * @param errorHandler  a handler object which will be used if an error occurs on the
      *                      background thread
      * @return the server object created by the connection
      */
     public Server onConnectionRequested(final ServerConfiguration configuration,
             final Handler errorHandler) {
-        ServerConnection connection;
+        final ServerConnection connection;
         if (mServerMap.containsKey(configuration.getTitle())) {
             connection = mServerMap.get(configuration.getTitle());
         } else {
@@ -72,7 +72,7 @@ public class ConnectionManager {
     /**
      * Disconnect from the server with the specified name
      *
-     * @param serverName - the name of the server you're wanting to disconnect from
+     * @param serverName the name of the server you're wanting to disconnect from
      * @return whether the list of connected servers is empty
      */
     public boolean onDisconnectionRequested(final String serverName) {
@@ -101,7 +101,7 @@ public class ConnectionManager {
      *
      * Only use this if you know what you're doing
      *
-     * @param serverName - the name of the server you're wanting to get
+     * @param serverName the name of the server you're wanting to get
      * @return the server with the required title if it exists - this may be null
      */
     public Server getServerIfExists(final String serverName) {
