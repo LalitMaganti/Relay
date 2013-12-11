@@ -32,7 +32,7 @@ class WhoParser {
 
     Event parseWhoFinished() {
         if (mWhoChannel != null && mWhoChannel.getUsers() != null) {
-            final Event event = mServer.getServerSenderBus().sendGenericChannelEvent
+            final Event event = mServer.getServerEventBus().sendGenericChannelEvent
                     (mWhoChannel, "", true);
             mWhoChannel = null;
             return event;

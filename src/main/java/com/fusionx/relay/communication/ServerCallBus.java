@@ -1,5 +1,6 @@
 package com.fusionx.relay.communication;
 
+import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
@@ -17,11 +18,11 @@ import com.fusionx.relay.misc.InterfaceHolders;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
-public class ServerReceiverBus extends Bus {
+public class ServerCallBus extends Bus {
 
     private final ServerConnection mConnection;
 
-    public ServerReceiverBus(final ServerConnection connection) {
+    public ServerCallBus(final ServerConnection connection) {
         super(ThreadEnforcer.ANY);
 
         mConnection = connection;
@@ -32,7 +33,7 @@ public class ServerReceiverBus extends Bus {
         mConnection.getServerHandler().post(new Runnable() {
             @Override
             public void run() {
-                ServerReceiverBus.super.post(event);
+                ServerCallBus.super.post(event);
             }
         });
     }
@@ -42,7 +43,7 @@ public class ServerReceiverBus extends Bus {
     }
 
     public void sendUnknownEvent(final String event) {
-        getServer().getServerSenderBus().sendSwitchToServerEvent(getServer(), event);
+        getServer().getServerEventBus().sendSwitchToServerEvent(getServer(), event);
     }
 
     public void sendUserWhois(final String nick) {
@@ -68,8 +69,7 @@ public class ServerReceiverBus extends Bus {
     public void sendActionToUser(final String userNick, final String action) {
         final PrivateMessageUser user = getServer().getPrivateMessageUser(userNick);
         final boolean isPrivateMessageOpen = getServer().getUser().isPrivateMessageOpen(user);
-        post(new PrivateMessageEvent(action, userNick,
-                !isPrivateMessageOpen));
+        post(new PrivateMessageEvent(action, userNick, !isPrivateMessageOpen));
 
         getServer().onPrivateAction(user, action, true);
     }
@@ -99,8 +99,8 @@ public class ServerReceiverBus extends Bus {
 
         if (InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
             final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
-            getServer().getServerSenderBus().onChannelMessage(getServer().getUser(), channel,
-                    getServer().getUser(), message);
+            final AppUser user = getServer().getUser();
+            getServer().getServerEventBus().onChannelMessage(user, channel, user, message);
         }
     }
 
@@ -109,8 +109,8 @@ public class ServerReceiverBus extends Bus {
 
         if (InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
             final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
-            getServer().getServerSenderBus().onChannelAction(getServer().getUser(), channel,
-                    getServer().getUser(), action);
+            final AppUser user = getServer().getUser();
+            getServer().getServerEventBus().onChannelAction(user, channel, user, action);
         }
     }
 

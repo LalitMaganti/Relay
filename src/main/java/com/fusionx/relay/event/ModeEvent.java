@@ -1,6 +1,7 @@
 package com.fusionx.relay.event;
 
 public class ModeEvent extends Event {
+
     public final String mode;
 
     public final String channel;

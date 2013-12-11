@@ -3,7 +3,7 @@ package com.fusionx.relay.parser;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
-import com.fusionx.relay.communication.ServerSenderBus;
+import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.misc.InterfaceHolders;
@@ -35,12 +35,12 @@ class ServerCodeParser {
 
     private final Server mServer;
 
-    private final ServerSenderBus mServerSenderBus;
+    private final ServerEventBus mServerEventBus;
 
     ServerCodeParser(final ServerLineParser parser) {
         mServer = parser.getServer();
         mUserChannelInterface = mServer.getUserChannelInterface();
-        mServerSenderBus = mServer.getServerSenderBus();
+        mServerEventBus = mServer.getServerEventBus();
 
         mWhoParser = new WhoParser(mUserChannelInterface, mServer);
         mNameParser = new NameParser(mUserChannelInterface, mServer);
@@ -67,13 +67,13 @@ class ServerCodeParser {
             case RPL_MOTD:
                 final String motdline = message.substring(1).trim();
                 if (InterfaceHolders.getPreferences().isMOTDShown()) {
-                    return mServerSenderBus.sendGenericServerEvent(mServer, motdline);
+                    return mServerEventBus.sendGenericServerEvent(mServer, motdline);
                 } else {
                     return new Event(motdline);
                 }
             case RPL_ENDOFMOTD:
                 if (InterfaceHolders.getPreferences().isMOTDShown()) {
-                    return mServerSenderBus.sendGenericServerEvent(mServer, message);
+                    return mServerEventBus.sendGenericServerEvent(mServer, message);
                 } else {
                     return new Event(message);
                 }
@@ -86,7 +86,7 @@ class ServerCodeParser {
             case RPL_ENDOFWHO:
                 return mWhoParser.parseWhoFinished();
             case ERR_NICKNAMEINUSE:
-                return mServerSenderBus.sendNickInUseMessage(mServer);
+                return mServerEventBus.sendNickInUseMessage(mServer);
             default:
                 return onFallThrough(code, message, parsedArray);
         }
@@ -111,16 +111,16 @@ class ServerCodeParser {
         final String eventMessage = InterfaceHolders.getEventResponses().getInitialTopicMessage
                 (channel.getTopic(), nick);
 
-        return mServerSenderBus.sendGenericChannelEvent(channel, eventMessage, false);
+        return mServerEventBus.sendGenericChannelEvent(channel, eventMessage, false);
     }
 
     private Event onFallThrough(final int code, final String message,
             final ArrayList<String> parsedArray) {
         if (genericCodes.contains(code)) {
-            return mServerSenderBus.sendGenericServerEvent(mServer, message);
+            return mServerEventBus.sendGenericServerEvent(mServer, message);
         } else if (whoisCodes.contains(code)) {
             final String response = IRCUtils.convertArrayListToString(parsedArray);
-            return mServerSenderBus.sendSwitchToServerEvent(mServer, response);
+            return mServerEventBus.sendSwitchToServerEvent(mServer, response);
         } else if (doNothingCodes.contains(code)) {
             return new Event(message);
         }

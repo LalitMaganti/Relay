@@ -60,7 +60,7 @@ public class Channel {
     /**
      * Returns a list of all the users currently in the channel
      *
-     * @return - list of users currently in the channel
+     * @return list of users currently in the channel
      */
     public UserListTreeSet getUsers() {
         return mUserChannelInterface.getAllUsersInChannel(this);

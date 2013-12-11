@@ -25,13 +25,13 @@ import com.squareup.otto.ThreadEnforcer;
 import android.os.Handler;
 import android.os.Looper;
 
-public class ServerSenderBus extends Bus {
+public class ServerEventBus extends Bus {
 
     private final Handler mMainThread = new Handler(Looper.getMainLooper());
 
     private boolean mDisplayed;
 
-    public ServerSenderBus() {
+    public ServerEventBus() {
         super(ThreadEnforcer.ANY);
     }
 
@@ -43,7 +43,7 @@ public class ServerSenderBus extends Bus {
             mMainThread.post(new Runnable() {
                 @Override
                 public void run() {
-                    ServerSenderBus.super.post(event);
+                    ServerEventBus.super.post(event);
                 }
             });
         }

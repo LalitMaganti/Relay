@@ -5,7 +5,7 @@ import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.misc.InterfaceHolders;
 
 import android.os.Handler;
-import android.os.Looper;
+import android.os.HandlerThread;
 
 public class ServerConnection extends Thread {
 
@@ -18,22 +18,10 @@ public class ServerConnection extends Thread {
     private Handler mServerHandler;
 
     ServerConnection(final ServerConfiguration configuration, final Handler handler) {
-        final Thread thread = new Thread() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                mServerHandler = new Handler();
-                Looper.loop();
-            }
+        final HandlerThread handlerThread = new HandlerThread("ServerCalls");
+        mServerHandler = new Handler(handler.getLooper());
+        handlerThread.start();
 
-            @Override
-            public void interrupt() {
-                super.interrupt();
-
-                Looper.myLooper().quitSafely();
-            }
-        };
-        thread.start();
         mServer = new Server(configuration.getTitle(), this);
         mConnection = new BaseConnection(configuration, mServer);
         mUiThreadHandler = handler;

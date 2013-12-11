@@ -7,6 +7,7 @@ import com.squareup.otto.Subscribe;
 import java.io.OutputStreamWriter;
 
 public class UserWriter extends RawWriter {
+
     public UserWriter(OutputStreamWriter writer) {
         super(writer);
     }

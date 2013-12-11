@@ -54,7 +54,7 @@ public class ServerLineParser {
      *
      * @param rawLine - the raw line from the server
      * @param writer  -
-     * @return - returns a boolean which indicates whether the server has disconnected
+     * @return returns a boolean which indicates whether the server has disconnected
      */
     Event parseLine(final String rawLine, final ServerWriter writer) {
         final ArrayList<String> parsedArray = IRCUtils.splitRawLine(rawLine, true);

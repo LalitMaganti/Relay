@@ -1,16 +1,16 @@
 package com.fusionx.relay.misc;
 
 import com.fusionx.relay.interfaces.EventPreferences;
-import com.fusionx.relay.interfaces.EventStringResponses;
+import com.fusionx.relay.interfaces.EventResponses;
 
 public final class InterfaceHolders {
 
     private static EventPreferences sPreferences;
 
-    private static EventStringResponses sEventResponses;
+    private static EventResponses sEventResponses;
 
     public static void onInterfaceReceived(final EventPreferences eventPreferences,
-            final EventStringResponses responses) {
+            final EventResponses responses) {
         sPreferences = eventPreferences;
         sEventResponses = responses;
     }
@@ -19,7 +19,7 @@ public final class InterfaceHolders {
         return sPreferences;
     }
 
-    public static EventStringResponses getEventResponses() {
+    public static EventResponses getEventResponses() {
         return sEventResponses;
     }
 }

@@ -1,7 +1,7 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.communication.ServerReceiverBus;
-import com.fusionx.relay.communication.ServerSenderBus;
+import com.fusionx.relay.communication.ServerCallBus;
+import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.connection.ServerConnection;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.ServerEvent;
@@ -33,17 +33,17 @@ public class Server {
 
     private final ServerCache mServerCache;
 
-    private final ServerSenderBus mServerSenderBus;
+    private final ServerEventBus mServerEventBus;
 
-    private final ServerReceiverBus mServerReceiverBus;
+    private final ServerCallBus mServerCallBus;
 
     public Server(final String serverTitle, final ServerConnection connection) {
         mTitle = serverTitle;
         mBuffer = new ArrayList<Message>();
         mStatus = "Disconnected";
         mServerCache = new ServerCache();
-        mServerSenderBus = new ServerSenderBus();
-        mServerReceiverBus = new ServerReceiverBus(connection);
+        mServerEventBus = new ServerEventBus();
+        mServerCallBus = new ServerCallBus(connection);
         mUserChannelInterface = new UserChannelInterface(this);
     }
 
@@ -63,7 +63,7 @@ public class Server {
             mUser.createPrivateMessage(userWhoIsNotUs);
         }
         if (!weAreSending || InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
-            return mServerSenderBus.sendPrivateMessage(userWhoIsNotUs, sendingUser, message,
+            return mServerEventBus.sendPrivateMessage(userWhoIsNotUs, sendingUser, message,
                     !doesPrivateMessageExist);
         } else {
             return new Event("");
@@ -78,7 +78,7 @@ public class Server {
             mUser.createPrivateMessage(userWhoIsNotUs);
         }
         if (!weAreSending || InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
-            return mServerSenderBus.sendPrivateAction(userWhoIsNotUs, sendingUser, action,
+            return mServerEventBus.sendPrivateAction(userWhoIsNotUs, sendingUser, action,
                     !doesPrivateMessageExist);
         } else {
             return new Event("");
@@ -113,14 +113,14 @@ public class Server {
     /**
      * Sets up the writers based on the output stream passed into the method
      *
-     * @param writer - the which the writers will use
-     * @return  - the server writer created from the OutputStreamWriter
+     * @param writer the which the writers will use
+     * @return the server writer created from the OutputStreamWriter
      */
     public ServerWriter onOutputStreamCreated(final OutputStreamWriter writer) {
         final ServerWriter serverWriter = new ServerWriter(writer);
-        mServerReceiverBus.register(serverWriter);
-        mServerReceiverBus.register(new ChannelWriter(writer));
-        mServerReceiverBus.register(new UserWriter(writer));
+        mServerCallBus.register(serverWriter);
+        mServerCallBus.register(new ChannelWriter(writer));
+        mServerCallBus.register(new UserWriter(writer));
         return serverWriter;
     }
 
@@ -157,11 +157,11 @@ public class Server {
         return mServerCache;
     }
 
-    public ServerReceiverBus getServerReceiverBus() {
-        return mServerReceiverBus;
+    public ServerCallBus getServerCallBus() {
+        return mServerCallBus;
     }
 
-    public ServerSenderBus getServerSenderBus() {
-        return mServerSenderBus;
+    public ServerEventBus getServerEventBus() {
+        return mServerEventBus;
     }
 }

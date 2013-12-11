@@ -2,7 +2,7 @@ package com.fusionx.relay.parser;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.communication.ServerSenderBus;
+import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.constants.ServerCommands;
 import com.fusionx.relay.event.NickChangeEvent;
 import com.fusionx.relay.misc.CoreListener;
@@ -37,7 +37,7 @@ public class ServerConnectionParser {
         suffix = 0;
         triedSecondNick = false;
         triedThirdNick = false;
-        final ServerSenderBus sender = server.getServerSenderBus();
+        final ServerEventBus sender = server.getServerEventBus();
 
         while ((line = reader.readLine()) != null) {
             final ArrayList<String> parsedArray = IRCUtils.splitRawLine(line, true);
@@ -68,7 +68,7 @@ public class ServerConnectionParser {
     }
 
     private static String parseConnectionCode(final boolean canChangeNick,
-            final ArrayList<String> parsedArray, final ServerSenderBus sender,
+            final ArrayList<String> parsedArray, final ServerEventBus sender,
             final Server server, final NickStorage nickStorage,
             final ServerWriter writer) {
         final int code = Integer.parseInt(parsedArray.get(1));
@@ -80,18 +80,18 @@ public class ServerConnectionParser {
                 return nick;
             case ERR_NICKNAMEINUSE:
                 if (!triedSecondNick && StringUtils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
-                    server.getServerReceiverBus().post(new NickChangeEvent("", nickStorage
+                    server.getServerCallBus().post(new NickChangeEvent("", nickStorage
                             .getSecondChoiceNick()));
                     triedSecondNick = true;
                 } else if (!triedThirdNick && StringUtils.isNotEmpty(nickStorage
                         .getThirdChoiceNick())) {
-                    server.getServerReceiverBus().post(new NickChangeEvent("",
+                    server.getServerCallBus().post(new NickChangeEvent("",
                             nickStorage.getThirdChoiceNick()));
                     triedThirdNick = true;
                 } else {
                     if (canChangeNick) {
                         ++suffix;
-                        server.getServerReceiverBus().post(new NickChangeEvent("",
+                        server.getServerCallBus().post(new NickChangeEvent("",
                                 nickStorage.getFirstChoiceNick() + suffix));
                     } else {
                         sender.sendNickInUseMessage(server);
@@ -99,7 +99,7 @@ public class ServerConnectionParser {
                 }
                 break;
             case ERR_NONICKNAMEGIVEN:
-                server.getServerReceiverBus().post(new NickChangeEvent("",
+                server.getServerCallBus().post(new NickChangeEvent("",
                         nickStorage.getFirstChoiceNick()));
                 break;
             default:
@@ -112,7 +112,7 @@ public class ServerConnectionParser {
     }
 
     private static void parseConnectionCommand(final ArrayList<String> parsedArray,
-            final ServerConfiguration configuration, final ServerSenderBus sender,
+            final ServerConfiguration configuration, final ServerEventBus sender,
             final Server server, final ServerWriter writer) {
         final String s = parsedArray.get(1).toUpperCase();
         if (s.equals(ServerCommands.Notice)) {

@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends TreeSet<E> {
+
     public interface Updateable {
 
         void update(Object newValue);

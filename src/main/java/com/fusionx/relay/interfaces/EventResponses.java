@@ -1,6 +1,6 @@
 package com.fusionx.relay.interfaces;
 
-public interface EventStringResponses {
+public interface EventResponses {
 
     // Status constants
     public String getConnectedStatus();

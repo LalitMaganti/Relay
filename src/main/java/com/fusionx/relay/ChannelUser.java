@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
 
-    final Server mServer;
+    private final Server mServer;
 
     private final HashMap<Channel, UserLevelEnum> mUserLevelMap;
 
@@ -60,6 +60,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         onUpdateSpannedNick(channel);
     }
 
+    // Called either on part of other or on quit of our user
     public void onRemove(final Channel channel) {
         mUserLevelMap.remove(channel);
         mChannelSpannedMap.remove(channel);
@@ -94,7 +95,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     public void onWhoMode(final String rawMode, final Channel channel) {
         UserLevelEnum mode = UserLevelEnum.NONE;
-        for (UserLevelEnum levelEnum : UserLevelEnum.values()) {
+        for (final UserLevelEnum levelEnum : UserLevelEnum.values()) {
             if (rawMode.contains(String.valueOf(levelEnum.getPrefix()))) {
                 mode = levelEnum;
                 channel.onIncrementUserType(mode);
@@ -171,6 +172,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         }
     }
 
+    // Checkable interface
     @Override
     public boolean isChecked() {
         return mChecked;

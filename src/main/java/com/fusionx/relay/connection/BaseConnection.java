@@ -3,7 +3,7 @@ package com.fusionx.relay.connection;
 import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.communication.ServerSenderBus;
+import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.JoinEvent;
 import com.fusionx.relay.event.NickChangeEvent;
 import com.fusionx.relay.event.QuitEvent;
@@ -63,7 +63,7 @@ public class BaseConnection {
         connect();
 
         while (isReconnectNeeded()) {
-            server.getServerSenderBus().sendGenericServerEvent(server,
+            server.getServerEventBus().sendGenericServerEvent(server,
                     "Trying to reconnect to the server in 5 seconds.");
             try {
                 Thread.sleep(5000);
@@ -76,7 +76,7 @@ public class BaseConnection {
             ++reconnectAttempts;
         }
 
-        server.getServerSenderBus().onDisconnected(server, "Disconnected from the server",
+        server.getServerEventBus().onDisconnected(server, "Disconnected from the server",
                 false);
     }
 
@@ -84,7 +84,7 @@ public class BaseConnection {
      * Called by the connectToServer method ONLY
      */
     private void connect() {
-        final ServerSenderBus sender = server.getServerSenderBus();
+        final ServerEventBus sender = server.getServerEventBus();
         try {
             setupSocket();
             final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());
@@ -132,7 +132,7 @@ public class BaseConnection {
 
                 // Automatically join the channels specified in the configuration
                 for (String channelName : serverConfiguration.getAutoJoinChannels()) {
-                    server.getServerReceiverBus().post(new JoinEvent(channelName));
+                    server.getServerCallBus().post(new JoinEvent(channelName));
                 }
 
                 // Initialise the parser used to parse any lines from the server
@@ -172,7 +172,8 @@ public class BaseConnection {
         final InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),
                 serverConfiguration.getPort());
 
-        mSocket = serverConfiguration.isSslEnabled() ? sslSocketFactory.createSocket() : new Socket();
+        mSocket = serverConfiguration.isSslEnabled() ? sslSocketFactory.createSocket()
+                : new Socket();
         mSocket.setKeepAlive(true);
         mSocket.connect(address, 5000);
     }
@@ -180,7 +181,7 @@ public class BaseConnection {
     /**
      * Called when we are connected to the server
      */
-    private void onConnected(final ServerSenderBus sender) {
+    private void onConnected(final ServerEventBus sender) {
         // We are connected
         server.setStatus(InterfaceHolders.getEventResponses().getConnectedStatus());
         sender.sendConnected(server, serverConfiguration.getUrl());
@@ -192,7 +193,7 @@ public class BaseConnection {
     public void onDisconnect() {
         mUserDisconnected = true;
         server.setStatus(InterfaceHolders.getEventResponses().getDisconnectedStatus());
-        server.getServerSenderBus().post(new QuitEvent(InterfaceHolders.getPreferences()
+        server.getServerEventBus().post(new QuitEvent(InterfaceHolders.getPreferences()
                 .getQuitReason()));
     }
 

@@ -2,7 +2,7 @@ package com.fusionx.relay.parser;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.communication.ServerSenderBus;
+import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.constants.ServerReplyCodes;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.writers.ServerWriter;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 class CapParser {
 
     static void parseCommand(final ArrayList<String> parsedArray, final ServerConfiguration
-            configuration, final Server server, final ServerSenderBus sender,
+            configuration, final Server server, final ServerEventBus sender,
             final ServerWriter writer) {
         final String command = parsedArray.get(0);
         if (command.equals("AUTHENTICATE")) {
@@ -35,7 +35,7 @@ class CapParser {
     }
 
     static void parseCode(final int code, final ArrayList<String> parsedArray,
-            final ServerSenderBus sender, final Server server, final ServerWriter writer) {
+            final ServerEventBus sender, final Server server, final ServerWriter writer) {
         switch (code) {
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String successful = parsedArray.get(3);

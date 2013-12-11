@@ -18,16 +18,16 @@ public class UserInputParser {
         if (command.startsWith("/")) {
             if (command.equals("/me")) {
                 final String action = IRCUtils.convertArrayListToString(parsedArray);
-                server.getServerReceiverBus().sendActionToChannel(channelName, action);
+                server.getServerCallBus().sendActionToChannel(channelName, action);
             } else if (command.equals("/part") || command.equals("/p")) {
                 if (parsedArray.size() == 0) {
-                    server.getServerReceiverBus().sendPart(channelName);
+                    server.getServerCallBus().sendPart(channelName);
                 } else {
                     sendUnknownEvent(server, message);
                 }
             } else if (command.equals("/mode")) {
                 if (parsedArray.size() == 2) {
-                    server.getServerReceiverBus().sendMode(channelName, parsedArray.get(0),
+                    server.getServerCallBus().sendMode(channelName, parsedArray.get(0),
                             parsedArray.get(1));
                 } else {
                     sendUnknownEvent(server, message);
@@ -36,7 +36,7 @@ public class UserInputParser {
                 serverCommandToParse(server, message, callbacks);
             }
         } else {
-            server.getServerReceiverBus().sendMessageToChannel(channelName, message);
+            server.getServerCallBus().sendMessageToChannel(channelName, message);
         }
     }
 
@@ -48,10 +48,10 @@ public class UserInputParser {
         if (command.startsWith("/")) {
             if (command.equals("/me")) {
                 final String action = IRCUtils.convertArrayListToString(parsedArray);
-                server.getServerReceiverBus().sendActionToUser(userNick, action);
+                server.getServerCallBus().sendActionToUser(userNick, action);
             } else if (command.equals("/close") || command.equals("/c")) {
                 if (parsedArray.size() == 0) {
-                    server.getServerReceiverBus().sendClosePrivateMessage(server
+                    server.getServerCallBus().sendClosePrivateMessage(server
                             .getPrivateMessageUser(userNick));
                 } else {
                     sendUnknownEvent(server, message);
@@ -60,7 +60,7 @@ public class UserInputParser {
                 serverCommandToParse(server, message, callbacks);
             }
         } else {
-            server.getServerReceiverBus().sendMessageToUser(userNick, message);
+            server.getServerCallBus().sendMessageToUser(userNick, message);
         }
     }
 
@@ -81,7 +81,7 @@ public class UserInputParser {
         if (command.equals("/join") || command.equals("/j")) {
             if (parsedArray.size() == 1) {
                 final String channelName = parsedArray.get(0);
-                server.getServerReceiverBus().sendJoin(channelName);
+                server.getServerCallBus().sendJoin(channelName);
             } else {
                 sendUnknownEvent(server, rawLine);
             }
@@ -90,7 +90,7 @@ public class UserInputParser {
                 final String nick = parsedArray.remove(0);
                 if (parsedArray.size() >= 1) {
                     final String message = IRCUtils.convertArrayListToString(parsedArray);
-                    server.getServerReceiverBus().sendMessageToUser(nick, message);
+                    server.getServerCallBus().sendMessageToUser(nick, message);
                 } else {
                     callbacks.openPrivateMessage(nick);
                 }
@@ -100,27 +100,27 @@ public class UserInputParser {
         } else if (command.equals("/nick")) {
             if (parsedArray.size() == 1) {
                 final String newNick = parsedArray.get(0);
-                server.getServerReceiverBus().sendNickChange(newNick);
+                server.getServerCallBus().sendNickChange(newNick);
             } else {
                 sendUnknownEvent(server, rawLine);
             }
         } else if (command.equals("/quit")) {
             if (parsedArray.size() == 0) {
-                server.getServerReceiverBus().sendDisconnect();
+                server.getServerCallBus().sendDisconnect();
             } else {
                 sendUnknownEvent(server, rawLine);
             }
         } else if (command.equals("/whois")) {
             if (parsedArray.size() == 1) {
-                server.getServerReceiverBus().sendUserWhois(parsedArray.get(0));
+                server.getServerCallBus().sendUserWhois(parsedArray.get(0));
             } else {
                 sendUnknownEvent(server, rawLine);
             }
         } else if (command.equals("/raw")) {
-            server.getServerReceiverBus().sendRawLine(IRCUtils.convertArrayListToString
+            server.getServerCallBus().sendRawLine(IRCUtils.convertArrayListToString
                     (parsedArray));
         } else if (command.startsWith("/")) {
-            server.getServerReceiverBus().sendRawLine(command.substring(1) + IRCUtils
+            server.getServerCallBus().sendRawLine(command.substring(1) + IRCUtils
                     .convertArrayListToString(parsedArray));
         } else {
             sendUnknownEvent(server, rawLine);
@@ -128,7 +128,7 @@ public class UserInputParser {
     }
 
     private static void sendUnknownEvent(final Server server, final String rawLine) {
-        server.getServerReceiverBus().sendUnknownEvent(rawLine + " is not a valid command");
+        server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
     }
 
     public interface ParserCallbacks {
