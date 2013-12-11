@@ -36,9 +36,9 @@ public class IRCUserComparator implements Comparator<ChannelUser> {
 
             return firstRemoved.compareToIgnoreCase(secondRemoved);
         } else if (firstUserMode.ordinal() > secondUserMode.ordinal()) {
-            return -1;
-        } else {
             return 1;
+        } else {
+            return -1;
         }
     }
 }

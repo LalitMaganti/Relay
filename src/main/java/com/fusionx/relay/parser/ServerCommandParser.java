@@ -320,9 +320,9 @@ class ServerCommandParser {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final ChannelUser kickedUser = mUserChannelInterface.getUser(kickedNick);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
-        final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"",
-                "") : "";
+        final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
         final String kickingUserNick = user.getPrettyNick(channel);
+
         if (kickedUser.equals(mServer.getUser())) {
             final String message = mEventResponses.getOnUserKickedMessage(channel.getName(),
                     kickingUserNick, reason);

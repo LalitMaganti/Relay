@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
 
-    private final Server mServer;
+    final Server mServer;
 
     private final HashMap<Channel, UserLevelEnum> mUserLevelMap;
 
