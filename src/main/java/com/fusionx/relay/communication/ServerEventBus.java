@@ -129,7 +129,7 @@ public class ServerEventBus extends Bus {
         String preMessage = InterfaceHolders.getEventResponses().getMessage(nick, rawMessage);
         if (rawMessage.toLowerCase().contains(user.getNick().toLowerCase())) {
             onUserMentioned(channel.getName());
-            preMessage = "<b>" + preMessage + "</b>";
+            preMessage = "<bold>" + preMessage + "</bold>";
         }
         return sendGenericChannelEvent(channel, preMessage, false);
     }
@@ -140,7 +140,7 @@ public class ServerEventBus extends Bus {
                 .getActionMessage(nick, rawAction);
         if (rawAction.toLowerCase().contains(user.getNick().toLowerCase())) {
             onUserMentioned(channel.getName());
-            finalMessage = "<b>" + finalMessage + "</b>";
+            finalMessage = "<bold>" + finalMessage + "</bold>";
         }
         return sendGenericChannelEvent(channel, finalMessage, false);
     }

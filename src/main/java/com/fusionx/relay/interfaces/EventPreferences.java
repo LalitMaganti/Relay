@@ -21,4 +21,6 @@ public interface EventPreferences {
     public boolean shouldSendSelfMessageEvent();
 
     public boolean isMOTDShown();
+
+    public boolean shouldHighlightLine();
 }
