@@ -136,11 +136,10 @@ public class ServerEventBus extends Bus {
 
     public ChannelEvent onChannelAction(final AppUser user, final Channel channel,
             final String nick, final String rawAction) {
-        String finalMessage = InterfaceHolders.getEventResponses()
+        final String finalMessage = InterfaceHolders.getEventResponses()
                 .getActionMessage(nick, rawAction);
         if (rawAction.toLowerCase().contains(user.getNick().toLowerCase())) {
             onUserMentioned(channel.getName());
-            finalMessage = "<bold>" + finalMessage + "</bold>";
         }
         return sendGenericChannelEvent(channel, finalMessage, false);
     }
