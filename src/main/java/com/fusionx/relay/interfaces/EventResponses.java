@@ -42,4 +42,6 @@ public interface EventResponses {
 
     // Errors
     public String getNickInUserError();
+
+    public void onUserMentioned(final String serverName, final String messageDestination);
 }

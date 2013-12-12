@@ -11,6 +11,7 @@ import com.fusionx.relay.event.ConnectedEvent;
 import com.fusionx.relay.event.DisconnectEvent;
 import com.fusionx.relay.event.JoinEvent;
 import com.fusionx.relay.event.KickEvent;
+import com.fusionx.relay.event.MentionEvent;
 import com.fusionx.relay.event.NickInUseEvent;
 import com.fusionx.relay.event.PartEvent;
 import com.fusionx.relay.event.PrivateActionEvent;
@@ -29,10 +30,14 @@ public class ServerEventBus extends Bus {
 
     private final Handler mMainThread = new Handler(Looper.getMainLooper());
 
+    private final String mServerName;
+
     private boolean mDisplayed;
 
-    public ServerEventBus() {
+    public ServerEventBus(final String serverName) {
         super(ThreadEnforcer.ANY);
+
+        mServerName = serverName;
     }
 
     @Override
@@ -207,32 +212,13 @@ public class ServerEventBus extends Bus {
         // TODO figure out what to do here
     }
 
-    // TODO - fix this
+    // TODO - refine this
     void onUserMentioned(final String messageDestination) {
-    /*    if (mDisplayed) {
-            mBus.post(new MentionEvent(messageDestination));
+        if (mDisplayed) {
+            post(new MentionEvent(messageDestination));
         } else {
-            final NotificationManager mNotificationManager =
-                    (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            final Intent intent = new Intent(mContext, UIUtils.getIRCActivity(mContext));
-            intent.putExtra("serverTitle", mServerName);
-            intent.putExtra("mention", messageDestination);
-            final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
-            taskStackBuilder.addParentStack(UIUtils.getIRCActivity(mContext));
-            taskStackBuilder.addNextIntent(intent);
-            final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            final Notification notification = new NotificationCompat.Builder(mContext)
-                    .setContentTitle(mContext.getString(R.string.app_name))
-                    .setContentText(mContext.getString(R.string.service_you_mentioned) + " " +
-                            messageDestination)
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .setAutoCancel(true)
-                    .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
-                            messageDestination)
-                    .setContentIntent(pIntent).build();
-            mNotificationManager.notify(345, notification);
-        }*/
+            InterfaceHolders.getEventResponses().onUserMentioned(mServerName, messageDestination);
+        }
     }
 
     // Getters and setters
