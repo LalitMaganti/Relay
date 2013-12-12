@@ -66,7 +66,7 @@ class ServerCommandParser {
         } else if (command.equals(ServerCommands.Quit)) {
             return onQuit(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Nick)) {
-            return onNickChange(parsedArray, rawSource);
+            return onNickChanged(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Topic)) {
             return onChannelTopicChanged(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Kick)) {
@@ -79,7 +79,7 @@ class ServerCommandParser {
         }
     }
 
-    private Event onNickChange(ArrayList<String> parsedArray, String rawSource) {
+    private Event onNickChanged(final ArrayList<String> parsedArray, final String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Set<Channel> channels = user.getChannels();
         final String oldNick = user.getColorfulNick();
@@ -161,7 +161,7 @@ class ServerCommandParser {
             final String rawSource) {
         // TODO - THIS IS INCOMPLETE
         if (message.startsWith("ACTION")) {
-            return onParseAction(parsedArray, rawSource);
+            return onAction(parsedArray, rawSource);
         } else if (message.startsWith("VERSION")) {
             final String nick = IRCUtils.getNickFromRaw(rawSource);
             // TODO - get the version from the app
@@ -172,7 +172,7 @@ class ServerCommandParser {
         }
     }
 
-    private Event onParseAction(final ArrayList<String> parsedArray, final String rawSource) {
+    private Event onAction(final ArrayList<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
         final String action = parsedArray.get(3).replace("ACTION ", "");
 
@@ -231,19 +231,19 @@ class ServerCommandParser {
     }
 
     // Channel parsing starts here
-    private ChannelEvent parseChannelMessage(final String sendingNick,
-            final String channelName, final String message) {
+    private ChannelEvent parseChannelMessage(final String sendingNick, final String channelName,
+            final String message) {
         final ChannelUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         // This occurs rarely - usually on ZNCs - for example the ZNC buffer starts with a
         // PRIVMSG from the nick ***. Also if someone said something on the channel during
         // the buffer but is not in the channel now then this will also happen
         if (sendingUser == null) {
-            return mServerEventBus.onChannelMessage(mServer.getUser(), channel,
-                    sendingNick, message);
+            return mServerEventBus.onChannelMessage(mServer.getUser(), channel, sendingNick,
+                    message);
         } else {
-            return mServerEventBus.onChannelMessage(mServer.getUser(), channel,
-                    sendingUser, message);
+            return mServerEventBus.onChannelMessage(mServer.getUser(), channel, sendingUser,
+                    message);
         }
     }
 
@@ -299,8 +299,8 @@ class ServerCommandParser {
             mUserChannelInterface.removeChannel(channel);
             return new Event(channelName);
         } else {
-            final String reason = parsedArray.size() == 4 ?
-                    parsedArray.get(3).replace("\"", "") : "";
+            final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"",
+                    "") : "";
             final String message = mEventResponses.getPartMessage(user.getPrettyNick(channel),
                     reason);
 
@@ -343,7 +343,7 @@ class ServerCommandParser {
         }
     }
 
-    private Event onChannelInvite(ArrayList<String> parsedArray, String rawSource) {
+    private Event onChannelInvite(final ArrayList<String> parsedArray, String rawSource) {
         final String invitingNick = IRCUtils.getNickFromRaw(rawSource);
         if (parsedArray.get(2).equals(mServer.getUser().getNick())) {
             final String channelName = parsedArray.get(3);

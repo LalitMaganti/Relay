@@ -19,9 +19,6 @@ public class Channel {
     private final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',
             '+', '!');
 
-    /**
-     * Name of the channel
-     */
     private final String mName;
 
     private final UserChannelInterface mUserChannelInterface;
@@ -30,9 +27,6 @@ public class Channel {
 
     private final EnumMap<UserLevelEnum, Integer> mNumberOfUsers;
 
-    /**
-     * Topic of the channel
-     */
     private String mTopic;
 
     private boolean mCached;
@@ -53,6 +47,12 @@ public class Channel {
         mBuffer.add(new Message(message));
     }
 
+    /**
+     * Returns whether a string is a channel name based on the first character of the string
+     *
+     * @param firstCharacter the first character of the string that is to be tested
+     * @return whether the character can be one at the start of a channel
+     */
     public static boolean isChannelPrefix(char firstCharacter) {
         return channelPrefixes.contains(firstCharacter);
     }
@@ -78,6 +78,11 @@ public class Channel {
         }
     }
 
+    /**
+     * Gets the number of people in the channel
+     *
+     * @return the number of users in the channel
+     */
     public int getNumberOfUsers() {
         if (getUsers() != null) {
             return getUsers().size();
@@ -86,6 +91,11 @@ public class Channel {
         }
     }
 
+    /**
+     * Increments the type of user in the channel by 1 - for internal use only
+     *
+     * @param userLevelEnum the type of user
+     */
     public void onIncrementUserType(final UserLevelEnum userLevelEnum) {
         if (userLevelEnum != UserLevelEnum.NONE) {
             synchronized (mNumberOfUsers) {
@@ -95,6 +105,11 @@ public class Channel {
         }
     }
 
+    /**
+     * Decrements the type of user in the channel by 1 - for internal use only
+     *
+     * @param userLevelEnum the type of user
+     */
     public void onDecrementUserType(final UserLevelEnum userLevelEnum) {
         if (userLevelEnum != UserLevelEnum.NONE) {
             synchronized (mNumberOfUsers) {
@@ -104,6 +119,12 @@ public class Channel {
         }
     }
 
+    /**
+     * Gets the number of users of a specific level in the channel
+     *
+     * @param userLevelEnum - the level to get
+     * @return the number of users of this level
+     */
     public int getNumberOfUsersType(final UserLevelEnum userLevelEnum) {
         synchronized (mNumberOfUsers) {
             if (userLevelEnum != UserLevelEnum.NONE) {
@@ -118,6 +139,11 @@ public class Channel {
         }
     }
 
+    /**
+     * Overidden method which returns the channel's name
+     *
+     * @return the channel name
+     */
     @Override
     public String toString() {
         return mName;
@@ -128,16 +154,32 @@ public class Channel {
         return mName;
     }
 
+    /**
+     * Gets the buffer of the channel - the messages which were received since the start of
+     * observation
+     *
+     * @return a list of the messages
+     */
     public List<Message> getBuffer() {
         return mBuffer;
     }
 
+    /**
+     * Gets the topic of the channel
+     *
+     * @return the topic
+     */
     public String getTopic() {
         return mTopic;
     }
 
-    public void setTopic(String mTopic) {
-        this.mTopic = mTopic;
+    /**
+     * Sets the topic of the channel - for internal use only
+     *
+     * @param topic the topic to be set
+     */
+    public void setTopic(String topic) {
+        this.mTopic = topic;
     }
 
     public boolean isCached() {

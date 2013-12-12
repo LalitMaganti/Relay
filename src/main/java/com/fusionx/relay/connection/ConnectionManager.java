@@ -24,10 +24,10 @@ public class ConnectionManager {
     /**
      * Returns a singleton connection manager which is lazily created
      *
-     * @param responses   a concrete implementation of the {@link com.fusionx.relay
-     *                    .interfaces.EventResponses interface}
-     * @param preferences a concrete implementation of the {@link com.fusionx.relay
-     *                    .interfaces.EventPreferences interface}
+     * @param responses   a concrete implementation of the
+     * {@link com.fusionx.relay.interfaces.EventResponses} interface
+     * @param preferences a concrete implementation of the
+     * {@link com.fusionx.relay.interfaces.EventPreferences} interface
      * @return the connection manager which was created
      */
     public static ConnectionManager getConnectionManager(final EventResponses responses,
