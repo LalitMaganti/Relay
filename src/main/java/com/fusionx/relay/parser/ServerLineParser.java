@@ -12,8 +12,6 @@ import com.fusionx.relay.writers.ServerWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,8 +57,6 @@ public class ServerLineParser {
      * @return returns a boolean which indicates whether the server has disconnected
      */
     Event parseLine(final String rawLine, final ServerWriter writer) {
-        Log.e("Line", rawLine);
-
         final ArrayList<String> parsedArray = IRCUtils.splitRawLine(rawLine, true);
         // For stupid servers that send blank lines - like seriously - why??
         if (!parsedArray.isEmpty()) {
