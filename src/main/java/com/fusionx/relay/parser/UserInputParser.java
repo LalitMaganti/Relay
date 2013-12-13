@@ -20,20 +20,25 @@ public class UserInputParser {
             if (command.equals("/me")) {
                 final String action = IRCUtils.convertArrayListToString(parsedArray);
                 server.getServerCallBus().sendActionToChannel(channelName, action);
+                return;
             } else if (command.equals("/part") || command.equals("/p")) {
                 if (arrayLength == 0) {
                     server.getServerCallBus().sendPart(channelName);
+                    return;
                 }
             } else if (command.equals("/mode")) {
                 if (arrayLength == 2) {
                     server.getServerCallBus().sendMode(channelName, parsedArray.get(0),
                             parsedArray.get(1));
+                    return;
                 }
             } else {
                 serverCommandToParse(server, message);
+                return;
             }
         } else {
             server.getServerCallBus().sendMessageToChannel(channelName, message);
+            return;
         }
         sendUnknownEvent(server, message);
     }
@@ -48,16 +53,20 @@ public class UserInputParser {
             if (command.equals("/me")) {
                 final String action = IRCUtils.convertArrayListToString(parsedArray);
                 server.getServerCallBus().sendActionToUser(userNick, action);
+                return;
             } else if (command.equals("/close") || command.equals("/c")) {
                 if (arrayLength == 0) {
                     server.getServerCallBus().sendClosePrivateMessage(server
                             .getPrivateMessageUserIfExists(userNick));
+                    return;
                 }
             } else {
                 serverCommandToParse(server, message);
+                return;
             }
         } else {
             server.getServerCallBus().sendMessageToUser(userNick, message);
+            return;
         }
         sendUnknownEvent(server, message);
     }
@@ -79,6 +88,7 @@ public class UserInputParser {
             if (arrayLength == 1) {
                 final String channelName = parsedArray.get(0);
                 server.getServerCallBus().sendJoin(channelName);
+                return;
             }
         } else if (command.equals("/msg")) {
             if (arrayLength >= 1) {
@@ -86,25 +96,31 @@ public class UserInputParser {
                 final String message = parsedArray.size() >= 1 ? IRCUtils
                         .convertArrayListToString(parsedArray) : "";
                 server.getServerCallBus().sendMessageToUser(nick, message);
+                return;
             }
         } else if (command.equals("/nick")) {
             if (arrayLength == 1) {
                 final String newNick = parsedArray.get(0);
                 server.getServerCallBus().sendNickChange(newNick);
+                return;
             }
         } else if (command.equals("/quit")) {
             if (arrayLength == 0) {
                 server.getServerCallBus().sendDisconnect();
+                return;
             }
         } else if (command.equals("/whois")) {
             if (arrayLength == 1) {
                 server.getServerCallBus().sendUserWhois(parsedArray.get(0));
+                return;
             }
         } else if (command.equals("/raw")) {
             server.getServerCallBus().sendRawLine(IRCUtils.convertArrayListToString(parsedArray));
+            return;
         } else if (command.startsWith("/")) {
             server.getServerCallBus().sendRawLine(command.substring(1) + IRCUtils
                     .convertArrayListToString(parsedArray));
+            return;
         }
         sendUnknownEvent(server, rawLine);
     }

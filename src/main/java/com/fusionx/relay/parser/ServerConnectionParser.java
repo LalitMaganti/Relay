@@ -37,7 +37,7 @@ public class ServerConnectionParser {
         suffix = 0;
         triedSecondNick = false;
         triedThirdNick = false;
-        final ServerEventBus sender = server.getServerEventBus();
+        final ServerEventBus eventBus = server.getServerEventBus();
 
         while ((line = reader.readLine()) != null) {
             final ArrayList<String> parsedArray = IRCUtils.splitRawLine(line, true);
@@ -49,17 +49,17 @@ public class ServerConnectionParser {
                 // kicked us out for some reason
                 return null;
             } else if (s.equals(ServerCommands.Authenticate)) {
-                CapParser.parseCommand(parsedArray, configuration, server, sender, writer);
+                CapParser.parseCommand(parsedArray, configuration, server, eventBus, writer);
             } else {
                 if (StringUtils.isNumeric(parsedArray.get(1))) {
                     final String nick = parseConnectionCode(configuration.isNickChangable(),
-                            parsedArray, sender, server,
+                            parsedArray, eventBus, server,
                             configuration.getNickStorage(), writer);
                     if (nick != null) {
                         return nick;
                     }
                 } else {
-                    parseConnectionCommand(parsedArray, configuration, sender,
+                    parseConnectionCommand(parsedArray, configuration, eventBus,
                             server, writer);
                 }
             }
