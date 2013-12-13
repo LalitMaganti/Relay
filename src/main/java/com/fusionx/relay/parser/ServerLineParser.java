@@ -12,6 +12,8 @@ import com.fusionx.relay.writers.ServerWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,23 +59,29 @@ public class ServerLineParser {
      * @return returns a boolean which indicates whether the server has disconnected
      */
     Event parseLine(final String rawLine, final ServerWriter writer) {
+        Log.e("Line", rawLine);
+
         final ArrayList<String> parsedArray = IRCUtils.splitRawLine(rawLine, true);
-        String s = parsedArray.get(0);
-        if (s.equals(ServerCommands.Ping)) {// Immediately return
-            final String source = parsedArray.get(1);
-            CoreListener.respondToPing(writer, source);
-            return new Event(rawLine);
-        } else if (s.equals(ServerCommands.Error)) {
-            // We are finished - the server has kicked us
-            // out for some reason
-            return new ErrorEvent(rawLine);
-        } else {// Check if the second thing is a code or a command
-            if (StringUtils.isNumeric(parsedArray.get(1))) {
-                return mCodeParser.onParseCode(parsedArray, rawLine);
-            } else {
-                return mCommandParser.onParseServerCommand(parsedArray, rawLine);
+        // For stupid servers that send blank lines - like seriously - why??
+        if (!parsedArray.isEmpty()) {
+            String s = parsedArray.get(0);
+            if (s.equals(ServerCommands.Ping)) {// Immediately return
+                final String source = parsedArray.get(1);
+                CoreListener.respondToPing(writer, source);
+                return new Event(rawLine);
+            } else if (s.equals(ServerCommands.Error)) {
+                // We are finished - the server has kicked us
+                // out for some reason
+                return new ErrorEvent(rawLine);
+            } else {// Check if the second thing is a code or a command
+                if (StringUtils.isNumeric(parsedArray.get(1))) {
+                    return mCodeParser.onParseCode(parsedArray, rawLine);
+                } else {
+                    return mCommandParser.onParseServerCommand(parsedArray, rawLine);
+                }
             }
         }
+        return new Event("");
     }
 
     Server getServer() {

@@ -18,9 +18,11 @@ public interface EventPreferences {
 
     public boolean shouldLogUserListChanges();
 
-    public boolean shouldSendSelfMessageEvent();
+    public boolean isSelfEventBroadcast();
 
     public boolean isMOTDShown();
 
     public boolean shouldHighlightLine();
+
+    public boolean shouldHandleInitialPrivateMessage();
 }

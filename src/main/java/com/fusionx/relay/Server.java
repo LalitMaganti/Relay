@@ -25,11 +25,7 @@ public class Server {
 
     private final UserChannelInterface mUserChannelInterface;
 
-    private AppUser mUser;
-
     private final List<Message> mBuffer;
-
-    private String mStatus;
 
     private final ServerCache mServerCache;
 
@@ -37,12 +33,16 @@ public class Server {
 
     private final ServerCallBus mServerCallBus;
 
+    private AppUser mUser;
+
+    private String mStatus;
+
     public Server(final String serverTitle, final ServerConnection connection) {
         mTitle = serverTitle;
         mBuffer = new ArrayList<Message>();
         mStatus = "Disconnected";
         mServerCache = new ServerCache();
-        mServerEventBus = new ServerEventBus();
+        mServerEventBus = new ServerEventBus(serverTitle);
         mServerCallBus = new ServerCallBus(connection);
         mUserChannelInterface = new UserChannelInterface(this);
     }
@@ -55,15 +55,15 @@ public class Server {
         }
     }
 
-    public Event onPrivateMessage(final PrivateMessageUser userWhoIsNotUs,
-            final String message, final boolean weAreSending) {
+    public Event onPrivateMessage(final PrivateMessageUser userWhoIsNotUs, final String message,
+            final boolean weAreSending) {
         final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
         final boolean doesPrivateMessageExist = mUser.isPrivateMessageOpen(userWhoIsNotUs);
         if (!doesPrivateMessageExist) {
             mUser.createPrivateMessage(userWhoIsNotUs);
         }
-        if (!weAreSending || InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
-            return mServerEventBus.sendPrivateMessage(userWhoIsNotUs, sendingUser, message,
+        if (!weAreSending || InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
+            return mServerEventBus.onPrivateMessage(userWhoIsNotUs, sendingUser, message,
                     !doesPrivateMessageExist);
         } else {
             return new Event("");
@@ -77,15 +77,15 @@ public class Server {
         if (!doesPrivateMessageExist) {
             mUser.createPrivateMessage(userWhoIsNotUs);
         }
-        if (!weAreSending || InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
-            return mServerEventBus.sendPrivateAction(userWhoIsNotUs, sendingUser, action,
+        if (!weAreSending || InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
+            return mServerEventBus.onPrivateAction(userWhoIsNotUs, sendingUser, action,
                     !doesPrivateMessageExist);
         } else {
             return new Event("");
         }
     }
 
-    public synchronized PrivateMessageUser getPrivateMessageUser(final String nick) {
+    public synchronized PrivateMessageUser getPrivateMessageUserIfExists(final String nick) {
         final Iterator<PrivateMessageUser> iterator = mUser.getPrivateMessageIterator();
         while (iterator.hasNext()) {
             final PrivateMessageUser privateMessageUser = iterator.next();
@@ -93,7 +93,17 @@ public class Server {
                 return privateMessageUser;
             }
         }
-        return new PrivateMessageUser(nick, mUserChannelInterface);
+        return null;
+    }
+
+    public synchronized PrivateMessageUser getPrivateMessageUser(final String nick,
+            final String initialMessage) {
+        final PrivateMessageUser user = getPrivateMessageUserIfExists(nick);
+        if (user == null) {
+            return new PrivateMessageUser(nick, mUserChannelInterface, initialMessage);
+        } else {
+            return user;
+        }
     }
 
     public boolean isConnected() {

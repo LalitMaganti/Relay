@@ -17,7 +17,6 @@ public final class UserChannelInterface {
 
     private final Server mServer;
 
-
     public UserChannelInterface(final Server server) {
         mServer = server;
         mUserToChannelMap = new HashMap<ChannelUser, LinkedHashSet<Channel>>();

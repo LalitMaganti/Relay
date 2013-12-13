@@ -6,17 +6,21 @@ import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.connection.ServerConnection;
 import com.fusionx.relay.event.ActionEvent;
+import com.fusionx.relay.event.DisconnectEvent;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.JoinEvent;
 import com.fusionx.relay.event.MessageEvent;
 import com.fusionx.relay.event.ModeEvent;
 import com.fusionx.relay.event.NickChangeEvent;
 import com.fusionx.relay.event.PartEvent;
+import com.fusionx.relay.event.PrivateActionEvent;
 import com.fusionx.relay.event.PrivateMessageEvent;
 import com.fusionx.relay.event.WhoisEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class ServerCallBus extends Bus {
 
@@ -55,21 +59,26 @@ public class ServerCallBus extends Bus {
     }
 
     public void sendDisconnect() {
+        getServer().getServerEventBus().post(new DisconnectEvent("", false, true));
         mConnection.onDisconnect();
     }
 
     public void sendMessageToUser(final String userNick, final String message) {
-        final PrivateMessageUser user = getServer().getPrivateMessageUser(userNick);
-        final boolean isPrivateMessageOpen = getServer().getUser().isPrivateMessageOpen(user);
-        post(new PrivateMessageEvent(message, userNick, !isPrivateMessageOpen));
+        final PrivateMessageUser user = getServer().getPrivateMessageUser(userNick, message);
+        if (StringUtils.isNotEmpty(message)) {
+            final boolean isPrivateMessageOpen = getServer().getUser().isPrivateMessageOpen(user);
+            post(new PrivateMessageEvent(userNick, message, !isPrivateMessageOpen));
+        }
 
         getServer().onPrivateMessage(user, message, true);
     }
 
     public void sendActionToUser(final String userNick, final String action) {
-        final PrivateMessageUser user = getServer().getPrivateMessageUser(userNick);
-        final boolean isPrivateMessageOpen = getServer().getUser().isPrivateMessageOpen(user);
-        post(new PrivateMessageEvent(action, userNick, !isPrivateMessageOpen));
+        final PrivateMessageUser user = getServer().getPrivateMessageUser(userNick, action);
+        if (StringUtils.isNotEmpty(action)) {
+            final boolean isPrivateMessageOpen = getServer().getUser().isPrivateMessageOpen(user);
+            post(new PrivateActionEvent(userNick, action, !isPrivateMessageOpen));
+        }
 
         getServer().onPrivateAction(user, action, true);
     }
@@ -83,7 +92,7 @@ public class ServerCallBus extends Bus {
     }
 
     public void sendClosePrivateMessage(final String nick) {
-        sendClosePrivateMessage(getServer().getPrivateMessageUser(nick));
+        sendClosePrivateMessage(getServer().getPrivateMessageUserIfExists(nick));
     }
 
     public void sendClosePrivateMessage(final PrivateMessageUser user) {
@@ -97,7 +106,7 @@ public class ServerCallBus extends Bus {
     public void sendMessageToChannel(final String channelName, final String message) {
         post(new MessageEvent(channelName, message));
 
-        if (InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
+        if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
             final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
             final AppUser user = getServer().getUser();
             getServer().getServerEventBus().onChannelMessage(user, channel, user, message);
@@ -107,7 +116,7 @@ public class ServerCallBus extends Bus {
     public void sendActionToChannel(final String channelName, final String action) {
         post(new ActionEvent(channelName, action));
 
-        if (InterfaceHolders.getPreferences().shouldSendSelfMessageEvent()) {
+        if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
             final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
             final AppUser user = getServer().getUser();
             getServer().getServerEventBus().onChannelAction(user, channel, user, action);

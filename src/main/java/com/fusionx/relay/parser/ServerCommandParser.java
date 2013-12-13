@@ -145,8 +145,8 @@ class ServerCommandParser {
             final Channel channel = mUserChannelInterface.getChannel(recipient);
             return mServerEventBus.sendGenericChannelEvent(channel, formattedNotice, false);
         } else if (recipient.equals(mServer.getUser().getNick())) {
-            final PrivateMessageUser user = mServer.getPrivateMessageUser(sendingUser);
-            if (mServer.getUser().isPrivateMessageOpen(user)) {
+            final PrivateMessageUser user = mServer.getPrivateMessageUserIfExists(sendingUser);
+            if (user != null) {
                 return mServer.onPrivateMessage(user, notice, false);
             } else {
                 return mServerEventBus.sendSwitchToServerEvent(mServer, formattedNotice);
@@ -181,7 +181,7 @@ class ServerCommandParser {
             if (Channel.isChannelPrefix(recipient.charAt(0))) {
                 return onParseChannelAction(recipient, nick, action);
             } else {
-                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
+                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick, action);
                 return mServer.onPrivateAction(sendingUser, action, false);
             }
         } else {
@@ -200,7 +200,7 @@ class ServerCommandParser {
             if (Channel.isChannelPrefix(recipient.charAt(0))) {
                 return parseChannelMessage(nick, recipient, message);
             } else {
-                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
+                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick, message);
                 return mServer.onPrivateMessage(sendingUser, message, false);
             }
         } else {

@@ -74,7 +74,9 @@ public class ServerEventBus extends Bus {
     }
 
     private void sendUserEvent(final PrivateMessageUser user, final PrivateEvent event) {
-        if (user.isCached()) {
+        // Make an exception if this is a new private message - we need the client to catch that
+        // it's a new message
+        if (user.isCached() || event.newPrivateMessage) {
             post(event);
         } else {
             user.onUserEvent(event);
@@ -101,9 +103,9 @@ public class ServerEventBus extends Bus {
     }
     // Generic events end
 
-    public void onDisconnected(final Server server,
-            final String disconnectLine, final boolean retryPending) {
-        final DisconnectEvent event = new DisconnectEvent(disconnectLine, retryPending);
+    public void onDisconnected(final Server server, final String disconnectLine,
+            final boolean retryPending) {
+        final DisconnectEvent event = new DisconnectEvent(disconnectLine, retryPending, false);
         sendServerEvent(server, event);
     }
 
@@ -155,29 +157,21 @@ public class ServerEventBus extends Bus {
         return onChannelAction(user, channel, nick, rawAction);
     }
 
-    /**
-     * Method used to send a private message. <p/> Method should not be used from anywhere but the
-     * Server class.
-     *
-     * @param user       - the destination user object
-     * @param sending    - the user who is sending the message - it may be us or it may be the other
-     *                   user
-     * @param rawMessage - the message being sent
-     * @param newMessage - whether this conversation was open prior to this point
-     */
-    public PrivateEvent sendPrivateMessage(final PrivateMessageUser user, final User sending,
+    public PrivateEvent onPrivateMessage(final PrivateMessageUser user, final User sending,
             final String rawMessage, final boolean newMessage) {
         final String message = InterfaceHolders.getEventResponses().getMessage(sending
                 .getColorfulNick(), rawMessage);
         // TODO - change this to be specific for PMs
         onUserMentioned(user.getNick());
+
         final PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(user.getNick(),
                 message, newMessage);
         sendUserEvent(user, privateMessageEvent);
+
         return privateMessageEvent;
     }
 
-    public PrivateEvent sendPrivateAction(final PrivateMessageUser user, final User sendingUser,
+    public PrivateEvent onPrivateAction(final PrivateMessageUser user, final User sendingUser,
             final String rawAction, final boolean newMessage) {
         final String message = InterfaceHolders.getEventResponses().getActionMessage(sendingUser
                 .getColorfulNick(), rawAction);
@@ -185,9 +179,11 @@ public class ServerEventBus extends Bus {
         if (sendingUser.equals(user)) {
             onUserMentioned(user.getNick());
         }
-        final PrivateActionEvent privateMessageEvent = new PrivateActionEvent(user.getNick(),
-                message, newMessage);
+
+        final PrivateActionEvent privateMessageEvent = new PrivateActionEvent(message, user.getNick(),
+                newMessage);
         sendUserEvent(user, privateMessageEvent);
+
         return privateMessageEvent;
     }
 
