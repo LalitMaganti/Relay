@@ -24,10 +24,10 @@ public class ConnectionManager {
     /**
      * Returns a singleton connection manager which is lazily created
      *
-     * @param responses   a concrete implementation of the
-     * {@link com.fusionx.relay.interfaces.EventResponses} interface
-     * @param preferences a concrete implementation of the
-     * {@link com.fusionx.relay.interfaces.EventPreferences} interface
+     * @param responses   a concrete implementation of the {@link com.fusionx.relay.interfaces.EventResponses}
+     *                    interface
+     * @param preferences a concrete implementation of the {@link com.fusionx.relay.interfaces.EventPreferences}
+     *                    interface
      * @return the connection manager which was created
      */
     public static ConnectionManager getConnectionManager(final EventResponses responses,
@@ -43,8 +43,8 @@ public class ConnectionManager {
      * Creates a connection with the IRC server and tries to connect to it
      *
      * @param configuration the configuration you want to connect with
-     * @param errorHandler  a handler object which will be used if an error occurs on the
-     *                      background thread
+     * @param errorHandler  a handler object which will be used if an error occurs on the background
+     *                      thread
      * @return the server object created by the connection
      */
     public Server onConnectionRequested(final ServerConfiguration configuration,

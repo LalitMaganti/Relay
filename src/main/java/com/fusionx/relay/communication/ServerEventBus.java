@@ -20,6 +20,7 @@ import com.fusionx.relay.event.PrivateMessageEvent;
 import com.fusionx.relay.event.ServerEvent;
 import com.fusionx.relay.event.SwitchToServerEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.util.IRCUtils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
@@ -134,7 +135,7 @@ public class ServerEventBus extends Bus {
     public ChannelEvent onChannelMessage(final AppUser user, final Channel channel,
             final String nick, final String rawMessage) {
         String preMessage = InterfaceHolders.getEventResponses().getMessage(nick, rawMessage);
-        if (rawMessage.toLowerCase().contains(user.getNick().toLowerCase())) {
+        if (IRCUtils.splitRawLine(rawMessage, false).contains(user.getNick().toLowerCase());) {
             onUserMentioned(channel.getName());
             preMessage = "<bold>" + preMessage + "</bold>";
         }
@@ -180,7 +181,8 @@ public class ServerEventBus extends Bus {
             onUserMentioned(user.getNick());
         }
 
-        final PrivateActionEvent privateMessageEvent = new PrivateActionEvent(message, user.getNick(),
+        final PrivateActionEvent privateMessageEvent = new PrivateActionEvent(message,
+                user.getNick(),
                 newMessage);
         sendUserEvent(user, privateMessageEvent);
 

@@ -6,7 +6,8 @@ public class DisconnectEvent extends ServerEvent {
 
     public final boolean userTriggered;
 
-    public DisconnectEvent(String message, final boolean retryPending, final boolean userTriggered) {
+    public DisconnectEvent(String message, final boolean retryPending,
+            final boolean userTriggered) {
         super(message);
 
         this.retryPending = retryPending;
