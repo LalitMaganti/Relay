@@ -38,7 +38,6 @@ public class ServerConnectionParser {
     public String parseConnect(final Server server, final ServerConfiguration
             configuration, final BufferedReader reader, final ServerWriter writer) throws
             IOException {
-
         String line;
         final ServerEventBus eventBus = server.getServerEventBus();
 

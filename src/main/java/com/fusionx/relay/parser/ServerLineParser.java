@@ -61,20 +61,21 @@ public class ServerLineParser {
         // For stupid servers that send blank lines - like seriously - why??
         if (!parsedArray.isEmpty()) {
             String s = parsedArray.get(0);
-            if (s.equals(ServerCommands.Ping)) {// Immediately return
-                final String source = parsedArray.get(1);
-                CoreListener.respondToPing(writer, source);
-                return new Event(rawLine);
-            } else if (s.equals(ServerCommands.Error)) {
-                // We are finished - the server has kicked us
-                // out for some reason
-                return new ErrorEvent(rawLine);
-            } else {// Check if the second thing is a code or a command
-                if (StringUtils.isNumeric(parsedArray.get(1))) {
-                    return mCodeParser.onParseCode(parsedArray, rawLine);
-                } else {
-                    return mCommandParser.onParseServerCommand(parsedArray, rawLine);
-                }
+            switch (s) {
+                case ServerCommands.Ping: // Immediately return
+                    final String source = parsedArray.get(1);
+                    CoreListener.respondToPing(writer, source);
+                    return new Event(rawLine);
+                case ServerCommands.Error:
+                    // We are finished - the server has kicked us
+                    // out for some reason
+                    return new ErrorEvent(rawLine);
+                default: // Check if the second thing is a code or a command
+                    if (StringUtils.isNumeric(parsedArray.get(1))) {
+                        return mCodeParser.onParseCode(parsedArray, rawLine);
+                    } else {
+                        return mCommandParser.onParseServerCommand(parsedArray, rawLine);
+                    }
             }
         }
         return new Event("");
