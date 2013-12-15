@@ -19,8 +19,7 @@ class CapParser {
             writer.sendSaslAuthentication(configuration.getSaslUsername(),
                     configuration.getSaslPassword());
         } else {
-            final ArrayList<String> capabilities = IRCUtils.splitRawLine(parsedArray.get(1),
-                    true);
+            final ArrayList<String> capabilities = IRCUtils.splitRawLine(parsedArray.get(1), true);
             if (capabilities.contains("sasl")) {
                 switch (command) {
                     case "LS":
@@ -31,8 +30,15 @@ class CapParser {
                         break;
                 }
             } else {
-                sender.sendGenericServerEvent(server, "SASL not supported by server");
-                writer.sendEndCap();
+                switch (command) {
+                    case "NAK":
+                        // This is non-fatal
+                        break;
+                    default:
+                        sender.sendGenericServerEvent(server, "SASL not supported by server");
+                        writer.sendEndCap();
+                        break;
+                }
             }
         }
     }
