@@ -135,7 +135,7 @@ public class ServerEventBus extends Bus {
     public ChannelEvent onChannelMessage(final AppUser user, final Channel channel,
             final String nick, final String rawMessage) {
         String preMessage = InterfaceHolders.getEventResponses().getMessage(nick, rawMessage);
-        if (IRCUtils.splitRawLine(rawMessage, false).contains(user.getNick().toLowerCase());) {
+        if (IRCUtils.splitRawLine(rawMessage, false).contains(user.getNick().toLowerCase())) {
             onUserMentioned(channel.getName());
             preMessage = "<bold>" + preMessage + "</bold>";
         }
@@ -146,7 +146,7 @@ public class ServerEventBus extends Bus {
             final String nick, final String rawAction) {
         final String finalMessage = InterfaceHolders.getEventResponses()
                 .getActionMessage(nick, rawAction);
-        if (rawAction.toLowerCase().contains(user.getNick().toLowerCase())) {
+        if (IRCUtils.splitRawLine(rawAction, false).contains(user.getNick().toLowerCase())) {
             onUserMentioned(channel.getName());
         }
         return sendGenericChannelEvent(channel, finalMessage, false);
