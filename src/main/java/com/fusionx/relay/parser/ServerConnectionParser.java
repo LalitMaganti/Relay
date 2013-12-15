@@ -29,9 +29,15 @@ public class ServerConnectionParser {
 
     private static int suffix = 0;
 
+    /**
+     * Not to be instantiated
+     */
+    private ServerConnectionParser() {
+    }
+
     public static String parseConnect(final Server server, final ServerConfiguration
-            configuration, final BufferedReader reader, final ServerWriter writer)
-            throws IOException {
+            configuration, final BufferedReader reader, final ServerWriter writer) throws
+            IOException {
 
         String line;
         suffix = 0;
@@ -45,16 +51,15 @@ public class ServerConnectionParser {
             if (s.equals(ServerCommands.Ping)) {// Immediately return
                 final String source = parsedArray.get(1);
                 CoreListener.respondToPing(writer, source);
-            } else if (s.equals(ServerCommands.Error)) {// We are finished - the server has
-                // kicked us out for some reason
+            } else if (s.equals(ServerCommands.Error)) {
+                // We are finished - the server has kicked us out for some reason
                 return null;
             } else if (s.equals(ServerCommands.Authenticate)) {
                 CapParser.parseCommand(parsedArray, configuration, server, eventBus, writer);
             } else {
                 if (StringUtils.isNumeric(parsedArray.get(1))) {
                     final String nick = parseConnectionCode(configuration.isNickChangable(),
-                            parsedArray, eventBus, server,
-                            configuration.getNickStorage(), writer);
+                            parsedArray, eventBus, server, configuration.getNickStorage(), writer);
                     if (nick != null) {
                         return nick;
                     }
@@ -122,11 +127,5 @@ public class ServerConnectionParser {
             IRCUtils.removeFirstElementFromList(parsedArray, 3);
             CapParser.parseCommand(parsedArray, configuration, server, sender, writer);
         }
-    }
-
-    /**
-     * Not to be instantiated
-     */
-    private ServerConnectionParser() {
     }
 }

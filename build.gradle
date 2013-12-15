@@ -4,7 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.6.+'
-        classpath 'com.jakewharton.hugo:hugo-plugin:1.0.0'
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.0.1'
     }
 }
 
@@ -29,8 +29,9 @@ android {
         targetSdkVersion 19
     }
 
-    release {
-        name = "debug"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 

@@ -19,8 +19,8 @@ public class ServerConnection extends Thread {
 
     ServerConnection(final ServerConfiguration configuration, final Handler handler) {
         final HandlerThread handlerThread = new HandlerThread("ServerCalls");
-        mServerHandler = new Handler(handler.getLooper());
         handlerThread.start();
+        mServerHandler = new Handler(handlerThread.getLooper());
 
         mServer = new Server(configuration.getTitle(), this);
         mConnection = new BaseConnection(configuration, mServer);
