@@ -34,7 +34,7 @@ public class ServerCallBus extends Bus {
 
     @Override
     public void post(final Object event) {
-        mConnection.getServerHandler().post(new Runnable() {
+        mConnection.getServerCallHandler().post(new Runnable() {
             @Override
             public void run() {
                 ServerCallBus.super.post(event);

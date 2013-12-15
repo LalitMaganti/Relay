@@ -76,8 +76,7 @@ public class BaseConnection {
             ++reconnectAttempts;
         }
 
-        server.getServerEventBus().onDisconnected(server, "Disconnected from the server",
-                false);
+        server.getServerEventBus().onDisconnected(server, "Disconnected from the server", false);
     }
 
     /**
@@ -110,8 +109,9 @@ public class BaseConnection {
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
                     .getInputStream()));
-            final String nick = ServerConnectionParser.parseConnect(server, serverConfiguration,
-                    reader, serverWriter);
+            final ServerConnectionParser parser = new ServerConnectionParser();
+            final String nick = parser.parseConnect(server, serverConfiguration, reader,
+                    serverWriter);
 
             onConnected(sender);
 
@@ -136,9 +136,9 @@ public class BaseConnection {
                 }
 
                 // Initialise the parser used to parse any lines from the server
-                final ServerLineParser parser = new ServerLineParser(server, this);
+                final ServerLineParser lineParser = new ServerLineParser(server, this);
                 // Loops forever until broken
-                parser.parseMain(reader, serverWriter);
+                lineParser.parseMain(reader, serverWriter);
 
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used

@@ -15,12 +15,12 @@ public class ServerConnection extends Thread {
 
     private final Handler mUiThreadHandler;
 
-    private Handler mServerHandler;
+    private Handler mServerCallHandler;
 
     ServerConnection(final ServerConfiguration configuration, final Handler handler) {
         final HandlerThread handlerThread = new HandlerThread("ServerCalls");
         handlerThread.start();
-        mServerHandler = new Handler(handlerThread.getLooper());
+        mServerCallHandler = new Handler(handlerThread.getLooper());
 
         mServer = new Server(configuration.getTitle(), this);
         mConnection = new BaseConnection(configuration, mServer);
@@ -42,7 +42,7 @@ public class ServerConnection extends Thread {
     }
 
     public void onDisconnect() {
-        mServerHandler.post(new Runnable() {
+        mServerCallHandler.post(new Runnable() {
             @Override
             public void run() {
                 final String status = mServer.getStatus();
@@ -56,8 +56,8 @@ public class ServerConnection extends Thread {
         });
     }
 
-    public Handler getServerHandler() {
-        return mServerHandler;
+    public Handler getServerCallHandler() {
+        return mServerCallHandler;
     }
 
     public Server getServer() {
