@@ -109,7 +109,8 @@ public class BaseConnection {
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
                     .getInputStream()));
-            final ServerConnectionParser parser = new ServerConnectionParser();
+            final ServerConnectionParser parser = new ServerConnectionParser(server, configuration,
+                    bufferedReader, writer);
             final String nick = parser.parseConnect(server, serverConfiguration, reader,
                     serverWriter);
 

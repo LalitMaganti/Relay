@@ -23,43 +23,55 @@ import static com.fusionx.relay.constants.ServerReplyCodes.saslCodes;
 
 public class ServerConnectionParser {
 
+    private final Server mServer;
+
+    private final ServerConfiguration mConfiguration;
+
+    private final BufferedReader mBufferedReader;
+
+    private final ServerWriter mWriter;
+
     private boolean triedSecondNick;
 
     private boolean triedThirdNick;
 
     private int suffix;
 
-    public ServerConnectionParser() {
+    public ServerConnectionParser(final Server server, final ServerConfiguration configuration,
+            final BufferedReader bufferedReader, final ServerWriter writer) {
         suffix = 0;
         triedSecondNick = false;
         triedThirdNick = false;
+
+        mServer = server;
+        mConfiguration = configuration;
+        mBufferedReader = bufferedReader;
+        mWriter = writer;
     }
 
-    public String parseConnect(final Server server, final ServerConfiguration
-            configuration, final BufferedReader reader, final ServerWriter writer) throws
-            IOException {
+    public String parseConnect() throws IOException {
         String line;
-        final ServerEventBus eventBus = server.getServerEventBus();
+        final ServerEventBus eventBus = mServer.getServerEventBus();
 
-        while ((line = reader.readLine()) != null) {
+        while ((line = mBufferedReader.readLine()) != null) {
             final ArrayList<String> parsedArray = IRCUtils.splitRawLine(line, true);
             String s = parsedArray.get(0);
             switch (s) {
                 case ServerCommands.Ping: // Immediately return
                     final String source = parsedArray.get(1);
-                    CoreListener.respondToPing(writer, source);
+                    CoreListener.respondToPing(mWriter, source);
                     break;
                 case ServerCommands.Error:
                     // We are finished - the server has kicked us out for some reason
                     return null;
                 case ServerCommands.Authenticate:
-                    CapParser.parseCommand(parsedArray, configuration, server, eventBus, writer);
+                    CapParser.parseCommand(parsedArray, mConfiguration, mServer, eventBus, mWriter);
                     break;
                 default:
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
-                        final String nick = parseConnectionCode(configuration.isNickChangable(),
-                                parsedArray, eventBus, server, configuration.getNickStorage(),
-                                writer);
+                        final String nick = parseConnectionCode(mConfiguration.isNickChangable(),
+                                parsedArray, eventBus, mServer, mConfiguration.getNickStorage(),
+                                mWriter);
                         if (nick != null) {
                             return nick;
                         }
@@ -75,7 +87,7 @@ public class ServerConnectionParser {
 
     private String parseConnectionCode(final boolean canChangeNick,
             final ArrayList<String> parsedArray, final ServerEventBus sender,
-            final Server server, final NickStorage nickStorage, final ServerWriter writer) {
+            final NickStorage nickStorage) {
         final int code = Integer.parseInt(parsedArray.get(1));
         switch (code) {
             case RPL_WELCOME:
@@ -85,28 +97,28 @@ public class ServerConnectionParser {
                 return nick;
             case ERR_NICKNAMEINUSE:
                 if (!triedSecondNick && StringUtils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
-                    writer.changeNick(new NickChangeEvent("", nickStorage.getSecondChoiceNick()));
+                    mWriter.changeNick(new NickChangeEvent("", nickStorage.getSecondChoiceNick()));
                     triedSecondNick = true;
                 } else if (!triedThirdNick && StringUtils.isNotEmpty(nickStorage
                         .getThirdChoiceNick())) {
-                    writer.changeNick(new NickChangeEvent("", nickStorage.getThirdChoiceNick()));
+                    mWriter.changeNick(new NickChangeEvent("", nickStorage.getThirdChoiceNick()));
                     triedThirdNick = true;
                 } else {
                     if (canChangeNick) {
                         ++suffix;
-                        writer.changeNick(new NickChangeEvent("",
+                        mWriter.changeNick(new NickChangeEvent("",
                                 nickStorage.getFirstChoiceNick() + suffix));
                     } else {
-                        sender.sendNickInUseMessage(server);
+                        sender.sendNickInUseMessage(mServer);
                     }
                 }
                 break;
             case ERR_NONICKNAMEGIVEN:
-                writer.changeNick(new NickChangeEvent("", nickStorage.getFirstChoiceNick()));
+                mWriter.changeNick(new NickChangeEvent("", nickStorage.getFirstChoiceNick()));
                 break;
             default:
                 if (saslCodes.contains(code)) {
-                    CapParser.parseCode(code, parsedArray, sender, server, writer);
+                    CapParser.parseCode(code, parsedArray, sender, mServer, mWriter);
                 }
                 break;
         }
@@ -114,16 +126,15 @@ public class ServerConnectionParser {
     }
 
     private void parseConnectionCommand(final ArrayList<String> parsedArray,
-            final ServerConfiguration configuration, final ServerEventBus sender,
-            final Server server, final ServerWriter writer) {
+            final ServerEventBus sender) {
         final String command = parsedArray.get(1).toUpperCase();
         IRCUtils.removeFirstElementFromList(parsedArray, 3);
         switch (command) {
             case ServerCommands.Notice:
-                sender.sendGenericServerEvent(server, parsedArray.get(0));
+                sender.sendGenericServerEvent(mServer, parsedArray.get(0));
                 break;
             case ServerCommands.Cap:
-                CapParser.parseCommand(parsedArray, configuration, server, sender, writer);
+                CapParser.parseCommand(parsedArray, mConfiguration, mServer, sender, mWriter);
                 break;
         }
     }
