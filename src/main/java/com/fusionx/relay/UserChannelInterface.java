@@ -130,7 +130,7 @@ public final class UserChannelInterface {
                 this);
     }
 
-    synchronized Channel getChannelIfExists(final String name) {
+    public synchronized Channel getChannelIfExists(final String name) {
         for (final Channel channel : mChannelToUserMap.keySet()) {
             if (channel.getName().equals(name)) {
                 return channel;

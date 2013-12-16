@@ -28,7 +28,8 @@ public final class PrivateMessageUser extends User {
 
         if (InterfaceHolders.getPreferences().shouldHandleInitialPrivateMessage() && StringUtils
                 .isNotEmpty(initalMessage)) {
-            mBuffer.add(new Message(initalMessage));
+            mBuffer.add(new Message(InterfaceHolders.getEventResponses().getMessage(nick,
+                    initalMessage)));
         }
     }
 

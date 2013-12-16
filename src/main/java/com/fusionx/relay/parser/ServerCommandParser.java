@@ -88,6 +88,7 @@ class ServerCommandParser {
         final String message = mEventResponses.getNickChangedMessage(oldNick,
                 user.getColorfulNick(), user instanceof AppUser);
 
+        mServerEventBus.sendGenericServerEvent(mServer, message);
         if (channels != null) {
             for (final Channel channel : channels) {
                 mServerEventBus.sendGenericChannelEvent(channel, message, true);
