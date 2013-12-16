@@ -41,41 +41,44 @@ class ServerCommandParser {
         final String rawSource = parsedArray.get(0);
         final String command = parsedArray.get(1).toUpperCase();
 
-        if (command.equals(ServerCommands.Privmsg)) {
-            final String message = parsedArray.get(3);
-            if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
-                final String strippedMessage = message.substring(1, message.length() - 1);
-                return onCTCP(parsedArray, strippedMessage, rawSource);
-            } else {
-                return onPRIVMSG(parsedArray, rawSource);
+        switch (command) {
+            case ServerCommands.Privmsg: {
+                final String message = parsedArray.get(3);
+                if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
+                    final String strippedMessage = message.substring(1, message.length() - 1);
+                    return onCTCP(parsedArray, strippedMessage, rawSource);
+                } else {
+                    return onPRIVMSG(parsedArray, rawSource);
+                }
             }
-        } else if (command.equals(ServerCommands.Join)) {
-            return onChannelJoin(parsedArray, rawSource);
-        } else if (command.equals(ServerCommands.Notice)) {
-            final String message = parsedArray.get(3);
-            if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
-                final String strippedMessage = message.substring(1, message.length() - 1);
-                return onCTCP(parsedArray, strippedMessage, rawSource);
-            } else {
-                return onNotice(parsedArray, rawSource);
+            case ServerCommands.Notice: {
+                final String message = parsedArray.get(3);
+                if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
+                    final String strippedMessage = message.substring(1, message.length() - 1);
+                    return onCTCP(parsedArray, strippedMessage, rawSource);
+                } else {
+                    return onNotice(parsedArray, rawSource);
+                }
             }
-        } else if (command.equals(ServerCommands.Part)) {
-            return onChannelPart(parsedArray, rawSource);
-        } else if (command.equals(ServerCommands.Mode)) {
-            return onModeChanged(parsedArray, rawSource);
-        } else if (command.equals(ServerCommands.Quit)) {
-            return onQuit(parsedArray, rawSource);
-        } else if (command.equals(ServerCommands.Nick)) {
-            return onNickChanged(parsedArray, rawSource);
-        } else if (command.equals(ServerCommands.Topic)) {
-            return onChannelTopicChanged(parsedArray, rawSource);
-        } else if (command.equals(ServerCommands.Kick)) {
-            return onChannelKick(parsedArray, rawSource);
-        } else if (command.equals(ServerCommands.Invite)) {
-            return onChannelInvite(parsedArray, rawSource);
-        } else {
-            // Not sure what to do here - TODO
-            return new Event(rawLine);
+            case ServerCommands.Join:
+                return onChannelJoin(parsedArray, rawSource);
+            case ServerCommands.Part:
+                return onChannelPart(parsedArray, rawSource);
+            case ServerCommands.Mode:
+                return onModeChanged(parsedArray, rawSource);
+            case ServerCommands.Quit:
+                return onQuit(parsedArray, rawSource);
+            case ServerCommands.Nick:
+                return onNickChanged(parsedArray, rawSource);
+            case ServerCommands.Topic:
+                return onChannelTopicChanged(parsedArray, rawSource);
+            case ServerCommands.Kick:
+                return onChannelKick(parsedArray, rawSource);
+            case ServerCommands.Invite:
+                return onChannelInvite(parsedArray, rawSource);
+            default:
+                // Not sure what to do here - TODO
+                return new Event(rawLine);
         }
     }
 
@@ -83,6 +86,7 @@ class ServerCommandParser {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Set<Channel> channels = user.getChannels();
         final String oldNick = user.getColorfulNick();
+
         user.setNick(parsedArray.get(2));
 
         final String message = mEventResponses.getNickChangedMessage(oldNick,
@@ -102,6 +106,7 @@ class ServerCommandParser {
         final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String mode = parsedArray.get(3);
+
         if (Channel.isChannelPrefix(recipient.charAt(0))) {
             // The recipient is a channel (i.e. the mode of a user in the channel is being changed
             // or possibly the mode of the channel itself)
@@ -142,6 +147,7 @@ class ServerCommandParser {
         final String notice = parsedArray.get(3);
 
         final String formattedNotice = mEventResponses.getNoticeMessage(sendingUser, notice);
+
         if (Channel.isChannelPrefix(recipient.charAt(0))) {
             final Channel channel = mUserChannelInterface.getChannel(recipient);
             return mServerEventBus.sendGenericChannelEvent(channel, formattedNotice, false);
@@ -195,9 +201,9 @@ class ServerCommandParser {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
         final String message = parsedArray.get(3);
 
-        // TODO - optimize this
         if (!InterfaceHolders.getPreferences().shouldIgnoreUser(nick)) {
             final String recipient = parsedArray.get(2);
+
             if (Channel.isChannelPrefix(recipient.charAt(0))) {
                 return parseChannelMessage(nick, recipient, message);
             } else {
