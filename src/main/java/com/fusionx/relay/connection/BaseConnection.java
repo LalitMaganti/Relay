@@ -109,10 +109,9 @@ public class BaseConnection {
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
                     .getInputStream()));
-            final ServerConnectionParser parser = new ServerConnectionParser(server, configuration,
-                    bufferedReader, writer);
-            final String nick = parser.parseConnect(server, serverConfiguration, reader,
-                    serverWriter);
+            final ServerConnectionParser parser = new ServerConnectionParser(server,
+                    serverConfiguration, reader, serverWriter);
+            final String nick = parser.parseConnect();
 
             onConnected(sender);
 
@@ -143,7 +142,7 @@ public class BaseConnection {
 
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used
-                // all out lives
+                // all our lives
                 if (isReconnectNeeded()) {
                     sender.onDisconnected(server, "Disconnected from the server", true);
                 }

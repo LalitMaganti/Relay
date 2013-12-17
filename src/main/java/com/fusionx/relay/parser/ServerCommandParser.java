@@ -222,16 +222,14 @@ class ServerCommandParser {
             return new QuitEvent("");
         } else {
             final Set<Channel> list = mUserChannelInterface.removeUser(user);
-            if (list != null) {
-                for (final Channel channel : list) {
-                    final String reason = parsedArray.size() == 4 ?
-                            parsedArray.get(3).replace("\"", "") : "";
-                    final String nick = user.getPrettyNick(channel);
+            for (final Channel channel : list) {
+                final String reason = parsedArray.size() == 4 ?
+                        parsedArray.get(3).replace("\"", "") : "";
+                final String nick = user.getPrettyNick(channel);
 
-                    final String message = mEventResponses.getQuitMessage(nick, reason);
-                    mServerEventBus.sendGenericChannelEvent(channel, message, true);
-                    channel.onDecrementUserType(user.getChannelPrivileges(channel));
-                }
+                final String message = mEventResponses.getQuitMessage(nick, reason);
+                mServerEventBus.sendGenericChannelEvent(channel, message, true);
+                channel.onDecrementUserType(user.getChannelPrivileges(channel));
             }
             return new Event(rawSource);
         }

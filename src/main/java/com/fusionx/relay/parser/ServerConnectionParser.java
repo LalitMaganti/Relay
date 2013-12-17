@@ -70,14 +70,12 @@ public class ServerConnectionParser {
                 default:
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
                         final String nick = parseConnectionCode(mConfiguration.isNickChangable(),
-                                parsedArray, eventBus, mServer, mConfiguration.getNickStorage(),
-                                mWriter);
+                                parsedArray, eventBus, mConfiguration.getNickStorage());
                         if (nick != null) {
                             return nick;
                         }
                     } else {
-                        parseConnectionCommand(parsedArray, configuration, eventBus, server,
-                                writer);
+                        parseConnectionCommand(parsedArray, eventBus);
                     }
                     break;
             }

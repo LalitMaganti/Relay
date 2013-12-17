@@ -19,8 +19,8 @@ public final class UserChannelInterface {
 
     public UserChannelInterface(final Server server) {
         mServer = server;
-        mUserToChannelMap = new HashMap<ChannelUser, LinkedHashSet<Channel>>();
-        mChannelToUserMap = new HashMap<Channel, UserListTreeSet>();
+        mUserToChannelMap = new HashMap<>();
+        mChannelToUserMap = new HashMap<>();
     }
 
     public synchronized void coupleUserAndChannel(final ChannelUser user,
@@ -30,18 +30,16 @@ public final class UserChannelInterface {
         addUserToChannel(user, channel);
     }
 
-    public synchronized void addChannelToUser(final ChannelUser user,
-            final Channel channel) {
+    public synchronized void addChannelToUser(final ChannelUser user, final Channel channel) {
         LinkedHashSet<Channel> list = mUserToChannelMap.get(user);
         if (list == null) {
-            list = new LinkedHashSet<Channel>();
+            list = new LinkedHashSet<>();
             mUserToChannelMap.put(user, list);
         }
         list.add(channel);
     }
 
-    private synchronized void addUserToChannel(final ChannelUser user,
-            final Channel channel) {
+    private synchronized void addUserToChannel(final ChannelUser user, final Channel channel) {
         UserListTreeSet setOfUsers = mChannelToUserMap.get(channel);
         if (setOfUsers == null) {
             setOfUsers = new UserListTreeSet(new IRCUserComparator(channel));
@@ -54,20 +52,25 @@ public final class UserChannelInterface {
 
     public synchronized void decoupleUserAndChannel(final ChannelUser user, final Channel channel) {
         user.onRemove(channel);
+        removeChannelFromUser(channel, user);
+        removeUserFromChannel(channel, user);
+    }
 
+    private void removeChannelFromUser(final Channel channel, final ChannelUser user) {
         final Set<Channel> setOfChannels = mUserToChannelMap.get(user);
-        if (setOfChannels != null) {
+        if (setOfChannels.size() > 1) {
             setOfChannels.remove(channel);
-            if (setOfChannels.isEmpty()) {
-                mUserToChannelMap.remove(user);
-            }
+        } else {
+            mUserToChannelMap.remove(user);
         }
+    }
+
+    private void removeUserFromChannel(final Channel channel, final ChannelUser user) {
         final UserListTreeSet setOfUsers = mChannelToUserMap.get(channel);
-        if (setOfUsers != null) {
-            synchronized (setOfUsers.getLock()) {
+        synchronized (setOfUsers.getLock()) {
+            if (setOfUsers.size() > 1) {
                 setOfUsers.remove(user);
-            }
-            if (setOfUsers.isEmpty()) {
+            } else {
                 mChannelToUserMap.remove(channel);
             }
         }
@@ -75,27 +78,16 @@ public final class UserChannelInterface {
 
     public synchronized Set<Channel> removeUser(final ChannelUser user) {
         final Set<Channel> removedSet = mUserToChannelMap.remove(user);
-        if (removedSet != null) {
-            for (final Channel channel : removedSet) {
-                final UserListTreeSet set = mChannelToUserMap.get(channel);
-                synchronized (set.getLock()) {
-                    set.remove(user);
-                }
-            }
+        for (final Channel channel : removedSet) {
+            removeUserFromChannel(channel, user);
         }
         return removedSet;
     }
 
     public synchronized void removeChannel(final Channel channel) {
         for (final ChannelUser user : mChannelToUserMap.remove(channel)) {
-            final LinkedHashSet<Channel> channelMap = mUserToChannelMap.get(user);
-            if (channelMap != null) {
-                channelMap.remove(channel);
-                user.onRemove(channel);
-                if (channelMap.isEmpty()) {
-                    mUserToChannelMap.remove(user);
-                }
-            }
+            user.onRemove(channel);
+            removeChannelFromUser(channel, user);
         }
     }
 
@@ -103,7 +95,7 @@ public final class UserChannelInterface {
         return mChannelToUserMap.get(channel);
     }
 
-    synchronized LinkedHashSet<Channel> getAllChannelsInUser(final ChannelUser user) {
+    synchronized Set<Channel> getAllChannelsInUser(final ChannelUser user) {
         return mUserToChannelMap.get(user);
     }
 
@@ -122,12 +114,13 @@ public final class UserChannelInterface {
     }
 
     public synchronized ChannelUser getUser(final String nick) {
-        return getUserIfExists(nick) != null ? getUserIfExists(nick) : new ChannelUser(nick, this);
+        final ChannelUser user = getUserIfExists(nick);
+        return user != null ? user : new ChannelUser(nick, this);
     }
 
     public synchronized Channel getChannel(final String name) {
-        return getChannelIfExists(name) != null ? getChannelIfExists(name) : new Channel(name,
-                this);
+        final Channel channel = getChannelIfExists(name);
+        return channel != null ? channel : new Channel(name, this);
     }
 
     public synchronized Channel getChannelIfExists(final String name) {
@@ -143,13 +136,13 @@ public final class UserChannelInterface {
         mUserToChannelMap.put(user, new LinkedHashSet<Channel>());
     }
 
-    // Getters and setters
-    Server getServer() {
-        return mServer;
-    }
-
     public void onCleanup() {
         mUserToChannelMap.clear();
         mChannelToUserMap.clear();
+    }
+
+    // Getters and setters
+    Server getServer() {
+        return mServer;
     }
 }
