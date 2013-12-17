@@ -29,7 +29,7 @@ class NameParser {
         }
         final ArrayList<String> listOfUsers = IRCUtils.splitRawLine(parsedArray.get(2), false);
         for (final String rawNick : listOfUsers) {
-            final ChannelUser user = getNickFromNameReply(rawNick);
+            final ChannelUser user = getUserFromNameReply(rawNick);
             mUserChannelInterface.addChannelToUser(user, mChannel);
             mChannel.getUsers().markForAddition(user);
         }
@@ -44,13 +44,15 @@ class NameParser {
         return event;
     }
 
-    ChannelUser getNickFromNameReply(final String rawNameNick) {
+    private ChannelUser getUserFromNameReply(final String rawNameNick) {
         final char firstChar = rawNameNick.charAt(0);
-        final UserLevelEnum mode = UserLevelEnum.getLevelFromPrefix(firstChar);
-        final ChannelUser user = mUserChannelInterface.getUser(mode == UserLevelEnum.NONE ?
-                rawNameNick : rawNameNick.substring(1));
-        user.putMode(mChannel, mode);
-        mChannel.onIncrementUserType(mode);
+        final UserLevelEnum level = UserLevelEnum.getLevelFromPrefix(firstChar);
+        final String nick = level == UserLevelEnum.NONE ? rawNameNick : rawNameNick.substring(1);
+        final ChannelUser user = mUserChannelInterface.getUser(nick);
+
+        user.onPutMode(mChannel, level);
+        mChannel.onIncrementUserType(level);
+
         return user;
     }
 }

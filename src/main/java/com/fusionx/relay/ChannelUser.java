@@ -27,16 +27,12 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     public ChannelUser(final String nick, final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
 
-        mUserLevelMap = new HashMap<Channel, UserLevelEnum>();
-        mChannelSpannedMap = new HashMap<Channel, Spanned>();
+        mUserLevelMap = new HashMap<>();
+        mChannelSpannedMap = new HashMap<>();
         mServer = userChannelInterface.getServer();
 
         // Checkable interface
         mChecked = false;
-    }
-
-    public String getPrettyNick(final String channel) {
-        return getPrettyNick(mUserChannelInterface.getChannel(channel));
     }
 
     public String getPrettyNick(final Channel channel) {
@@ -56,14 +52,18 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public void onJoin(final Channel channel) {
-        mUserLevelMap.put(channel, UserLevelEnum.NONE);
-        onUpdateSpannedNick(channel);
+        onPutMode(channel, UserLevelEnum.NONE);
     }
 
     // Called either on part of other or on quit of our user
     public void onRemove(final Channel channel) {
         mUserLevelMap.remove(channel);
         mChannelSpannedMap.remove(channel);
+    }
+
+    public void onPutMode(final Channel channel, final UserLevelEnum mode) {
+        mUserLevelMap.put(channel, mode);
+        onUpdateSpannedNick(channel);
     }
 
     public UserLevelEnum getChannelPrivileges(final Channel channel) {
@@ -86,11 +86,6 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     public Set<Channel> getChannels() {
         return mUserChannelInterface.getAllChannelsInUser(this);
-    }
-
-    public void putMode(final Channel channel, final UserLevelEnum mode) {
-        mUserLevelMap.put(channel, mode);
-        onUpdateSpannedNick(channel);
     }
 
     public void onWhoMode(final String rawMode, final Channel channel) {
@@ -125,11 +120,10 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                     channel.onDecrementUserType(mUserLevelMap.get(channel));
                     if (addingMode) {
                         channel.onIncrementUserType(levelEnum);
-                        channel.getUsers().update(this, new ImmutablePair<Channel,
-                                UserLevelEnum>(channel, levelEnum));
+                        channel.getUsers().update(this, new ImmutablePair<>(channel, levelEnum));
                     } else {
-                        channel.getUsers().update(this, new ImmutablePair<Channel,
-                                UserLevelEnum>(channel, UserLevelEnum.NONE));
+                        channel.getUsers()
+                                .update(this, new ImmutablePair<>(channel, UserLevelEnum.NONE));
                     }
                     break;
             }

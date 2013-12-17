@@ -23,8 +23,7 @@ public final class UserChannelInterface {
         mChannelToUserMap = new HashMap<>();
     }
 
-    public synchronized void coupleUserAndChannel(final ChannelUser user,
-            final Channel channel) {
+    public synchronized void coupleUserAndChannel(final ChannelUser user, final Channel channel) {
         user.onJoin(channel);
         addChannelToUser(user, channel);
         addUserToChannel(user, channel);
@@ -56,15 +55,6 @@ public final class UserChannelInterface {
         removeUserFromChannel(channel, user);
     }
 
-    private void removeChannelFromUser(final Channel channel, final ChannelUser user) {
-        final Set<Channel> setOfChannels = mUserToChannelMap.get(user);
-        if (setOfChannels.size() > 1) {
-            setOfChannels.remove(channel);
-        } else {
-            mUserToChannelMap.remove(user);
-        }
-    }
-
     private void removeUserFromChannel(final Channel channel, final ChannelUser user) {
         final UserListTreeSet setOfUsers = mChannelToUserMap.get(channel);
         synchronized (setOfUsers.getLock()) {
@@ -73,6 +63,17 @@ public final class UserChannelInterface {
             } else {
                 mChannelToUserMap.remove(channel);
             }
+        }
+    }
+
+    private void removeChannelFromUser(final Channel channel, final ChannelUser user) {
+        final Set<Channel> setOfChannels = mUserToChannelMap.get(user);
+        // The app user check is to make sure that the list of channels returned for the app user
+        // is never null
+        if (setOfChannels.size() > 1 || user instanceof AppUser) {
+            setOfChannels.remove(channel);
+        } else {
+            mUserToChannelMap.remove(user);
         }
     }
 
@@ -104,15 +105,6 @@ public final class UserChannelInterface {
         return getUser(nick);
     }
 
-    public synchronized ChannelUser getUserIfExists(final String nick) {
-        for (final ChannelUser user : mUserToChannelMap.keySet()) {
-            if (nick.equals(user.getNick())) {
-                return user;
-            }
-        }
-        return null;
-    }
-
     public synchronized ChannelUser getUser(final String nick) {
         final ChannelUser user = getUserIfExists(nick);
         return user != null ? user : new ChannelUser(nick, this);
@@ -123,9 +115,18 @@ public final class UserChannelInterface {
         return channel != null ? channel : new Channel(name, this);
     }
 
+    public synchronized ChannelUser getUserIfExists(final String nick) {
+        for (final ChannelUser user : mUserToChannelMap.keySet()) {
+            if (nick.equals(user.getNick())) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     public synchronized Channel getChannelIfExists(final String name) {
         for (final Channel channel : mChannelToUserMap.keySet()) {
-            if (channel.getName().equals(name)) {
+            if (name.equals(channel.getName())) {
                 return channel;
             }
         }

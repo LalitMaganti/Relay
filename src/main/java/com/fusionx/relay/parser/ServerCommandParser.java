@@ -300,8 +300,9 @@ class ServerCommandParser {
         final ChannelUser user = mUserChannelInterface.getUserIfExists(userNick);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         if (user.equals(mServer.getUser())) {
-            mServerEventBus.onChannelParted(channel.getName());
             mUserChannelInterface.removeChannel(channel);
+            mServerEventBus.onChannelParted(channel.getName());
+
             return new Event(channelName);
         } else {
             final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"",
@@ -333,8 +334,8 @@ class ServerCommandParser {
                     kickingUserNick, reason);
             final Event event = mServerEventBus.sendGenericServerEvent(mServer, message);
 
-            mServerEventBus.onKicked(channel.getName());
             mUserChannelInterface.removeChannel(channel);
+            mServerEventBus.onKicked(channel.getName());
             return event;
         } else {
             final String message = mEventResponses.getUserKickedMessage(kickedUser.getPrettyNick

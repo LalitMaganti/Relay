@@ -13,7 +13,7 @@ public class AppUser extends ChannelUser {
         super(nick, userChannelInterface);
         userChannelInterface.putAppUser(this);
 
-        mPrivateMessages = new ArrayList<PrivateMessageUser>();
+        mPrivateMessages = new ArrayList<>();
     }
 
     public void createPrivateMessage(final PrivateMessageUser user) {
