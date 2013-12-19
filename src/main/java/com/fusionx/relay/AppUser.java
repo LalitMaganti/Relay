@@ -1,7 +1,9 @@
 package com.fusionx.relay;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +37,14 @@ public class AppUser extends ChannelUser {
     @Override
     public Set<Channel> getChannels() {
         return mUserChannelInterface.getAllChannelsInUser(this);
+    }
+
+    public Collection<String> getChannelList() {
+        final Collection<String> channelList = new LinkedHashSet<>();
+        for (Channel channel : getChannels()) {
+            channelList.add(channel.getName());
+        }
+        return channelList;
     }
 
     @Override
