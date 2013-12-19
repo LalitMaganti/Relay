@@ -14,7 +14,7 @@ public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends T
 
     private final Set<E> toBeAdded = new HashSet<E>();
 
-    UpdateableTreeSet(Comparator<? super E> comparator) {
+    public UpdateableTreeSet(Comparator<? super E> comparator) {
         super(comparator);
     }
 

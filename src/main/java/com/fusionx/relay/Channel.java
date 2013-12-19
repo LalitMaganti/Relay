@@ -2,8 +2,9 @@ package com.fusionx.relay;
 
 import com.google.common.collect.ImmutableList;
 
-import com.fusionx.relay.collection.UserListTreeSet;
+import com.fusionx.relay.collection.UpdateableTreeSet;
 import com.fusionx.relay.constants.UserLevelEnum;
+import com.fusionx.relay.constants.UserListChangeType;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 
@@ -31,12 +32,14 @@ public class Channel {
 
     private boolean mCached;
 
+    private boolean mObserving;
+
     Channel(final String channelName, final UserChannelInterface
             userChannelInterface) {
         mName = channelName;
         mUserChannelInterface = userChannelInterface;
-        mBuffer = new ArrayList<Message>();
-        mNumberOfUsers = new EnumMap<UserLevelEnum, Integer>(UserLevelEnum.class);
+        mBuffer = new ArrayList<>();
+        mNumberOfUsers = new EnumMap<>(UserLevelEnum.class);
 
         for (final UserLevelEnum levelEnum : UserLevelEnum.values()) {
             mNumberOfUsers.put(levelEnum, 0);
@@ -62,7 +65,7 @@ public class Channel {
      *
      * @return list of users currently in the channel
      */
-    public UserListTreeSet getUsers() {
+    public UpdateableTreeSet<ChannelUser> getUsers() {
         return mUserChannelInterface.getAllUsersInChannel(this);
     }
 
@@ -72,7 +75,7 @@ public class Channel {
     }
 
     public void onChannelEvent(final ChannelEvent event) {
-        if ((!event.userListChanged || InterfaceHolders.getPreferences()
+        if ((event.changeType != UserListChangeType.NONE || InterfaceHolders.getPreferences()
                 .shouldLogUserListChanges()) && StringUtils.isNotEmpty(event.message)) {
             mBuffer.add(new Message(event.message));
         }
@@ -188,5 +191,13 @@ public class Channel {
 
     public void setCached(boolean cached) {
         mCached = cached;
+    }
+
+    public boolean isObserving() {
+        return mObserving;
+    }
+
+    public void setObserving(boolean observing) {
+        mObserving = observing;
     }
 }

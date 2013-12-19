@@ -6,12 +6,15 @@ import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.User;
+import com.fusionx.relay.constants.UserListChangeType;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.event.ConnectedEvent;
 import com.fusionx.relay.event.DisconnectEvent;
+import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.JoinEvent;
 import com.fusionx.relay.event.KickEvent;
 import com.fusionx.relay.event.MentionEvent;
+import com.fusionx.relay.event.NameFinishedEvent;
 import com.fusionx.relay.event.NickInUseEvent;
 import com.fusionx.relay.event.PartEvent;
 import com.fusionx.relay.event.PrivateActionEvent;
@@ -26,6 +29,9 @@ import com.squareup.otto.ThreadEnforcer;
 
 import android.os.Handler;
 import android.os.Looper;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 public class ServerEventBus extends Bus {
 
@@ -55,8 +61,8 @@ public class ServerEventBus extends Bus {
         }
     }
 
-    /**
-     * Start of sending messages
+    /*
+     * Start of internal methods
      */
     private void sendServerEvent(final Server server, final ServerEvent event) {
         if (server.getServerCache().isCached()) {
@@ -83,7 +89,6 @@ public class ServerEventBus extends Bus {
             user.onUserEvent(event);
         }
     }
-
     /*
      * End of internal methods
      */
@@ -96,18 +101,36 @@ public class ServerEventBus extends Bus {
     }
 
     public ChannelEvent sendGenericChannelEvent(final Channel channel, final String message,
-            final boolean userListChanged) {
+            final UserListChangeType changeType, final ChannelUser channelUser) {
         final ChannelEvent event = new ChannelEvent(channel.getName(), message,
-                userListChanged);
+                changeType, channelUser);
         sendChannelEvent(channel, event);
         return event;
+    }
+
+    public ChannelEvent sendGenericChannelEvent(final Channel channel, final String message,
+            final UserListChangeType changeType) {
+        return sendGenericChannelEvent(channel, message, changeType, null);
     }
     // Generic events end
 
     public void onDisconnected(final Server server, final String disconnectLine,
             final boolean retryPending) {
         final DisconnectEvent event = new DisconnectEvent(disconnectLine, retryPending, false);
-        sendServerEvent(server, event);
+        if (!server.getServerCache().isCached()) {
+            server.onServerEvent(event);
+        }
+        // Post this event no matter what
+        post(event);
+
+        /*for (Channel channel : server.getUser().getChannels()) {
+            sendGenericChannelEvent(channel, disconnectLine, UserListChangeType.NONE);
+        }
+        final Iterator<PrivateMessageUser> iterator = server.getUser().getPrivateMessageIterator();
+        while (iterator.hasNext()) {
+            final PrivateMessageUser user = iterator.next();
+            sendUserEvent(user, new PrivateMessageEvent(user.getNick(), disconnectLine, false));
+        }*/
     }
 
     public JoinEvent onChannelJoined(final String channelName) {
@@ -139,7 +162,7 @@ public class ServerEventBus extends Bus {
             onUserMentioned(channel.getName());
             preMessage = "<bold>" + preMessage + "</bold>";
         }
-        return sendGenericChannelEvent(channel, preMessage, false);
+        return sendGenericChannelEvent(channel, preMessage, UserListChangeType.NONE);
     }
 
     public ChannelEvent onChannelAction(final AppUser user, final Channel channel,
@@ -149,7 +172,7 @@ public class ServerEventBus extends Bus {
         if (IRCUtils.splitRawLine(rawAction, false).contains(user.getNick().toLowerCase())) {
             onUserMentioned(channel.getName());
         }
-        return sendGenericChannelEvent(channel, finalMessage, false);
+        return sendGenericChannelEvent(channel, finalMessage, UserListChangeType.NONE);
     }
 
     public ChannelEvent onChannelAction(final AppUser user, final Channel channel,
@@ -187,6 +210,14 @@ public class ServerEventBus extends Bus {
         sendUserEvent(user, privateMessageEvent);
 
         return privateMessageEvent;
+    }
+
+    public Event onNameFinished(final Channel channel, final Collection<ChannelUser> channelUsers) {
+        final NameFinishedEvent event = new NameFinishedEvent(channel.getName(), channelUsers);
+        if (channel.isObserving()) {
+            post(event);
+        }
+        return event;
     }
 
     public NickInUseEvent sendNickInUseMessage(final Server server) {

@@ -72,6 +72,10 @@ public class BaseConnection {
                 // reconnection
                 return;
             }
+            // Make sure the cleanup happens before the next connection but after all the tabs
+            // have been closed
+            server.onCleanup();
+
             connect();
             ++reconnectAttempts;
         }
@@ -151,13 +155,13 @@ public class BaseConnection {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
             if (isReconnectNeeded()) {
-                sender.onDisconnected(server, ex.getMessage(), true);
+                sender.onDisconnected(server, "Disconnected from the server (" + ex.getMessage()
+                        + ")", true);
             }
         }
         if (!mUserDisconnected) {
             // We are disconnected :( - close up shop
             server.setStatus(InterfaceHolders.getEventResponses().getDisconnectedStatus());
-            server.onCleanup();
             closeSocket();
         }
     }
@@ -193,7 +197,7 @@ public class BaseConnection {
     public void onDisconnect() {
         mUserDisconnected = true;
         server.setStatus(InterfaceHolders.getEventResponses().getDisconnectedStatus());
-        server.getServerEventBus().post(new QuitEvent(InterfaceHolders.getPreferences()
+        server.getServerCallBus().post(new QuitEvent(InterfaceHolders.getPreferences()
                 .getQuitReason()));
     }
 

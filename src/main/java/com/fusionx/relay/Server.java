@@ -29,9 +29,9 @@ public class Server {
 
     private final ServerCache mServerCache;
 
-    private final ServerEventBus mServerEventBus;
+    private ServerEventBus mServerEventBus;
 
-    private final ServerCallBus mServerCallBus;
+    private ServerCallBus mServerCallBus;
 
     private AppUser mUser;
 
@@ -39,7 +39,7 @@ public class Server {
 
     public Server(final String serverTitle, final ServerConnection connection) {
         mTitle = serverTitle;
-        mBuffer = new ArrayList<Message>();
+        mBuffer = new ArrayList<>();
         mStatus = "Disconnected";
         mServerCache = new ServerCache();
         mServerEventBus = new ServerEventBus(serverTitle);

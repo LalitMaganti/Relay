@@ -1,6 +1,6 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.collection.UserListTreeSet;
+import com.fusionx.relay.collection.UpdateableTreeSet;
 import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -11,9 +11,9 @@ import java.util.Set;
 
 public final class UserChannelInterface {
 
-    private final Map<ChannelUser, LinkedHashSet<Channel>> mUserToChannelMap;
+    private final Map<ChannelUser, Set<Channel>> mUserToChannelMap;
 
-    private final Map<Channel, UserListTreeSet> mChannelToUserMap;
+    private final Map<Channel, UpdateableTreeSet<ChannelUser>> mChannelToUserMap;
 
     private final Server mServer;
 
@@ -30,7 +30,7 @@ public final class UserChannelInterface {
     }
 
     public synchronized void addChannelToUser(final ChannelUser user, final Channel channel) {
-        LinkedHashSet<Channel> list = mUserToChannelMap.get(user);
+        Set<Channel> list = mUserToChannelMap.get(user);
         if (list == null) {
             list = new LinkedHashSet<>();
             mUserToChannelMap.put(user, list);
@@ -39,14 +39,12 @@ public final class UserChannelInterface {
     }
 
     private synchronized void addUserToChannel(final ChannelUser user, final Channel channel) {
-        UserListTreeSet setOfUsers = mChannelToUserMap.get(channel);
+        UpdateableTreeSet<ChannelUser> setOfUsers = mChannelToUserMap.get(channel);
         if (setOfUsers == null) {
-            setOfUsers = new UserListTreeSet(new IRCUserComparator(channel));
+            setOfUsers = new UpdateableTreeSet<>(new IRCUserComparator(channel));
             mChannelToUserMap.put(channel, setOfUsers);
         }
-        synchronized (setOfUsers.getLock()) {
-            setOfUsers.add(user);
-        }
+        setOfUsers.add(user);
     }
 
     public synchronized void decoupleUserAndChannel(final ChannelUser user, final Channel channel) {
@@ -55,18 +53,16 @@ public final class UserChannelInterface {
         removeUserFromChannel(channel, user);
     }
 
-    private void removeUserFromChannel(final Channel channel, final ChannelUser user) {
-        final UserListTreeSet setOfUsers = mChannelToUserMap.get(channel);
-        synchronized (setOfUsers.getLock()) {
-            if (setOfUsers.size() > 1) {
-                setOfUsers.remove(user);
-            } else {
-                mChannelToUserMap.remove(channel);
-            }
+    public void removeUserFromChannel(final Channel channel, final ChannelUser user) {
+        final Set<ChannelUser> setOfUsers = mChannelToUserMap.get(channel);
+        if (setOfUsers.size() > 1) {
+            setOfUsers.remove(user);
+        } else {
+            mChannelToUserMap.remove(channel);
         }
     }
 
-    private void removeChannelFromUser(final Channel channel, final ChannelUser user) {
+    public void removeChannelFromUser(final Channel channel, final ChannelUser user) {
         final Set<Channel> setOfChannels = mUserToChannelMap.get(user);
         // The app user check is to make sure that the list of channels returned for the app user
         // is never null
@@ -78,11 +74,7 @@ public final class UserChannelInterface {
     }
 
     public synchronized Set<Channel> removeUser(final ChannelUser user) {
-        final Set<Channel> removedSet = mUserToChannelMap.remove(user);
-        for (final Channel channel : removedSet) {
-            removeUserFromChannel(channel, user);
-        }
-        return removedSet;
+        return mUserToChannelMap.remove(user);
     }
 
     public synchronized void removeChannel(final Channel channel) {
@@ -92,7 +84,7 @@ public final class UserChannelInterface {
         }
     }
 
-    synchronized UserListTreeSet getAllUsersInChannel(final Channel channel) {
+    synchronized UpdateableTreeSet<ChannelUser> getAllUsersInChannel(final Channel channel) {
         return mChannelToUserMap.get(channel);
     }
 

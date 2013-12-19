@@ -4,6 +4,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.constants.UserListChangeType;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.misc.InterfaceHolders;
@@ -111,7 +112,8 @@ class ServerCodeParser {
         final String eventMessage = InterfaceHolders.getEventResponses().getInitialTopicMessage
                 (channel.getTopic(), nick);
 
-        return mServerEventBus.sendGenericChannelEvent(channel, eventMessage, false);
+        return mServerEventBus.sendGenericChannelEvent(channel, eventMessage,
+                UserListChangeType.NONE);
     }
 
     private Event onFallThrough(final int code, final String message,

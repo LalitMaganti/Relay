@@ -38,8 +38,8 @@ class NameParser {
 
     Event parseNameFinished() {
         mChannel.getUsers().addMarked();
-        final Event event = mServer.getServerEventBus().sendGenericChannelEvent(mChannel,
-                "", true);
+        final Event event = mServer.getServerEventBus().onNameFinished(mChannel,
+                mChannel.getUsers());
         mChannel = null;
         return event;
     }

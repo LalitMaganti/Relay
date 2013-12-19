@@ -12,9 +12,9 @@ class WhoParser {
 
     private final UserChannelInterface mUserChannelInterface;
 
-    private Channel mWhoChannel;
-
     private final Server mServer;
+
+    private Channel mWhoChannel;
 
     WhoParser(final UserChannelInterface userChannelInterface, final Server server) {
         mUserChannelInterface = userChannelInterface;
@@ -32,8 +32,8 @@ class WhoParser {
 
     Event parseWhoFinished() {
         if (mWhoChannel != null && mWhoChannel.getUsers() != null) {
-            final Event event = mServer.getServerEventBus().sendGenericChannelEvent
-                    (mWhoChannel, "", true);
+            final Event event = mServer.getServerEventBus().onNameFinished(mWhoChannel,
+                    mWhoChannel.getUsers());
             mWhoChannel = null;
             return event;
         } else {
