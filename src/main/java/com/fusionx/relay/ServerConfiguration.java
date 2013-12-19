@@ -9,7 +9,18 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 
-public class ServerConfiguration {
+public class ServerConfiguration implements Parcelable {
+
+    public static final Parcelable.Creator<ServerConfiguration> CREATOR =
+            new Parcelable.Creator<ServerConfiguration>() {
+                public ServerConfiguration createFromParcel(Parcel in) {
+                    return new ServerConfiguration(in);
+                }
+
+                public ServerConfiguration[] newArray(int size) {
+                    return new ServerConfiguration[size];
+                }
+            };
 
     /**
      * The informal name of the server that is being connected to
@@ -50,7 +61,7 @@ public class ServerConfiguration {
     /**
      * Whether the library can change the nick on the user's behalf if needed
      */
-    private final boolean mNickChangable;
+    private final boolean mNickChangeable;
 
     /**
      * The username to connect to the server with - unless the server is password protected this is
@@ -83,6 +94,30 @@ public class ServerConfiguration {
      */
     private final ArrayList<String> mAutoJoinChannels;
 
+    private ServerConfiguration(final Parcel in) {
+        mTitle = in.readString();
+        mUrl = in.readString();
+        mPort = in.readInt();
+
+        mSsl = in.readInt() == 1;
+        mSslAcceptAllCertificates = in.readInt() == 1;
+
+        mNickStorage = in.readParcelable(NickStorage.class.getClassLoader());
+        mRealName = in.readString();
+        mNickChangeable = in.readInt() == 1;
+
+        mServerUserName = in.readString();
+        mServerPassword = in.readString();
+
+        mSaslUsername = in.readString();
+        mSaslPassword = in.readString();
+
+        mNickservPassword = in.readString();
+
+        mAutoJoinChannels = new ArrayList<>();
+        in.readStringList(mAutoJoinChannels);
+    }
+
     private ServerConfiguration(final Builder builder) {
         mTitle = builder.getTitle();
         mUrl = builder.getUrl();
@@ -93,7 +128,7 @@ public class ServerConfiguration {
 
         mNickStorage = builder.getNickStorage();
         mRealName = builder.getRealName();
-        mNickChangable = builder.isNickChangeable();
+        mNickChangeable = builder.isNickChangeable();
 
         mServerUserName = builder.getServerUserName();
         mServerPassword = builder.getServerPassword();
@@ -104,6 +139,33 @@ public class ServerConfiguration {
         mNickservPassword = builder.getNickservPassword();
 
         mAutoJoinChannels = builder.getAutoJoinChannels();
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(mTitle);
+        out.writeString(mUrl);
+        out.writeInt(mPort);
+
+        out.writeInt(mSsl ? 1 : 0);
+        out.writeInt(mSslAcceptAllCertificates ? 1 : 0);
+
+        out.writeParcelable(mNickStorage, 0);
+        out.writeString(mRealName);
+        out.writeInt(mNickChangeable ? 1 : 0);
+
+        out.writeString(mServerUserName);
+        out.writeString(mServerPassword);
+
+        out.writeString(mSaslUsername);
+        out.writeString(mSaslPassword);
+
+        out.writeString(mNickservPassword);
+
+        out.writeStringList(mAutoJoinChannels);
     }
 
     // Helper methods
@@ -140,8 +202,8 @@ public class ServerConfiguration {
         return mRealName;
     }
 
-    public boolean isNickChangable() {
-        return mNickChangable;
+    public boolean isNickChangeable() {
+        return mNickChangeable;
     }
 
     public String getServerUserName() {
@@ -180,6 +242,11 @@ public class ServerConfiguration {
                         return new Builder[size];
                     }
                 };
+
+        /**
+         * The list of all the channels that will be joined when connected to the server
+         */
+        private final ArrayList<String> mAutoJoinChannels;
 
         /**
          * The informal name of the server that is being connected to
@@ -247,11 +314,6 @@ public class ServerConfiguration {
          * The password for NickServ authentication
          */
         private String mNickservPassword;
-
-        /**
-         * The list of all the channels that will be joined when connected to the server
-         */
-        private final ArrayList<String> mAutoJoinChannels;
 
         public Builder() {
             mTitle = "";

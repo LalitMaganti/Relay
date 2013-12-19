@@ -37,14 +37,14 @@ public class ServerEventBus extends Bus {
 
     private final Handler mMainThread = new Handler(Looper.getMainLooper());
 
-    private final String mServerName;
+    private final Server mServer;
 
     private boolean mDisplayed;
 
-    public ServerEventBus(final String serverName) {
+    public ServerEventBus(final Server server) {
         super(ThreadEnforcer.ANY);
 
-        mServerName = serverName;
+        mServer = server;
     }
 
     @Override
@@ -246,7 +246,7 @@ public class ServerEventBus extends Bus {
         if (mDisplayed) {
             post(new MentionEvent(messageDestination));
         } else {
-            InterfaceHolders.getEventResponses().onUserMentioned(mServerName, messageDestination);
+            InterfaceHolders.getEventResponses().onUserMentioned(mServer, messageDestination);
         }
     }
 

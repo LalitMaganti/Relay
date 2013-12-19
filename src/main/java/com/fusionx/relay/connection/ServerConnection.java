@@ -22,7 +22,7 @@ public class ServerConnection extends Thread {
         handlerThread.start();
         mServerCallHandler = new Handler(handlerThread.getLooper());
 
-        mServer = new Server(configuration.getTitle(), this);
+        mServer = new Server(configuration, this);
         mConnection = new BaseConnection(configuration, mServer);
         mUiThreadHandler = handler;
     }

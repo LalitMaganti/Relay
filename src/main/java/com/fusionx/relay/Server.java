@@ -29,6 +29,8 @@ public class Server {
 
     private final ServerCache mServerCache;
 
+    private final ServerConfiguration mConfiguration;
+
     private ServerEventBus mServerEventBus;
 
     private ServerCallBus mServerCallBus;
@@ -37,12 +39,13 @@ public class Server {
 
     private String mStatus;
 
-    public Server(final String serverTitle, final ServerConnection connection) {
-        mTitle = serverTitle;
+    public Server(final ServerConfiguration configuration, final ServerConnection connection) {
+        mConfiguration = configuration;
+        mTitle = configuration.getTitle();
         mBuffer = new ArrayList<>();
         mStatus = "Disconnected";
         mServerCache = new ServerCache();
-        mServerEventBus = new ServerEventBus(serverTitle);
+        mServerEventBus = new ServerEventBus(this);
         mServerCallBus = new ServerCallBus(connection);
         mUserChannelInterface = new UserChannelInterface(this);
     }
@@ -173,5 +176,9 @@ public class Server {
 
     public ServerEventBus getServerEventBus() {
         return mServerEventBus;
+    }
+
+    public ServerConfiguration getConfiguration() {
+        return mConfiguration;
     }
 }

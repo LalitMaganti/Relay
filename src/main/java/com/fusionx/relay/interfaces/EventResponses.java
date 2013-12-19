@@ -1,5 +1,7 @@
 package com.fusionx.relay.interfaces;
 
+import com.fusionx.relay.Server;
+
 public interface EventResponses {
 
     // Status constants
@@ -43,5 +45,5 @@ public interface EventResponses {
     // Errors
     public String getNickInUserError();
 
-    public void onUserMentioned(final String serverName, final String messageDestination);
+    public void onUserMentioned(final Server server, final String messageDestination);
 }

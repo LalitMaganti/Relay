@@ -69,7 +69,7 @@ public class ServerConnectionParser {
                     break;
                 default:
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
-                        final String nick = parseConnectionCode(mConfiguration.isNickChangable(),
+                        final String nick = parseConnectionCode(mConfiguration.isNickChangeable(),
                                 parsedArray, eventBus, mConfiguration.getNickStorage());
                         if (nick != null) {
                             return nick;
