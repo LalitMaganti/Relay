@@ -165,7 +165,9 @@ public class BaseConnection {
                 sender.onDisconnected(server, "Disconnected from the server (" + ex.getMessage()
                         + ")", true);
 
-                channelList = server.getUser().getChannelList();
+                if (server.getUser() != null) {
+                    channelList = server.getUser().getChannelList();
+                }
             }
         }
         if (!mUserDisconnected) {
