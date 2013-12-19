@@ -1,7 +1,6 @@
 package com.fusionx.relay.connection;
 
 import com.fusionx.relay.AppUser;
-import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.communication.ServerEventBus;
@@ -23,7 +22,6 @@ import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Collection;
-import java.util.List;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -167,10 +165,7 @@ public class BaseConnection {
                 sender.onDisconnected(server, "Disconnected from the server (" + ex.getMessage()
                         + ")", true);
 
-                channelList.clear();
-                for (Channel channel : server.getUser().getChannels()) {
-                    channelList.add(channel.getName());
-                }
+                channelList = server.getUser().getChannelList();
             }
         }
         if (!mUserDisconnected) {
