@@ -340,7 +340,8 @@ class ServerCommandParser {
                         UserListChangeType.REMOVE, user);
             } else {
                 mUserChannelInterface.decoupleUserAndChannel(user, channel);
-                mServerEventBus.sendGenericChannelEvent(channel, message,                        UserListChangeType.REMOVE);
+                mServerEventBus.sendGenericChannelEvent(channel, message,
+                        UserListChangeType.REMOVE);
             }
             return null;
         }
@@ -350,18 +351,20 @@ class ServerCommandParser {
         final String channelName = parsedArray.get(2);
         final String kickedNick = parsedArray.get(3);
 
-        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
+        final ChannelUser user = mUserChannelInterface.getUserIfExists(kickingNick);
+
         final ChannelUser kickedUser = mUserChannelInterface.getUser(kickedNick);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
         final String kickingUserNick = user.getPrettyNick(channel);
 
         if (kickedUser.equals(mServer.getUser())) {
+            mUserChannelInterface.removeChannel(channel);
+
             final String message = mEventResponses.getOnUserKickedMessage(channel.getName(),
                     kickingUserNick, reason);
             final Event event = mServerEventBus.sendGenericServerEvent(mServer, message);
-
-            mUserChannelInterface.removeChannel(channel);
             mServerEventBus.onKicked(channel.getName());
             return event;
         } else {
