@@ -145,6 +145,14 @@ public class UserInputParser {
                     return;
                 }
                 break;
+            case "/ns":
+                if (arrayLength > 1) {
+                    final String message = parsedArray.size() >= 1 ? IRCUtils
+                            .convertArrayListToString(parsedArray) : "";
+                    server.getServerCallBus().sendMessageToUser("NickServ", message);
+                    return;
+                }
+                break;
             case "/raw":
                 server.getServerCallBus().sendRawLine(IRCUtils.convertArrayListToString
                         (parsedArray));
