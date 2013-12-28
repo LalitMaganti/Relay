@@ -24,7 +24,7 @@ public interface EventResponses {
     public String getTopicChangedMessage(final String setterNick, final String oldTopic,
             final String newTopic);
 
-    String getUserKickedMessage(final String kickedUserNick, final String kickingUserNick,
+    public String getUserKickedMessage(final String kickedUserNick, final String kickingUserNick,
             final String reason);
 
     public String getOnUserKickedMessage(final String name, final String nick,
@@ -42,8 +42,11 @@ public interface EventResponses {
 
     public String getInitialTopicMessage(final String topic, final String topicSetter);
 
+    public String getSlapMessage(final String receivingNick);
+
+    // Other things
+    public void onUserMentioned(final Server server, final String messageDestination);
+
     // Errors
     public String getNickInUserError();
-
-    public void onUserMentioned(final Server server, final String messageDestination);
 }

@@ -113,6 +113,11 @@ public class ServerCallBus extends Bus {
         }
     }
 
+    public void sendSlap(final String channelName, final String nick) {
+        final String message = InterfaceHolders.getEventResponses().getSlapMessage(nick);
+        sendActionToChannel(channelName, message);
+    }
+
     public void sendActionToChannel(final String channelName, final String action) {
         post(new ActionEvent(channelName, action));
 
