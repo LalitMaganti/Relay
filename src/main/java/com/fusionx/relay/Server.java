@@ -8,14 +8,14 @@ import com.fusionx.relay.event.ServerEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.misc.ServerCache;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ChannelWriter;
 import com.fusionx.relay.writers.ServerWriter;
 import com.fusionx.relay.writers.UserWriter;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,7 +51,7 @@ public class Server {
     }
 
     public void onServerEvent(final ServerEvent event) {
-        if (StringUtils.isNotBlank(event.message)) {
+        if (Utils.isNotBlank(event.message)) {
             synchronized (mBuffer) {
                 mBuffer.add(new Message(event.message));
             }
@@ -89,11 +89,10 @@ public class Server {
     }
 
     public synchronized PrivateMessageUser getPrivateMessageUserIfExists(final String nick) {
-        final Iterator<PrivateMessageUser> iterator = mUser.getPrivateMessageIterator();
-        while (iterator.hasNext()) {
-            final PrivateMessageUser privateMessageUser = iterator.next();
-            if (IRCUtils.areNicksEqual(privateMessageUser.getNick(), nick)) {
-                return privateMessageUser;
+        final Collection<PrivateMessageUser> privateMessages = mUser.getPrivateMessages();
+        for (final PrivateMessageUser user : privateMessages) {
+            if (IRCUtils.areNicksEqual(user.getNick(), nick)) {
+                return user;
             }
         }
         return null;

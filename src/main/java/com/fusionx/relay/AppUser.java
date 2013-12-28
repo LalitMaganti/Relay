@@ -2,7 +2,6 @@ package com.fusionx.relay;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,8 +29,8 @@ public class AppUser extends ChannelUser {
         return mPrivateMessages.contains(user);
     }
 
-    public Iterator<PrivateMessageUser> getPrivateMessageIterator() {
-        return mPrivateMessages.iterator();
+    public Collection<PrivateMessageUser> getPrivateMessages() {
+        return mPrivateMessages;
     }
 
     @Override

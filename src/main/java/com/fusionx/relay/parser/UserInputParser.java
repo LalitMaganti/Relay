@@ -36,6 +36,16 @@ public class UserInputParser {
                         return;
                     }
                     break;
+
+                case "/kick":
+                    if (arrayLength >= 1) {
+                        final String nick = parsedArray.remove(0);
+                        final String reason = parsedArray.size() >= 1 ? IRCUtils
+                                .convertArrayListToString(parsedArray) : "";
+                        server.getServerCallBus().sendKick(channelName, nick, reason);
+                        return;
+                    }
+                    break;
                 default:
                     serverCommandToParse(server, message);
                     return;

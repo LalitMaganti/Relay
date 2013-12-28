@@ -8,6 +8,7 @@ import com.fusionx.relay.event.NickChangeEvent;
 import com.fusionx.relay.misc.CoreListener;
 import com.fusionx.relay.misc.NickStorage;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ServerWriter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -94,10 +95,10 @@ public class ServerConnectionParser {
                 IRCUtils.removeFirstElementFromList(parsedArray, 3);
                 return nick;
             case ERR_NICKNAMEINUSE:
-                if (!triedSecondNick && StringUtils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
+                if (!triedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
                     mWriter.changeNick(new NickChangeEvent("", nickStorage.getSecondChoiceNick()));
                     triedSecondNick = true;
-                } else if (!triedThirdNick && StringUtils.isNotEmpty(nickStorage
+                } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage
                         .getThirdChoiceNick())) {
                     mWriter.changeNick(new NickChangeEvent("", nickStorage.getThirdChoiceNick()));
                     triedThirdNick = true;

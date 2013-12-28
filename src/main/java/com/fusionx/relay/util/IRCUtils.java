@@ -30,16 +30,6 @@ public class IRCUtils {
         return nick;
     }
 
-    public static String getHostNameFromRaw(final String rawSource) {
-        String nick;
-        if (rawSource.contains("!") && rawSource.contains("@")) {
-            nick = StringUtils.substringAfter(rawSource, "@");
-        } else {
-            nick = rawSource;
-        }
-        return nick;
-    }
-
     public static int generateRandomColor(final Theme theme) {
         final int colorOffset = theme.getGetTextColourOffset();
 

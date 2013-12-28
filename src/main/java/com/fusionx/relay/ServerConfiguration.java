@@ -1,6 +1,7 @@
 package com.fusionx.relay;
 
 import com.fusionx.relay.misc.NickStorage;
+import com.fusionx.relay.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -170,7 +171,7 @@ public class ServerConfiguration implements Parcelable {
 
     // Helper methods
     public boolean isSaslAvailable() {
-        return StringUtils.isNotEmpty(mSaslUsername) && StringUtils.isNotEmpty(mSaslPassword);
+        return Utils.isNotEmpty(mSaslUsername) && Utils.isNotEmpty(mSaslPassword);
     }
 
     // Getters and setters
@@ -390,9 +391,9 @@ public class ServerConfiguration implements Parcelable {
         }
 
         public ServerConfiguration build() {
-            if (StringUtils.isEmpty(mTitle)) {
+            if (Utils.isEmpty(mTitle)) {
                 throw new IllegalArgumentException("The server title cannot be empty");
-            } else if (StringUtils.isEmpty(mUrl)) {
+            } else if (Utils.isEmpty(mUrl)) {
                 throw new IllegalArgumentException("The server URL cannot be empty");
             }
             return new ServerConfiguration(this);

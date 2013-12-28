@@ -3,6 +3,7 @@ package com.fusionx.relay;
 import com.fusionx.relay.event.PrivateEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,7 +27,7 @@ public final class PrivateMessageUser extends User {
             final String initalMessage) {
         super(nick, userChannelInterface);
 
-        if (InterfaceHolders.getPreferences().shouldHandleInitialPrivateMessage() && StringUtils
+        if (InterfaceHolders.getPreferences().shouldHandleInitialPrivateMessage() && Utils
                 .isNotEmpty(initalMessage)) {
             mBuffer.add(new Message(InterfaceHolders.getEventResponses().getMessage(nick,
                     initalMessage)));
@@ -44,7 +45,7 @@ public final class PrivateMessageUser extends User {
     }
 
     public void onUserEvent(final PrivateEvent event) {
-        if (StringUtils.isNotBlank(event.message)) {
+        if (Utils.isNotBlank(event.message)) {
             synchronized (mBuffer) {
                 mBuffer.add(new Message(event.message));
             }

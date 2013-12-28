@@ -1,6 +1,7 @@
 package com.fusionx.relay.writers;
 
 import com.fusionx.relay.event.ActionEvent;
+import com.fusionx.relay.event.KickEvent;
 import com.fusionx.relay.event.MessageEvent;
 import com.fusionx.relay.event.PartEvent;
 import com.squareup.otto.Subscribe;
@@ -31,5 +32,13 @@ public class ChannelWriter extends RawWriter {
                 String.format(WriterCommands.Part, event.channelName) :
                 String.format(WriterCommands.PartWithReason, event.channelName, event.reason)
                         .trim());
+    }
+
+    @Subscribe
+    public void onKick(final KickEvent event) {
+        writeLineToServer(StringUtils.isEmpty(event.channelName) ?
+                String.format(WriterCommands.Kick, event.channelName, event.userNick) :
+                String.format(WriterCommands.KickWithReason, event.channelName, event.userNick,
+                        event.reason).trim());
     }
 }

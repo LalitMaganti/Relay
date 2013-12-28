@@ -11,9 +11,8 @@ import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.parser.ServerConnectionParser;
 import com.fusionx.relay.parser.ServerLineParser;
 import com.fusionx.relay.util.SSLUtils;
+import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ServerWriter;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -106,14 +105,14 @@ public class BaseConnection {
                 serverWriter.getSupportedCapabilities();
             }
 
-            if (StringUtils.isNotEmpty(serverConfiguration.getServerPassword())) {
+            if (Utils.isNotEmpty(serverConfiguration.getServerPassword())) {
                 serverWriter.sendServerPassword(serverConfiguration.getServerPassword());
             }
 
             serverWriter.changeNick(new NickChangeEvent("", serverConfiguration.getNickStorage()
                     .getFirstChoiceNick()));
             serverWriter.sendUser(serverConfiguration.getServerUserName(),
-                    StringUtils.isNotEmpty(serverConfiguration.getRealName()) ?
+                    Utils.isNotEmpty(serverConfiguration.getRealName()) ?
                             serverConfiguration.getRealName() : "HoloIRC");
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
@@ -134,7 +133,7 @@ public class BaseConnection {
                 server.setUser(user);
 
                 // Identifies with NickServ if the password exists
-                if (StringUtils.isNotEmpty(serverConfiguration.getNickservPassword())) {
+                if (Utils.isNotEmpty(serverConfiguration.getNickservPassword())) {
                     serverWriter.sendNickServPassword(serverConfiguration
                             .getNickservPassword());
                 }

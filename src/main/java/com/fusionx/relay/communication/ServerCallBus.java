@@ -9,6 +9,7 @@ import com.fusionx.relay.event.ActionEvent;
 import com.fusionx.relay.event.DisconnectEvent;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.JoinEvent;
+import com.fusionx.relay.event.KickEvent;
 import com.fusionx.relay.event.MessageEvent;
 import com.fusionx.relay.event.ModeEvent;
 import com.fusionx.relay.event.NickChangeEvent;
@@ -17,10 +18,9 @@ import com.fusionx.relay.event.PrivateActionEvent;
 import com.fusionx.relay.event.PrivateMessageEvent;
 import com.fusionx.relay.event.WhoisEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.util.Utils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class ServerCallBus extends Bus {
 
@@ -65,7 +65,7 @@ public class ServerCallBus extends Bus {
 
     public void sendMessageToUser(final String userNick, final String message) {
         final PrivateMessageUser user = getServer().getPrivateMessageUser(userNick, message);
-        if (StringUtils.isNotEmpty(message)) {
+        if (Utils.isNotEmpty(message)) {
             final boolean isPrivateMessageOpen = getServer().getUser().isPrivateMessageOpen(user);
             post(new PrivateMessageEvent(userNick, message, !isPrivateMessageOpen));
         }
@@ -75,7 +75,7 @@ public class ServerCallBus extends Bus {
 
     public void sendActionToUser(final String userNick, final String action) {
         final PrivateMessageUser user = getServer().getPrivateMessageUser(userNick, action);
-        if (StringUtils.isNotEmpty(action)) {
+        if (Utils.isNotEmpty(action)) {
             final boolean isPrivateMessageOpen = getServer().getUser().isPrivateMessageOpen(user);
             post(new PrivateActionEvent(userNick, action, !isPrivateMessageOpen));
         }
@@ -125,5 +125,9 @@ public class ServerCallBus extends Bus {
 
     Server getServer() {
         return mConnection.getServer();
+    }
+
+    public void sendKick(String channelName, String nick, String reason) {
+        post(new KickEvent(channelName, nick, reason));
     }
 }

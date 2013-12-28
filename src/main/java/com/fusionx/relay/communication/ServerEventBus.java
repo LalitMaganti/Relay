@@ -31,7 +31,6 @@ import android.os.Handler;
 import android.os.Looper;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 public class ServerEventBus extends Bus {
 
@@ -122,15 +121,6 @@ public class ServerEventBus extends Bus {
         }
         // Post this event no matter what
         post(event);
-
-        /*for (Channel channel : server.getUser().getChannels()) {
-            sendGenericChannelEvent(channel, disconnectLine, UserListChangeType.NONE);
-        }
-        final Iterator<PrivateMessageUser> iterator = server.getUser().getPrivateMessageIterator();
-        while (iterator.hasNext()) {
-            final PrivateMessageUser user = iterator.next();
-            sendUserEvent(user, new PrivateMessageEvent(user.getNick(), disconnectLine, false));
-        }*/
     }
 
     public JoinEvent onChannelJoined(final String channelName) {
@@ -144,8 +134,8 @@ public class ServerEventBus extends Bus {
         post(event);
     }
 
-    public void onKicked(final String channelName) {
-        final KickEvent event = new KickEvent(channelName);
+    public void onKicked(final String channelName, final String reason) {
+        final KickEvent event = new KickEvent(channelName, mServer.getUser().getNick(), reason);
         post(event);
     }
 

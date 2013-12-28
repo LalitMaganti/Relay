@@ -365,7 +365,7 @@ class ServerCommandParser {
             final String message = mEventResponses.getOnUserKickedMessage(channel.getName(),
                     kickingUserNick, reason);
             final Event event = mServerEventBus.sendGenericServerEvent(mServer, message);
-            mServerEventBus.onKicked(channel.getName());
+            mServerEventBus.onKicked(channel.getName(), reason);
             return event;
         } else {
             final String message = mEventResponses.getUserKickedMessage(kickedUser.getPrettyNick
