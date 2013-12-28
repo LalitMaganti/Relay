@@ -13,16 +13,16 @@ import javax.net.ssl.X509TrustManager;
 
 public class SSLUtils {
 
-    public static SSLSocketFactory getCorrectSSLSocketFactory(final Boolean acceptAll) {
+    public static SSLSocketFactory getAppropriateSSLFactory(final boolean acceptAll) {
         if (acceptAll) {
             try {
                 final TrustManager[] tm = new TrustManager[]{new X509TrustManager() {
                     @Override
-                    public void checkClientTrusted(X509Certificate[] cert, String authType) {
+                    public void checkClientTrusted(final X509Certificate[] cert, String authType) {
                     }
 
                     @Override
-                    public void checkServerTrusted(X509Certificate[] cert, String authType) {
+                    public void checkServerTrusted(final X509Certificate[] cert, String authType) {
                     }
 
                     @Override
@@ -33,12 +33,10 @@ public class SSLUtils {
                 SSLContext context = SSLContext.getInstance("SSL");
                 context.init(new KeyManager[0], tm, new SecureRandom());
                 return context.getSocketFactory();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                return null;
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
-                return null;
+            } catch (final NoSuchAlgorithmException e) {
+                return (SSLSocketFactory) SSLSocketFactory.getDefault();
+            } catch (final KeyManagementException e) {
+                return (SSLSocketFactory) SSLSocketFactory.getDefault();
             }
         } else {
             return (SSLSocketFactory) SSLSocketFactory.getDefault();

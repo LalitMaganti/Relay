@@ -50,26 +50,26 @@ public class IRCUtils {
      * Split the line received from the server into it's components
      *
      * @param input          the line received from the server
-     * @param careAboutColon - whether a colon means the rest of the line should be added in one go
+     * @param colonDelimiter whether a colon means the rest of the line should be added in one go
      * @return the parsed list
      */
     public static ArrayList<String> splitRawLine(final String input,
-            final boolean careAboutColon) {
+            final boolean colonDelimiter) {
         final ArrayList<String> stringParts = new ArrayList<String>();
         if (input == null || input.length() == 0) {
             return stringParts;
         }
 
         final String colonLessLine = input.charAt(0) == ':' ? input.substring(1) : input;
-        //Heavily optimized version string split by space with all characters after :
-        //added as a single entry. Under benchmarks, its faster than StringTokenizer,
-        //String.split, toCharArray, and charAt
+        // Heavily optimized version string split by space with all characters after :
+        // added as a single entry. Under benchmarks, its faster than StringTokenizer,
+        // String.split, toCharArray, and charAt
         String trimmedInput = CharMatcher.WHITESPACE.trimFrom(colonLessLine);
         int pos = 0, end;
         while ((end = trimmedInput.indexOf(' ', pos)) >= 0) {
             stringParts.add(trimmedInput.substring(pos, end));
             pos = end + 1;
-            if (trimmedInput.charAt(pos) == ':' && careAboutColon) {
+            if (trimmedInput.charAt(pos) == ':' && colonDelimiter) {
                 stringParts.add(trimmedInput.substring(pos + 1));
                 return stringParts;
             }

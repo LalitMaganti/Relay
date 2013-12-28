@@ -71,7 +71,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     private void onUpdateSpannedNick(final Channel channel) {
-        Spanned spannable = ColourParserUtils.parseMarkup(getPrettyNick(channel));
+        Spanned spannable = ColourParserUtils.onParseMarkup(getPrettyNick(channel));
         mChannelSpannedMap.put(channel, spannable);
     }
 

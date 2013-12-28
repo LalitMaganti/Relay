@@ -5,12 +5,9 @@ import com.fusionx.relay.util.IRCUtils;
 
 import java.util.ArrayList;
 
-/**
- * This entire class needs full parsing
- */
 public class UserInputParser {
 
-    public static void channelMessageToParse(final Server server, final String channelName,
+    public static void onParseChannelMessage(final Server server, final String channelName,
             final String message) {
         final ArrayList<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
@@ -53,17 +50,17 @@ public class UserInputParser {
                     }
                     break;
                 default:
-                    serverCommandToParse(server, message);
+                    onParseServerCommand(server, message);
                     return;
             }
         } else {
             server.getServerCallBus().sendMessageToChannel(channelName, message);
             return;
         }
-        sendUnknownEvent(server, message);
+        onUnknownEvent(server, message);
     }
 
-    public static void userMessageToParse(final Server server, final String userNick,
+    public static void onParseUserMessage(final Server server, final String userNick,
             final String message) {
         final ArrayList<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
@@ -84,25 +81,25 @@ public class UserInputParser {
                     }
                     break;
                 default:
-                    serverCommandToParse(server, message);
+                    onParseServerCommand(server, message);
                     return;
             }
         } else {
             server.getServerCallBus().sendMessageToUser(userNick, message);
             return;
         }
-        sendUnknownEvent(server, message);
+        onUnknownEvent(server, message);
     }
 
-    public static void serverMessageToParse(final Server server, final String message) {
+    public static void onParseServerMessage(final Server server, final String message) {
         if (message.startsWith("/")) {
-            serverCommandToParse(server, message);
+            onParseServerCommand(server, message);
             return;
         }
-        sendUnknownEvent(server, message);
+        onUnknownEvent(server, message);
     }
 
-    private static void serverCommandToParse(final Server server,
+    private static void onParseServerCommand(final Server server,
             final String rawLine) {
         final ArrayList<String> parsedArray = IRCUtils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
@@ -147,8 +144,7 @@ public class UserInputParser {
                 break;
             case "/ns":
                 if (arrayLength > 1) {
-                    final String message = parsedArray.size() >= 1 ? IRCUtils
-                            .convertArrayListToString(parsedArray) : "";
+                    final String message = IRCUtils.convertArrayListToString(parsedArray);
                     server.getServerCallBus().sendMessageToUser("NickServ", message);
                     return;
                 }
@@ -165,10 +161,10 @@ public class UserInputParser {
                 }
                 break;
         }
-        sendUnknownEvent(server, rawLine);
+        onUnknownEvent(server, rawLine);
     }
 
-    private static void sendUnknownEvent(final Server server, final String rawLine) {
+    private static void onUnknownEvent(final Server server, final String rawLine) {
         server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
     }
 }

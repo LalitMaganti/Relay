@@ -13,7 +13,7 @@ import android.text.style.StyleSpan;
 
 public class ColourParserUtils {
 
-    public static Spanned parseMarkup(final String input) {
+    public static Spanned onParseMarkup(final String input) {
         try {
             final SpannableStringBuilder builder = new SpannableStringBuilder();
             String remainingText = CharMatcher.JAVA_ISO_CONTROL.removeFrom(input);
@@ -46,7 +46,7 @@ public class ColourParserUtils {
                 final int length;
 
                 if (containsValidTag(text)) {
-                    final Spanned spanned = parseMarkup(text);
+                    final Spanned spanned = onParseMarkup(text);
                     length = spanned.length();
                     builder.append(spanned);
                 } else {

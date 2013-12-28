@@ -180,7 +180,7 @@ public class BaseConnection {
      * Called to setup the socket
      */
     private void setupSocket() throws IOException {
-        final SSLSocketFactory sslSocketFactory = SSLUtils.getCorrectSSLSocketFactory
+        final SSLSocketFactory sslSocketFactory = SSLUtils.getAppropriateSSLFactory
                 (serverConfiguration.shouldAcceptAllSSLCertificates());
 
         final InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),

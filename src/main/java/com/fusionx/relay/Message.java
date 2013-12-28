@@ -20,6 +20,6 @@ public class Message {
         } else {
             this.timestamp = "";
         }
-        this.message = ColourParserUtils.parseMarkup(message);
+        this.message = ColourParserUtils.onParseMarkup(message);
     }
 }
