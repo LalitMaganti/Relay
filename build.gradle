@@ -1,0 +1,37 @@
+allprojects {
+  buildscript {
+    repositories {
+      mavenCentral()
+    }
+  }
+
+  dependencies {
+    repositories {
+      mavenCentral()
+    }
+  }
+
+  apply plugin: 'maven'
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.9'
+}
+
+task cleanExample(type: Exec) {
+  executable = 'gradle'
+  workingDir = project.file('example')
+  args = [ 'clean' ]
+}
+
+task assembleExample(type: Exec) {
+  executable = 'gradle'
+  workingDir = project.file('example')
+  args = [ 'assemble' ]
+}
+
+task installExample(type: Exec) {
+  executable = 'gradle'
+  workingDir = project.file('example')
+  args = [ 'installDebug' ]
+}
