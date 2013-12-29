@@ -5,6 +5,7 @@ import com.fusionx.relay.interfaces.EventPreferences;
 import com.fusionx.relay.interfaces.EventResponses;
 
 public class TestMisc {
+
     public static class DefaultEventPreferences implements EventPreferences {
 
         @Override

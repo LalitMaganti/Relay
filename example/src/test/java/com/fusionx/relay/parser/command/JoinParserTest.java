@@ -1,11 +1,10 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.ServerConfigurationTest;
+import com.fusionx.relay.ServerTest;
 import com.fusionx.relay.TestMisc;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.event.JoinEvent;
@@ -29,10 +28,10 @@ public class JoinParserTest {
 
     private Server mServer;
 
+    private JoinParser mJoinParser;
+
     // Setup work for the tests
     public JoinParserTest() {
-        final ServerConfiguration freenode = ServerConfigurationTest
-                .getFreenodeConfiguration();
         final EventResponses eventResponses = new TestMisc.DefaultEventResponses() {
             @Override
             public String getJoinMessage(final String nick) {
@@ -42,21 +41,13 @@ public class JoinParserTest {
         InterfaceHolders.onInterfaceReceived(new TestMisc.DefaultEventPreferences(),
                 eventResponses);
 
-        mServer = new Server(freenode, null);
-        final String nick = freenode.getNickStorage().getFirstChoiceNick();
-        final AppUser user = new AppUser(nick, mServer.getUserChannelInterface());
-        mServer.setUser(user);
-    }
-
-    @Test
-    public void testOnParseCommand() {
-        final JoinParser parser = new JoinParser(mServer);
-        testOnJoin(parser);
-        testOnUserJoin(parser);
+        mServer = ServerTest.getDefaultServer();
+        mJoinParser = new JoinParser(mServer);
     }
 
     // This method tests that when another user joins, everything is set up correctly
-    private void testOnUserJoin(final JoinParser parser) {
+    @Test
+    public void testOnUserJoin() {
         mServer.getServerEventBus().register(new Object() {
             @Subscribe
             public void onJoinEvent(final ChannelEvent event) {
@@ -85,11 +76,12 @@ public class JoinParserTest {
         });
         final String joinLine = ":otheruser!otheruser@test JOIN #holoirc";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
-        parser.onParseCommand(list, "otheruser!otheruser@test");
+        mJoinParser.onParseCommand(list, "otheruser!otheruser@test");
     }
 
     // This method tests that when our user joins, everything is set up correctly
-    private void testOnJoin(final JoinParser parser) {
+    @Test
+    public void testOnJoin() {
         final String nick = ServerConfigurationTest.getFreenodeConfiguration()
                 .getNickStorage().getFirstChoiceNick();
         mServer.getServerEventBus().register(new Object() {
@@ -117,6 +109,6 @@ public class JoinParserTest {
         });
         final String joinLine = ":holoirctester!holoirctester@test JOIN #holoirc";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
-        parser.onParseCommand(list, "holoirctester!holoirctester@test");
+        mJoinParser.onParseCommand(list, "holoirctester!holoirctester@test");
     }
 }
