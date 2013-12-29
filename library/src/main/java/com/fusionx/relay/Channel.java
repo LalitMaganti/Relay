@@ -34,8 +34,7 @@ public class Channel {
 
     private boolean mObserving;
 
-    Channel(final String channelName, final UserChannelInterface
-            userChannelInterface) {
+    Channel(final String channelName, final UserChannelInterface userChannelInterface) {
         mName = channelName;
         mUserChannelInterface = userChannelInterface;
         mBuffer = new ArrayList<>();
@@ -71,7 +70,16 @@ public class Channel {
 
     @Override
     public boolean equals(final Object o) {
-        return o instanceof Channel && ((Channel) o).mName.equals(mName);
+        if (o instanceof Channel) {
+            final Channel otherChannel = (Channel) o;
+            return otherChannel.getName().equals(mName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return mName.hashCode();
     }
 
     public void onChannelEvent(final ChannelEvent event) {

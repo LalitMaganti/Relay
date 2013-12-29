@@ -16,7 +16,7 @@ public class UserInputParser {
         if (command.startsWith("/")) {
             switch (command) {
                 case "/me":
-                    final String action = IRCUtils.convertArrayListToString(parsedArray);
+                    final String action = IRCUtils.concatStringList(parsedArray);
                     server.getServerCallBus().sendActionToChannel(channelName, action);
                     return;
                 case "/part":
@@ -37,7 +37,7 @@ public class UserInputParser {
                     if (arrayLength >= 1) {
                         final String nick = parsedArray.remove(0);
                         final String reason = parsedArray.size() >= 1 ? IRCUtils
-                                .convertArrayListToString(parsedArray) : "";
+                                .concatStringList(parsedArray) : "";
                         server.getServerCallBus().sendKick(channelName, nick, reason);
                         return;
                     }
@@ -69,7 +69,7 @@ public class UserInputParser {
         if (command.startsWith("/")) {
             switch (command) {
                 case "/me":
-                    final String action = IRCUtils.convertArrayListToString(parsedArray);
+                    final String action = IRCUtils.concatStringList(parsedArray);
                     server.getServerCallBus().sendActionToUser(userNick, action);
                     return;
                 case "/close":
@@ -118,7 +118,7 @@ public class UserInputParser {
                 if (arrayLength >= 1) {
                     final String nick = parsedArray.remove(0);
                     final String message = parsedArray.size() >= 1 ? IRCUtils
-                            .convertArrayListToString(parsedArray) : "";
+                            .concatStringList(parsedArray) : "";
                     server.getServerCallBus().sendMessageToUser(nick, message);
                     return;
                 }
@@ -144,19 +144,19 @@ public class UserInputParser {
                 break;
             case "/ns":
                 if (arrayLength > 1) {
-                    final String message = IRCUtils.convertArrayListToString(parsedArray);
+                    final String message = IRCUtils.concatStringList(parsedArray);
                     server.getServerCallBus().sendMessageToUser("NickServ", message);
                     return;
                 }
                 break;
             case "/raw":
-                server.getServerCallBus().sendRawLine(IRCUtils.convertArrayListToString
+                server.getServerCallBus().sendRawLine(IRCUtils.concatStringList
                         (parsedArray));
                 return;
             default:
                 if (command.startsWith("/")) {
                     server.getServerCallBus().sendRawLine(command.substring(1) + IRCUtils
-                            .convertArrayListToString(parsedArray));
+                            .concatStringList(parsedArray));
                     return;
                 }
                 break;

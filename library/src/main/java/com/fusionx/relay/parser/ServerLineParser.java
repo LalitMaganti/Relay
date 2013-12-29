@@ -29,7 +29,7 @@ public class ServerLineParser {
     public ServerLineParser(final Server server, final BaseConnection connection) {
         mServer = server;
         mBaseConnection = connection;
-        mCommandParser = new ServerCommandParser(this);
+        mCommandParser = new ServerCommandParser(mServer);
         mCodeParser = new ServerCodeParser(this);
     }
 
@@ -74,7 +74,11 @@ public class ServerLineParser {
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
                         return mCodeParser.onParseCode(parsedArray, rawLine);
                     } else {
-                        return mCommandParser.onParseServerCommand(parsedArray, rawLine);
+                        final boolean stopParsing = !mCommandParser.onParseServerCommand
+                                (parsedArray);
+                        if (stopParsing) {
+                            return new QuitEvent("");
+                        }
                     }
             }
         }

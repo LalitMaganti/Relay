@@ -121,7 +121,7 @@ class ServerCodeParser {
         if (genericCodes.contains(code)) {
             return mServerEventBus.sendGenericServerEvent(mServer, message);
         } else if (whoisCodes.contains(code)) {
-            final String response = IRCUtils.convertArrayListToString(parsedArray);
+            final String response = IRCUtils.concatStringList(parsedArray);
             return mServerEventBus.sendSwitchToServerEvent(mServer, response);
         } else if (doNothingCodes.contains(code)) {
             return new Event(message);

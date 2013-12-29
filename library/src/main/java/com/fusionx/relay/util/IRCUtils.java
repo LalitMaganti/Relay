@@ -85,7 +85,7 @@ public class IRCUtils {
         }
     }
 
-    public static String convertArrayListToString(final ArrayList<String> list) {
+    public static String concatStringList(final Iterable<String> list) {
         final StringBuilder builder = new StringBuilder();
         for (final String item : list) {
             builder.append(item).append(" ");

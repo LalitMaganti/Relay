@@ -46,13 +46,18 @@ public class AppUser extends ChannelUser {
         return channelList;
     }
 
+    // Two app users are only equal if and only if they belong to the same server
     @Override
     public boolean equals(final Object o) {
         if (o instanceof AppUser) {
             final AppUser us = ((AppUser) o);
-            return us.mNick.equals(mNick) && us.mServer.equals(mServer);
-        } else {
-            return false;
+            return us.getNick().equals(mNick) && us.mServer.equals(mServer);
         }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (mNick.hashCode() * 31) + mServer.hashCode();
     }
 }

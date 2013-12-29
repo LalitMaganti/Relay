@@ -5,6 +5,17 @@ import android.os.Parcelable;
 
 public class NickStorage implements Parcelable {
 
+    public static final Parcelable.Creator<NickStorage> CREATOR = new Parcelable
+            .Creator<NickStorage>() {
+        public NickStorage createFromParcel(Parcel in) {
+            return new NickStorage(in.readString(), in.readString(), in.readString());
+        }
+
+        public NickStorage[] newArray(int size) {
+            return new NickStorage[size];
+        }
+    };
+
     private final String mFirstChoiceNick;
 
     private final String mSecondChoiceNick;
@@ -30,16 +41,22 @@ public class NickStorage implements Parcelable {
         parcel.writeString(mThirdChoiceNick);
     }
 
-    public static final Parcelable.Creator<NickStorage> CREATOR = new Parcelable
-            .Creator<NickStorage>() {
-        public NickStorage createFromParcel(Parcel in) {
-            return new NickStorage(in.readString(), in.readString(), in.readString());
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof NickStorage) {
+            final NickStorage nickStorage = (NickStorage) o;
+            return mFirstChoiceNick.equals(nickStorage.getFirstChoiceNick()) &&
+                    mSecondChoiceNick.equals(nickStorage.getSecondChoiceNick()) &&
+                    mThirdChoiceNick.equals(nickStorage.getThirdChoiceNick());
         }
+        return false;
+    }
 
-        public NickStorage[] newArray(int size) {
-            return new NickStorage[size];
-        }
-    };
+    @Override
+    public int hashCode() {
+        return mFirstChoiceNick.hashCode() * 41 + mSecondChoiceNick.hashCode() * 43 +
+                mThirdChoiceNick.hashCode() * 31;
+    }
 
     // Getters and setters
     public String getFirstChoiceNick() {

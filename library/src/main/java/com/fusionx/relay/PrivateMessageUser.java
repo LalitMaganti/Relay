@@ -5,8 +5,6 @@ import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.Utils;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +40,11 @@ public final class PrivateMessageUser extends User {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return mNick.hashCode();
     }
 
     public void onUserEvent(final PrivateEvent event) {

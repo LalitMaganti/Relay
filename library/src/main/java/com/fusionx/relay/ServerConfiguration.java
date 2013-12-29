@@ -3,8 +3,6 @@ package com.fusionx.relay;
 import com.fusionx.relay.misc.NickStorage;
 import com.fusionx.relay.util.Utils;
 
-import org.apache.commons.lang3.StringUtils;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -146,7 +144,7 @@ public class ServerConfiguration implements Parcelable {
         return 0;
     }
 
-    public void writeToParcel(Parcel out, int flags) {
+    public void writeToParcel(final Parcel out, final int flags) {
         out.writeString(mTitle);
         out.writeString(mUrl);
         out.writeInt(mPort);
@@ -172,6 +170,20 @@ public class ServerConfiguration implements Parcelable {
     // Helper methods
     public boolean isSaslAvailable() {
         return Utils.isNotEmpty(mSaslUsername) && Utils.isNotEmpty(mSaslPassword);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ServerConfiguration) {
+            final ServerConfiguration configuration = (ServerConfiguration) o;
+            return mTitle.equals(configuration.getTitle());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return mTitle.hashCode();
     }
 
     // Getters and setters
@@ -235,11 +247,11 @@ public class ServerConfiguration implements Parcelable {
 
         public static final Parcelable.Creator<Builder> CREATOR =
                 new Parcelable.Creator<Builder>() {
-                    public Builder createFromParcel(Parcel in) {
+                    public Builder createFromParcel(final Parcel in) {
                         return new Builder(in);
                     }
 
-                    public Builder[] newArray(int size) {
+                    public Builder[] newArray(final int size) {
                         return new Builder[size];
                     }
                 };
@@ -336,7 +348,7 @@ public class ServerConfiguration implements Parcelable {
 
             mNickservPassword = "";
 
-            mAutoJoinChannels = new ArrayList<String>();
+            mAutoJoinChannels = new ArrayList <>();
         }
 
         private Builder(final Parcel in) {
@@ -359,7 +371,7 @@ public class ServerConfiguration implements Parcelable {
 
             mNickservPassword = in.readString();
 
-            mAutoJoinChannels = new ArrayList<String>();
+            mAutoJoinChannels = new ArrayList<>();
             in.readStringList(mAutoJoinChannels);
         }
 
@@ -397,6 +409,20 @@ public class ServerConfiguration implements Parcelable {
                 throw new IllegalArgumentException("The server URL cannot be empty");
             }
             return new ServerConfiguration(this);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Builder) {
+                final Builder builder = (Builder) o;
+                return mTitle.equals(builder.getTitle());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return mTitle.hashCode();
         }
 
         // Getters and setters

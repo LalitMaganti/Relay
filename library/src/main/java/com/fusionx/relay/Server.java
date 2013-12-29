@@ -16,7 +16,6 @@ import com.fusionx.relay.writers.UserWriter;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 public class Server {
@@ -119,7 +118,11 @@ public class Server {
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof Server) && ((Server) o).getTitle().equals(mTitle);
+        if (o instanceof Server) {
+            final Server server = (Server) o;
+            return server.getTitle().equals(mTitle);
+        }
+        return false;
     }
 
     /**
