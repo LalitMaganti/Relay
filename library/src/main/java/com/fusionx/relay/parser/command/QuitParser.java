@@ -18,9 +18,9 @@ public class QuitParser extends CommandParser {
 
     // TODO - split this up
     @Override
-    public void onParseCommand(List<String> parsedArray, String rawSource) {
+    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
-        if (user.equals(mServer.getUser())) {
+        if (user.isUserNickEqual(mServer.getUser())) {
             // TODO - improve this
             mIsUserQuit = true;
         } else {

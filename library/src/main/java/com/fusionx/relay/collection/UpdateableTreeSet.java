@@ -7,11 +7,6 @@ import java.util.TreeSet;
 
 public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends TreeSet<E> {
 
-    public interface Updateable {
-
-        void update(Object newValue);
-    }
-
     private final Set<E> toBeAdded = new HashSet<E>();
 
     public UpdateableTreeSet(Comparator<? super E> comparator) {
@@ -32,5 +27,10 @@ public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends T
             element.update(newValue);
             add(element);
         }
+    }
+
+    public interface Updateable {
+
+        void update(Object newValue);
     }
 }

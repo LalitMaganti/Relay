@@ -151,7 +151,7 @@ public class Channel {
     }
 
     /**
-     * Overidden method which returns the channel's name
+     * Overridden method which returns the channel's name
      *
      * @return the channel name
      */

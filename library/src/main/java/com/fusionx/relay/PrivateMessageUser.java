@@ -2,7 +2,6 @@ package com.fusionx.relay;
 
 import com.fusionx.relay.event.PrivateEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
-import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.Utils;
 
 import java.util.ArrayList;
@@ -30,21 +29,6 @@ public final class PrivateMessageUser extends User {
             mBuffer.add(new Message(InterfaceHolders.getEventResponses().getMessage(nick,
                     initalMessage)));
         }
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (o instanceof PrivateMessageUser) {
-            String otherNick = ((PrivateMessageUser) o).getNick();
-            return IRCUtils.areNicksEqual(mNick, otherNick);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return mNick.hashCode();
     }
 
     public void onUserEvent(final PrivateEvent event) {

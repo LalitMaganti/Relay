@@ -29,8 +29,15 @@ public class NickParser extends CommandParser {
         mServerEventBus.sendGenericServerEvent(mServer, message);
 
         for (final Channel channel : channels) {
-            mServerEventBus.sendGenericChannelEvent(channel, message, UserListChangeType.MODIFIED);
             channel.getUsers().update(user, channel);
+
+            if (channel.isObserving()) {
+                mServerEventBus.sendGenericChannelEvent(channel, message,
+                        UserListChangeType.MODIFIED, user);
+            } else {
+                mServerEventBus.sendGenericChannelEvent(channel, message,
+                        UserListChangeType.MODIFIED);
+            }
         }
     }
 }

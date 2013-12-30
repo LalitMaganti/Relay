@@ -18,7 +18,7 @@ public class JoinParser extends CommandParser {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
 
-        if (user.equals(mServer.getUser())) {
+        if (user.isUserNickEqual(mServer.getUser())) {
             mUserChannelInterface.coupleUserAndChannel(user, channel);
             mServerEventBus.onChannelJoined(channel.getName());
         } else {

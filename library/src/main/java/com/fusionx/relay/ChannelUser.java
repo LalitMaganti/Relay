@@ -156,19 +156,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         }
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        if (o instanceof ChannelUser) {
-            final ChannelUser us = (ChannelUser) o;
-            return us.getNick().equals(mNick) && us.mServer.equals(mServer);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return (mNick.hashCode() * 31) + mServer.hashCode();
+    public boolean isUserNickEqual(final User user) {
+        return mNick.equals(user.getNick());
     }
 
     // Checkable interface
