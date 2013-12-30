@@ -57,14 +57,13 @@ public class KickParser extends RemoveUserParser {
      */
     @Override
     void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
+        mUserChannelInterface.removeChannel(channel);
+
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
         final ChannelUser kickingUser = mUserChannelInterface.getUserIfExists(kickingNick);
         final String kickingUserNick = kickingUser.getPrettyNick(channel);
 
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
-
-        mUserChannelInterface.removeChannel(channel);
-
         final String message = mEventResponses.getOnUserKickedMessage(channel.getName(),
                 kickingUserNick, reason);
         mServerEventBus.sendGenericServerEvent(mServer, message);

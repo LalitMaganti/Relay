@@ -10,7 +10,7 @@ import java.util.List;
 public final class PrivateMessageUser extends User {
 
     /**
-     * Contains a copy of the messages when the conversation is not displayed to the user
+     * Contains a copy of the messages when the conversation
      */
     private final List<Message> mBuffer = new ArrayList<Message>();
 
@@ -19,6 +19,11 @@ public final class PrivateMessageUser extends User {
      * FragmentManager
      */
     private boolean mCached;
+
+    /**
+     * Retains whether the person on the other end of the PM quit in the middle of the conversation
+     */
+    private boolean mUserQuit;
 
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface,
             final String initalMessage) {
@@ -50,5 +55,13 @@ public final class PrivateMessageUser extends User {
 
     public void setCached(boolean cached) {
         mCached = cached;
+    }
+
+    public boolean isUserQuit() {
+        return mUserQuit;
+    }
+
+    public void setUserQuit(boolean userQuit) {
+        mUserQuit = userQuit;
     }
 }

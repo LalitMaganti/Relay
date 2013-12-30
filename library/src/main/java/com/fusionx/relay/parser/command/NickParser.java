@@ -3,8 +3,10 @@ package com.fusionx.relay.parser.command;
 import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
+import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.constants.UserListChangeType;
+import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -17,7 +19,8 @@ public class NickParser extends CommandParser {
 
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final String oldRawNick = IRCUtils.getNickFromRaw(rawSource);
+        final ChannelUser user = mUserChannelInterface.getUserIfExists(oldRawNick);
         final Set<Channel> channels = user.getChannels();
         final String oldNick = user.getColorfulNick();
 
@@ -38,6 +41,13 @@ public class NickParser extends CommandParser {
                 mServerEventBus.sendGenericChannelEvent(channel, message,
                         UserListChangeType.MODIFIED);
             }
+        }
+
+        final PrivateMessageUser privateMessageUser = mServer.getPrivateMessageUserIfExists
+                (oldNick);
+        if (privateMessageUser != null) {
+            privateMessageUser.setNick(parsedArray.get(2));
+            mServerEventBus.sendPrivateNickChangeEvent(privateMessageUser, oldRawNick, message);
         }
     }
 }

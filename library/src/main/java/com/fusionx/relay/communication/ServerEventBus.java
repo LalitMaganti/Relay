@@ -20,6 +20,8 @@ import com.fusionx.relay.event.PartEvent;
 import com.fusionx.relay.event.PrivateActionEvent;
 import com.fusionx.relay.event.PrivateEvent;
 import com.fusionx.relay.event.PrivateMessageEvent;
+import com.fusionx.relay.event.PrivateNickChangeEvent;
+import com.fusionx.relay.event.PrivateQuitEvent;
 import com.fusionx.relay.event.ServerEvent;
 import com.fusionx.relay.event.SwitchToServerEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
@@ -225,6 +227,19 @@ public class ServerEventBus extends Bus {
     public void sendConnected(final Server server, final String url) {
         final ConnectedEvent event = new ConnectedEvent(url);
         sendServerEvent(server, event);
+    }
+
+    public void sendPrivateQuitEvent(final PrivateMessageUser privateMessageUser,
+            final String message) {
+        final PrivateQuitEvent event = new PrivateQuitEvent(privateMessageUser.getNick(), message);
+        sendUserEvent(privateMessageUser, event);
+    }
+
+    public void sendPrivateNickChangeEvent(final PrivateMessageUser privateMessageUser,
+            final String oldNick, final String message) {
+        final PrivateNickChangeEvent event = new PrivateNickChangeEvent(oldNick, message,
+                privateMessageUser.getNick());
+        sendUserEvent(privateMessageUser, event);
     }
 
     public void sendInviteEvent(Server server, String channelName) {
