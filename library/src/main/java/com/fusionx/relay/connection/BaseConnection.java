@@ -20,9 +20,11 @@ import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ServerWriter;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Collection;
@@ -102,7 +104,8 @@ public class BaseConnection {
         final ServerEventBus sender = server.getServerEventBus();
         try {
             setupSocket();
-            final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());
+            final Writer writer = new BufferedWriter(new OutputStreamWriter(mSocket
+                    .getOutputStream()));
             final ServerWriter serverWriter = server.onOutputStreamCreated(writer);
 
             server.setStatus(ServerStatus.CONNECTING);

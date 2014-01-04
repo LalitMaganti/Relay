@@ -131,7 +131,7 @@ public class ServerLineParser {
             final ServerEvent event = new GenericServerEvent(message);
             mServer.getServerEventBus().postAndStoreEvent(event, mServer);
         } else if (whoisCodes.contains(code)) {
-            final String response = IRCUtils.concatStringList(parsedArray);
+            final String response = IRCUtils.concatenateStringList(parsedArray);
             final WhoisEvent event = new WhoisEvent(response);
             mServer.getServerEventBus().postAndStoreEvent(event, mServer);
         } else if (doNothingCodes.contains(code)) {

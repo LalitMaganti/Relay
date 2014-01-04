@@ -18,9 +18,8 @@ public class ModeParser extends CommandParser {
         super(server);
     }
 
-    // TODO - split this up
     @Override
-    public void onParseCommand(List<String> parsedArray, String rawSource) {
+    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String mode = parsedArray.get(3);
@@ -36,15 +35,6 @@ public class ModeParser extends CommandParser {
             } else if (messageLength == 5) {
                 // User specified - therefore user mode in channel is being changed
                 onUserModeInChannel(parsedArray, sendingUser, channel, mode);
-            } else {
-                // TODO - fix this
-                //IRCUtils.removeFirstElementFromList(parsedArray, 4);
-                //final WorldUser user = mUserChannelInterface.getUserIfExists(sendingUser);
-                //final String nick = (user == null) ? sendingUser : user.getPrettyNick(channel);
-                //final String message = mEventResponses.getModeChangedMessage(mode,
-                //        IRCUtils.concatStringList(parsedArray), nick);
-                //mServerEventBus.sendGenericChannelEvent(channel, message,
-                //        UserListChangeType.MODIFIED);
             }
         } else {
             // A user is changing a mode about themselves

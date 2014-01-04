@@ -35,7 +35,7 @@ public class CtcpParser extends CommandParser {
         } else if (message.startsWith("VERSION")) {
             final String nick = IRCUtils.getNickFromRaw(rawSource);
             // TODO - get the version from the app
-            mServer.getServerCallBus().post(new VersionCall(nick, mServer.toString()));
+            mServer.getServerCallBus().post(new VersionCall(nick, "Relay Android Library"));
         }
     }
 
@@ -49,9 +49,6 @@ public class CtcpParser extends CommandParser {
                 onParseChannelAction(recipient, nick, action);
             } else {
                 onParseUserAction(nick, action);
-                //final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick,
-                //        action);
-                //mServer.onPrivateAction(sendingUser, action, false);
             }
         }
     }

@@ -8,8 +8,8 @@ import org.robolectric.RobolectricTestRunner;
 
 import android.os.Parcel;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class ServerConfigurationTest {
@@ -43,27 +43,8 @@ public class ServerConfigurationTest {
         final ServerConfiguration.Builder actual = ServerConfiguration.Builder.CREATOR
                 .createFromParcel(parcel);
 
-        assertNotNull(actual);
-        assertEquals(expected.getTitle(), actual.getTitle());
-        assertEquals(expected.getUrl(), actual.getUrl());
-        assertEquals(expected.getPort(), actual.getPort());
-
-        assertEquals(expected.isSsl(), actual.isSsl());
-        assertEquals(expected.isSslAcceptAllCertificates(), actual.isSslAcceptAllCertificates());
-
-        assertEquals(expected.getNickStorage(), actual.getNickStorage());
-        assertEquals(expected.getRealName(), actual.getRealName());
-        assertEquals(expected.isNickChangeable(), actual.isNickChangeable());
-
-        assertEquals(expected.getServerUserName(), actual.getServerUserName());
-        assertEquals(expected.getServerPassword(), actual.getServerPassword());
-
-        assertEquals(expected.getSaslUsername(), actual.getSaslUsername());
-        assertEquals(expected.getSaslPassword(), actual.getSaslPassword());
-
-        assertEquals(expected.getNickservPassword(), actual.getNickservPassword());
-
-        assertEquals(expected.getAutoJoinChannels(), actual.getAutoJoinChannels());
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualsToByComparingFields(expected);
     }
 
     // Configuration tests
@@ -85,27 +66,7 @@ public class ServerConfigurationTest {
 
         final ServerConfiguration actual = ServerConfiguration.CREATOR.createFromParcel(parcel);
 
-        assertNotNull(actual);
-        assertEquals(expected.getTitle(), actual.getTitle());
-        assertEquals(expected.getUrl(), actual.getUrl());
-        assertEquals(expected.getPort(), actual.getPort());
-
-        assertEquals(expected.isSslEnabled(), actual.isSslEnabled());
-        assertEquals(expected.shouldAcceptAllSSLCertificates(),
-                actual.shouldAcceptAllSSLCertificates());
-
-        assertEquals(expected.getNickStorage(), actual.getNickStorage());
-        assertEquals(expected.getRealName(), actual.getRealName());
-        assertEquals(expected.isNickChangeable(), actual.isNickChangeable());
-
-        assertEquals(expected.getServerUserName(), actual.getServerUserName());
-        assertEquals(expected.getServerPassword(), actual.getServerPassword());
-
-        assertEquals(expected.getSaslUsername(), actual.getSaslUsername());
-        assertEquals(expected.getSaslPassword(), actual.getSaslPassword());
-
-        assertEquals(expected.getNickservPassword(), actual.getNickservPassword());
-
-        assertEquals(expected.getAutoJoinChannels(), actual.getAutoJoinChannels());
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualsToByComparingFields(expected);
     }
 }

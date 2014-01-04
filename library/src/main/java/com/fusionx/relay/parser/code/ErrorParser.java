@@ -27,6 +27,7 @@ public class ErrorParser extends CodeParser {
         }
     }
 
+    // TODO - implement this
     private void onNicknameInUse(final List<String> parsedArray) {
     }
 

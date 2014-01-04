@@ -9,7 +9,7 @@ import com.fusionx.relay.writers.ChannelWriter;
 import com.fusionx.relay.writers.ServerWriter;
 import com.fusionx.relay.writers.UserWriter;
 
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class Server {
      * @param writer the which the writers will use
      * @return the server writer created from the OutputStreamWriter
      */
-    public ServerWriter onOutputStreamCreated(final OutputStreamWriter writer) {
+    public ServerWriter onOutputStreamCreated(final Writer writer) {
         final ServerWriter serverWriter = new ServerWriter(writer);
         mServerCallBus.register(serverWriter);
         mServerCallBus.register(new ChannelWriter(writer));

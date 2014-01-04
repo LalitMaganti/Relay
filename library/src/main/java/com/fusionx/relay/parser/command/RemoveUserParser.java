@@ -30,10 +30,7 @@ public abstract class RemoveUserParser extends CommandParser {
             final Channel channel, final WorldUser removedUser) {
         // Decrease the user count before we broadcast the message so that it is picked up
         channel.onDecrementUserType(removedUser.getChannelPrivileges(channel));
-
-        removedUser.onRemove(channel);
-        mUserChannelInterface.removeChannelFromUser(channel, removedUser);
-        mUserChannelInterface.removeUserFromChannel(channel, removedUser);
+        mUserChannelInterface.decoupleUserAndChannel(removedUser, channel);
 
         final WorldUserEvent event = getEvent(parsedArray, rawSource, channel, removedUser);
         mServerEventBus.postAndStoreEvent(event, channel);

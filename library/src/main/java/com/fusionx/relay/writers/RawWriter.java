@@ -1,13 +1,13 @@
 package com.fusionx.relay.writers;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 abstract class RawWriter {
 
-    private final OutputStreamWriter streamWriter;
+    private final Writer streamWriter;
 
-    RawWriter(final OutputStreamWriter writer) {
+    RawWriter(final Writer writer) {
         streamWriter = writer;
     }
 

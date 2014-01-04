@@ -13,13 +13,11 @@ import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NOSUCHNICK;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_ENDOFMOTD;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_ENDOFNAMES;
-import static com.fusionx.relay.constants.ServerReplyCodes.RPL_ENDOFWHO;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_MOTD;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_MOTDSTART;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_NAMREPLY;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_TOPIC;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_TOPICWHOTIME;
-import static com.fusionx.relay.constants.ServerReplyCodes.RPL_WHOREPLY;
 
 public abstract class CodeParser {
 
@@ -54,10 +52,6 @@ public abstract class CodeParser {
         final TopicParser topicParser = new TopicParser(server);
         parserMap.put(RPL_TOPIC, topicParser);
         parserMap.put(RPL_TOPICWHOTIME, topicParser);
-
-        final WhoParser whoParser = new WhoParser(server);
-        parserMap.put(RPL_WHOREPLY, whoParser);
-        parserMap.put(RPL_ENDOFWHO, whoParser);
 
         final ErrorParser errorParser = new ErrorParser(server);
         parserMap.put(ERR_NOSUCHNICK, errorParser);

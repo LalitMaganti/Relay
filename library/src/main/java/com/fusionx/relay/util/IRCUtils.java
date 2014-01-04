@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import android.graphics.Color;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -79,7 +80,7 @@ public class IRCUtils {
         }
     }
 
-    public static String concatStringList(final Iterable<String> list) {
+    public static String concatenateStringList(final Collection<String> list) {
         final StringBuilder builder = new StringBuilder();
         for (final String item : list) {
             builder.append(item).append(" ");

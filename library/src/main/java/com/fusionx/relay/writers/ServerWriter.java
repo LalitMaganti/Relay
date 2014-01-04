@@ -13,11 +13,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import android.util.Base64;
 
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 public class ServerWriter extends RawWriter {
 
-    public ServerWriter(final OutputStreamWriter out) {
+    public ServerWriter(final Writer out) {
         super(out);
     }
 

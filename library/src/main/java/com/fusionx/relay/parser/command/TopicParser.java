@@ -20,11 +20,6 @@ public class TopicParser extends CommandParser {
         final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
         final String newTopic = parsedArray.get(3);
 
-        //final String message = mEventResponses.getTopicChangedMessage(setterNick,
-        //        channel.getTopic(), newTopic);
-        //channel.setTopic(newTopic);
-        //mServerEventBus.sendGenericChannelEvent(channel, message, UserListChangeType.NONE);
-
         final ChannelEvent event = new TopicEvent(channel, user, newTopic);
         mServerEventBus.postAndStoreEvent(event, channel);
     }

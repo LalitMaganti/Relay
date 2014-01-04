@@ -8,11 +8,11 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 public class ChannelWriter extends RawWriter {
 
-    public ChannelWriter(OutputStreamWriter out) {
+    public ChannelWriter(Writer out) {
         super(out);
     }
 

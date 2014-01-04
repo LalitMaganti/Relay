@@ -4,11 +4,11 @@ import com.fusionx.relay.call.PrivateActionCall;
 import com.fusionx.relay.call.PrivateMessageCall;
 import com.squareup.otto.Subscribe;
 
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 public class UserWriter extends RawWriter {
 
-    public UserWriter(OutputStreamWriter writer) {
+    public UserWriter(final Writer writer) {
         super(writer);
     }
 
