@@ -1,12 +1,11 @@
 package com.fusionx.relay.writers;
 
-import com.fusionx.relay.event.Event;
-import com.fusionx.relay.event.JoinEvent;
-import com.fusionx.relay.event.ModeEvent;
-import com.fusionx.relay.event.NickChangeEvent;
-import com.fusionx.relay.event.QuitEvent;
-import com.fusionx.relay.event.VersionEvent;
-import com.fusionx.relay.event.WhoisEvent;
+import com.fusionx.relay.call.ChannelJoinCall;
+import com.fusionx.relay.call.ModeCall;
+import com.fusionx.relay.call.NickChangeCall;
+import com.fusionx.relay.call.QuitCall;
+import com.fusionx.relay.call.RawCall;
+import com.fusionx.relay.call.VersionCall;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,19 +25,19 @@ public class ServerWriter extends RawWriter {
     }
 
     @Subscribe
-    public void changeNick(final NickChangeEvent nickChangeEvent) {
+    public void changeNick(final NickChangeCall nickChangeEvent) {
         writeLineToServer("NICK " + nickChangeEvent.newNick);
     }
 
     @Subscribe
-    public void joinChannel(final JoinEvent joinEvent) {
-        writeLineToServer("JOIN " + joinEvent.channelToJoin);
+    public void joinChannel(final ChannelJoinCall worldJoinEvent) {
+        writeLineToServer("JOIN " + worldJoinEvent.channelName);
     }
 
     @Subscribe
-    public void quitServer(final QuitEvent quitEvent) {
-        writeLineToServer(StringUtils.isEmpty(quitEvent.reason) ? "QUIT" : "QUIT :" + quitEvent
-                .reason);
+    public void quitServer(final QuitCall quitEvent) {
+        writeLineToServer(StringUtils.isEmpty(quitEvent.quitReason) ? "QUIT" : "QUIT :" + quitEvent
+                .quitReason);
     }
 
     public void pongServer(final String absoluteURL) {
@@ -54,14 +53,14 @@ public class ServerWriter extends RawWriter {
     }
 
     @Subscribe
-    public void sendChannelMode(final ModeEvent event) {
-        writeLineToServer("MODE " + event.channel + " " + event.mode + " " + event.nick);
+    public void sendChannelMode(final ModeCall event) {
+        writeLineToServer("MODE " + event.channelName + " " + event.mode + " " + event.nick);
     }
 
-    @Subscribe
-    public void sendWhois(final WhoisEvent event) {
-        writeLineToServer("WHOIS " + event.baseMessage);
-    }
+    //@Subscribe
+    //public void sendWhois(final WhoisEvent event) {
+    //    writeLineToServer("WHOIS " + event.baseMessage);
+    //}
 
     public void getSupportedCapabilities() {
         writeLineToServer("CAP LS");
@@ -80,7 +79,7 @@ public class ServerWriter extends RawWriter {
     }
 
     @Subscribe
-    public void sendVersion(final VersionEvent event) {
+    public void sendVersion(final VersionCall event) {
         writeLineToServer("PRIVMSG " + event.askingUser + " :\u0001VERSION " + event.version +
                 "\u0001");
     }
@@ -98,7 +97,7 @@ public class ServerWriter extends RawWriter {
      * @param event - the event with the raw line that you want to send
      */
     @Subscribe
-    public void sendRawLineToServer(final Event event) {
-        writeLineToServer(event.baseMessage);
+    public void sendRawLineToServer(final RawCall event) {
+        writeLineToServer(event.rawLine);
     }
 }

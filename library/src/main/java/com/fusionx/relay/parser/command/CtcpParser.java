@@ -1,10 +1,14 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.VersionEvent;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.call.VersionCall;
+import com.fusionx.relay.event.SwitchToPrivateMessage;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.WorldActionEvent;
+import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -31,7 +35,7 @@ public class CtcpParser extends CommandParser {
         } else if (message.startsWith("VERSION")) {
             final String nick = IRCUtils.getNickFromRaw(rawSource);
             // TODO - get the version from the app
-            mServer.getServerCallBus().post(new VersionEvent(nick, mServer.toString()));
+            mServer.getServerCallBus().post(new VersionCall(nick, mServer.toString()));
         }
     }
 
@@ -44,22 +48,30 @@ public class CtcpParser extends CommandParser {
             if (Channel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelAction(recipient, nick, action);
             } else {
-                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick, action);
-                mServer.onPrivateAction(sendingUser, action, false);
+                onParseUserAction(nick, action);
+                //final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick,
+                //        action);
+                //mServer.onPrivateAction(sendingUser, action, false);
             }
+        }
+    }
+
+    private void onParseUserAction(final String nick, final String action) {
+        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUserIfExists(nick);
+        if (user == null) {
+            mUserChannelInterface.getNewPrivateMessageUser(nick, action, true);
+            mServerEventBus.post(new SwitchToPrivateMessage(nick));
+        } else {
+            mServerEventBus.postAndStoreEvent(new WorldPrivateActionEvent(user, action), user);
         }
     }
 
     private void onParseChannelAction(final String channelName, final String userNick,
             final String action) {
         final Channel channel = mUserChannelInterface.getChannel(channelName);
-        final ChannelUser sendingUser = mUserChannelInterface.getUserIfExists(userNick);
-        // This occurs rarely - usually on ZNCs. Also if someone performed an action on the
-        // channel during the buffer but is not in the channel now then this will also happen
-        if (sendingUser == null) {
-            mServerEventBus.onChannelAction(mServer.getUser(), channel, userNick, action);
-        } else {
-            mServerEventBus.onChannelAction(mServer.getUser(), channel, sendingUser, action);
-        }
+        final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(userNick);
+        final ChannelEvent event = new WorldActionEvent(channel, action, sendingUser,
+                userNick);
+        mServerEventBus.postAndStoreEvent(event, channel);
     }
 }

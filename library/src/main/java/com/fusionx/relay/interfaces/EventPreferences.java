@@ -10,8 +10,6 @@ public interface EventPreferences {
 
     public String getQuitReason();
 
-    public boolean getShouldTimestampMessages();
-
     public Theme getTheme();
 
     public boolean shouldIgnoreUser(final String nick);
@@ -24,5 +22,5 @@ public interface EventPreferences {
 
     public boolean shouldHighlightLine();
 
-    public boolean shouldHandleInitialPrivateMessage();
+    public boolean shouldNickBeColourful();
 }

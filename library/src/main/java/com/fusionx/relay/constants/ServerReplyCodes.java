@@ -405,7 +405,7 @@ public final class ServerReplyCodes {
             RPL_LUSERCHANNELS, RPL_LUSERME, RPL_STATSCONN, RPL_LOCALUSERS, RPL_GLOBALUSERS,
             RPL_NOWAWAY, RPL_UNAWAY);
 
-    // Codes we know about and choose to ignore - removes these from logs
+    // Codes we know about and choose to ignore
     public static final ImmutableList<Integer> doNothingCodes = ImmutableList.of
             (RPL_MYINFO, RPL_PROTOCTL);
 

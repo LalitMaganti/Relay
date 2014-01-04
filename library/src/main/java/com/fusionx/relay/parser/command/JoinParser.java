@@ -1,9 +1,12 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.constants.UserListChangeType;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.WorldJoinEvent;
+import com.fusionx.relay.event.server.JoinEvent;
+import com.fusionx.relay.event.server.ServerEvent;
 
 import java.util.List;
 
@@ -15,24 +18,16 @@ public class JoinParser extends CommandParser {
 
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final WorldUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
+        mUserChannelInterface.coupleUserAndChannel(user, channel);
 
         if (user.isUserNickEqual(mServer.getUser())) {
-            mUserChannelInterface.coupleUserAndChannel(user, channel);
-            mServerEventBus.onChannelJoined(channel.getName());
+            final ServerEvent event = new JoinEvent(channel);
+            mServerEventBus.post(event);
         } else {
-            final String message = mEventResponses.getJoinMessage(user.getPrettyNick(channel));
-            if (channel.isObserving()) {
-                user.onJoin(channel);
-                mUserChannelInterface.addChannelToUser(user, channel);
-                mServerEventBus.sendGenericChannelEvent(channel, message,
-                        UserListChangeType.ADD, user);
-            } else {
-                mUserChannelInterface.coupleUserAndChannel(user, channel);
-                mServerEventBus.sendGenericChannelEvent(channel, message,
-                        UserListChangeType.ADD);
-            }
+            final ChannelEvent event = new WorldJoinEvent(channel, user);
+            mServerEventBus.postAndStoreEvent(event, channel);
         }
     }
 }

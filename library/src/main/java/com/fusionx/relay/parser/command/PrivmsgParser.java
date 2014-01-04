@@ -1,9 +1,13 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.SwitchToPrivateMessage;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.WorldMessageEvent;
+import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -40,21 +44,24 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick, message);
-        mServer.onPrivateMessage(sendingUser, message, false);
+        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUserIfExists(nick);
+        if (user == null) {
+            mUserChannelInterface.getNewPrivateMessageUser(nick, message, false);
+            mServerEventBus.post(new SwitchToPrivateMessage(nick));
+        } else {
+            mServerEventBus.postAndStoreEvent(new WorldPrivateMessageEvent(user, message), user);
+        }
     }
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
             final String message) {
-        final ChannelUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
+        final Channel channel = mUserChannelInterface.getChannelIfExists(channelName);
         // This occurs rarely - usually on BNCs - for example the ZNC buffer starts with a
         // PRIVMSG from the nick ***. Also if someone said something on the channel during
         // the buffer but is not in the channel now then this will also happen
-        if (sendingUser == null) {
-            mServerEventBus.onChannelMessage(mServer.getUser(), channel, sendingNick, message);
-        } else {
-            mServerEventBus.onChannelMessage(mServer.getUser(), channel, sendingUser, message);
-        }
+        final ChannelEvent event = new WorldMessageEvent(channel, message, sendingUser,
+                sendingNick);
+        mServerEventBus.postAndStoreEvent(event, channel);
     }
 }

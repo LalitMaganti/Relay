@@ -4,6 +4,8 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.constants.ServerReplyCodes;
+import com.fusionx.relay.event.server.GenericServerEvent;
+import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.writers.ServerWriter;
 
@@ -35,7 +37,10 @@ class CapParser {
                         // This is non-fatal
                         break;
                     default:
-                        sender.sendGenericServerEvent(server, "SASL not supported by server");
+                        // TODO - change this
+                        final ServerEvent event = new GenericServerEvent("SASL not supported by "
+                                + "server");
+                        sender.postAndStoreEvent(event, server);
                         writer.sendEndCap();
                         break;
                 }
@@ -45,19 +50,26 @@ class CapParser {
 
     static void parseCode(final int code, final ArrayList<String> parsedArray,
             final ServerEventBus sender, final Server server, final ServerWriter writer) {
+        final ServerEvent event;
         switch (code) {
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String successful = parsedArray.get(3);
-                sender.sendGenericServerEvent(server, successful);
+
+                event = new GenericServerEvent(successful);
+                sender.postAndStoreEvent(event, server);
                 break;
             case ServerReplyCodes.RPL_SASL_LOGGED_IN:
                 final String loginMessage = parsedArray.get(5);
-                sender.sendGenericServerEvent(server, loginMessage);
+
+                event = new GenericServerEvent(loginMessage);
+                sender.postAndStoreEvent(event, server);
                 break;
             case ServerReplyCodes.ERR_SASL_FAILED:
             case ServerReplyCodes.ERR_SASL_FAILED_2:
                 final String error = parsedArray.get(3);
-                sender.sendGenericServerEvent(server, error);
+
+                event = new GenericServerEvent(error);
+                sender.postAndStoreEvent(event, server);
                 break;
             default:
                 return;

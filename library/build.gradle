@@ -31,6 +31,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.0'
     compile 'com.squareup:otto:1.3.2'
     compile 'com.google.guava:guava:15.0'
+    compile 'net.sf.trove4j:trove4j:3.0.3'
 }
 
 android.libraryVariants.all { variant ->

@@ -1,8 +1,10 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.event.PrivateEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
-import com.fusionx.relay.util.Utils;
+import com.fusionx.relay.event.user.UserEvent;
+import com.fusionx.relay.event.user.WorldPrivateActionEvent;
+import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +14,7 @@ public final class PrivateMessageUser extends User {
     /**
      * Contains a copy of the messages when the conversation
      */
-    private final List<Message> mBuffer = new ArrayList<Message>();
-
-    /**
-     * Stores whether the fragment corresponding to this conversation is cached by the
-     * FragmentManager
-     */
-    private boolean mCached;
+    private final List<UserEvent> mBuffer = new ArrayList<>();
 
     /**
      * Retains whether the person on the other end of the PM quit in the middle of the conversation
@@ -26,35 +22,31 @@ public final class PrivateMessageUser extends User {
     private boolean mUserQuit;
 
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface,
-            final String initalMessage) {
+            final String message, final boolean action) {
         super(nick, userChannelInterface);
 
-        if (InterfaceHolders.getPreferences().shouldHandleInitialPrivateMessage() && Utils
-                .isNotEmpty(initalMessage)) {
-            mBuffer.add(new Message(InterfaceHolders.getEventResponses().getMessage(nick,
-                    initalMessage)));
+        if (StringUtils.isNotEmpty(message)) {
+            final UserEvent event;
+            if (action) {
+                event = new WorldPrivateActionEvent(this, message);
+            } else {
+                event = new WorldPrivateMessageEvent(this, message);
+            }
+            mBuffer.add(event);
         }
+
+        /*if (InterfaceHolders.getPreferences().shouldHandleInitialPrivateMessage() && Utils
+                .isNotEmpty(initalMessage)) {*/
+        //}
     }
 
-    public void onUserEvent(final PrivateEvent event) {
-        if (Utils.isNotBlank(event.message)) {
-            synchronized (mBuffer) {
-                mBuffer.add(new Message(event.message));
-            }
-        }
+    public void onUserEvent(final UserEvent event) {
+        mBuffer.add(event);
     }
 
     // Getters and Setters
-    public List<Message> getBuffer() {
+    public List<UserEvent> getBuffer() {
         return mBuffer;
-    }
-
-    public boolean isCached() {
-        return mCached;
-    }
-
-    public void setCached(boolean cached) {
-        mCached = cached;
     }
 
     public boolean isUserQuit() {

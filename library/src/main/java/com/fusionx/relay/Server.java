@@ -3,19 +3,14 @@ package com.fusionx.relay;
 import com.fusionx.relay.communication.ServerCallBus;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.connection.ServerConnection;
-import com.fusionx.relay.event.Event;
-import com.fusionx.relay.event.ServerEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.misc.ServerCache;
-import com.fusionx.relay.util.IRCUtils;
-import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ChannelWriter;
 import com.fusionx.relay.writers.ServerWriter;
 import com.fusionx.relay.writers.UserWriter;
 
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Server {
@@ -24,7 +19,7 @@ public class Server {
 
     private final UserChannelInterface mUserChannelInterface;
 
-    private final List<Message> mBuffer;
+    private final List<ServerEvent> mBuffer;
 
     private final ServerCache mServerCache;
 
@@ -36,79 +31,21 @@ public class Server {
 
     private AppUser mUser;
 
-    private String mStatus;
+    private ServerStatus mStatus;
 
     public Server(final ServerConfiguration configuration, final ServerConnection connection) {
         mConfiguration = configuration;
         mTitle = configuration.getTitle();
         mBuffer = new ArrayList<>();
-        mStatus = "Disconnected";
+        mStatus = ServerStatus.DISCONNECTED;
         mServerCache = new ServerCache();
-        mServerEventBus = new ServerEventBus(this);
+        mServerEventBus = new ServerEventBus();
         mServerCallBus = new ServerCallBus(connection);
         mUserChannelInterface = new UserChannelInterface(this);
     }
 
     public void onServerEvent(final ServerEvent event) {
-        if (Utils.isNotBlank(event.message)) {
-            synchronized (mBuffer) {
-                mBuffer.add(new Message(event.message));
-            }
-        }
-    }
-
-    public Event onPrivateMessage(final PrivateMessageUser userWhoIsNotUs, final String message,
-            final boolean weAreSending) {
-        final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
-        final boolean doesPrivateMessageExist = mUser.isPrivateMessageOpen(userWhoIsNotUs);
-        if (!doesPrivateMessageExist) {
-            mUser.createPrivateMessage(userWhoIsNotUs);
-        }
-        if (!weAreSending || InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            return mServerEventBus.onPrivateMessage(userWhoIsNotUs, sendingUser, message,
-                    !doesPrivateMessageExist);
-        } else {
-            return new Event("");
-        }
-    }
-
-    public Event onPrivateAction(final PrivateMessageUser userWhoIsNotUs, final String action,
-            final boolean weAreSending) {
-        final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
-        final boolean doesPrivateMessageExist = mUser.isPrivateMessageOpen(userWhoIsNotUs);
-        if (!doesPrivateMessageExist) {
-            mUser.createPrivateMessage(userWhoIsNotUs);
-        }
-        if (!weAreSending || InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            return mServerEventBus.onPrivateAction(userWhoIsNotUs, sendingUser, action,
-                    !doesPrivateMessageExist);
-        } else {
-            return new Event("");
-        }
-    }
-
-    public synchronized PrivateMessageUser getPrivateMessageUserIfExists(final String nick) {
-        final Collection<PrivateMessageUser> privateMessages = mUser.getPrivateMessages();
-        for (final PrivateMessageUser user : privateMessages) {
-            if (IRCUtils.areNicksEqual(user.getNick(), nick)) {
-                return user;
-            }
-        }
-        return null;
-    }
-
-    public synchronized PrivateMessageUser getPrivateMessageUser(final String nick,
-            final String initialMessage) {
-        final PrivateMessageUser user = getPrivateMessageUserIfExists(nick);
-        if (user == null) {
-            return new PrivateMessageUser(nick, mUserChannelInterface, initialMessage);
-        } else {
-            return user;
-        }
-    }
-
-    public boolean isConnected() {
-        return mStatus.equals(InterfaceHolders.getEventResponses().getConnectedStatus());
+        mBuffer.add(event);
     }
 
     public void onCleanup() {
@@ -140,7 +77,7 @@ public class Server {
     }
 
     // Getters and Setters
-    public List<Message> getBuffer() {
+    public List<ServerEvent> getBuffer() {
         return mBuffer;
     }
 
@@ -160,11 +97,11 @@ public class Server {
         return mTitle;
     }
 
-    public String getStatus() {
+    public ServerStatus getStatus() {
         return mStatus;
     }
 
-    public void setStatus(final String status) {
+    public void setStatus(final ServerStatus status) {
         mStatus = status;
     }
 

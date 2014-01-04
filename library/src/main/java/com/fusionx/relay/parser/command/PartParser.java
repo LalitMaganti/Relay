@@ -1,8 +1,11 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.channel.WorldPartEvent;
+import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -14,22 +17,23 @@ public class PartParser extends RemoveUserParser {
     }
 
     @Override
-    public ChannelUser getRemovedUser(List<String> parsedArray, String rawSource) {
+    public WorldUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
         final String userNick = IRCUtils.getNickFromRaw(rawSource);
         return mUserChannelInterface.getUserIfExists(userNick);
     }
 
     @Override
-    public String getUserRemoveMessage(final List<String> parsedArray, final Channel channel,
-            final ChannelUser user) {
-        final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"",
-                "") : "";
-        return mEventResponses.getPartMessage(user.getPrettyNick(channel), reason);
+    public WorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
+            final Channel channel, final WorldUser user) {
+        final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"", "") : "";
+        return new WorldPartEvent(channel, user, reason);
     }
 
     @Override
     void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
         mUserChannelInterface.removeChannel(channel);
-        mServerEventBus.onChannelParted(channel.getName());
+
+        final PartEvent event = new PartEvent(channel);
+        mServerEventBus.post(event);
     }
 }

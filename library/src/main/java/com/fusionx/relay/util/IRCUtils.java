@@ -74,7 +74,7 @@ public class IRCUtils {
                 return stringParts;
             }
         }
-        //No more spaces, add last part of line
+        // No more spaces, add last part of line
         stringParts.add(trimmedInput.substring(pos));
         return stringParts;
     }

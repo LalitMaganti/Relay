@@ -2,15 +2,12 @@ package com.fusionx.relay;
 
 import com.google.common.collect.ImmutableList;
 
-import com.fusionx.relay.collection.UpdateableTreeSet;
 import com.fusionx.relay.constants.UserLevelEnum;
-import com.fusionx.relay.constants.UserListChangeType;
-import com.fusionx.relay.event.ChannelEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
-
-import org.apache.commons.lang3.StringUtils;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.WorldJoinEvent;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -22,31 +19,27 @@ public class Channel {
 
     private final String mName;
 
-    private final UserChannelInterface mUserChannelInterface;
-
-    private final List<Message> mBuffer;
+    private final List<ChannelEvent> mBuffer;
 
     private final EnumMap<UserLevelEnum, Integer> mNumberOfUsers;
 
-    private String mTopic;
-
-    private boolean mCached;
-
-    private boolean mObserving;
+    private final UserChannelInterface mUserChannelInterface;
 
     Channel(final String channelName, final UserChannelInterface userChannelInterface) {
         mName = channelName;
-        mUserChannelInterface = userChannelInterface;
         mBuffer = new ArrayList<>();
         mNumberOfUsers = new EnumMap<>(UserLevelEnum.class);
+        mUserChannelInterface = userChannelInterface;
 
         for (final UserLevelEnum levelEnum : UserLevelEnum.values()) {
             mNumberOfUsers.put(levelEnum, 0);
         }
 
-        final String userNick = mUserChannelInterface.getServer().getUser().getColorfulNick();
-        final String message = InterfaceHolders.getEventResponses().getJoinMessage(userNick);
-        mBuffer.add(new Message(message));
+        //final String userNick = mUserChannelInterface.getServer().getUser().getColorfulNick();
+        //final String message = InterfaceHolders.getEventResponses().getJoinMessage(userNick);
+
+        // WorldJoinEvent is used as JoinEvent is a server event
+        mBuffer.add(new WorldJoinEvent(this, userChannelInterface.getServer().getUser()));
     }
 
     /**
@@ -57,15 +50,6 @@ public class Channel {
      */
     public static boolean isChannelPrefix(char firstCharacter) {
         return channelPrefixes.contains(firstCharacter);
-    }
-
-    /**
-     * Returns a list of all the users currently in the channel
-     *
-     * @return list of users currently in the channel
-     */
-    public UpdateableTreeSet<ChannelUser> getUsers() {
-        return mUserChannelInterface.getAllUsersInChannel(this);
     }
 
     @Override
@@ -83,10 +67,10 @@ public class Channel {
     }
 
     public void onChannelEvent(final ChannelEvent event) {
-        if ((event.changeType != UserListChangeType.NONE || InterfaceHolders.getPreferences()
+        /*if ((event.changeType != UserListChangeType.NONE || InterfaceHolders.getPreferences()
                 .shouldLogUserListChanges()) && StringUtils.isNotEmpty(event.message)) {
-            mBuffer.add(new Message(event.message));
-        }
+        }*/
+        mBuffer.add(event);
     }
 
     /**
@@ -171,41 +155,16 @@ public class Channel {
      *
      * @return a list of the messages
      */
-    public List<Message> getBuffer() {
+    public List<ChannelEvent> getBuffer() {
         return mBuffer;
     }
 
     /**
-     * Gets the topic of the channel
+     * Returns a list of all the users currently in the channel
      *
-     * @return the topic
+     * @return list of users currently in the channel
      */
-    public String getTopic() {
-        return mTopic;
-    }
-
-    /**
-     * Sets the topic of the channel - for internal use only
-     *
-     * @param topic the topic to be set
-     */
-    public void setTopic(String topic) {
-        this.mTopic = topic;
-    }
-
-    public boolean isCached() {
-        return mCached;
-    }
-
-    public void setCached(boolean cached) {
-        mCached = cached;
-    }
-
-    public boolean isObserving() {
-        return mObserving;
-    }
-
-    public void setObserving(boolean observing) {
-        mObserving = observing;
+    public Collection<WorldUser> getUsers() {
+        return mUserChannelInterface.getAllUsersInChannel(this);
     }
 }

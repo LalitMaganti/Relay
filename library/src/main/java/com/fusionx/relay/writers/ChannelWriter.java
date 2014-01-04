@@ -1,9 +1,9 @@
 package com.fusionx.relay.writers;
 
-import com.fusionx.relay.event.ActionEvent;
-import com.fusionx.relay.event.KickEvent;
-import com.fusionx.relay.event.MessageEvent;
-import com.fusionx.relay.event.PartEvent;
+import com.fusionx.relay.call.ChannelActionCall;
+import com.fusionx.relay.call.ChannelKickCall;
+import com.fusionx.relay.call.ChannelMessageCall;
+import com.fusionx.relay.call.ChannelPartCall;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,17 +17,18 @@ public class ChannelWriter extends RawWriter {
     }
 
     @Subscribe
-    public void sendMessage(final MessageEvent event) {
+    public void sendMessage(final ChannelMessageCall event) {
         writeLineToServer(String.format(WriterCommands.PRIVMSG, event.channelName, event.message));
     }
 
     @Subscribe
-    public void sendAction(final ActionEvent event) {
-        writeLineToServer(String.format(WriterCommands.Action, event.channelName, event.message));
+    public void sendAction(final ChannelActionCall event) {
+        final String line = String.format(WriterCommands.ACTION, event.channelName, event.action);
+        writeLineToServer(line);
     }
 
     @Subscribe
-    public void partChannel(final PartEvent event) {
+    public void partChannel(final ChannelPartCall event) {
         writeLineToServer(StringUtils.isEmpty(event.channelName) ?
                 String.format(WriterCommands.Part, event.channelName) :
                 String.format(WriterCommands.PartWithReason, event.channelName, event.reason)
@@ -35,7 +36,7 @@ public class ChannelWriter extends RawWriter {
     }
 
     @Subscribe
-    public void onKick(final KickEvent event) {
+    public void onKick(final ChannelKickCall event) {
         writeLineToServer(StringUtils.isEmpty(event.channelName) ?
                 String.format(WriterCommands.Kick, event.channelName, event.userNick) :
                 String.format(WriterCommands.KickWithReason, event.channelName, event.userNick,

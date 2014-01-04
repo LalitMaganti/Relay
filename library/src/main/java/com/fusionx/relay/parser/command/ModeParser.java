@@ -1,10 +1,9 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.constants.UserListChangeType;
-import com.fusionx.relay.event.Event;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.constants.UserLevelEnum;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -33,22 +32,22 @@ public class ModeParser extends CommandParser {
             } else if (messageLength == 5) {
                 // User specified - therefore user mode in channel is being changed
                 final String nick = IRCUtils.getNickFromRaw(parsedArray.get(4));
-                final ChannelUser user = mUserChannelInterface.getUserIfExists(nick);
+                final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
                 if (user != null) {
-                    final String message = user.onModeChange(sendingUser, channel, mode);
-                    mServerEventBus.sendGenericChannelEvent(channel, message,
-                            UserListChangeType.MODIFIED);
+                    final UserLevelEnum levelEnum = user.onModeChange(channel, mode);
+                    //mServerEventBus.sendGenericChannelEvent(channel, message,
+                    //        UserListChangeType.MODIFIED);
                 } else {
-                    new Event("");
+                    // TODO
                 }
             } else {
                 IRCUtils.removeFirstElementFromList(parsedArray, 4);
-                final ChannelUser user = mUserChannelInterface.getUserIfExists(sendingUser);
-                final String nick = (user == null) ? sendingUser : user.getPrettyNick(channel);
-                final String message = mEventResponses.getModeChangedMessage(mode,
-                        IRCUtils.concatStringList(parsedArray), nick);
-                mServerEventBus.sendGenericChannelEvent(channel, message,
-                        UserListChangeType.MODIFIED);
+                final WorldUser user = mUserChannelInterface.getUserIfExists(sendingUser);
+                //final String nick = (user == null) ? sendingUser : user.getPrettyNick(channel);
+                //final String message = mEventResponses.getModeChangedMessage(mode,
+                //        IRCUtils.concatStringList(parsedArray), nick);
+                //mServerEventBus.sendGenericChannelEvent(channel, message,
+                //        UserListChangeType.MODIFIED);
             }
         } else {
             // A user is changing a mode about themselves

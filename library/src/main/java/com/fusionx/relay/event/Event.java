@@ -1,21 +1,15 @@
 package com.fusionx.relay.event;
 
-/**
- * A common class for all events to subclass
- */
+import android.text.format.Time;
+
 public class Event {
 
-    public String baseMessage = "";
+    public final Time timestamp;
 
-    Event() {
-    }
+    public Object store;
 
-    public Event(String baseMessage) {
-        this.baseMessage = baseMessage;
-    }
-
-    @Override
-    public String toString() {
-        return baseMessage;
+    public Event() {
+        timestamp = new Time();
+        timestamp.setToNow();
     }
 }

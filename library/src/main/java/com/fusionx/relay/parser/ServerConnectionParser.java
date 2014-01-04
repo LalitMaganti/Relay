@@ -2,9 +2,10 @@ package com.fusionx.relay.parser;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.constants.ServerCommands;
-import com.fusionx.relay.event.NickChangeEvent;
+import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.misc.CoreListener;
 import com.fusionx.relay.misc.NickStorage;
 import com.fusionx.relay.util.IRCUtils;
@@ -96,24 +97,24 @@ public class ServerConnectionParser {
                 return nick;
             case ERR_NICKNAMEINUSE:
                 if (!triedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
-                    mWriter.changeNick(new NickChangeEvent("", nickStorage.getSecondChoiceNick()));
+                    mWriter.changeNick(new NickChangeCall(nickStorage.getSecondChoiceNick()));
                     triedSecondNick = true;
                 } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage
                         .getThirdChoiceNick())) {
-                    mWriter.changeNick(new NickChangeEvent("", nickStorage.getThirdChoiceNick()));
+                    mWriter.changeNick(new NickChangeCall(nickStorage.getThirdChoiceNick()));
                     triedThirdNick = true;
                 } else {
                     if (canChangeNick) {
                         ++suffix;
-                        mWriter.changeNick(new NickChangeEvent("",
-                                nickStorage.getFirstChoiceNick() + suffix));
+                        mWriter.changeNick(new NickChangeCall(nickStorage.getFirstChoiceNick() +
+                                suffix));
                     } else {
-                        sender.sendNickInUseMessage(mServer);
+                        //sender.sendNickInUseMessage();
                     }
                 }
                 break;
             case ERR_NONICKNAMEGIVEN:
-                mWriter.changeNick(new NickChangeEvent("", nickStorage.getFirstChoiceNick()));
+                mWriter.changeNick(new NickChangeCall(nickStorage.getFirstChoiceNick()));
                 break;
             default:
                 if (saslCodes.contains(code)) {
@@ -128,9 +129,11 @@ public class ServerConnectionParser {
             final ServerEventBus sender) {
         final String command = parsedArray.get(1).toUpperCase();
         IRCUtils.removeFirstElementFromList(parsedArray, 3);
+
         switch (command) {
             case ServerCommands.Notice:
-                sender.sendGenericServerEvent(mServer, parsedArray.get(0));
+                final GenericServerEvent event = new GenericServerEvent(parsedArray.get(0));
+                sender.postAndStoreEvent(event, mServer);
                 break;
             case ServerCommands.Cap:
                 CapParser.parseCommand(parsedArray, mConfiguration, mServer, sender, mWriter);

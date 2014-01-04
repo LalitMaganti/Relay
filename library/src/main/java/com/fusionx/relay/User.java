@@ -20,7 +20,11 @@ public abstract class User {
     }
 
     public String getColorfulNick() {
-        return String.format(mColourCode, mNick);
+        if (InterfaceHolders.getPreferences().shouldNickBeColourful()) {
+            return String.format(mColourCode, mNick);
+        } else {
+            return mNick;
+        }
     }
 
     @Override

@@ -16,7 +16,7 @@ public class InviteParser extends CommandParser {
         final String invitingNick = IRCUtils.getNickFromRaw(rawSource);
         if (parsedArray.get(2).equals(mServer.getUser().getNick())) {
             final String channelName = parsedArray.get(3);
-            mServerEventBus.sendInviteEvent(mServer, channelName);
+            //mServerEventBus.sendInviteEvent(mServer, channelName);
         } else {
             // TODO - fix up what should happen here
         }

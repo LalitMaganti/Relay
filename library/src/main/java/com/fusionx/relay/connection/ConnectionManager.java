@@ -3,20 +3,21 @@ package com.fusionx.relay.connection;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.interfaces.EventPreferences;
-import com.fusionx.relay.interfaces.EventResponses;
 import com.fusionx.relay.misc.InterfaceHolders;
 
 import android.os.Handler;
+import android.util.Pair;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
+import gnu.trove.map.hash.THashMap;
 
 public class ConnectionManager {
 
     private static ConnectionManager sConnectionManager;
 
-    private final HashMap<String, ServerConnection> mServerMap
-            = new HashMap<String, ServerConnection>();
+    private final Map<String, ServerConnection> mServerMap = new THashMap<>();
 
     private ConnectionManager() {
     }
@@ -24,17 +25,14 @@ public class ConnectionManager {
     /**
      * Returns a singleton connection manager which is lazily created
      *
-     * @param responses   a concrete implementation of the {@link com.fusionx.relay.interfaces.EventResponses}
-     *                    interface
      * @param preferences a concrete implementation of the {@link com.fusionx.relay.interfaces.EventPreferences}
      *                    interface
      * @return the connection manager which was created
      */
-    public static ConnectionManager getConnectionManager(final EventResponses responses,
-            final EventPreferences preferences) {
+    public static ConnectionManager getConnectionManager(final EventPreferences preferences) {
         if (sConnectionManager == null) {
             sConnectionManager = new ConnectionManager();
-            InterfaceHolders.onInterfaceReceived(preferences, responses);
+            InterfaceHolders.onInterfaceReceived(preferences);
         }
         return sConnectionManager;
     }
@@ -45,19 +43,21 @@ public class ConnectionManager {
      * @param configuration the configuration you want to connect with
      * @param errorHandler  a handler object which will be used if an error occurs on the background
      *                      thread
-     * @return the server object created by the connection
+     * @return a pair of objects - the first item is a boolean which is true if the server already
+     * exists in the manager. The second item is the server which was created.
      */
-    public Server onConnectionRequested(final ServerConfiguration configuration,
+    public Pair<Boolean, Server> onConnectionRequested(final ServerConfiguration configuration,
             final Handler errorHandler) {
+        final boolean existingServer = mServerMap.containsKey(configuration.getTitle());
         final ServerConnection connection;
-        if (mServerMap.containsKey(configuration.getTitle())) {
+        if (existingServer) {
             connection = mServerMap.get(configuration.getTitle());
         } else {
             connection = new ServerConnection(configuration, errorHandler);
             connection.start();
             mServerMap.put(configuration.getTitle(), connection);
         }
-        return connection.getServer();
+        return new Pair<>(existingServer, connection.getServer());
     }
 
     /**
@@ -65,7 +65,7 @@ public class ConnectionManager {
      *
      * @return the number of servers which are managed
      */
-    public int getConnectedServerCount() {
+    public int getServerCount() {
         return mServerMap.size();
     }
 
@@ -75,6 +75,7 @@ public class ConnectionManager {
      * @param serverName the name of the server you're wanting to disconnect from
      * @return whether the list of connected servers is empty
      */
+    // TODO - fix this up - this is actually very misnamed
     public boolean onDisconnectionRequested(final String serverName) {
         if (mServerMap.containsKey(serverName)) {
             mServerMap.remove(serverName);

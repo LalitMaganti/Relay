@@ -1,5 +1,6 @@
 package com.fusionx.relay.parser;
 
+import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -65,6 +66,8 @@ public class UserInputParser {
         final ArrayList<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
+        final PrivateMessageUser user = server.getUserChannelInterface()
+                .getPrivateMessageUserIfExists(userNick);
 
         if (command.startsWith("/")) {
             switch (command) {
@@ -75,8 +78,7 @@ public class UserInputParser {
                 case "/close":
                 case "/c":
                     if (arrayLength == 0) {
-                        server.getServerCallBus().sendClosePrivateMessage(server
-                                .getPrivateMessageUserIfExists(userNick));
+                        server.getServerCallBus().sendClosePrivateMessage(user);
                         return;
                     }
                     break;
@@ -117,8 +119,8 @@ public class UserInputParser {
             case "/msg":
                 if (arrayLength >= 1) {
                     final String nick = parsedArray.remove(0);
-                    final String message = parsedArray.size() >= 1 ? IRCUtils
-                            .concatStringList(parsedArray) : "";
+                    final String message = parsedArray.size() >= 1 ? IRCUtils.concatStringList
+                            (parsedArray) : "";
                     server.getServerCallBus().sendMessageToUser(nick, message);
                     return;
                 }

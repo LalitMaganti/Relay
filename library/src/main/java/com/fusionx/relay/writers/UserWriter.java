@@ -1,7 +1,7 @@
 package com.fusionx.relay.writers;
 
-import com.fusionx.relay.event.PrivateActionEvent;
-import com.fusionx.relay.event.PrivateMessageEvent;
+import com.fusionx.relay.call.PrivateActionCall;
+import com.fusionx.relay.call.PrivateMessageCall;
 import com.squareup.otto.Subscribe;
 
 import java.io.OutputStreamWriter;
@@ -13,12 +13,12 @@ public class UserWriter extends RawWriter {
     }
 
     @Subscribe
-    public void sendMessage(final PrivateMessageEvent event) {
+    public void sendMessage(final PrivateMessageCall event) {
         writeLineToServer(String.format(WriterCommands.PRIVMSG, event.userNick, event.message));
     }
 
     @Subscribe
-    public void sendAction(final PrivateActionEvent event) {
-        writeLineToServer(String.format(WriterCommands.Action, event.userNick, event.message));
+    public void sendAction(final PrivateActionCall event) {
+        writeLineToServer(String.format(WriterCommands.ACTION, event.userNick, event.message));
     }
 }

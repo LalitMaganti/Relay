@@ -2,7 +2,7 @@ package com.fusionx.relay.connection;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.ServerStatus;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -45,8 +45,8 @@ public class ServerConnection extends Thread {
         mServerCallHandler.post(new Runnable() {
             @Override
             public void run() {
-                final String status = mServer.getStatus();
-                if (status.equals(InterfaceHolders.getEventResponses().getConnectedStatus())) {
+                final ServerStatus status = mServer.getStatus();
+                if (status == ServerStatus.CONNECTED) {
                     mConnection.onDisconnect();
                 } else if (isAlive()) {
                     interrupt();
