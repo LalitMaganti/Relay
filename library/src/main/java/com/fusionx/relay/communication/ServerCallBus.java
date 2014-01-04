@@ -13,6 +13,7 @@ import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.PrivateActionCall;
 import com.fusionx.relay.call.PrivateMessageCall;
 import com.fusionx.relay.call.RawCall;
+import com.fusionx.relay.call.WhoisCall;
 import com.fusionx.relay.connection.ServerConnection;
 import com.fusionx.relay.event.SwitchToPrivateMessage;
 import com.fusionx.relay.event.channel.ActionEvent;
@@ -56,7 +57,7 @@ public class ServerCallBus extends Bus {
     }
 
     public void sendUserWhois(final String nick) {
-        //post(new WhoisEvent(nick));
+        post(new WhoisCall(nick));
     }
 
     public void sendRawLine(final String rawLine) {

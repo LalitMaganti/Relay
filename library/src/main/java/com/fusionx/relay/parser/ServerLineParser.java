@@ -80,12 +80,12 @@ public class ServerLineParser {
         if (!parsedArray.isEmpty()) {
             String command = parsedArray.get(0);
             switch (command) {
-                case ServerCommands.Ping:
+                case ServerCommands.PING:
                     // Immediately respond & return
                     final String source = parsedArray.get(1);
                     CoreListener.respondToPing(mWriter, source);
                     break;
-                case ServerCommands.Error:
+                case ServerCommands.ERROR:
                     // We are finished - the server has kicked us
                     // out for some reason
                     return new ErrorEvent(rawLine);

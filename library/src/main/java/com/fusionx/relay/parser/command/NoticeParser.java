@@ -1,9 +1,12 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
+import com.fusionx.relay.event.server.PrivateNoticeEvent;
+import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -30,8 +33,6 @@ public class NoticeParser extends CommandParser {
             final String recipient = parsedArray.get(2);
             final String notice = parsedArray.get(3);
 
-            //final String formattedNotice = mEventResponses.getNoticeMessage(sendingUser, notice);
-
             if (Channel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelNotice(recipient, notice, sendingNick);
             } else if (recipient.equals(mServer.getUser().getNick())) {
@@ -45,17 +46,15 @@ public class NoticeParser extends CommandParser {
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
         mServerEventBus.postAndStoreEvent(event, channel);
-
-        //mServerEventBus.sendGenericChannelEvent(channel, formattedNotice,
-        //        UserListChangeType.NONE);
     }
 
     public void onParseUserNotice(final String sendingNick, final String notice) {
-        //final PrivateMessageUser user = mServer.getPrivateMessageUserIfExists(changingNick);
-        //if (user != null) {
-        //mServer.onPrivateMessage(user, notice, false);
-        //} else {
-        //mServerEventBus.sendSwitchToServerEvent(formattedNotice);
-        //}
+        final PrivateMessageUser user = mUserChannelInterface
+                .getPrivateMessageUserIfExists(sendingNick);
+        if (user == null) {
+            mServerEventBus.postAndStoreEvent(new PrivateNoticeEvent(notice, sendingNick), mServer);
+        } else {
+            mServerEventBus.postAndStoreEvent(new WorldPrivateMessageEvent(user, notice), user);
+        }
     }
 }

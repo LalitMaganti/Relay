@@ -28,16 +28,16 @@ public abstract class CommandParser {
         final CtcpParser ctcpParser = new CtcpParser(server);
 
         final Map<String, CommandParser> parserMap = new THashMap<>();
-        parserMap.put(ServerCommands.Join, new JoinParser(server));
-        parserMap.put(ServerCommands.Privmsg, new PrivmsgParser(server, ctcpParser));
-        parserMap.put(ServerCommands.Notice, new NoticeParser(server, ctcpParser));
-        parserMap.put(ServerCommands.Part, new PartParser(server));
-        parserMap.put(ServerCommands.Mode, new ModeParser(server));
-        parserMap.put(ServerCommands.Quit, new QuitParser(server));
-        parserMap.put(ServerCommands.Nick, new NickParser(server));
-        parserMap.put(ServerCommands.Topic, new TopicParser(server));
-        parserMap.put(ServerCommands.Kick, new KickParser(server));
-        parserMap.put(ServerCommands.Invite, new InviteParser(server));
+        parserMap.put(ServerCommands.JOIN, new JoinParser(server));
+        parserMap.put(ServerCommands.PRIVMSG, new PrivmsgParser(server, ctcpParser));
+        parserMap.put(ServerCommands.NOTICE, new NoticeParser(server, ctcpParser));
+        parserMap.put(ServerCommands.PART, new PartParser(server));
+        parserMap.put(ServerCommands.MODE, new ModeParser(server));
+        parserMap.put(ServerCommands.QUIT, new QuitParser(server));
+        parserMap.put(ServerCommands.NICK, new NickParser(server));
+        parserMap.put(ServerCommands.TOPIC, new TopicParser(server));
+        parserMap.put(ServerCommands.KICK, new KickParser(server));
+        parserMap.put(ServerCommands.INVITE, new InviteParser(server));
 
         return parserMap;
     }

@@ -59,14 +59,14 @@ public class ServerConnectionParser {
             final ArrayList<String> parsedArray = IRCUtils.splitRawLine(line, true);
             String s = parsedArray.get(0);
             switch (s) {
-                case ServerCommands.Ping: // Immediately return
+                case ServerCommands.PING: // Immediately return
                     final String source = parsedArray.get(1);
                     CoreListener.respondToPing(mWriter, source);
                     break;
-                case ServerCommands.Error:
+                case ServerCommands.ERROR:
                     // We are finished - the server has kicked us out for some reason
                     return null;
-                case ServerCommands.Authenticate:
+                case ServerCommands.AUTHENTICATE:
                     CapParser.parseCommand(parsedArray, mConfiguration, mServer, eventBus, mWriter);
                     break;
                 default:
@@ -131,11 +131,11 @@ public class ServerConnectionParser {
         IRCUtils.removeFirstElementFromList(parsedArray, 3);
 
         switch (command) {
-            case ServerCommands.Notice:
+            case ServerCommands.NOTICE:
                 final GenericServerEvent event = new GenericServerEvent(parsedArray.get(0));
                 sender.postAndStoreEvent(event, mServer);
                 break;
-            case ServerCommands.Cap:
+            case ServerCommands.CAP:
                 CapParser.parseCommand(parsedArray, mConfiguration, mServer, sender, mWriter);
                 break;
         }

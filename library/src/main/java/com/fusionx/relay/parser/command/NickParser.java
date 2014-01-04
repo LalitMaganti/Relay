@@ -29,8 +29,6 @@ public class NickParser extends CommandParser {
 
         user.setNick(parsedArray.get(2));
 
-        //final String message = mEventResponses.getNickChangedMessage(oldNick,
-        //        user.getColorfulNick(), user instanceof AppUser);
         if (user instanceof AppUser) {
             final ServerNickChangeEvent event = new ServerNickChangeEvent(oldNick, user);
             mServerEventBus.postAndStoreEvent(event, mServer);

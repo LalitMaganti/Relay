@@ -6,6 +6,7 @@ import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.QuitCall;
 import com.fusionx.relay.call.RawCall;
 import com.fusionx.relay.call.VersionCall;
+import com.fusionx.relay.call.WhoisCall;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,10 +58,10 @@ public class ServerWriter extends RawWriter {
         writeLineToServer("MODE " + event.channelName + " " + event.mode + " " + event.nick);
     }
 
-    //@Subscribe
-    //public void sendWhois(final WhoisEvent event) {
-    //    writeLineToServer("WHOIS " + event.baseMessage);
-    //}
+    @Subscribe
+    public void sendWhois(final WhoisCall event) {
+        writeLineToServer("WHOIS " + event.nick);
+    }
 
     public void getSupportedCapabilities() {
         writeLineToServer("CAP LS");

@@ -14,7 +14,7 @@ public abstract class WorldUserEvent extends ChannelEvent {
     protected WorldUserEvent(final Channel channel, final String nick) {
         super(channel);
 
-        // Nick should never be null
+        // NICK should never be null
         if (nick != null) {
             this.nick = nick;
         } else {
