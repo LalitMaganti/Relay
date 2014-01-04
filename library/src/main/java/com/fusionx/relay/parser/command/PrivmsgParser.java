@@ -9,6 +9,7 @@ import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -63,5 +64,8 @@ public class PrivmsgParser extends CommandParser {
         final ChannelEvent event = new WorldMessageEvent(channel, message, sendingUser,
                 sendingNick);
         mServerEventBus.postAndStoreEvent(event, channel);
+
+        MentionParser.onMentionableCommand(message, mServer.getUser().getNick(), mServerEventBus,
+                channel);
     }
 }

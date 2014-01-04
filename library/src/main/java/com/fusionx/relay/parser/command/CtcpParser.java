@@ -10,6 +10,7 @@ import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -41,9 +42,8 @@ public class CtcpParser extends CommandParser {
 
     private void onAction(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        final String action = parsedArray.get(3).replace("ACTION ", "");
-
         if (!InterfaceHolders.getPreferences().shouldIgnoreUser(nick)) {
+            final String action = parsedArray.get(3).replace("ACTION ", "");
             final String recipient = parsedArray.get(2);
             if (Channel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelAction(recipient, nick, action);
@@ -70,5 +70,8 @@ public class CtcpParser extends CommandParser {
         final ChannelEvent event = new WorldActionEvent(channel, action, sendingUser,
                 userNick);
         mServerEventBus.postAndStoreEvent(event, channel);
+
+        MentionParser.onMentionableCommand(action, mServer.getUser().getNick(), mServerEventBus,
+                channel);
     }
 }

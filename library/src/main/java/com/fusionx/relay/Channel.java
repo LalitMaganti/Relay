@@ -35,9 +35,6 @@ public class Channel {
             mNumberOfUsers.put(levelEnum, 0);
         }
 
-        //final String userNick = mUserChannelInterface.getServer().getUser().getColorfulNick();
-        //final String message = InterfaceHolders.getEventResponses().getJoinMessage(userNick);
-
         // WorldJoinEvent is used as JoinEvent is a server event
         mBuffer.add(new WorldJoinEvent(this, userChannelInterface.getServer().getUser()));
     }
