@@ -4,7 +4,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.constants.UserLevelEnum;
+import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.NameEvent;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -45,8 +45,8 @@ public class NameParser extends CodeParser {
 
     private WorldUser getUserFromNameReply(final String rawNameNick) {
         final char firstChar = rawNameNick.charAt(0);
-        final UserLevelEnum level = UserLevelEnum.getLevelFromPrefix(firstChar);
-        final String nick = level == UserLevelEnum.NONE ? rawNameNick : rawNameNick.substring(1);
+        final UserLevel level = UserLevel.getLevelFromPrefix(firstChar);
+        final String nick = level == UserLevel.NONE ? rawNameNick : rawNameNick.substring(1);
         final WorldUser user = mUserChannelInterface.getUser(nick);
 
         user.onPutMode(mChannel, level);

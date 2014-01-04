@@ -25,8 +25,7 @@ public class NickParser extends CommandParser {
         final WorldUser user = mUserChannelInterface.getUserIfExists(oldRawNick);
         final Collection<Channel> channels = user.getChannels();
 
-        final String oldNick;
-        oldNick = user.getColorfulNick();
+        final String oldNick = user.getColorfulNick();
 
         user.setNick(parsedArray.get(2));
 
@@ -44,7 +43,7 @@ public class NickParser extends CommandParser {
             } else {
                 event = new WorldNickChangeEvent(channel, oldNick, user);
             }
-            user.update(channel);
+            user.onUpdateNick(channel);
             mServerEventBus.postAndStoreEvent(event, channel);
         }
     }

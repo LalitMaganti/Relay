@@ -51,7 +51,7 @@ public class NoticeParser extends CommandParser {
     }
 
     public void onParseUserNotice(final String sendingNick, final String notice) {
-        //final PrivateMessageUser user = mServer.getPrivateMessageUserIfExists(sendingNick);
+        //final PrivateMessageUser user = mServer.getPrivateMessageUserIfExists(changingNick);
         //if (user != null) {
         //mServer.onPrivateMessage(user, notice, false);
         //} else {

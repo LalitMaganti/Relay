@@ -1,17 +1,14 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.constants.UserLevelEnum;
+import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.ColourParserUtils;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import android.text.Spanned;
 import android.widget.Checkable;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -19,7 +16,7 @@ public class WorldUser extends User implements Checkable {
 
     final Server mServer;
 
-    private final Map<Channel, UserLevelEnum> mUserLevelMap;
+    private final Map<Channel, UserLevel> mUserLevelMap;
 
     private final Map<Channel, Spanned> mChannelSpannedMap;
 
@@ -62,7 +59,7 @@ public class WorldUser extends User implements Checkable {
     }
 
     public void onJoin(final Channel channel) {
-        onPutMode(channel, UserLevelEnum.NONE);
+        onPutMode(channel, UserLevel.NONE);
     }
 
     // Called either on part of other or on quit of our user
@@ -71,12 +68,12 @@ public class WorldUser extends User implements Checkable {
         mChannelSpannedMap.remove(channel);
     }
 
-    public void onPutMode(final Channel channel, final UserLevelEnum mode) {
+    public void onPutMode(final Channel channel, final UserLevel mode) {
         mUserLevelMap.put(channel, mode);
         onUpdateSpannedNick(channel);
     }
 
-    public UserLevelEnum getChannelPrivileges(final Channel channel) {
+    public UserLevel getChannelPrivileges(final Channel channel) {
         return mUserLevelMap.get(channel);
     }
 
@@ -86,7 +83,7 @@ public class WorldUser extends User implements Checkable {
     }
 
     public char getUserPrefix(final Channel channel) {
-        final UserLevelEnum levelEnum = mUserLevelMap.get(channel);
+        final UserLevel levelEnum = mUserLevelMap.get(channel);
         if (levelEnum != null) {
             return mUserLevelMap.get(channel).getPrefix();
         } else {
@@ -99,8 +96,8 @@ public class WorldUser extends User implements Checkable {
     }
 
     public void onWhoMode(final String rawMode, final Channel channel) {
-        UserLevelEnum mode = UserLevelEnum.NONE;
-        for (final UserLevelEnum levelEnum : UserLevelEnum.values()) {
+        UserLevel mode = UserLevel.NONE;
+        for (final UserLevel levelEnum : UserLevel.values()) {
             if (rawMode.contains(String.valueOf(levelEnum.getPrefix()))) {
                 mode = levelEnum;
                 channel.onIncrementUserType(mode);
@@ -110,7 +107,7 @@ public class WorldUser extends User implements Checkable {
         onUpdateSpannedNick(channel);
     }
 
-    public UserLevelEnum onModeChange(final Channel channel, final String mode) {
+    public UserLevel onModeChange(final Channel channel, final String mode) {
         boolean addingMode = false;
         for (char character : mode.toCharArray()) {
             switch (character) {
@@ -126,43 +123,26 @@ public class WorldUser extends User implements Checkable {
                 case 'a':
                 case 'q':
                     // TODO - don't return straight away
-                    final UserLevelEnum levelEnum = UserLevelEnum.getLevelFromMode(character);
+                    final UserLevel levelEnum = UserLevel.getLevelFromMode(character);
                     channel.onDecrementUserType(mUserLevelMap.get(channel));
                     if (addingMode) {
                         channel.onIncrementUserType(levelEnum);
+                        onPutMode(channel, levelEnum);
+
                         return levelEnum;
                     } else {
-                        return UserLevelEnum.NONE;
-                        //channel.getUsers().update(this, new ImmutablePair<>(channel,
-                         //       UserLevelEnum.NONE));
+                        onPutMode(channel, UserLevel.NONE);
+                        return UserLevel.NONE;
                     }
             }
         }
+        onUpdateSpannedNick(channel);
 
-        return UserLevelEnum.NONE;
-
-        //onUpdateSpannedNick(channel);
-
-        //final String formattedSenderNick;
-        //final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
-        //if (sendingUser == null) {
-        //    formattedSenderNick = sendingNick;
-        //} else {
-        //    formattedSenderNick = sendingUser.getPrettyNick(channel);
-        //}
-
-        //return InterfaceHolders.getEventResponses().getModeChangedMessage(mode,
-        //        getColorfulNick(), formattedSenderNick);
+        return UserLevel.NONE;
     }
 
-    public void update(final Object newValue) {
-        if (newValue instanceof ImmutablePair) {
-            ImmutablePair<Channel, UserLevelEnum> list = (ImmutablePair<Channel,
-                    UserLevelEnum>) newValue;
-            mUserLevelMap.put(list.getLeft(), list.getRight());
-        } else if (newValue instanceof Channel) {
-            onUpdateSpannedNick((Channel) newValue);
-        }
+    public void onUpdateNick(final Channel channel) {
+        onUpdateSpannedNick(channel);
     }
 
     public boolean isUserNickEqual(final User user) {

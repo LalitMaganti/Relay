@@ -1,9 +1,13 @@
 package com.fusionx.relay.parser.command;
 
+import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.constants.UserLevelEnum;
+import com.fusionx.relay.constants.UserLevel;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.UserLevelChangeEvent;
+import com.fusionx.relay.event.channel.WorldLevelChangeEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -31,18 +35,11 @@ public class ModeParser extends CommandParser {
                 // TODO - implement this?
             } else if (messageLength == 5) {
                 // User specified - therefore user mode in channel is being changed
-                final String nick = IRCUtils.getNickFromRaw(parsedArray.get(4));
-                final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
-                if (user != null) {
-                    final UserLevelEnum levelEnum = user.onModeChange(channel, mode);
-                    //mServerEventBus.sendGenericChannelEvent(channel, message,
-                    //        UserListChangeType.MODIFIED);
-                } else {
-                    // TODO
-                }
+                onUserModeInChannel(parsedArray, sendingUser, channel, mode);
             } else {
-                IRCUtils.removeFirstElementFromList(parsedArray, 4);
-                final WorldUser user = mUserChannelInterface.getUserIfExists(sendingUser);
+                // TODO - fix this
+                //IRCUtils.removeFirstElementFromList(parsedArray, 4);
+                //final WorldUser user = mUserChannelInterface.getUserIfExists(sendingUser);
                 //final String nick = (user == null) ? sendingUser : user.getPrettyNick(channel);
                 //final String message = mEventResponses.getModeChangedMessage(mode,
                 //        IRCUtils.concatStringList(parsedArray), nick);
@@ -53,5 +50,24 @@ public class ModeParser extends CommandParser {
             // A user is changing a mode about themselves
             // TODO - implement this?
         }
+    }
+
+    private void onUserModeInChannel(final List<String> parsedArray, final String sendingNick,
+            final Channel channel, final String mode) {
+        final String nick = IRCUtils.getNickFromRaw(parsedArray.get(4));
+        final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
+        final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
+        final String sendingPrettyNick = (sendingUser == null) ? sendingNick : sendingUser
+                .getPrettyNick(channel);
+
+        final UserLevel levelEnum = user.onModeChange(channel, mode);
+        final ChannelEvent event;
+        if (user instanceof AppUser) {
+            event = new UserLevelChangeEvent(channel, mode, (AppUser) user, levelEnum,
+                    sendingPrettyNick);
+        } else {
+            event = new WorldLevelChangeEvent(channel, mode, user, levelEnum, sendingPrettyNick);
+        }
+        mServerEventBus.postAndStoreEvent(event, channel);
     }
 }

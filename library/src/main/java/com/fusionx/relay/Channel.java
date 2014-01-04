@@ -2,7 +2,7 @@ package com.fusionx.relay;
 
 import com.google.common.collect.ImmutableList;
 
-import com.fusionx.relay.constants.UserLevelEnum;
+import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldJoinEvent;
 
@@ -21,17 +21,17 @@ public class Channel {
 
     private final List<ChannelEvent> mBuffer;
 
-    private final EnumMap<UserLevelEnum, Integer> mNumberOfUsers;
+    private final EnumMap<UserLevel, Integer> mNumberOfUsers;
 
     private final UserChannelInterface mUserChannelInterface;
 
     Channel(final String channelName, final UserChannelInterface userChannelInterface) {
         mName = channelName;
         mBuffer = new ArrayList<>();
-        mNumberOfUsers = new EnumMap<>(UserLevelEnum.class);
+        mNumberOfUsers = new EnumMap<>(UserLevel.class);
         mUserChannelInterface = userChannelInterface;
 
-        for (final UserLevelEnum levelEnum : UserLevelEnum.values()) {
+        for (final UserLevel levelEnum : UserLevel.values()) {
             mNumberOfUsers.put(levelEnum, 0);
         }
 
@@ -89,13 +89,13 @@ public class Channel {
     /**
      * Increments the type of user in the channel by 1 - for internal use only
      *
-     * @param userLevelEnum the type of user
+     * @param userLevel the type of user
      */
-    public void onIncrementUserType(final UserLevelEnum userLevelEnum) {
-        if (userLevelEnum != UserLevelEnum.NONE) {
+    public void onIncrementUserType(final UserLevel userLevel) {
+        if (userLevel != UserLevel.NONE) {
             synchronized (mNumberOfUsers) {
-                Integer users = mNumberOfUsers.get(userLevelEnum);
-                mNumberOfUsers.put(userLevelEnum, ++users);
+                Integer users = mNumberOfUsers.get(userLevel);
+                mNumberOfUsers.put(userLevel, ++users);
             }
         }
     }
@@ -103,13 +103,13 @@ public class Channel {
     /**
      * Decrements the type of user in the channel by 1 - for internal use only
      *
-     * @param userLevelEnum the type of user
+     * @param userLevel the type of user
      */
-    public void onDecrementUserType(final UserLevelEnum userLevelEnum) {
-        if (userLevelEnum != UserLevelEnum.NONE) {
+    public void onDecrementUserType(final UserLevel userLevel) {
+        if (userLevel != UserLevel.NONE) {
             synchronized (mNumberOfUsers) {
-                Integer users = mNumberOfUsers.get(userLevelEnum);
-                mNumberOfUsers.put(userLevelEnum, --users);
+                Integer users = mNumberOfUsers.get(userLevel);
+                mNumberOfUsers.put(userLevel, --users);
             }
         }
     }
@@ -117,16 +117,16 @@ public class Channel {
     /**
      * Gets the number of users of a specific level in the channel
      *
-     * @param userLevelEnum - the level to get
+     * @param userLevel - the level to get
      * @return the number of users of this level
      */
-    public int getNumberOfUsersType(final UserLevelEnum userLevelEnum) {
+    public int getNumberOfUsersType(final UserLevel userLevel) {
         synchronized (mNumberOfUsers) {
-            if (userLevelEnum != UserLevelEnum.NONE) {
-                return mNumberOfUsers.get(userLevelEnum);
+            if (userLevel != UserLevel.NONE) {
+                return mNumberOfUsers.get(userLevel);
             } else {
                 int normalUsers = getNumberOfUsers();
-                for (UserLevelEnum levelEnum : UserLevelEnum.values()) {
+                for (UserLevel levelEnum : UserLevel.values()) {
                     normalUsers -= mNumberOfUsers.get(levelEnum);
                 }
                 return normalUsers;

@@ -1,6 +1,6 @@
 package com.fusionx.relay.constants;
 
-public enum UserLevelEnum {
+public enum UserLevel {
     OWNER('~', "owners"),
     SUPEROP('&', "super-ops"),
     HALFOP('%', "half-ops"),
@@ -12,7 +12,7 @@ public enum UserLevelEnum {
 
     private final String mName;
 
-    private UserLevelEnum(char c, String users) {
+    private UserLevel(final char c, final String users) {
         mPrefix = c;
         mName = users;
     }
@@ -25,37 +25,37 @@ public enum UserLevelEnum {
         return mName;
     }
 
-    public static UserLevelEnum getLevelFromPrefix(final char prefix) {
+    public static UserLevel getLevelFromPrefix(final char prefix) {
         switch (prefix) {
             case '~':
-                return UserLevelEnum.OWNER;
+                return UserLevel.OWNER;
             case '&':
-                return UserLevelEnum.SUPEROP;
+                return UserLevel.SUPEROP;
             case '%':
-                return UserLevelEnum.HALFOP;
+                return UserLevel.HALFOP;
             case '@':
-                return UserLevelEnum.OP;
+                return UserLevel.OP;
             case '+':
-                return UserLevelEnum.VOICE;
+                return UserLevel.VOICE;
             default:
-                return UserLevelEnum.NONE;
+                return UserLevel.NONE;
         }
     }
 
-    public static UserLevelEnum getLevelFromMode(final char modeCharacter) {
+    public static UserLevel getLevelFromMode(final char modeCharacter) {
         switch (modeCharacter) {
             case 'q':
-                return UserLevelEnum.OWNER;
+                return UserLevel.OWNER;
             case 'a':
-                return UserLevelEnum.SUPEROP;
+                return UserLevel.SUPEROP;
             case 'h':
-                return UserLevelEnum.HALFOP;
+                return UserLevel.HALFOP;
             case 'o':
-                return UserLevelEnum.OP;
+                return UserLevel.OP;
             case 'v':
-                return UserLevelEnum.VOICE;
+                return UserLevel.VOICE;
             default:
-                return UserLevelEnum.NONE;
+                return UserLevel.NONE;
         }
     }
 }
