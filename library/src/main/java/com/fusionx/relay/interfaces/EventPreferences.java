@@ -12,8 +12,6 @@ public interface EventPreferences {
 
     public Theme getTheme();
 
-    public boolean shouldIgnoreUser(final String nick);
-
     public boolean shouldLogUserListChanges();
 
     public boolean isSelfEventBroadcast();

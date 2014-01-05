@@ -35,7 +35,7 @@ public class ServerConnection extends Thread {
             mUiThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    throw new RuntimeException(ex);
+                    throw new RuntimeException(mConnection.getCurrentLine(), ex);
                 }
             });
         }

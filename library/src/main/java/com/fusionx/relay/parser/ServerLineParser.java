@@ -43,6 +43,8 @@ public class ServerLineParser {
 
     private ServerWriter mWriter;
 
+    public String mLine;
+
     public ServerLineParser(final Server server, final BaseConnection connection) {
         mServer = server;
         mBaseConnection = connection;
@@ -61,6 +63,7 @@ public class ServerLineParser {
 
         String line;
         while ((line = reader.readLine()) != null && !mBaseConnection.isUserDisconnected()) {
+            mLine = line;
             final Event quit = parseLine(line);
             if (quit instanceof QuitEvent || quit instanceof ErrorEvent) {
                 return;
@@ -148,5 +151,9 @@ public class ServerLineParser {
 
     public Server getServer() {
         return mServer;
+    }
+
+    public String getCurrentLine() {
+        return mLine;
     }
 }

@@ -11,6 +11,7 @@ import com.fusionx.relay.writers.UserWriter;
 
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Server {
@@ -33,6 +34,8 @@ public class Server {
 
     private ServerStatus mStatus;
 
+    public List<String> mIgnoreList;
+
     public Server(final ServerConfiguration configuration, final ServerConnection connection) {
         mConfiguration = configuration;
         mTitle = configuration.getTitle();
@@ -42,6 +45,7 @@ public class Server {
         mServerEventBus = new ServerEventBus();
         mServerCallBus = new ServerCallBus(connection);
         mUserChannelInterface = new UserChannelInterface(this);
+        mIgnoreList = new ArrayList<>();
     }
 
     public void onServerEvent(final ServerEvent event) {
@@ -74,6 +78,14 @@ public class Server {
         mServerCallBus.register(new ChannelWriter(writer));
         mServerCallBus.register(new UserWriter(writer));
         return serverWriter;
+    }
+
+    public void setIgnoreList(final Collection<String> collection) {
+        mIgnoreList = new ArrayList<>(collection);
+    }
+
+    public boolean shouldIgnoreUser(final String userNick) {
+        return mIgnoreList.contains(userNick);
     }
 
     // Getters and Setters

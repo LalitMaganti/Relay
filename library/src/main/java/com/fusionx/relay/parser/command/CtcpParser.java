@@ -9,7 +9,6 @@ import com.fusionx.relay.event.SwitchToPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -42,7 +41,7 @@ public class CtcpParser extends CommandParser {
 
     private void onAction(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        if (!InterfaceHolders.getPreferences().shouldIgnoreUser(nick)) {
+        if (!mServer.shouldIgnoreUser(nick)) {
             final String action = parsedArray.get(3).replace("ACTION ", "");
             final String recipient = parsedArray.get(2);
             if (Channel.isChannelPrefix(recipient.charAt(0))) {

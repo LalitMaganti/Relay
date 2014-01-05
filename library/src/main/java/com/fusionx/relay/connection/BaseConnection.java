@@ -51,6 +51,8 @@ public class BaseConnection {
 
     private Collection<String> channelList;
 
+    private ServerLineParser mLineParser;
+
     /**
      * Constructor for the object - package local since this object should always be contained only
      * within a {@link ServerConnection} object
@@ -92,8 +94,9 @@ public class BaseConnection {
         }
 
         if (!mUserDisconnected) {
-            server.getServerEventBus().postAndStoreEvent(new DisconnectEvent("Disconnected from the "
-                    + "server", false, false), server);
+            server.getServerEventBus()
+                    .postAndStoreEvent(new DisconnectEvent("Disconnected from the "
+                            + "server", false, false), server);
         }
     }
 
@@ -155,9 +158,9 @@ public class BaseConnection {
                 }
 
                 // Initialise the parser used to parse any lines from the server
-                final ServerLineParser lineParser = new ServerLineParser(server, this);
+                mLineParser = new ServerLineParser(server, this);
                 // Loops forever until broken
-                lineParser.parseMain(reader, serverWriter);
+                mLineParser.parseMain(reader, serverWriter);
 
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used
@@ -208,7 +211,6 @@ public class BaseConnection {
      * Called when we are connected to the server
      */
     private void onConnected(final ServerEventBus sender) {
-        // We are connected
         server.setStatus(ServerStatus.CONNECTED);
 
         final ServerEvent event = new ConnectEvent(serverConfiguration.getUrl());
@@ -246,5 +248,9 @@ public class BaseConnection {
 
     public boolean isUserDisconnected() {
         return mUserDisconnected;
+    }
+
+    public String getCurrentLine() {
+        return mLineParser.getCurrentLine();
     }
 }
