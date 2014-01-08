@@ -51,22 +51,19 @@ public class Channel {
 
     @Override
     public boolean equals(final Object o) {
-        if (o instanceof Channel) {
+        if (o != null && o instanceof Channel) {
             final Channel otherChannel = (Channel) o;
-            return otherChannel.getName().equals(mName);
+            return otherChannel.getName().equalsIgnoreCase(mName);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return mName.hashCode();
+        return mName.toLowerCase().hashCode();
     }
 
     public void onChannelEvent(final ChannelEvent event) {
-        /*if ((event.changeType != UserListChangeType.NONE || InterfaceHolders.getPreferences()
-                .shouldLogUserListChanges()) && StringUtils.isNotEmpty(event.message)) {
-        }*/
         mBuffer.add(event);
     }
 
