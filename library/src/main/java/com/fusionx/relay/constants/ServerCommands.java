@@ -30,6 +30,8 @@ public class ServerCommands {
 
     public final static String INVITE = "INVITE";
 
+    public final static String PONG = "PONG";
+
     private ServerCommands() {
     }
 }

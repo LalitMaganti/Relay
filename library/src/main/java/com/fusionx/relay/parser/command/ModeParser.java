@@ -6,6 +6,7 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.ModeEvent;
 import com.fusionx.relay.event.channel.UserLevelChangeEvent;
 import com.fusionx.relay.event.channel.WorldLevelChangeEvent;
 import com.fusionx.relay.util.IRCUtils;
@@ -44,20 +45,30 @@ public class ModeParser extends CommandParser {
 
     private void onUserModeInChannel(final List<String> parsedArray, final String sendingNick,
             final Channel channel, final String mode) {
-        final String nick = IRCUtils.getNickFromRaw(parsedArray.get(4));
+        final String source = parsedArray.get(4);
+        final String nick = IRCUtils.getNickFromRaw(source);
         final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
         final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
+
+        // TODO - investigate when this can be null?
         final String sendingPrettyNick = (sendingUser == null) ? sendingNick : sendingUser
                 .getPrettyNick(channel);
 
-        final UserLevel levelEnum = user.onModeChange(channel, mode);
-        final ChannelEvent event;
-        if (user instanceof AppUser) {
-            event = new UserLevelChangeEvent(channel, mode, (AppUser) user, levelEnum,
-                    sendingPrettyNick);
+        // This can happen when a ban is being added/removed on a whole range using wildcards
+        if (user == null) {
+            final ChannelEvent event = new ModeEvent(channel, sendingPrettyNick, source, mode);
+            mServerEventBus.postAndStoreEvent(event, channel);
         } else {
-            event = new WorldLevelChangeEvent(channel, mode, user, levelEnum, sendingPrettyNick);
+            final UserLevel levelEnum = user.onModeChange(channel, mode);
+            final ChannelEvent event;
+            if (user instanceof AppUser) {
+                event = new UserLevelChangeEvent(channel, mode, (AppUser) user, levelEnum,
+                        sendingPrettyNick);
+            } else {
+                event = new WorldLevelChangeEvent(channel, mode, user, levelEnum,
+                        sendingPrettyNick);
+            }
+            mServerEventBus.postAndStoreEvent(event, channel);
         }
-        mServerEventBus.postAndStoreEvent(event, channel);
     }
 }
