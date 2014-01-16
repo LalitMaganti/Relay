@@ -195,14 +195,16 @@ public class BaseConnection {
      * Called to setup the socket
      */
     private void setupSocket() throws IOException {
-        final SSLSocketFactory sslSocketFactory = SSLUtils.getAppropriateSSLFactory
-                (serverConfiguration.shouldAcceptAllSSLCertificates());
-
         final InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),
                 serverConfiguration.getPort());
 
-        mSocket = serverConfiguration.isSslEnabled() ? sslSocketFactory.createSocket()
-                : new Socket();
+        if (serverConfiguration.isSslEnabled()) {
+            final SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory
+                    (serverConfiguration.shouldAcceptAllSSLCertificates());
+            mSocket = sslSocketFactory.createSocket();
+        } else {
+            mSocket = new Socket();
+        }
         mSocket.setKeepAlive(true);
         mSocket.connect(address, 5000);
     }
@@ -220,7 +222,7 @@ public class BaseConnection {
     /**
      * Called when the user explicitly requests a disconnect
      */
-    public void onDisconnect() {
+    public void disconnect() {
         mUserDisconnected = true;
         server.setStatus(ServerStatus.DISCONNECTED);
         server.getServerCallBus().post(new QuitCall(InterfaceHolders.getPreferences()

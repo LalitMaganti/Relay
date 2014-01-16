@@ -17,7 +17,7 @@ public class ConnectionManager {
 
     private static ConnectionManager sConnectionManager;
 
-    private final Map<String, ServerConnection> mServerMap = new THashMap<>();
+    private final Map<String, ServerConnection> mConnectionMap = new THashMap<>();
 
     private ConnectionManager() {
     }
@@ -48,14 +48,14 @@ public class ConnectionManager {
      */
     public Pair<Boolean, Server> onConnectionRequested(final ServerConfiguration configuration,
             final Handler errorHandler) {
-        final boolean existingServer = mServerMap.containsKey(configuration.getTitle());
+        final boolean existingServer = mConnectionMap.containsKey(configuration.getTitle());
         final ServerConnection connection;
         if (existingServer) {
-            connection = mServerMap.get(configuration.getTitle());
+            connection = mConnectionMap.get(configuration.getTitle());
         } else {
             connection = new ServerConnection(configuration, errorHandler);
             connection.start();
-            mServerMap.put(configuration.getTitle(), connection);
+            mConnectionMap.put(configuration.getTitle(), connection);
         }
         return new Pair<>(existingServer, connection.getServer());
     }
@@ -66,7 +66,7 @@ public class ConnectionManager {
      * @return the number of servers which are managed
      */
     public int getServerCount() {
-        return mServerMap.size();
+        return mConnectionMap.size();
     }
 
     /**
@@ -75,21 +75,33 @@ public class ConnectionManager {
      * @param serverName the name of the server you're wanting to disconnect from
      * @return whether the list of connected servers is empty
      */
-    // TODO - fix this up - this is actually very misnamed
     public boolean onDisconnectionRequested(final String serverName) {
-        if (mServerMap.containsKey(serverName)) {
-            mServerMap.remove(serverName);
+        final ServerConnection connection = mConnectionMap.get(serverName);
+        if (connection != null) {
+            connection.disconnect();
+            mConnectionMap.remove(serverName);
         }
-        return mServerMap.isEmpty();
+        return mConnectionMap.isEmpty();
+    }
+
+    /**
+     * This method should be called when the server has notified the user that a disconnect has
+     * occurred and there are no retries pending
+     *
+     * @param serverName the name of the server that this event came from
+     */
+    public boolean onFinalUnexpectedDisconnect(final String serverName) {
+        mConnectionMap.remove(serverName);
+        return mConnectionMap.isEmpty();
     }
 
     /**
      * Disconnects all the managed servers
      */
-    public void onDisconnectAll() {
-        final Iterator<ServerConnection> iterator = mServerMap.values().iterator();
+    public void disconnectAll() {
+        final Iterator<ServerConnection> iterator = mConnectionMap.values().iterator();
         while (iterator.hasNext()) {
-            iterator.next().onDisconnect();
+            iterator.next().disconnect();
             iterator.remove();
         }
     }
@@ -106,8 +118,8 @@ public class ConnectionManager {
      * @return the server with the required title if it exists - this may be null
      */
     public Server getServerIfExists(final String serverName) {
-        if (mServerMap.containsKey(serverName)) {
-            return mServerMap.get(serverName).getServer();
+        if (mConnectionMap.containsKey(serverName)) {
+            return mConnectionMap.get(serverName).getServer();
         } else {
             return null;
         }

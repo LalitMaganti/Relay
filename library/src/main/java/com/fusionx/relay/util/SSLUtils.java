@@ -13,7 +13,7 @@ import javax.net.ssl.X509TrustManager;
 
 public class SSLUtils {
 
-    public static SSLSocketFactory getAppropriateSSLFactory(final boolean acceptAll) {
+    public static SSLSocketFactory getSSLSocketFactory(final boolean acceptAll) {
         if (acceptAll) {
             try {
                 final TrustManager[] tm = new TrustManager[]{new X509TrustManager() {
@@ -33,13 +33,10 @@ public class SSLUtils {
                 SSLContext context = SSLContext.getInstance("SSL");
                 context.init(new KeyManager[0], tm, new SecureRandom());
                 return context.getSocketFactory();
-            } catch (final NoSuchAlgorithmException e) {
-                return (SSLSocketFactory) SSLSocketFactory.getDefault();
-            } catch (final KeyManagementException e) {
-                return (SSLSocketFactory) SSLSocketFactory.getDefault();
+            } catch (final NoSuchAlgorithmException | KeyManagementException e) {
+                e.printStackTrace();
             }
-        } else {
-            return (SSLSocketFactory) SSLSocketFactory.getDefault();
         }
+        return (SSLSocketFactory) SSLSocketFactory.getDefault();
     }
 }

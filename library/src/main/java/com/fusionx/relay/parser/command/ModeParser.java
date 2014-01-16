@@ -50,15 +50,12 @@ public class ModeParser extends CommandParser {
         final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
         final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
 
-        // TODO - investigate when this can be null?
+        // TODO - investigate when this is null
         final String sendingPrettyNick = (sendingUser == null) ? sendingNick : sendingUser
                 .getPrettyNick(channel);
 
-        // This can happen when a ban is being added/removed on a whole range using wildcards
-        if (user == null) {
-            final ChannelEvent event = new ModeEvent(channel, sendingPrettyNick, source, mode);
-            mServerEventBus.postAndStoreEvent(event, channel);
-        } else {
+        // Nullity can occur when a ban is being added/removed on a whole range using wildcards
+        if (user != null) {
             final UserLevel levelEnum = user.onModeChange(channel, mode);
             final ChannelEvent event;
             if (user instanceof AppUser) {
@@ -68,6 +65,9 @@ public class ModeParser extends CommandParser {
                 event = new WorldLevelChangeEvent(channel, mode, user, levelEnum,
                         sendingPrettyNick);
             }
+            mServerEventBus.postAndStoreEvent(event, channel);
+        } else {
+            final ChannelEvent event = new ModeEvent(channel, sendingPrettyNick, source, mode);
             mServerEventBus.postAndStoreEvent(event, channel);
         }
     }

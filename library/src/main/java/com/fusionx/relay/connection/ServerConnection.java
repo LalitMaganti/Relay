@@ -41,13 +41,13 @@ public class ServerConnection extends Thread {
         }
     }
 
-    public void onDisconnect() {
+    public void disconnect() {
         mServerCallHandler.post(new Runnable() {
             @Override
             public void run() {
                 final ServerStatus status = mServer.getStatus();
                 if (status == ServerStatus.CONNECTED) {
-                    mConnection.onDisconnect();
+                    mConnection.disconnect();
                 } else if (isAlive()) {
                     interrupt();
                     mConnection.closeSocket();

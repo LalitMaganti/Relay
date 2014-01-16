@@ -66,7 +66,7 @@ public class ServerCallBus extends Bus {
 
     public void sendDisconnect() {
         getServer().getServerEventBus().post(new DisconnectEvent("", true, false));
-        mConnection.onDisconnect();
+        mConnection.disconnect();
     }
 
     public void sendMessageToUser(final String nick, final String message) {

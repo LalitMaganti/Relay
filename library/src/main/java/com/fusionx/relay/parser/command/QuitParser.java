@@ -25,29 +25,37 @@ public class QuitParser extends CommandParser {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
         final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
         if (user.isUserNickEqual(mServer.getUser())) {
-            // TODO - improve this
-            mIsUserQuit = true;
+            onQuit();
         } else {
-            final Collection<Channel> list = mUserChannelInterface.removeUser(user);
-            final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"",
-                    "") : "";
-            for (final Channel channel : list) {
-                channel.onDecrementUserType(user.getChannelPrivileges(channel));
-                mUserChannelInterface.removeUserFromChannel(channel, user);
-
-                final WorldQuitEvent event = new WorldQuitEvent(channel, user, reason);
-                mServerEventBus.postAndStoreEvent(event, channel);
-            }
-
-            final PrivateMessageUser pmUser = mUserChannelInterface
-                    .getPrivateMessageUserIfExists(nick);
-            if (pmUser != null) {
-                pmUser.setUserQuit(true);
-
-                final WorldPrivateQuitEvent event = new WorldPrivateQuitEvent(pmUser);
-                mServerEventBus.postAndStoreEvent(event, pmUser);
-            }
+            onUserQuit(parsedArray, user);
         }
+    }
+
+    private void onUserQuit(final List<String> parsedArray, final WorldUser user) {
+        final Collection<Channel> list = mUserChannelInterface.removeUser(user);
+        final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"",
+                "") : "";
+        for (final Channel channel : list) {
+            channel.onDecrementUserType(user.getChannelPrivileges(channel));
+            mUserChannelInterface.removeUserFromChannel(channel, user);
+
+            final WorldQuitEvent event = new WorldQuitEvent(channel, user, reason);
+            mServerEventBus.postAndStoreEvent(event, channel);
+        }
+
+        final PrivateMessageUser pmUser = mUserChannelInterface.getPrivateMessageUserIfExists
+                (user.getNick());
+        if (pmUser != null) {
+            pmUser.setUserQuit(true);
+
+            final WorldPrivateQuitEvent event = new WorldPrivateQuitEvent(pmUser);
+            mServerEventBus.postAndStoreEvent(event, pmUser);
+        }
+    }
+
+    private void onQuit() {
+        // TODO - improve this
+        mIsUserQuit = true;
     }
 
     public boolean isUserQuit() {

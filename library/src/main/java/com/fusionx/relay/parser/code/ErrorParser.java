@@ -22,13 +22,13 @@ public class ErrorParser extends CodeParser {
                 onNoSuchNickError(parsedArray);
                 break;
             case ERR_NICKNAMEINUSE:
-                onNicknameInUse(parsedArray);
+                onNickInUse(parsedArray);
                 break;
         }
     }
 
     // TODO - implement this
-    private void onNicknameInUse(final List<String> parsedArray) {
+    private void onNickInUse(final List<String> parsedArray) {
     }
 
     /**

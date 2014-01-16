@@ -122,7 +122,7 @@ public class WorldUser extends User implements Checkable {
                 case 'h':
                 case 'a':
                 case 'q':
-                    // TODO - don't return straight away
+                    // TODO - don't return straight away - more checking may need to be done
                     final UserLevel levelEnum = UserLevel.getLevelFromMode(character);
                     channel.onDecrementUserType(mUserLevelMap.get(channel));
                     if (addingMode) {

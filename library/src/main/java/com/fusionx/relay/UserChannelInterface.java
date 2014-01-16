@@ -35,6 +35,8 @@ public final class UserChannelInterface {
     public synchronized void addChannelToUser(final WorldUser user, final Channel channel) {
         Collection<Channel> setOfChannels = mUserToChannelMap.get(user);
         if (setOfChannels == null) {
+            // Linked hash set used to preserve insertion order - so that the channels are always
+            // displayed to the user in the order they were joined
             setOfChannels = new TLinkedHashSet<>();
             mUserToChannelMap.put(user, setOfChannels);
         }
@@ -121,7 +123,9 @@ public final class UserChannelInterface {
 
     public synchronized Channel getChannelIfExists(final String name) {
         for (final Channel channel : mChannelToUserMap.keySet()) {
-            if (name.equals(channel.getName())) {
+            // Channel names have to unique disregarding case - not having ignore-case here leads
+            // to null channels when the channel does actually exist
+            if (name.equalsIgnoreCase(channel.getName())) {
                 return channel;
             }
         }
