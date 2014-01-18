@@ -49,17 +49,9 @@ public class WorldUser extends User implements Checkable {
     public Spanned getSpannedNick(final Channel channel) {
         final Spanned spannable = mChannelSpannedMap.get(channel);
         if (spannable == null) {
-            onUpdateSpannedNick(channel);
+            onChannelNickChanged(channel);
         }
         return spannable;
-    }
-
-    public String getBracketedNick(final Channel channel) {
-        return String.format(mColourCode, "<" + getPrefixedNick(channel) + ">");
-    }
-
-    public void onJoin(final Channel channel) {
-        onPutMode(channel, UserLevel.NONE);
     }
 
     // Called either on part of other or on quit of our user
@@ -68,16 +60,16 @@ public class WorldUser extends User implements Checkable {
         mChannelSpannedMap.remove(channel);
     }
 
-    public void onPutMode(final Channel channel, final UserLevel mode) {
+    public void onModeChanged(final Channel channel, final UserLevel mode) {
         mUserLevelMap.put(channel, mode);
-        onUpdateSpannedNick(channel);
+        onChannelNickChanged(channel);
     }
 
     public UserLevel getChannelPrivileges(final Channel channel) {
         return mUserLevelMap.get(channel);
     }
 
-    private void onUpdateSpannedNick(final Channel channel) {
+    public void onChannelNickChanged(final Channel channel) {
         final Spanned spannable = ColourParserUtils.onParseMarkup(getPrettyNick(channel));
         mChannelSpannedMap.put(channel, spannable);
     }
@@ -93,18 +85,6 @@ public class WorldUser extends User implements Checkable {
 
     public Collection<Channel> getChannels() {
         return mUserChannelInterface.getAllChannelsInUser(this);
-    }
-
-    public void onWhoMode(final String rawMode, final Channel channel) {
-        UserLevel mode = UserLevel.NONE;
-        for (final UserLevel levelEnum : UserLevel.values()) {
-            if (rawMode.contains(String.valueOf(levelEnum.getPrefix()))) {
-                mode = levelEnum;
-                channel.onIncrementUserType(mode);
-            }
-        }
-        mUserLevelMap.put(channel, mode);
-        onUpdateSpannedNick(channel);
     }
 
     public UserLevel onModeChange(final Channel channel, final String mode) {
@@ -127,22 +107,18 @@ public class WorldUser extends User implements Checkable {
                     channel.onDecrementUserType(mUserLevelMap.get(channel));
                     if (addingMode) {
                         channel.onIncrementUserType(levelEnum);
-                        onPutMode(channel, levelEnum);
+                        onModeChanged(channel, levelEnum);
 
                         return levelEnum;
                     } else {
-                        onPutMode(channel, UserLevel.NONE);
+                        onModeChanged(channel, UserLevel.NONE);
                         return UserLevel.NONE;
                     }
             }
         }
-        onUpdateSpannedNick(channel);
+        onChannelNickChanged(channel);
 
         return UserLevel.NONE;
-    }
-
-    public void onUpdateNick(final Channel channel) {
-        onUpdateSpannedNick(channel);
     }
 
     public boolean isUserNickEqual(final User user) {

@@ -64,11 +64,6 @@ public class ServerCallBus extends Bus {
         post(new RawCall(rawLine));
     }
 
-    public void sendDisconnect() {
-        getServer().getServerEventBus().post(new DisconnectEvent("", true, false));
-        mConnection.disconnect();
-    }
-
     public void sendMessageToUser(final String nick, final String message) {
         if (StringUtils.isNotEmpty(message)) {
             post(new PrivateMessageCall(nick, message));

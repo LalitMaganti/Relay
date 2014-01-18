@@ -41,7 +41,7 @@ public class NickParser extends CommandParser {
             } else {
                 event = new WorldNickChangeEvent(channel, oldNick, user);
             }
-            user.onUpdateNick(channel);
+            user.onChannelNickChanged(channel);
             mServerEventBus.postAndStoreEvent(event, channel);
         }
     }

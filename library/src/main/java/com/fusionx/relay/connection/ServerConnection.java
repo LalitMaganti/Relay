@@ -3,6 +3,7 @@ package com.fusionx.relay.connection;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.ServerStatus;
+import com.fusionx.relay.event.server.DisconnectEvent;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -52,6 +53,7 @@ public class ServerConnection extends Thread {
                     interrupt();
                     mConnection.closeSocket();
                 }
+                mServer.getServerEventBus().post(new DisconnectEvent("", true, false));
             }
         });
     }

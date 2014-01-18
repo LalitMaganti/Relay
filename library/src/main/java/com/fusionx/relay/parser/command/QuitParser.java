@@ -36,7 +36,6 @@ public class QuitParser extends CommandParser {
         final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"",
                 "") : "";
         for (final Channel channel : list) {
-            channel.onDecrementUserType(user.getChannelPrivileges(channel));
             mUserChannelInterface.removeUserFromChannel(channel, user);
 
             final WorldQuitEvent event = new WorldQuitEvent(channel, user, reason);

@@ -1,5 +1,6 @@
 package com.fusionx.relay;
 
+import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.Collection;
@@ -21,18 +22,26 @@ public final class UserChannelInterface {
 
     public UserChannelInterface(final Server server) {
         mServer = server;
+
         mUserToChannelMap = new THashMap<>();
         mChannelToUserMap = new THashMap<>();
         mPrivateMessageUsers = new TLinkedHashSet<>();
     }
 
     public synchronized void coupleUserAndChannel(final WorldUser user, final Channel channel) {
-        user.onJoin(channel);
-        addChannelToUser(user, channel);
-        addUserToChannel(user, channel);
+        coupleUserAndChannel(user, channel, UserLevel.NONE);
     }
 
-    public synchronized void addChannelToUser(final WorldUser user, final Channel channel) {
+    public synchronized void coupleUserAndChannel(final WorldUser user, final Channel channel,
+            final UserLevel userLevel) {
+        user.onModeChanged(channel, userLevel);
+        addChannelToUser(user, channel);
+        addUserToChannel(user, channel);
+
+        channel.onIncrementUserType(userLevel);
+    }
+
+    private synchronized void addChannelToUser(final WorldUser user, final Channel channel) {
         Collection<Channel> setOfChannels = mUserToChannelMap.get(user);
         if (setOfChannels == null) {
             // Linked hash set used to preserve insertion order - so that the channels are always
@@ -53,12 +62,14 @@ public final class UserChannelInterface {
     }
 
     public synchronized void decoupleUserAndChannel(final WorldUser user, final Channel channel) {
-        user.onRemove(channel);
-        removeChannelFromUser(channel, user);
         removeUserFromChannel(channel, user);
+        removeChannelFromUser(channel, user);
+        user.onRemove(channel);
     }
 
     public void removeUserFromChannel(final Channel channel, final WorldUser user) {
+        channel.onDecrementUserType(user.getChannelPrivileges(channel));
+
         final Collection<WorldUser> setOfUsers = mChannelToUserMap.get(channel);
         if (setOfUsers.size() > 1) {
             setOfUsers.remove(user);
@@ -145,8 +156,8 @@ public final class UserChannelInterface {
         return mPrivateMessageUsers;
     }
 
-    public PrivateMessageUser getNewPrivateMessageUser(final String nick,
-            final String message, final boolean action) {
+    public PrivateMessageUser getNewPrivateMessageUser(final String nick, final String message,
+            final boolean action) {
         final PrivateMessageUser user = new PrivateMessageUser(nick, this, message, action);
         mPrivateMessageUsers.add(user);
         return user;

@@ -31,9 +31,10 @@ public class NameParser extends CodeParser {
         }
         final ArrayList<String> listOfUsers = IRCUtils.splitRawLine(parsedArray.get(2), false);
         for (final String rawNick : listOfUsers) {
-            final WorldUser user = getUserFromNameReply(rawNick);
-            mUserChannelInterface.addChannelToUser(user, mChannel);
-            mUserChannelInterface.addUserToChannel(user, mChannel);
+            final UserLevel level = UserLevel.getLevelFromPrefix(rawNick.charAt(0));
+            final String nick = level == UserLevel.NONE ? rawNick : rawNick.substring(1);
+            final WorldUser user = mUserChannelInterface.getUser(nick);
+            mUserChannelInterface.coupleUserAndChannel(user, mChannel, level);
         }
     }
 
@@ -41,18 +42,6 @@ public class NameParser extends CodeParser {
         mServer.getServerEventBus().post(new NameEvent(mChannel, mChannel.getUsers()));
 
         mChannel = null;
-    }
-
-    private WorldUser getUserFromNameReply(final String rawNameNick) {
-        final char firstChar = rawNameNick.charAt(0);
-        final UserLevel level = UserLevel.getLevelFromPrefix(firstChar);
-        final String nick = level == UserLevel.NONE ? rawNameNick : rawNameNick.substring(1);
-        final WorldUser user = mUserChannelInterface.getUser(nick);
-
-        user.onPutMode(mChannel, level);
-        mChannel.onIncrementUserType(level);
-
-        return user;
     }
 
     @Override

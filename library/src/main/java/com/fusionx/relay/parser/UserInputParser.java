@@ -132,12 +132,6 @@ public class UserInputParser {
                     return;
                 }
                 break;
-            case "/quit":
-                if (arrayLength == 0) {
-                    server.getServerCallBus().sendDisconnect();
-                    return;
-                }
-                break;
             case "/whois":
                 if (arrayLength == 1) {
                     server.getServerCallBus().sendUserWhois(parsedArray.get(0));

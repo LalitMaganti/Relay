@@ -403,7 +403,7 @@ public final class ServerReplyCodes {
     public static final ImmutableList<Integer> genericCodes = ImmutableList.of(RPL_WELCOME,
             RPL_YOURHOST, RPL_CREATED, RPL_LUSERCLIENT, RPL_LUSEROP, RPL_LUSERUNKNOWN,
             RPL_LUSERCHANNELS, RPL_LUSERME, RPL_STATSCONN, RPL_LOCALUSERS, RPL_GLOBALUSERS,
-            RPL_NOWAWAY, RPL_UNAWAY);
+            RPL_NOWAWAY, RPL_UNAWAY, ERR_NOMOTD);
 
     // Codes we know about and choose to ignore
     public static final ImmutableList<Integer> doNothingCodes = ImmutableList.of
