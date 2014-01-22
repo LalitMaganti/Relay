@@ -23,7 +23,7 @@ public class ColourParserUtils {
                 final String start = remainingText.substring(0, indexOfFirstOpen);
                 builder.append(start);
 
-                final int indexOfFirstClose = remainingText.indexOf(">");
+                final int indexOfFirstClose = remainingText.indexOf(">", indexOfFirstOpen + 1);
                 String tag = remainingText.substring(indexOfFirstOpen + 1, indexOfFirstClose);
 
                 final String textAfterTag = remainingText.substring(indexOfFirstClose + 1);
@@ -34,9 +34,8 @@ public class ColourParserUtils {
                 } else if (tag.equals("bold")) {
                     characterStyle = new StyleSpan(Typeface.BOLD);
                 } else {
-                    final int indexOfLastOpen = textAfterTag.indexOf("</" + tag + ">");
-                    builder.append(tag);
-                    remainingText = textAfterTag.substring(indexOfLastOpen + 3 + tag.length());
+                    remainingText = remainingText.substring(indexOfFirstOpen + 1);
+                    builder.append("<");
                     continue;
                 }
 

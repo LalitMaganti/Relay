@@ -59,7 +59,8 @@ public class ServerConnectionParser {
             final ArrayList<String> parsedArray = IRCUtils.splitRawLine(line, true);
             String s = parsedArray.get(0);
             switch (s) {
-                case ServerCommands.PING: // Immediately return
+                case ServerCommands.PING:
+                    // Immediately return
                     final String source = parsedArray.get(1);
                     CoreListener.respondToPing(mWriter, source);
                     break;
@@ -109,6 +110,7 @@ public class ServerConnectionParser {
                         mWriter.changeNick(new NickChangeCall(nickStorage.getFirstChoiceNick() +
                                 suffix));
                     } else {
+                        // TODO - fix this
                         //sender.sendNickInUseMessage();
                     }
                 }

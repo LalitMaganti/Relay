@@ -174,6 +174,7 @@ public final class UserChannelInterface {
     public void onCleanup() {
         mUserToChannelMap.clear();
         mChannelToUserMap.clear();
+        mPrivateMessageUsers.clear();
     }
 
     // Getters and setters

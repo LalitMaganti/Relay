@@ -127,7 +127,7 @@ public class BaseConnection {
                     .getFirstChoiceNick()));
             serverWriter.sendUser(serverConfiguration.getServerUserName(),
                     Utils.isNotEmpty(serverConfiguration.getRealName()) ?
-                            serverConfiguration.getRealName() : "HoloIRC");
+                            serverConfiguration.getRealName() : "RelayUser");
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
                     .getInputStream()));
