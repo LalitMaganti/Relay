@@ -1,6 +1,9 @@
 package com.fusionx.relay.connection;
 
 import com.fusionx.relay.AppUser;
+import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelSnapshot;
+import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.ServerStatus;
@@ -8,16 +11,22 @@ import com.fusionx.relay.call.ChannelJoinCall;
 import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.QuitCall;
 import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
+import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.ServerEvent;
+import com.fusionx.relay.event.user.UserDisconnectEvent;
+import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.parser.ServerConnectionParser;
 import com.fusionx.relay.parser.ServerLineParser;
 import com.fusionx.relay.util.SSLUtils;
 import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ServerWriter;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -39,17 +48,15 @@ import javax.net.ssl.SSLSocketFactory;
  */
 public class BaseConnection {
 
-    private final Server server;
+    private final Server mServer;
 
-    private final ServerConfiguration serverConfiguration;
+    private final ServerConfiguration mServerConfiguration;
 
     private Socket mSocket;
 
     private boolean mUserDisconnected;
 
-    private int reconnectAttempts;
-
-    private Collection<String> channelList;
+    private int mReconnectAttempts;
 
     private ServerLineParser mLineParser;
 
@@ -59,9 +66,9 @@ public class BaseConnection {
      *
      * @param configuration - the ServerConfiguration which should be used to connect to the server
      */
-    BaseConnection(final ServerConfiguration configuration, final Server serverObject) {
-        server = serverObject;
-        serverConfiguration = configuration;
+    BaseConnection(final ServerConfiguration configuration, final Server server) {
+        mServer = server;
+        mServerConfiguration = configuration;
     }
 
     /**
@@ -69,15 +76,13 @@ public class BaseConnection {
      * user has not explicitly tried to disconnect
      */
     void connectToServer() {
-        reconnectAttempts = 0;
-
-        channelList = serverConfiguration.getAutoJoinChannels();
+        mReconnectAttempts = 0;
 
         connect();
 
         while (isReconnectNeeded()) {
-            server.getServerEventBus().postAndStoreEvent(new GenericServerEvent("Trying to "
-                    + "reconnect to the server in 5 seconds."), server);
+            mServer.getServerEventBus().postAndStoreEvent(new GenericServerEvent("Trying to "
+                    + "reconnect to the server in 5 seconds."));
             try {
                 Thread.sleep(5000);
             } catch (final InterruptedException e) {
@@ -85,18 +90,13 @@ public class BaseConnection {
                 // reconnection
                 return;
             }
-            // Make sure the cleanup happens before the next connection but after all the tabs
-            // have been closed
-            server.onCleanup();
 
             connect();
-            ++reconnectAttempts;
+            ++mReconnectAttempts;
         }
 
         if (!mUserDisconnected) {
-            server.getServerEventBus()
-                    .postAndStoreEvent(new DisconnectEvent("Disconnected from the "
-                            + "server", false, false), server);
+            sendDisconnectEvents("", false, false);
         }
     }
 
@@ -104,35 +104,36 @@ public class BaseConnection {
      * Called by the connectToServer method ONLY
      */
     private void connect() {
-        final ServerEventBus sender = server.getServerEventBus();
+        final ServerEventBus sender = mServer.getServerEventBus();
+        String disconnectMessage = "";
         try {
             setupSocket();
             final Writer writer = new BufferedWriter(new OutputStreamWriter(mSocket
                     .getOutputStream()));
-            final ServerWriter serverWriter = server.onOutputStreamCreated(writer);
+            final ServerWriter serverWriter = mServer.onOutputStreamCreated(writer);
 
-            server.setStatus(ServerStatus.CONNECTING);
+            mServer.setStatus(ServerStatus.CONNECTING);
 
-            if (serverConfiguration.isSaslAvailable()) {
+            if (mServerConfiguration.isSaslAvailable()) {
                 // By sending this line, the server *should* wait until we end the CAP stuff with CAP
                 // END
                 serverWriter.getSupportedCapabilities();
             }
 
-            if (Utils.isNotEmpty(serverConfiguration.getServerPassword())) {
-                serverWriter.sendServerPassword(serverConfiguration.getServerPassword());
+            if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
+                serverWriter.sendServerPassword(mServerConfiguration.getServerPassword());
             }
 
-            serverWriter.changeNick(new NickChangeCall(serverConfiguration.getNickStorage()
+            serverWriter.changeNick(new NickChangeCall(mServerConfiguration.getNickStorage()
                     .getFirstChoiceNick()));
-            serverWriter.sendUser(serverConfiguration.getServerUserName(),
-                    Utils.isNotEmpty(serverConfiguration.getRealName()) ?
-                            serverConfiguration.getRealName() : "RelayUser");
+            serverWriter.sendUser(mServerConfiguration.getServerUserName(),
+                    Utils.isNotEmpty(mServerConfiguration.getRealName()) ?
+                            mServerConfiguration.getRealName() : "RelayUser");
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
                     .getInputStream()));
-            final ServerConnectionParser parser = new ServerConnectionParser(server,
-                    serverConfiguration, reader, serverWriter);
+            final ServerConnectionParser parser = new ServerConnectionParser(mServer,
+                    mServerConfiguration, reader, serverWriter);
             final String nick = parser.parseConnect();
 
             onConnected(sender);
@@ -140,71 +141,81 @@ public class BaseConnection {
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
             if (nick != null) {
-                // Since we are now connected, reset the reconnect attempts
-                reconnectAttempts = 0;
-
-                final AppUser user = new AppUser(nick, server.getUserChannelInterface());
-                server.setUser(user);
-
-                // Identifies with NickServ if the password exists
-                if (Utils.isNotEmpty(serverConfiguration.getNickservPassword())) {
-                    serverWriter.sendNickServPassword(serverConfiguration
-                            .getNickservPassword());
-                }
-
-                // Automatically join the channels specified in the configuration
-                for (final String channelName : channelList) {
-                    server.getServerCallBus().post(new ChannelJoinCall(channelName));
-                }
-
-                // Initialise the parser used to parse any lines from the server
-                mLineParser = new ServerLineParser(server, this);
-                // Loops forever until broken
-                mLineParser.parseMain(reader, serverWriter);
-
-                // If we have reached this point the connection has been broken - try to
-                // reconnect unless the disconnection was requested by the user or we have used
-                // all our lives
-                if (isReconnectNeeded()) {
-                    sender.postAndStoreEvent(new DisconnectEvent("Disconnected from the server",
-                            false, true), server);
-
-                    channelList = server.getUser().getChannelList();
-                }
+                onStartParsing(nick, serverWriter, reader);
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
-            if (isReconnectNeeded()) {
-                sender.postAndStoreEvent(new DisconnectEvent("Disconnected from the server (" +
-                        ex.getMessage() + ")", false, true), server);
-
-                if (server.getUser() != null) {
-                    channelList = server.getUser().getChannelList();
-                }
-            }
+            disconnectMessage = ex.getMessage();
         }
+
+        // If we have reached this point the connection has been broken - try to
+        // reconnect unless the disconnection was requested by the user or we have used
+        // all our lives
+        if (isReconnectNeeded()) {
+            sendDisconnectEvents(disconnectMessage, false, true);
+        }
+
         if (!mUserDisconnected) {
             // We are disconnected :( - close up shop
-            server.setStatus(ServerStatus.DISCONNECTED);
+            mServer.setStatus(ServerStatus.DISCONNECTED);
             closeSocket();
+
+            mServer.onDisconnect();
         }
+    }
+
+    private void onStartParsing(final String nick, final ServerWriter serverWriter,
+                                final BufferedReader reader) throws IOException {
+        // Since we are now connected, reset the reconnect attempts
+        mReconnectAttempts = 0;
+
+        if (mServer.getUser() == null) {
+            final AppUser user = new AppUser(nick, mServer.getUserChannelInterface());
+            mServer.setUser(user);
+        } else {
+            mServer.getUser().setNick(nick);
+        }
+
+        // Identifies with NickServ if the password exists
+        if (Utils.isNotEmpty(mServerConfiguration.getNickservPassword())) {
+            serverWriter.sendNickServPassword(mServerConfiguration
+                    .getNickservPassword());
+        }
+
+        final Collection<ChannelSnapshot> channels = mServer.getUser()
+                .getChannelSnapshots();
+        if (channels.isEmpty()) {
+            // Automatically join the channels specified in the configuration
+            for (final String channelName : mServerConfiguration.getAutoJoinChannels()) {
+                mServer.getServerCallBus().post(new ChannelJoinCall(channelName));
+            }
+        } else {
+            for (final Channel channel : channels) {
+                mServer.getServerCallBus().post(new ChannelJoinCall(channel.getName()));
+            }
+        }
+
+        // Initialise the parser used to parse any lines from the server
+        mLineParser = new ServerLineParser(mServer, this);
+        // Loops forever until broken
+        mLineParser.parseMain(reader, serverWriter);
     }
 
     /**
      * Called to setup the socket
      */
     private void setupSocket() throws IOException {
-        final InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),
-                serverConfiguration.getPort());
-
-        if (serverConfiguration.isSslEnabled()) {
+        final InetSocketAddress address = new InetSocketAddress(mServerConfiguration.getUrl(),
+                mServerConfiguration.getPort());
+        if (mServerConfiguration.isSslEnabled()) {
             final SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory
-                    (serverConfiguration.shouldAcceptAllSSLCertificates());
+                    (mServerConfiguration.shouldAcceptAllSSLCertificates());
             mSocket = sslSocketFactory.createSocket();
         } else {
             mSocket = new Socket();
         }
+
         mSocket.setKeepAlive(true);
         mSocket.connect(address, 5000);
     }
@@ -213,10 +224,33 @@ public class BaseConnection {
      * Called when we are connected to the server
      */
     private void onConnected(final ServerEventBus sender) {
-        server.setStatus(ServerStatus.CONNECTED);
+        mServer.setStatus(ServerStatus.CONNECTED);
 
-        final ServerEvent event = new ConnectEvent(serverConfiguration.getUrl());
-        sender.postAndStoreEvent(event, server);
+        final ServerEvent event = new ConnectEvent(mServerConfiguration.getUrl());
+        sender.postAndStoreEvent(event);
+    }
+
+    private void sendDisconnectEvents(final String serverMessage, boolean userSent,
+                                      boolean retryPending) {
+        final StringBuilder builder = new StringBuilder("Disconnected from the server");
+        if (StringUtils.isNotEmpty(serverMessage)) {
+            builder.append(" (").append(serverMessage).append(")");
+        }
+        final String message = builder.toString();
+        final DisconnectEvent event = new DisconnectEvent(message, userSent, retryPending);
+
+        mServer.getServerEventBus().postAndStoreEvent(event);
+
+        for (final Channel channel : mServer.getUser().getChannels()) {
+            final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel);
+            channel.onChannelEvent(channelEvent);
+        }
+
+        for (final PrivateMessageUser user : mServer.getUserChannelInterface()
+                .getPrivateMessageUsers()) {
+            final UserEvent userEvent = new UserDisconnectEvent(user);
+            user.onUserEvent(userEvent);
+        }
     }
 
     /**
@@ -224,8 +258,8 @@ public class BaseConnection {
      */
     public void disconnect() {
         mUserDisconnected = true;
-        server.setStatus(ServerStatus.DISCONNECTED);
-        server.getServerCallBus().post(new QuitCall(InterfaceHolders.getPreferences()
+        mServer.setStatus(ServerStatus.DISCONNECTED);
+        mServer.getServerCallBus().post(new QuitCall(InterfaceHolders.getPreferences()
                 .getQuitReason()));
     }
 
@@ -244,7 +278,7 @@ public class BaseConnection {
     }
 
     private boolean isReconnectNeeded() {
-        return reconnectAttempts < InterfaceHolders.getPreferences().getReconnectAttemptsCount()
+        return mReconnectAttempts < InterfaceHolders.getPreferences().getReconnectAttemptsCount()
                 && !mUserDisconnected;
     }
 
@@ -253,6 +287,9 @@ public class BaseConnection {
     }
 
     public String getCurrentLine() {
-        return mLineParser.getCurrentLine();
+        if (mLineParser != null) {
+            return mLineParser.getCurrentLine();
+        }
+        return "";
     }
 }

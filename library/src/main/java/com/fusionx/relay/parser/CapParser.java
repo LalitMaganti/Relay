@@ -14,8 +14,7 @@ import java.util.ArrayList;
 class CapParser {
 
     static void parseCommand(final ArrayList<String> parsedArray, final ServerConfiguration
-            configuration, final Server server, final ServerEventBus sender,
-            final ServerWriter writer) {
+            configuration, final ServerEventBus sender, final ServerWriter writer) {
         final String command = parsedArray.get(0);
         if (command.equals("AUTHENTICATE")) {
             writer.sendSaslAuthentication(configuration.getSaslUsername(),
@@ -40,7 +39,7 @@ class CapParser {
                         // TODO - change this
                         final ServerEvent event = new GenericServerEvent("SASL not supported by "
                                 + "server");
-                        sender.postAndStoreEvent(event, server);
+                        sender.postAndStoreEvent(event);
                         writer.sendEndCap();
                         break;
                 }
@@ -49,27 +48,27 @@ class CapParser {
     }
 
     static void parseCode(final int code, final ArrayList<String> parsedArray,
-            final ServerEventBus sender, final Server server, final ServerWriter writer) {
+                          final ServerEventBus sender, final ServerWriter writer) {
         final ServerEvent event;
         switch (code) {
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String successful = parsedArray.get(3);
 
                 event = new GenericServerEvent(successful);
-                sender.postAndStoreEvent(event, server);
+                sender.postAndStoreEvent(event);
                 break;
             case ServerReplyCodes.RPL_SASL_LOGGED_IN:
                 final String loginMessage = parsedArray.get(5);
 
                 event = new GenericServerEvent(loginMessage);
-                sender.postAndStoreEvent(event, server);
+                sender.postAndStoreEvent(event);
                 break;
             case ServerReplyCodes.ERR_SASL_FAILED:
             case ServerReplyCodes.ERR_SASL_FAILED_2:
                 final String error = parsedArray.get(3);
 
                 event = new GenericServerEvent(error);
-                sender.postAndStoreEvent(event, server);
+                sender.postAndStoreEvent(event);
                 break;
             default:
                 return;

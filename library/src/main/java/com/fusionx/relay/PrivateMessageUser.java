@@ -9,21 +9,27 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class PrivateMessageUser extends User {
+public class PrivateMessageUser extends User {
 
     /**
      * Contains a copy of the messages when the conversation
      */
-    private final List<UserEvent> mBuffer = new ArrayList<>();
+    private final List<UserEvent> mBuffer;
 
     /**
      * Retains whether the person on the other end of the PM quit in the middle of the conversation
      */
     private boolean mUserQuit;
 
+    protected PrivateMessageUser(final String nick, final List<UserEvent> buffer) {
+        super(nick, null);
+        mBuffer = buffer;
+    }
+
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface,
             final String message, final boolean action) {
         super(nick, userChannelInterface);
+        mBuffer = new ArrayList<>();
 
         if (StringUtils.isNotEmpty(message)) {
             final UserEvent event;
@@ -34,10 +40,6 @@ public final class PrivateMessageUser extends User {
             }
             mBuffer.add(event);
         }
-
-        /*if (InterfaceHolders.getPreferences().shouldHandleInitialPrivateMessage() && Utils
-                .isNotEmpty(initalMessage)) {*/
-        //}
     }
 
     public void onUserEvent(final UserEvent event) {

@@ -19,16 +19,22 @@ import com.fusionx.relay.event.SwitchToPrivateMessage;
 import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.MessageEvent;
-import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.writers.RawWriter;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Set;
+
+import gnu.trove.set.hash.THashSet;
+
 public class ServerCallBus extends Bus {
+
+    private final Set<RawWriter> mRawWriterSet = new THashSet<>();
 
     private final ServerConnection mConnection;
 
@@ -36,6 +42,19 @@ public class ServerCallBus extends Bus {
         super(ThreadEnforcer.ANY);
 
         mConnection = connection;
+    }
+
+    public void register(RawWriter rawWriter) {
+        super.register(rawWriter);
+
+        mRawWriterSet.add(rawWriter);
+    }
+
+    public void onDisconnect() {
+        for (final RawWriter writer : mRawWriterSet) {
+            super.unregister(writer);
+        }
+        mRawWriterSet.clear();
     }
 
     @Override
@@ -122,7 +141,8 @@ public class ServerCallBus extends Bus {
         post(new ChannelMessageCall(channelName, message));
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
+            final Channel channel = getServer().getUserChannelInterface().getChannelIfExists(
+                    channelName);
             final ChannelEvent event = new MessageEvent(channel, message,
                     getServer().getUser().getPrettyNick(channel));
             getServer().getServerEventBus().postAndStoreEvent(event, channel);
@@ -138,7 +158,8 @@ public class ServerCallBus extends Bus {
         post(new ChannelActionCall(channelName, action));
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
+            final Channel channel = getServer().getUserChannelInterface()
+                    .getChannelIfExists(channelName);
             final ChannelEvent event = new ActionEvent(channel, action,
                     getServer().getUser().getPrettyNick(channel));
             getServer().getServerEventBus().postAndStoreEvent(event, channel);

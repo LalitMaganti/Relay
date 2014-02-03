@@ -63,7 +63,7 @@ public class CtcpParser extends CommandParser {
 
     private void onParseChannelAction(final String channelName, final String userNick,
             final String action) {
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final Channel channel = mUserChannelInterface.getChannelIfExists(channelName);
         final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(userNick);
         final ChannelEvent event = new WorldActionEvent(channel, action, sendingUser,
                 userNick);

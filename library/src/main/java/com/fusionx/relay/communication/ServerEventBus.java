@@ -16,10 +16,14 @@ import android.os.Looper;
 
 public class ServerEventBus extends Bus {
 
+    private final Server mServer;
+
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
 
-    public ServerEventBus() {
+    public ServerEventBus(final Server server) {
         super(ThreadEnforcer.ANY);
+
+        mServer = server;
     }
 
     @Override
@@ -32,11 +36,11 @@ public class ServerEventBus extends Bus {
         });
     }
 
-    public void postAndStoreEvent(final ServerEvent event, final Server server) {
+    public void postAndStoreEvent(final ServerEvent event) {
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                server.onServerEvent(event);
+                mServer.onServerEvent(event);
                 ServerEventBus.super.post(event);
             }
         });

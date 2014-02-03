@@ -25,9 +25,30 @@ public class Channel {
 
     private final UserChannelInterface mUserChannelInterface;
 
+    protected Channel(final String channelName, final List<ChannelEvent> buffer) {
+        mName = channelName;
+        mBuffer = buffer;
+        mNumberOfUsers = null;
+        mUserChannelInterface = null;
+    }
+
     Channel(final String channelName, final UserChannelInterface userChannelInterface) {
         mName = channelName;
         mBuffer = new ArrayList<>();
+        mNumberOfUsers = new EnumMap<>(UserLevel.class);
+        mUserChannelInterface = userChannelInterface;
+
+        for (final UserLevel levelEnum : UserLevel.values()) {
+            mNumberOfUsers.put(levelEnum, 0);
+        }
+
+        // WorldJoinEvent is used as JoinEvent is a server event
+        mBuffer.add(new WorldJoinEvent(this, userChannelInterface.getServer().getUser()));
+    }
+
+    Channel(final ChannelSnapshot snapshot, final UserChannelInterface userChannelInterface) {
+        mName = snapshot.getName();
+        mBuffer = snapshot.getBuffer();
         mNumberOfUsers = new EnumMap<>(UserLevel.class);
         mUserChannelInterface = userChannelInterface;
 

@@ -3,7 +3,7 @@ package com.fusionx.relay.writers;
 import java.io.IOException;
 import java.io.Writer;
 
-abstract class RawWriter {
+public abstract class RawWriter {
 
     private final Writer streamWriter;
 

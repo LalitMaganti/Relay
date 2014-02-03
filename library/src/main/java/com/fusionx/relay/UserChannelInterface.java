@@ -4,6 +4,7 @@ import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
@@ -118,9 +119,17 @@ public final class UserChannelInterface {
         return user != null ? user : new WorldUser(nick, this);
     }
 
-    public synchronized Channel getChannel(final String name) {
+    public synchronized Channel getChannelFromSnapshot(final String name,
+            final ChannelSnapshot snapshot) {
         final Channel channel = getChannelIfExists(name);
-        return channel != null ? channel : new Channel(name, this);
+        if (channel != null) {
+            return channel;
+        } else if (snapshot != null) {
+            mServer.getUser().getChannelSnapshots().remove(snapshot);
+            return new Channel(snapshot, this);
+        } else {
+            return new Channel(name, this);
+        }
     }
 
     public synchronized WorldUser getUserIfExists(final String nick) {
@@ -171,10 +180,15 @@ public final class UserChannelInterface {
         mUserToChannelMap.put(user, new TLinkedHashSet<Channel>());
     }
 
-    public void onCleanup() {
-        mUserToChannelMap.clear();
+    public void onDisconnect() {
         mChannelToUserMap.clear();
-        mPrivateMessageUsers.clear();
+        final Iterator<WorldUser> iterator = mUserToChannelMap.keySet().iterator();
+        while (iterator.hasNext()) {
+            final WorldUser user = iterator.next();
+            if (!(user instanceof AppUser)) {
+                iterator.remove();
+            }
+        }
     }
 
     // Getters and setters

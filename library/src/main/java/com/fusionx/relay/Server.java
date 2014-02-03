@@ -34,15 +34,15 @@ public class Server {
 
     private ServerStatus mStatus;
 
-    public List<String> mIgnoreList;
+    private List<String> mIgnoreList;
 
     public Server(final ServerConfiguration configuration, final ServerConnection connection) {
+        mStatus = ServerStatus.DISCONNECTED;
         mConfiguration = configuration;
         mTitle = configuration.getTitle();
         mBuffer = new ArrayList<>();
-        mStatus = ServerStatus.DISCONNECTED;
         mServerCache = new ServerCache();
-        mServerEventBus = new ServerEventBus();
+        mServerEventBus = new ServerEventBus(this);
         mServerCallBus = new ServerCallBus(connection);
         mUserChannelInterface = new UserChannelInterface(this);
         mIgnoreList = new ArrayList<>();
@@ -52,9 +52,16 @@ public class Server {
         mBuffer.add(event);
     }
 
-    public void onCleanup() {
-        mUserChannelInterface.onCleanup();
-        mUser = null;
+    public void onDisconnect() {
+        // Null can occur if the connection does not occur on initial connect
+        if (mUser != null) {
+            mUser.onDisconnect();
+        }
+        mUserChannelInterface.onDisconnect();
+
+        // Need to remove old writers as they would be using the old socket OutputStream if a
+        // reconnection occurs
+        mServerCallBus.onDisconnect();
     }
 
     @Override

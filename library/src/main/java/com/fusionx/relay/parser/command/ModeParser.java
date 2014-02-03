@@ -28,7 +28,7 @@ public class ModeParser extends CommandParser {
         if (Channel.isChannelPrefix(recipient.charAt(0))) {
             // The recipient is a channel (i.e. the mode of a user in the channel is being changed
             // or possibly the mode of the channel itself)
-            final Channel channel = mUserChannelInterface.getChannel(recipient);
+            final Channel channel = mUserChannelInterface.getChannelIfExists(recipient);
             final int messageLength = parsedArray.size();
             if (messageLength == 4) {
                 // User not specified - therefore channel mode is being changed

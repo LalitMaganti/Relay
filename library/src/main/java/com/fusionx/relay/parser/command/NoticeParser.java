@@ -43,7 +43,7 @@ public class NoticeParser extends CommandParser {
 
     public void onParseChannelNotice(final String channelName, final String sendingNick,
             final String notice) {
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final Channel channel = mUserChannelInterface.getChannelIfExists(channelName);
         final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
         mServerEventBus.postAndStoreEvent(event, channel);
     }
@@ -52,7 +52,7 @@ public class NoticeParser extends CommandParser {
         final PrivateMessageUser user = mUserChannelInterface
                 .getPrivateMessageUserIfExists(sendingNick);
         if (user == null) {
-            mServerEventBus.postAndStoreEvent(new PrivateNoticeEvent(notice, sendingNick), mServer);
+            mServerEventBus.postAndStoreEvent(new PrivateNoticeEvent(notice, sendingNick));
         } else {
             mServerEventBus.postAndStoreEvent(new WorldPrivateMessageEvent(user, notice), user);
         }
