@@ -11,12 +11,14 @@ import com.fusionx.relay.call.ChannelJoinCall;
 import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.QuitCall;
 import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.ServerEvent;
+import com.fusionx.relay.event.user.UserConnectEvent;
 import com.fusionx.relay.event.user.UserDisconnectEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
@@ -104,7 +106,6 @@ public class BaseConnection {
      * Called by the connectToServer method ONLY
      */
     private void connect() {
-        final ServerEventBus sender = mServer.getServerEventBus();
         String disconnectMessage = "";
         try {
             setupSocket();
@@ -135,8 +136,6 @@ public class BaseConnection {
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
                     mServerConfiguration, reader, serverWriter);
             final String nick = parser.parseConnect();
-
-            onConnected(sender);
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
@@ -176,6 +175,8 @@ public class BaseConnection {
         } else {
             mServer.getUser().setNick(nick);
         }
+
+        onConnected();
 
         // Identifies with NickServ if the password exists
         if (Utils.isNotEmpty(mServerConfiguration.getNickservPassword())) {
@@ -223,11 +224,24 @@ public class BaseConnection {
     /**
      * Called when we are connected to the server
      */
-    private void onConnected(final ServerEventBus sender) {
+    private void onConnected() {
         mServer.setStatus(ServerStatus.CONNECTED);
 
+        final ServerEventBus bus = mServer.getServerEventBus();
+
         final ServerEvent event = new ConnectEvent(mServerConfiguration.getUrl());
-        sender.postAndStoreEvent(event);
+        bus.postAndStoreEvent(event);
+
+        for (final Channel channel : mServer.getUser().getChannels()) {
+            final ChannelEvent channelEvent = new ChannelConnectEvent(channel);
+            bus.postAndStoreEvent(channelEvent, channel);
+        }
+
+        for (final PrivateMessageUser user : mServer.getUserChannelInterface()
+                .getPrivateMessageUsers()) {
+            final UserEvent userEvent = new UserConnectEvent(user);
+            bus.postAndStoreEvent(userEvent, user);
+        }
     }
 
     private void sendDisconnectEvents(final String serverMessage, boolean userSent,
@@ -242,14 +256,14 @@ public class BaseConnection {
         mServer.getServerEventBus().postAndStoreEvent(event);
 
         for (final Channel channel : mServer.getUser().getChannels()) {
-            final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel);
-            channel.onChannelEvent(channelEvent);
+            final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel, message);
+            mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
         }
 
         for (final PrivateMessageUser user : mServer.getUserChannelInterface()
                 .getPrivateMessageUsers()) {
-            final UserEvent userEvent = new UserDisconnectEvent(user);
-            user.onUserEvent(userEvent);
+            final UserEvent userEvent = new UserDisconnectEvent(user, message);
+            mServer.getServerEventBus().postAndStoreEvent(userEvent, user);
         }
     }
 

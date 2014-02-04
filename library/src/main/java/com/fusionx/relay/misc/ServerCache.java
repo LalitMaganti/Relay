@@ -2,7 +2,7 @@ package com.fusionx.relay.misc;
 
 public class ServerCache {
 
-    private String mIrcTitle;
+    private String mIrcTitle = "";
 
     public String getIrcTitle() {
         return mIrcTitle;

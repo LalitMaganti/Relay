@@ -10,7 +10,7 @@ import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 
-public class KickParser extends RemoveUserParser {
+class KickParser extends RemoveUserParser {
 
     public KickParser(Server server) {
         super(server);

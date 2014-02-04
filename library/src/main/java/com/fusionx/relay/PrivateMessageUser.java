@@ -21,7 +21,7 @@ public class PrivateMessageUser extends User {
      */
     private boolean mUserQuit;
 
-    protected PrivateMessageUser(final String nick, final List<UserEvent> buffer) {
+    PrivateMessageUser(final String nick, final List<UserEvent> buffer) {
         super(nick, null);
         mBuffer = buffer;
     }

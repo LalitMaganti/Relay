@@ -19,12 +19,11 @@ public class QuitParser extends CommandParser {
         super(server);
     }
 
-    // TODO - split this up
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
         final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
-        if (user.isUserNickEqual(mServer.getUser())) {
+        if (mServer.getUser().isUserNickEqual(user)) {
             onQuit();
         } else {
             onUserQuit(parsedArray, user);
@@ -41,8 +40,8 @@ public class QuitParser extends CommandParser {
             mServerEventBus.postAndStoreEvent(event, channel);
         }
 
-        final PrivateMessageUser pmUser = mUserChannelInterface.getPrivateMessageUserIfExists
-                (user.getNick());
+        final PrivateMessageUser pmUser = mUserChannelInterface.getPrivateMessageUser(user
+                .getNick());
         if (pmUser != null) {
             pmUser.setUserQuit(true);
 

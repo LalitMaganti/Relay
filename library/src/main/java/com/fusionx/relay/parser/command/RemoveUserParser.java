@@ -9,14 +9,14 @@ import java.util.List;
 
 public abstract class RemoveUserParser extends CommandParser {
 
-    public RemoveUserParser(Server server) {
+    RemoveUserParser(Server server) {
         super(server);
     }
 
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String channelName = parsedArray.get(2);
-        final Channel channel = mUserChannelInterface.getChannelIfExists(channelName);
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
         final WorldUser removedUser = getRemovedUser(parsedArray, rawSource);
 
         if (removedUser.isUserNickEqual(mServer.getUser())) {

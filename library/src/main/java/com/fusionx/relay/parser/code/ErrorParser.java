@@ -9,7 +9,7 @@ import java.util.List;
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NOSUCHNICK;
 
-public class ErrorParser extends CodeParser {
+class ErrorParser extends CodeParser {
 
     ErrorParser(Server server) {
         super(server);
@@ -40,7 +40,7 @@ public class ErrorParser extends CodeParser {
     private void onNoSuchNickError(final List<String> parsedArray) {
         final String nick = parsedArray.get(0);
         final String message = parsedArray.get(1);
-        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUserIfExists(nick);
+        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
         mServerEventBus.postAndStoreEvent(new NoSuchNickEvent(user, message), user);
     }
 }

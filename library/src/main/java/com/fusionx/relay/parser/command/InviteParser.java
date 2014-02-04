@@ -5,7 +5,7 @@ import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 
-public class InviteParser extends CommandParser {
+class InviteParser extends CommandParser {
 
     public InviteParser(Server server) {
         super(server);

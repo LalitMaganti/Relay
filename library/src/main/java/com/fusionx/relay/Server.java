@@ -26,9 +26,9 @@ public class Server {
 
     private final ServerConfiguration mConfiguration;
 
-    private ServerEventBus mServerEventBus;
+    private final ServerEventBus mServerEventBus;
 
-    private ServerCallBus mServerCallBus;
+    private final ServerCallBus mServerCallBus;
 
     private AppUser mUser;
 

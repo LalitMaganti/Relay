@@ -4,21 +4,22 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.constants.ServerCommands;
+import com.fusionx.relay.parser.Parser;
 
 import java.util.List;
 import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
 
-public abstract class CommandParser {
+public abstract class CommandParser implements Parser {
 
-    Server mServer;
+    final Server mServer;
 
-    UserChannelInterface mUserChannelInterface;
+    final UserChannelInterface mUserChannelInterface;
 
-    ServerEventBus mServerEventBus;
+    final ServerEventBus mServerEventBus;
 
-    public CommandParser(final Server server) {
+    CommandParser(final Server server) {
         mServer = server;
         mUserChannelInterface = server.getUserChannelInterface();
         mServerEventBus = server.getServerEventBus();

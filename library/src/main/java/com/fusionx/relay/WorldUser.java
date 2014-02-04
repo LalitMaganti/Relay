@@ -14,8 +14,6 @@ import gnu.trove.map.hash.THashMap;
 
 public class WorldUser extends User implements Checkable {
 
-    final Server mServer;
-
     private final Map<Channel, UserLevel> mUserLevelMap;
 
     private final Map<Channel, Spanned> mChannelSpannedMap;
@@ -28,13 +26,12 @@ public class WorldUser extends User implements Checkable {
 
         mUserLevelMap = new THashMap<>();
         mChannelSpannedMap = new THashMap<>();
-        mServer = userChannelInterface.getServer();
 
         // Checkable interface
         mChecked = false;
     }
 
-    public String getPrefixedNick(final Channel channel) {
+    String getPrefixedNick(final Channel channel) {
         return getUserPrefix(channel) + mNick;
     }
 

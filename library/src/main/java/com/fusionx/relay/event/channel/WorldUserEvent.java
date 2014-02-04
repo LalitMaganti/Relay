@@ -7,11 +7,11 @@ public abstract class WorldUserEvent extends ChannelEvent {
 
     public final String nick;
 
-    public WorldUserEvent(final Channel channel, final WorldUser user) {
+    WorldUserEvent(final Channel channel, final WorldUser user) {
         this(channel, user != null ? user.getPrettyNick(channel) : null);
     }
 
-    protected WorldUserEvent(final Channel channel, final String nick) {
+    WorldUserEvent(final Channel channel, final String nick) {
         super(channel);
 
         // NICK should never be null

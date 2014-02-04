@@ -2,9 +2,9 @@ package com.fusionx.relay.event.user;
 
 import com.fusionx.relay.PrivateMessageUser;
 
-public class WorldPrivateEvent extends UserEvent {
+public abstract class WorldPrivateEvent extends UserEvent {
 
-    public WorldPrivateEvent(PrivateMessageUser user) {
+    WorldPrivateEvent(PrivateMessageUser user) {
         super(user);
     }
 }

@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NONICKNAMEGIVEN;
@@ -56,7 +56,7 @@ public class ServerConnectionParser {
         final ServerEventBus eventBus = mServer.getServerEventBus();
 
         while ((line = mBufferedReader.readLine()) != null) {
-            final ArrayList<String> parsedArray = IRCUtils.splitRawLine(line, true);
+            final List<String> parsedArray = IRCUtils.splitRawLine(line, true);
             String s = parsedArray.get(0);
             switch (s) {
                 case ServerCommands.PING:
@@ -87,7 +87,7 @@ public class ServerConnectionParser {
     }
 
     private String parseConnectionCode(final boolean canChangeNick,
-            final ArrayList<String> parsedArray, final ServerEventBus sender,
+            final List<String> parsedArray, final ServerEventBus sender,
             final NickStorage nickStorage) {
         final int code = Integer.parseInt(parsedArray.get(1));
         switch (code) {
@@ -127,7 +127,7 @@ public class ServerConnectionParser {
         return null;
     }
 
-    private void parseConnectionCommand(final ArrayList<String> parsedArray,
+    private void parseConnectionCommand(final List<String> parsedArray,
             final ServerEventBus sender) {
         final String command = parsedArray.get(1).toUpperCase();
         IRCUtils.removeFirstElementFromList(parsedArray, 3);

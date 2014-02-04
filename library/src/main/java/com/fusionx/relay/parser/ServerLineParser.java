@@ -3,10 +3,7 @@ package com.fusionx.relay.parser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.connection.BaseConnection;
 import com.fusionx.relay.constants.ServerCommands;
-import com.fusionx.relay.event.Event;
-import com.fusionx.relay.event.server.ErrorEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
-import com.fusionx.relay.event.server.QuitEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.server.WhoisEvent;
 import com.fusionx.relay.misc.CoreListener;
@@ -23,7 +20,6 @@ import android.util.SparseArray;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +39,7 @@ public class ServerLineParser {
 
     private ServerWriter mWriter;
 
-    public String mLine;
+    private String mLine;
 
     public ServerLineParser(final Server server, final BaseConnection connection) {
         mServer = server;
@@ -55,17 +51,16 @@ public class ServerLineParser {
     /**
      * A loop which reads each line from the server as it is received and passes it on to parse
      *
-     * @param reader - the reader associated with the server stream
+     * @param reader the reader associated with the server stream
+     * @param writer the writer to write to the server
      */
     public void parseMain(final BufferedReader reader, final ServerWriter writer) throws
             IOException {
         mWriter = writer;
 
-        String line;
-        while ((line = reader.readLine()) != null && !mBaseConnection.isUserDisconnected()) {
-            mLine = line;
-            final Event quit = parseLine(line);
-            if (quit instanceof QuitEvent || quit instanceof ErrorEvent) {
+        while ((mLine = reader.readLine()) != null && !mBaseConnection.isUserDisconnected()) {
+            final boolean quit = parseLine();
+            if (quit) {
                 return;
             }
         }
@@ -74,11 +69,10 @@ public class ServerLineParser {
     /**
      * Parses a line from the server
      *
-     * @param rawLine the raw line from the server
-     * @return returns a boolean which indicates whether the server has disconnected
+     * @return a boolean indicating whether the server has disconnected
      */
-    Event parseLine(final String rawLine) {
-        final ArrayList<String> parsedArray = IRCUtils.splitRawLine(rawLine, true);
+    boolean parseLine() {
+        final List<String> parsedArray = IRCUtils.splitRawLine(mLine, true);
         // For stupid servers that send blank lines - like seriously - why??
         if (!parsedArray.isEmpty()) {
             String command = parsedArray.get(0);
@@ -91,18 +85,17 @@ public class ServerLineParser {
                 case ServerCommands.ERROR:
                     // We are finished - the server has kicked us
                     // out for some reason
-                    return new ErrorEvent(rawLine);
+                    return true;
                 default:
                     // Check if the second thing is a code or a command
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
-                        onParseServerCode(rawLine, parsedArray);
-                        //mCodeParser.onParseCode(parsedArray);
-                    } else if (!onParseServerCommand(parsedArray)) {
-                        return new QuitEvent();
+                        onParseServerCode(mLine, parsedArray);
+                    } else {
+                        return onParseServerCommand(parsedArray);
                     }
             }
         }
-        return new Event();
+        return false;
     }
 
     // The server is sending a command to us - parse what it is
@@ -116,11 +109,10 @@ public class ServerLineParser {
 
         if (parser instanceof QuitParser) {
             final QuitParser quitParser = (QuitParser) parser;
-            if (quitParser.isUserQuit()) {
-                return false;
-            }
+            return quitParser.isUserQuit();
         }
-        return true;
+
+        return false;
     }
 
     private void onParseServerCode(final String rawLine, final List<String> parsedArray) {
@@ -144,13 +136,9 @@ public class ServerLineParser {
             if (parser != null) {
                 parser.onParseCode(code, parsedArray);
             } else {
-                Log.e("HoloIRC", rawLine);
+                Log.d("HoloIRC", rawLine);
             }
         }
-    }
-
-    public Server getServer() {
-        return mServer;
     }
 
     public String getCurrentLine() {

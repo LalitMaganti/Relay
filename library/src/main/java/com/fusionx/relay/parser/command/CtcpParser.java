@@ -14,7 +14,7 @@ import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 
-public class CtcpParser extends CommandParser {
+class CtcpParser extends CommandParser {
 
     public CtcpParser(Server server) {
         super(server);
@@ -52,9 +52,9 @@ public class CtcpParser extends CommandParser {
     }
 
     private void onParseUserAction(final String nick, final String action) {
-        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUserIfExists(nick);
+        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
         if (user == null) {
-            mUserChannelInterface.getNewPrivateMessageUser(nick, action, true);
+            mUserChannelInterface.addNewPrivateMessageUser(nick, action, true);
             mServerEventBus.post(new SwitchToPrivateMessage(nick));
         } else {
             mServerEventBus.postAndStoreEvent(new WorldPrivateActionEvent(user, action), user);
@@ -63,7 +63,7 @@ public class CtcpParser extends CommandParser {
 
     private void onParseChannelAction(final String channelName, final String userNick,
             final String action) {
-        final Channel channel = mUserChannelInterface.getChannelIfExists(channelName);
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
         final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(userNick);
         final ChannelEvent event = new WorldActionEvent(channel, action, sendingUser,
                 userNick);

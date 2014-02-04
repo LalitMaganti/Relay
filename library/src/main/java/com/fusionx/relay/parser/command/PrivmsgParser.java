@@ -15,7 +15,7 @@ import java.util.List;
 
 public class PrivmsgParser extends CommandParser {
 
-    private CtcpParser mCtcpParser;
+    private final CtcpParser mCtcpParser;
 
     public PrivmsgParser(final Server server, final CtcpParser ctcpParser) {
         super(server);
@@ -44,9 +44,9 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUserIfExists(nick);
+        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
         if (user == null) {
-            mUserChannelInterface.getNewPrivateMessageUser(nick, message, false);
+            mUserChannelInterface.addNewPrivateMessageUser(nick, message, false);
             mServerEventBus.post(new SwitchToPrivateMessage(nick));
         } else {
             mServerEventBus.postAndStoreEvent(new WorldPrivateMessageEvent(user, message), user);
@@ -56,7 +56,7 @@ public class PrivmsgParser extends CommandParser {
     private void onParseChannelMessage(final String sendingNick, final String channelName,
             final String message) {
         final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
-        final Channel channel = mUserChannelInterface.getChannelIfExists(channelName);
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
         // This occurs rarely - usually on BNCs - for example the ZNC buffer starts with a
         // PRIVMSG from the nick ***. Also if someone said something on the channel during
         // the buffer but is not in the channel now then this will also happen

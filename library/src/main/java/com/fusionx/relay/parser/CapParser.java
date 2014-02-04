@@ -1,6 +1,5 @@
 package com.fusionx.relay.parser;
 
-import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.constants.ServerReplyCodes;
@@ -9,18 +8,18 @@ import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.writers.ServerWriter;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class CapParser {
 
-    static void parseCommand(final ArrayList<String> parsedArray, final ServerConfiguration
+    static void parseCommand(final List<String> parsedArray, final ServerConfiguration
             configuration, final ServerEventBus sender, final ServerWriter writer) {
         final String command = parsedArray.get(0);
         if (command.equals("AUTHENTICATE")) {
             writer.sendSaslAuthentication(configuration.getSaslUsername(),
                     configuration.getSaslPassword());
         } else {
-            final ArrayList<String> capabilities = IRCUtils.splitRawLine(parsedArray.get(1), true);
+            final List<String> capabilities = IRCUtils.splitRawLine(parsedArray.get(1), true);
             if (capabilities.contains("sasl")) {
                 switch (command) {
                     case "LS":
@@ -47,7 +46,7 @@ class CapParser {
         }
     }
 
-    static void parseCode(final int code, final ArrayList<String> parsedArray,
+    static void parseCode(final int code, final List<String> parsedArray,
                           final ServerEventBus sender, final ServerWriter writer) {
         final ServerEvent event;
         switch (code) {

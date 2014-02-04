@@ -6,7 +6,7 @@ import com.fusionx.relay.constants.UserLevel;
 
 public class WorldLevelChangeEvent extends WorldUserEvent {
 
-    public final UserLevel level;
+    private final UserLevel level;
 
     public final String rawMode;
 

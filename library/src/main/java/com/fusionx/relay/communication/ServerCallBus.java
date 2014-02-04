@@ -89,9 +89,9 @@ public class ServerCallBus extends Bus {
         }
 
         final PrivateMessageUser user = getServer().getUserChannelInterface()
-                .getPrivateMessageUserIfExists(nick);
+                .getPrivateMessageUser(nick);
         if (user == null) {
-            getServer().getUserChannelInterface().getNewPrivateMessageUser(nick, message, false);
+            getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, message, false);
             getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
         } else {
             getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
@@ -108,9 +108,9 @@ public class ServerCallBus extends Bus {
         }
 
         final PrivateMessageUser user = getServer().getUserChannelInterface()
-                .getPrivateMessageUserIfExists(nick);
+                .getPrivateMessageUser(nick);
         if (user == null) {
-            getServer().getUserChannelInterface().getNewPrivateMessageUser(nick, action, true);
+            getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, action, true);
             getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
         } else {
             getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
@@ -141,7 +141,7 @@ public class ServerCallBus extends Bus {
         post(new ChannelMessageCall(channelName, message));
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final Channel channel = getServer().getUserChannelInterface().getChannelIfExists(
+            final Channel channel = getServer().getUserChannelInterface().getChannel(
                     channelName);
             final ChannelEvent event = new MessageEvent(channel, message,
                     getServer().getUser().getPrettyNick(channel));
@@ -159,7 +159,7 @@ public class ServerCallBus extends Bus {
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
             final Channel channel = getServer().getUserChannelInterface()
-                    .getChannelIfExists(channelName);
+                    .getChannel(channelName);
             final ChannelEvent event = new ActionEvent(channel, action,
                     getServer().getUser().getPrettyNick(channel));
             getServer().getServerEventBus().postAndStoreEvent(event, channel);

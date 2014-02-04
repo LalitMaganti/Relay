@@ -4,13 +4,13 @@ import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.util.IRCUtils;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class UserInputParser {
 
     public static void onParseChannelMessage(final Server server, final String channelName,
             final String message) {
-        final ArrayList<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 
@@ -63,11 +63,11 @@ public class UserInputParser {
 
     public static void onParseUserMessage(final Server server, final String userNick,
             final String message) {
-        final ArrayList<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
         final PrivateMessageUser user = server.getUserChannelInterface()
-                .getPrivateMessageUserIfExists(userNick);
+                .getPrivateMessageUser(userNick);
 
         if (command.startsWith("/")) {
             switch (command) {
@@ -103,7 +103,7 @@ public class UserInputParser {
 
     private static void onParseServerCommand(final Server server,
             final String rawLine) {
-        final ArrayList<String> parsedArray = IRCUtils.splitRawLine(rawLine, false);
+        final List<String> parsedArray = IRCUtils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 

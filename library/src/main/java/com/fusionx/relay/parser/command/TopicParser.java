@@ -17,7 +17,7 @@ public class TopicParser extends CommandParser {
     @Override
     public void onParseCommand(List<String> parsedArray, String rawSource) {
         final WorldUser user = mUserChannelInterface.getUserFromRaw(rawSource);
-        final Channel channel = mUserChannelInterface.getChannelIfExists(parsedArray.get(2));
+        final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
         final String newTopic = parsedArray.get(3);
 
         final ChannelEvent event = new TopicEvent(channel, user, newTopic);

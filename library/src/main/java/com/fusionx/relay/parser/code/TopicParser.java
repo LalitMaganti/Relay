@@ -8,7 +8,7 @@ import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 
-public class TopicParser extends CodeParser {
+class TopicParser extends CodeParser {
 
     private String tempTopic;
 
@@ -32,9 +32,7 @@ public class TopicParser extends CodeParser {
     private void onTopicInfo(final List<String> parsedArray) {
         final String channelName = parsedArray.get(0);
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
-        final Channel channel = mUserChannelInterface.getChannelIfExists(channelName);
-        //final String eventMessage = InterfaceHolders.getEventResponses().getInitialTopicMessage
-        //        (channel.getTopic(), nick);
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
 
         final InitialTopicEvent topicEvent = new InitialTopicEvent(channel, nick, tempTopic);
         mServerEventBus.postAndStoreEvent(topicEvent, channel);

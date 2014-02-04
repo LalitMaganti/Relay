@@ -25,7 +25,7 @@ public class Channel {
 
     private final UserChannelInterface mUserChannelInterface;
 
-    protected Channel(final String channelName, final List<ChannelEvent> buffer) {
+    Channel(final String channelName, final List<ChannelEvent> buffer) {
         mName = channelName;
         mBuffer = buffer;
         mNumberOfUsers = null;
@@ -93,7 +93,7 @@ public class Channel {
      *
      * @return the number of users in the channel
      */
-    public int getNumberOfUsers() {
+    int getNumberOfUsers() {
         if (getUsers() != null) {
             return getUsers().size();
         } else {

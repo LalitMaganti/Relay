@@ -11,9 +11,9 @@ import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 
-public class NoticeParser extends CommandParser {
+class NoticeParser extends CommandParser {
 
-    private CtcpParser mCtcpParser;
+    private final CtcpParser mCtcpParser;
 
     public NoticeParser(Server server, final CtcpParser ctcpParser) {
         super(server);
@@ -41,16 +41,16 @@ public class NoticeParser extends CommandParser {
         }
     }
 
-    public void onParseChannelNotice(final String channelName, final String sendingNick,
-            final String notice) {
-        final Channel channel = mUserChannelInterface.getChannelIfExists(channelName);
+    void onParseChannelNotice(final String channelName, final String sendingNick,
+                              final String notice) {
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
         final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
         mServerEventBus.postAndStoreEvent(event, channel);
     }
 
-    public void onParseUserNotice(final String sendingNick, final String notice) {
+    void onParseUserNotice(final String sendingNick, final String notice) {
         final PrivateMessageUser user = mUserChannelInterface
-                .getPrivateMessageUserIfExists(sendingNick);
+                .getPrivateMessageUser(sendingNick);
         if (user == null) {
             mServerEventBus.postAndStoreEvent(new PrivateNoticeEvent(notice, sendingNick));
         } else {

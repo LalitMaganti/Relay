@@ -6,13 +6,13 @@ public final class ServerReplyCodes {
 
     public static final int RPL_WELCOME = 1;
 
-    public static final int RPL_YOURHOST = 2;
+    private static final int RPL_YOURHOST = 2;
 
-    public static final int RPL_CREATED = 3;
+    private static final int RPL_CREATED = 3;
 
-    public static final int RPL_MYINFO = 4;
+    private static final int RPL_MYINFO = 4;
 
-    public static final int RPL_PROTOCTL = 5;
+    private static final int RPL_PROTOCTL = 5;
 
     public static final int RPL_TRACELINK = 200;
 
@@ -82,17 +82,17 @@ public final class ServerReplyCodes {
 
     public static final int RPL_STATSDEBUG = 249;
 
-    public static final int RPL_STATSCONN = 250;
+    private static final int RPL_STATSCONN = 250;
 
-    public static final int RPL_LUSERCLIENT = 251;
+    private static final int RPL_LUSERCLIENT = 251;
 
-    public static final int RPL_LUSEROP = 252;
+    private static final int RPL_LUSEROP = 252;
 
-    public static final int RPL_LUSERUNKNOWN = 253;
+    private static final int RPL_LUSERUNKNOWN = 253;
 
-    public static final int RPL_LUSERCHANNELS = 254;
+    private static final int RPL_LUSERCHANNELS = 254;
 
-    public static final int RPL_LUSERME = 255;
+    private static final int RPL_LUSERME = 255;
 
     public static final int RPL_ADMINME = 256;
 
@@ -104,9 +104,9 @@ public final class ServerReplyCodes {
 
     public static final int RPL_TRACELOG = 261;
 
-    public static final int RPL_LOCALUSERS = 265;
+    private static final int RPL_LOCALUSERS = 265;
 
-    public static final int RPL_GLOBALUSERS = 266;
+    private static final int RPL_GLOBALUSERS = 266;
 
     public static final int RPL_SILELIST = 271;
 
@@ -136,9 +136,9 @@ public final class ServerReplyCodes {
 
     public static final int RPL_TEXT = 304;
 
-    public static final int RPL_UNAWAY = 305;
+    private static final int RPL_UNAWAY = 305;
 
-    public static final int RPL_NOWAWAY = 306;
+    private static final int RPL_NOWAWAY = 306;
 
     public static final int RPL_WHOISREGNICK = 307;
 
@@ -148,23 +148,23 @@ public final class ServerReplyCodes {
 
     public static final int RPL_WHOISHELPOP = 310;
 
-    public static final int RPL_WHOISUSER = 311;
+    private static final int RPL_WHOISUSER = 311;
 
-    public static final int RPL_WHOISSERVER = 312;
+    private static final int RPL_WHOISSERVER = 312;
 
-    public static final int RPL_WHOISOPERATOR = 313;
+    private static final int RPL_WHOISOPERATOR = 313;
 
     public static final int RPL_WHOWASUSER = 314;
 
     public static final int RPL_ENDOFWHO = 315;
 
-    public static final int RPL_WHOISCHANOP = 316;
+    private static final int RPL_WHOISCHANOP = 316;
 
-    public static final int RPL_WHOISIDLE = 317;
+    private static final int RPL_WHOISIDLE = 317;
 
-    public static final int RPL_ENDOFWHOIS = 318;
+    private static final int RPL_ENDOFWHOIS = 318;
 
-    public static final int RPL_WHOISCHANNELS = 319;
+    private static final int RPL_WHOISCHANNELS = 319;
 
     public static final int RPL_LISTSTART = 321;
 
@@ -272,7 +272,7 @@ public final class ServerReplyCodes {
 
     public static final int ERR_UNKNOWNCOMMAND = 421;
 
-    public static final int ERR_NOMOTD = 422;
+    private static final int ERR_NOMOTD = 422;
 
     public static final int ERR_NOADMININFO = 423;
 

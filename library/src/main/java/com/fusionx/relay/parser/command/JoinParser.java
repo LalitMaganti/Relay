@@ -11,7 +11,7 @@ import com.fusionx.relay.event.server.ServerEvent;
 
 import java.util.List;
 
-public class JoinParser extends CommandParser {
+class JoinParser extends CommandParser {
 
     public JoinParser(final Server server) {
         super(server);

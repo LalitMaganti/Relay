@@ -11,7 +11,7 @@ import java.util.List;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_MOTD;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_MOTDSTART;
 
-public class MotdParser extends CodeParser {
+class MotdParser extends CodeParser {
 
     MotdParser(final Server server) {
         super(server);

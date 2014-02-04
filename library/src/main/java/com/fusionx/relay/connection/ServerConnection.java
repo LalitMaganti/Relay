@@ -8,6 +8,9 @@ import com.fusionx.relay.event.server.DisconnectEvent;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+/**
+ * A wrapper thread class for the interesting {@link BaseConnection} class
+ */
 public class ServerConnection extends Thread {
 
     private final Server mServer;
@@ -16,7 +19,7 @@ public class ServerConnection extends Thread {
 
     private final Handler mUiThreadHandler;
 
-    private Handler mServerCallHandler;
+    private final Handler mServerCallHandler;
 
     ServerConnection(final ServerConfiguration configuration, final Handler handler) {
         final HandlerThread handlerThread = new HandlerThread("ServerCalls");

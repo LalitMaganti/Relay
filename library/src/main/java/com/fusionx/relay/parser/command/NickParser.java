@@ -13,7 +13,7 @@ import com.fusionx.relay.util.IRCUtils;
 import java.util.Collection;
 import java.util.List;
 
-public class NickParser extends CommandParser {
+class NickParser extends CommandParser {
 
     public NickParser(final Server server) {
         super(server);

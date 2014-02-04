@@ -8,12 +8,11 @@ import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.NameEvent;
 import com.fusionx.relay.util.IRCUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_NAMREPLY;
 
-public class NameParser extends CodeParser {
+class NameParser extends CodeParser {
 
     private final UserChannelInterface mUserChannelInterface;
 
@@ -27,9 +26,9 @@ public class NameParser extends CodeParser {
 
     private void onParseNameReply(final List<String> parsedArray) {
         if (mChannel == null) {
-            mChannel = mUserChannelInterface.getChannelIfExists(parsedArray.get(1));
+            mChannel = mUserChannelInterface.getChannel(parsedArray.get(1));
         }
-        final ArrayList<String> listOfUsers = IRCUtils.splitRawLine(parsedArray.get(2), false);
+        final List<String> listOfUsers = IRCUtils.splitRawLine(parsedArray.get(2), false);
         for (final String rawNick : listOfUsers) {
             final UserLevel level = UserLevel.getLevelFromPrefix(rawNick.charAt(0));
             final String nick = level == UserLevel.NONE ? rawNick : rawNick.substring(1);

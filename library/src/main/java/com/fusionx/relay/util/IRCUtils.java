@@ -48,9 +48,8 @@ public class IRCUtils {
      * @param colonDelimiter whether a colon means the rest of the line should be added in one go
      * @return the parsed list
      */
-    public static ArrayList<String> splitRawLine(final String input,
-            final boolean colonDelimiter) {
-        final ArrayList<String> stringParts = new ArrayList<String>();
+    public static List<String> splitRawLine(final String input, final boolean colonDelimiter) {
+        final List<String> stringParts = new ArrayList<>();
         if (input == null || input.length() == 0) {
             return stringParts;
         }

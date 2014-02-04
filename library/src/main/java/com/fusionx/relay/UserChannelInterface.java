@@ -34,7 +34,7 @@ public final class UserChannelInterface {
     }
 
     public synchronized void coupleUserAndChannel(final WorldUser user, final Channel channel,
-            final UserLevel userLevel) {
+                                                  final UserLevel userLevel) {
         user.onModeChanged(channel, userLevel);
         addChannelToUser(user, channel);
         addUserToChannel(user, channel);
@@ -53,7 +53,7 @@ public final class UserChannelInterface {
         setOfChannels.add(channel);
     }
 
-    public synchronized void addUserToChannel(final WorldUser user, final Channel channel) {
+    synchronized void addUserToChannel(final WorldUser user, final Channel channel) {
         Collection<WorldUser> setOfUsers = mChannelToUserMap.get(channel);
         if (setOfUsers == null) {
             setOfUsers = new THashSet<>();
@@ -79,7 +79,7 @@ public final class UserChannelInterface {
         }
     }
 
-    public void removeChannelFromUser(final Channel channel, final WorldUser user) {
+    void removeChannelFromUser(final Channel channel, final WorldUser user) {
         final Collection<Channel> setOfChannels = mUserToChannelMap.get(user);
         // The app user check is to make sure that the list of channels returned for the app user
         // is never null
@@ -120,8 +120,8 @@ public final class UserChannelInterface {
     }
 
     public synchronized Channel getChannelFromSnapshot(final String name,
-            final ChannelSnapshot snapshot) {
-        final Channel channel = getChannelIfExists(name);
+                                                       final ChannelSnapshot snapshot) {
+        final Channel channel = getChannel(name);
         if (channel != null) {
             return channel;
         } else if (snapshot != null) {
@@ -141,7 +141,7 @@ public final class UserChannelInterface {
         return null;
     }
 
-    public synchronized Channel getChannelIfExists(final String name) {
+    public synchronized Channel getChannel(final String name) {
         for (final Channel channel : mChannelToUserMap.keySet()) {
             // Channel names have to unique disregarding case - not having ignore-case here leads
             // to null channels when the channel does actually exist
@@ -152,7 +152,7 @@ public final class UserChannelInterface {
         return null;
     }
 
-    public PrivateMessageUser getPrivateMessageUserIfExists(final String nick) {
+    public PrivateMessageUser getPrivateMessageUser(final String nick) {
         for (final PrivateMessageUser user : mPrivateMessageUsers) {
             if (nick.equals(user.getNick())) {
                 return user;
@@ -165,11 +165,10 @@ public final class UserChannelInterface {
         return mPrivateMessageUsers;
     }
 
-    public PrivateMessageUser getNewPrivateMessageUser(final String nick, final String message,
-            final boolean action) {
+    public void addNewPrivateMessageUser(final String nick, final String message,
+                                                       final boolean action) {
         final PrivateMessageUser user = new PrivateMessageUser(nick, this, message, action);
         mPrivateMessageUsers.add(user);
-        return user;
     }
 
     public void removePrivateMessageUser(final PrivateMessageUser user) {
