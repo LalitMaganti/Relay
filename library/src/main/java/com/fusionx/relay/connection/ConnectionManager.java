@@ -54,7 +54,7 @@ public class ConnectionManager {
             connection = mConnectionMap.get(configuration.getTitle());
         } else {
             connection = new ServerConnection(configuration, errorHandler);
-            connection.start();
+            connection.connect();
             mConnectionMap.put(configuration.getTitle(), connection);
         }
         return new Pair<>(existingServer, connection.getServer());

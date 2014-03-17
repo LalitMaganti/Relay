@@ -4,7 +4,6 @@ import com.fusionx.relay.communication.ServerCallBus;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.connection.ServerConnection;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.misc.ServerCache;
 import com.fusionx.relay.writers.ChannelWriter;
 import com.fusionx.relay.writers.ServerWriter;
 import com.fusionx.relay.writers.UserWriter;
@@ -16,13 +15,11 @@ import java.util.List;
 
 public class Server {
 
-    private final String mTitle;
+    private final ServerConnection mServerConnection;
 
     private final UserChannelInterface mUserChannelInterface;
 
     private final List<ServerEvent> mBuffer;
-
-    private final ServerCache mServerCache;
 
     private final ServerConfiguration mConfiguration;
 
@@ -32,16 +29,12 @@ public class Server {
 
     private AppUser mUser;
 
-    private ServerStatus mStatus;
-
     private List<String> mIgnoreList;
 
     public Server(final ServerConfiguration configuration, final ServerConnection connection) {
-        mStatus = ServerStatus.DISCONNECTED;
+        mServerConnection = connection;
         mConfiguration = configuration;
-        mTitle = configuration.getTitle();
         mBuffer = new ArrayList<>();
-        mServerCache = new ServerCache();
         mServerEventBus = new ServerEventBus(this);
         mServerCallBus = new ServerCallBus(connection);
         mUserChannelInterface = new UserChannelInterface(this);
@@ -68,7 +61,7 @@ public class Server {
     public boolean equals(Object o) {
         if (o instanceof Server) {
             final Server server = (Server) o;
-            return server.getTitle().equals(mTitle);
+            return server.getTitle().equals(getTitle());
         }
         return false;
     }
@@ -112,20 +105,12 @@ public class Server {
         mUser = user;
     }
 
-    String getTitle() {
-        return mTitle;
+    public String getTitle() {
+        return mConfiguration.getTitle();
     }
 
-    public ServerStatus getStatus() {
-        return mStatus;
-    }
-
-    public void setStatus(final ServerStatus status) {
-        mStatus = status;
-    }
-
-    public ServerCache getServerCache() {
-        return mServerCache;
+    public ConnectionStatus getStatus() {
+        return mServerConnection.getStatus();
     }
 
     public ServerCallBus getServerCallBus() {
@@ -134,9 +119,5 @@ public class Server {
 
     public ServerEventBus getServerEventBus() {
         return mServerEventBus;
-    }
-
-    public ServerConfiguration getConfiguration() {
-        return mConfiguration;
     }
 }

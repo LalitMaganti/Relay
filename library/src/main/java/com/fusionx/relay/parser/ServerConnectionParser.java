@@ -98,16 +98,16 @@ public class ServerConnectionParser {
                 return nick;
             case ERR_NICKNAMEINUSE:
                 if (!triedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
-                    mWriter.changeNick(new NickChangeCall(nickStorage.getSecondChoiceNick()));
+                    mWriter.sendNick(new NickChangeCall(nickStorage.getSecondChoiceNick()));
                     triedSecondNick = true;
                 } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage
                         .getThirdChoiceNick())) {
-                    mWriter.changeNick(new NickChangeCall(nickStorage.getThirdChoiceNick()));
+                    mWriter.sendNick(new NickChangeCall(nickStorage.getThirdChoiceNick()));
                     triedThirdNick = true;
                 } else {
                     if (canChangeNick) {
                         ++suffix;
-                        mWriter.changeNick(new NickChangeCall(nickStorage.getFirstChoiceNick() +
+                        mWriter.sendNick(new NickChangeCall(nickStorage.getFirstChoiceNick() +
                                 suffix));
                     } else {
                         // TODO - fix this
@@ -116,7 +116,7 @@ public class ServerConnectionParser {
                 }
                 break;
             case ERR_NONICKNAMEGIVEN:
-                mWriter.changeNick(new NickChangeCall(nickStorage.getFirstChoiceNick()));
+                mWriter.sendNick(new NickChangeCall(nickStorage.getFirstChoiceNick()));
                 break;
             default:
                 if (saslCodes.contains(code)) {

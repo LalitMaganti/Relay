@@ -5,13 +5,14 @@ import com.google.common.collect.ImmutableList;
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldJoinEvent;
+import com.fusionx.relay.interfaces.SubServerObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 
-public class Channel {
+public class Channel implements SubServerObject<ChannelEvent> {
 
     // Static stuff
     private final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',
@@ -170,8 +171,19 @@ public class Channel {
      *
      * @return a list of the messages
      */
+    @Override
     public List<ChannelEvent> getBuffer() {
         return mBuffer;
+    }
+
+    @Override
+    public String getId() {
+        return mName;
+    }
+
+    @Override
+    public Server getServer() {
+        return mUserChannelInterface.getServer();
     }
 
     /**

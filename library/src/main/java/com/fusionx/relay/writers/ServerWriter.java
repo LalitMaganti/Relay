@@ -26,7 +26,7 @@ public class ServerWriter extends RawWriter {
     }
 
     @Subscribe
-    public void changeNick(final NickChangeCall nickChangeEvent) {
+    public void sendNick(final NickChangeCall nickChangeEvent) {
         writeLineToServer("NICK " + nickChangeEvent.newNick);
     }
 

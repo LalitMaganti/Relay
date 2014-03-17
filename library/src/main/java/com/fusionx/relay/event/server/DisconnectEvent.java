@@ -1,6 +1,6 @@
 package com.fusionx.relay.event.server;
 
-public class DisconnectEvent extends ServerEvent {
+public class DisconnectEvent extends StatusChangeEvent {
 
     public final String serverMessage;
 

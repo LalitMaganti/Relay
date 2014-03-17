@@ -1,6 +1,6 @@
 package com.fusionx.relay;
 
-public enum ServerStatus {
+public enum ConnectionStatus {
     DISCONNECTED,
     CONNECTING,
     CONNECTED

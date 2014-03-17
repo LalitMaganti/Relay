@@ -4,7 +4,6 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.constants.ServerReplyCodes;
-import com.fusionx.relay.parser.Parser;
 
 import android.util.SparseArray;
 
@@ -18,7 +17,7 @@ import static com.fusionx.relay.constants.ServerReplyCodes.RPL_MOTD;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_MOTDSTART;
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_NAMREPLY;
 
-public abstract class CodeParser implements Parser {
+public abstract class CodeParser {
 
     final UserChannelInterface mUserChannelInterface;
 

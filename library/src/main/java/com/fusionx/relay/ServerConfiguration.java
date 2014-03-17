@@ -262,6 +262,12 @@ public class ServerConfiguration implements Parcelable {
         private final ArrayList<String> mAutoJoinChannels;
 
         /**
+         * An integer identifier for this server - not used by the library but useful for storing
+         * Builders in a database
+         */
+        private int mId;
+
+        /**
          * The informal name of the server that is being connected to
          */
         private String mTitle;
@@ -336,11 +342,11 @@ public class ServerConfiguration implements Parcelable {
             mSsl = false;
             mSslAcceptAllCertificates = false;
 
-            mNickStorage = new NickStorage("androidirclibrary", "", "");
+            mNickStorage = new NickStorage("relay", "", "");
             mRealName = "";
             mNickChangeable = true;
 
-            mServerUserName = "androidirclibrary";
+            mServerUserName = "relay";
             mServerPassword = "";
 
             mSaslUsername = "";
@@ -426,6 +432,14 @@ public class ServerConfiguration implements Parcelable {
         }
 
         // Getters and setters
+        public int getId() {
+            return mId;
+        }
+
+        public void setId(int id) {
+            mId = id;
+        }
+
         public String getTitle() {
             return mTitle;
         }

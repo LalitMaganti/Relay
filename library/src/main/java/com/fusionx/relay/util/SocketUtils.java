@@ -1,5 +1,10 @@
 package com.fusionx.relay.util;
 
+import com.fusionx.relay.ServerConfiguration;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -11,9 +16,9 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class SSLUtils {
+public class SocketUtils {
 
-    public static SSLSocketFactory getSSLSocketFactory(final boolean acceptAll) {
+    private static SSLSocketFactory getSSLSocketFactory(final boolean acceptAll) {
         if (acceptAll) {
             try {
                 final TrustManager[] tm = new TrustManager[]{new X509TrustManager() {
@@ -38,5 +43,24 @@ public class SSLUtils {
             }
         }
         return (SSLSocketFactory) SSLSocketFactory.getDefault();
+    }
+
+    public static Socket openSocketConnection(final ServerConfiguration configuration) throws
+            IOException {
+        final Socket socket;
+        final InetSocketAddress address = new InetSocketAddress(configuration.getUrl(),
+                configuration.getPort());
+        if (configuration.isSslEnabled()) {
+            final SSLSocketFactory sslSocketFactory = getSSLSocketFactory(configuration
+                    .shouldAcceptAllSSLCertificates());
+            socket = sslSocketFactory.createSocket();
+        } else {
+            socket = new Socket();
+        }
+
+        socket.setKeepAlive(true);
+        socket.connect(address, 5000);
+
+        return socket;
     }
 }
