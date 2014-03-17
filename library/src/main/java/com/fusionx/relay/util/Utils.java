@@ -1,11 +1,9 @@
 package com.fusionx.relay.util;
 
-public class Utils {
-    public static boolean isEmpty(final CharSequence cs) {
-        return cs == null || cs.length() == 0;
-    }
+import android.text.TextUtils;
 
+public class Utils {
     public static boolean isNotEmpty(final CharSequence cs) {
-        return !isEmpty(cs);
+        return !TextUtils.isEmpty(cs);
     }
 }

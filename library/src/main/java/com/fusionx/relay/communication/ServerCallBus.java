@@ -22,11 +22,10 @@ import com.fusionx.relay.event.channel.MessageEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.RawWriter;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -84,7 +83,7 @@ public class ServerCallBus extends Bus {
     }
 
     public void sendMessageToUser(final String nick, final String message) {
-        if (StringUtils.isNotEmpty(message)) {
+        if (Utils.isNotEmpty(message)) {
             post(new PrivateMessageCall(nick, message));
         }
 
@@ -95,7 +94,7 @@ public class ServerCallBus extends Bus {
             getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
         } else {
             getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
-            if (StringUtils.isNotEmpty(message)) {
+            if (Utils.isNotEmpty(message)) {
                 getServer().getServerEventBus().postAndStoreEvent(new PrivateMessageEvent(user,
                         getServer().getUser(), message), user);
             }
@@ -103,7 +102,7 @@ public class ServerCallBus extends Bus {
     }
 
     public void sendActionToUser(final String nick, final String action) {
-        if (StringUtils.isNotEmpty(action)) {
+        if (Utils.isNotEmpty(action)) {
             post(new PrivateActionCall(nick, action));
         }
 
@@ -114,7 +113,7 @@ public class ServerCallBus extends Bus {
             getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
         } else {
             getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
-            if (StringUtils.isNotEmpty(action)) {
+            if (Utils.isNotEmpty(action)) {
                 getServer().getServerEventBus().postAndStoreEvent(new PrivateActionEvent(user,
                         getServer().getUser(), action), user);
             }

@@ -9,8 +9,7 @@ import com.fusionx.relay.call.VersionCall;
 import com.fusionx.relay.call.WhoisCall;
 import com.squareup.otto.Subscribe;
 
-import org.apache.commons.lang3.StringUtils;
-
+import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.Writer;
@@ -37,7 +36,7 @@ public class ServerWriter extends RawWriter {
 
     @Subscribe
     public void quitServer(final QuitCall quitEvent) {
-        writeLineToServer(StringUtils.isEmpty(quitEvent.quitReason) ? "QUIT" : "QUIT :" + quitEvent
+        writeLineToServer(TextUtils.isEmpty(quitEvent.quitReason) ? "QUIT" : "QUIT :" + quitEvent
                 .quitReason);
     }
 

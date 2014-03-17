@@ -4,6 +4,7 @@ import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
 import com.fusionx.relay.interfaces.SubServerObject;
+import com.fusionx.relay.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,7 +37,7 @@ public class PrivateMessageUser extends User implements SubServerObject<UserEven
         mBuffer = new ArrayList<>();
         mServer = userChannelInterface.getServer();
 
-        if (StringUtils.isNotEmpty(message)) {
+        if (Utils.isNotEmpty(message)) {
             final UserEvent event;
             if (action) {
                 event = new WorldPrivateActionEvent(this, message);

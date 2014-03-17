@@ -28,8 +28,6 @@ import com.fusionx.relay.util.SocketUtils;
 import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ServerWriter;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -230,7 +228,7 @@ public class BaseConnection {
     private void sendDisconnectEvents(final String serverMessage, boolean userSent,
             boolean retryPending) {
         final StringBuilder builder = new StringBuilder("Disconnected from the server");
-        if (StringUtils.isNotEmpty(serverMessage)) {
+        if (Utils.isNotEmpty(serverMessage)) {
             builder.append(" (").append(serverMessage).append(")");
         }
         final String message = builder.toString();

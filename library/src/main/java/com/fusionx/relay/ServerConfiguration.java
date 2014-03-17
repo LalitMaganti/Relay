@@ -5,6 +5,7 @@ import com.fusionx.relay.util.Utils;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 
@@ -409,9 +410,9 @@ public class ServerConfiguration implements Parcelable {
         }
 
         public ServerConfiguration build() {
-            if (Utils.isEmpty(mTitle)) {
+            if (TextUtils.isEmpty(mTitle)) {
                 throw new IllegalArgumentException("The server title cannot be empty");
-            } else if (Utils.isEmpty(mUrl)) {
+            } else if (TextUtils.isEmpty(mUrl)) {
                 throw new IllegalArgumentException("The server URL cannot be empty");
             }
             return new ServerConfiguration(this);

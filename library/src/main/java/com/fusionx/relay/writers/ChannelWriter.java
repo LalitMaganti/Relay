@@ -6,7 +6,8 @@ import com.fusionx.relay.call.ChannelMessageCall;
 import com.fusionx.relay.call.ChannelPartCall;
 import com.squareup.otto.Subscribe;
 
-import org.apache.commons.lang3.StringUtils;
+
+import android.text.TextUtils;
 
 import java.io.Writer;
 
@@ -29,7 +30,7 @@ public class ChannelWriter extends RawWriter {
 
     @Subscribe
     public void partChannel(final ChannelPartCall event) {
-        writeLineToServer(StringUtils.isEmpty(event.channelName) ?
+        writeLineToServer(TextUtils.isEmpty(event.channelName) ?
                 String.format(WriterCommands.Part, event.channelName) :
                 String.format(WriterCommands.PartWithReason, event.channelName, event.reason)
                         .trim());
@@ -37,7 +38,7 @@ public class ChannelWriter extends RawWriter {
 
     @Subscribe
     public void onKick(final ChannelKickCall event) {
-        writeLineToServer(StringUtils.isEmpty(event.channelName) ?
+        writeLineToServer(TextUtils.isEmpty(event.channelName) ?
                 String.format(WriterCommands.Kick, event.channelName, event.userNick) :
                 String.format(WriterCommands.KickWithReason, event.channelName, event.userNick,
                         event.reason).trim());
