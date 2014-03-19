@@ -27,41 +27,45 @@ import com.fusionx.relay.writers.RawWriter;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
+import android.os.Handler;
+
 import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
 
-public class ServerCallBus extends Bus {
+public class ServerCallBus {
+
+    private Bus mBus;
 
     private final Set<RawWriter> mRawWriterSet = new THashSet<>();
 
-    private final ServerConnection mConnection;
+    private final Server mServer;
 
-    public ServerCallBus(final ServerConnection connection) {
-        super(ThreadEnforcer.ANY);
+    private final Handler mCallHandler;
 
-        mConnection = connection;
+    public ServerCallBus(final Server server, final Handler callHandler) {
+        mBus = new Bus(ThreadEnforcer.ANY);
+        mServer = server;
+        mCallHandler = callHandler;
     }
 
     public void register(RawWriter rawWriter) {
-        super.register(rawWriter);
-
+        mBus.register(rawWriter);
         mRawWriterSet.add(rawWriter);
     }
 
     public void onDisconnect() {
         for (final RawWriter writer : mRawWriterSet) {
-            super.unregister(writer);
+            mBus.unregister(writer);
         }
         mRawWriterSet.clear();
     }
 
-    @Override
     public void post(final Object event) {
-        mConnection.getServerCallHandler().post(new Runnable() {
+        mCallHandler.post(new Runnable() {
             @Override
             public void run() {
-                ServerCallBus.super.post(event);
+                mBus.post(event);
             }
         });
     }
@@ -166,7 +170,7 @@ public class ServerCallBus extends Bus {
     }
 
     Server getServer() {
-        return mConnection.getServer();
+        return mServer;
     }
 
     public void sendKick(String channelName, String nick, String reason) {

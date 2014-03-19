@@ -14,7 +14,6 @@ public abstract class User {
     User(final String nick, final UserChannelInterface userChannelInterface) {
         mNick = nick;
         mUserChannelInterface = userChannelInterface;
-
         mColourCode = "<color=" + IRCUtils.generateRandomColor(InterfaceHolders.getPreferences()
                 .getTheme()) + ">%1$s</color>";
     }

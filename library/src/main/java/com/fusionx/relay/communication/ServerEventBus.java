@@ -14,26 +14,17 @@ import com.squareup.otto.ThreadEnforcer;
 import android.os.Handler;
 import android.os.Looper;
 
-public class ServerEventBus extends Bus {
+public class ServerEventBus {
 
     private final Server mServer;
 
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
 
+    private final Bus mBus;
+
     public ServerEventBus(final Server server) {
-        super(ThreadEnforcer.ANY);
-
+        mBus = new Bus(ThreadEnforcer.ANY);
         mServer = server;
-    }
-
-    @Override
-    public void post(final Object event) {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                ServerEventBus.super.post(event);
-            }
-        });
     }
 
     public void postAndStoreEvent(final ServerEvent event) {
@@ -41,7 +32,7 @@ public class ServerEventBus extends Bus {
             @Override
             public void run() {
                 mServer.onServerEvent(event);
-                ServerEventBus.super.post(event);
+                mBus.post(event);
             }
         });
     }
@@ -54,7 +45,7 @@ public class ServerEventBus extends Bus {
                         .shouldLogUserListChanges()) {
                     channel.onChannelEvent(event);
                 }
-                ServerEventBus.super.post(event);
+                mBus.post(event);
             }
         });
     }
@@ -64,7 +55,24 @@ public class ServerEventBus extends Bus {
             @Override
             public void run() {
                 user.onUserEvent(event);
-                ServerEventBus.super.post(event);
+                mBus.post(event);
+            }
+        });
+    }
+
+    public void register(final Object object) {
+        mBus.register(object);
+    }
+
+    public void unregister(final Object object) {
+        mBus.unregister(object);
+    }
+
+    public void post(final Object event) {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mBus.post(event);
             }
         });
     }

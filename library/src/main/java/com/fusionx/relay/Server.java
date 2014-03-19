@@ -36,7 +36,7 @@ public class Server {
         mConfiguration = configuration;
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus(this);
-        mServerCallBus = new ServerCallBus(connection);
+        mServerCallBus = new ServerCallBus(this, connection.getServerCallHandler());
         mUserChannelInterface = new UserChannelInterface(this);
         mIgnoreList = new ArrayList<>();
     }
@@ -59,11 +59,14 @@ public class Server {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Server) {
-            final Server server = (Server) o;
-            return server.getTitle().equals(getTitle());
+        if (o == null) {
+            return false;
         }
-        return false;
+        if (!(o instanceof Server)) {
+            return false;
+        }
+        final Server server = (Server) o;
+        return server.getTitle().equals(getTitle());
     }
 
     /**

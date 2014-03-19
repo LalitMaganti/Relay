@@ -105,7 +105,6 @@ public class WorldUser extends User implements Checkable {
                     if (addingMode) {
                         channel.onIncrementUserType(levelEnum);
                         onModeChanged(channel, levelEnum);
-
                         return levelEnum;
                     } else {
                         onModeChanged(channel, UserLevel.NONE);
