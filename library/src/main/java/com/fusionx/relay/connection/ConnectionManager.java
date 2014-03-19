@@ -48,16 +48,13 @@ public class ConnectionManager {
      */
     public Pair<Boolean, Server> onConnectionRequested(final ServerConfiguration configuration,
             final Handler errorHandler) {
-        final boolean existingServer = mConnectionMap.containsKey(configuration.getTitle());
-        final ServerConnection connection;
-        if (existingServer) {
-            connection = mConnectionMap.get(configuration.getTitle());
-        } else {
+        ServerConnection connection = mConnectionMap.get(configuration.getTitle());
+        if (connection == null) {
             connection = new ServerConnection(configuration, errorHandler);
             connection.connect();
             mConnectionMap.put(configuration.getTitle(), connection);
         }
-        return new Pair<>(existingServer, connection.getServer());
+        return new Pair<>(connection != null, connection.getServer());
     }
 
     /**
