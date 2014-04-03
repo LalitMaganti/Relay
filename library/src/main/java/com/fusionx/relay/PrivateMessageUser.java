@@ -6,12 +6,10 @@ import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
 import com.fusionx.relay.interfaces.SubServerObject;
 import com.fusionx.relay.util.Utils;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class PrivateMessageUser extends User implements SubServerObject<UserEvent> {
+public class PrivateMessageUser implements SubServerObject<UserEvent> {
 
     private final Server mServer;
 
@@ -20,20 +18,22 @@ public class PrivateMessageUser extends User implements SubServerObject<UserEven
      */
     private final List<UserEvent> mBuffer;
 
+    private Nick mNick;
+
     /**
      * Retains whether the person on the other end of the PM quit in the middle of the conversation
      */
     private boolean mUserQuit;
 
     PrivateMessageUser(final String nick, final List<UserEvent> buffer) {
-        super(nick, null);
+        mNick = new Nick(nick);
         mBuffer = buffer;
         mServer = null;
     }
 
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface,
             final String message, final boolean action) {
-        super(nick, userChannelInterface);
+        mNick = new Nick(nick);
         mBuffer = new ArrayList<>();
         mServer = userChannelInterface.getServer();
 
@@ -60,7 +60,7 @@ public class PrivateMessageUser extends User implements SubServerObject<UserEven
 
     @Override
     public String getId() {
-        return mNick;
+        return getNick();
     }
 
     @Override
@@ -74,5 +74,22 @@ public class PrivateMessageUser extends User implements SubServerObject<UserEven
 
     public void setUserQuit(boolean userQuit) {
         mUserQuit = userQuit;
+    }
+
+    // Nick delegates
+    public String getColorfulNick() {
+        return mNick.getColorfulNick();
+    }
+
+    public String toString() {
+        return mNick.toString();
+    }
+
+    public String getNick() {
+        return mNick.getNick();
+    }
+
+    public void setNick(String nick) {
+        mNick = new Nick(nick);
     }
 }

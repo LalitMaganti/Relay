@@ -12,17 +12,23 @@ import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
 
-public class WorldUser extends User implements Checkable {
+public class WorldUser implements Checkable {
+
+    protected final UserChannelInterface mUserChannelInterface;
 
     private final Map<Channel, UserLevel> mUserLevelMap;
 
     private final Map<Channel, Spanned> mChannelSpannedMap;
 
+    private Nick mNick;
+
     // Checkable interface
     private boolean mChecked;
 
     public WorldUser(final String nick, final UserChannelInterface userChannelInterface) {
-        super(nick, userChannelInterface);
+        mNick = new Nick(nick);
+
+        mUserChannelInterface = userChannelInterface;
 
         mUserLevelMap = new THashMap<>();
         mChannelSpannedMap = new THashMap<>();
@@ -32,12 +38,12 @@ public class WorldUser extends User implements Checkable {
     }
 
     String getPrefixedNick(final Channel channel) {
-        return getUserPrefix(channel) + mNick;
+        return getUserPrefix(channel) + getNick();
     }
 
     public String getPrettyNick(final Channel channel) {
         if (InterfaceHolders.getPreferences().shouldNickBeColourful()) {
-            return String.format(mColourCode, getPrefixedNick(channel));
+            return String.format(mNick.getColourCode(), getPrefixedNick(channel));
         } else {
             return getPrefixedNick(channel);
         }
@@ -117,8 +123,8 @@ public class WorldUser extends User implements Checkable {
         return UserLevel.NONE;
     }
 
-    public boolean isUserNickEqual(final User user) {
-        return mNick.equals(user.getNick());
+    public boolean isUserNickEqual(final WorldUser user) {
+        return mNick.getNick().equals(user.getNick());
     }
 
     // Checkable interface
@@ -135,5 +141,22 @@ public class WorldUser extends User implements Checkable {
     @Override
     public void toggle() {
         mChecked = !mChecked;
+    }
+
+    public String getColorfulNick() {
+        return mNick.getColorfulNick();
+    }
+
+    @Override
+    public String toString() {
+        return mNick.toString();
+    }
+
+    public String getNick() {
+        return mNick.getNick();
+    }
+
+    public void setNick(String nick) {
+        mNick = new Nick(nick);
     }
 }

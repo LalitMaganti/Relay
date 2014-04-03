@@ -25,22 +25,6 @@ public class IRCUtils {
         return nick;
     }
 
-    public static int generateRandomColor(final Theme theme) {
-        final int colorOffset = theme.getGetTextColourOffset();
-
-        final Random random = new Random();
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
-
-        // mix the color
-        red = (red + colorOffset) / 2;
-        green = (green + colorOffset) / 2;
-        blue = (blue + colorOffset) / 2;
-
-        return Color.rgb(red, green, blue);
-    }
-
     /**
      * Split the line received from the server into it's components
      *

@@ -1,7 +1,7 @@
 package com.fusionx.relay.constants;
 
 public enum Theme {
-    LIGHT(0),
+    LIGHT(100),
     DARK(255);
 
     private final int getTextColourOffset;
