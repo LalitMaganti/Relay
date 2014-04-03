@@ -310,7 +310,8 @@ public class ServerConfiguration implements Parcelable {
         private boolean mNickChangeable;
 
         /**
-         * The username to connect to the server with - unless the server is password protected this
+         * The username to connect to the server with - unless the server is password protected
+         * this
          * is meaningless in most cases
          */
         private String mServerUserName;
@@ -357,7 +358,7 @@ public class ServerConfiguration implements Parcelable {
 
             mNickservPassword = "";
 
-            mAutoJoinChannels = new ArrayList <>();
+            mAutoJoinChannels = new ArrayList<>();
         }
 
         private Builder(final Parcel in) {

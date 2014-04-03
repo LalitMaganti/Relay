@@ -1,7 +1,6 @@
 package com.fusionx.relay;
 
 import com.fusionx.relay.misc.InterfaceHolders;
-import com.fusionx.relay.util.IRCUtils;
 
 import android.graphics.Color;
 

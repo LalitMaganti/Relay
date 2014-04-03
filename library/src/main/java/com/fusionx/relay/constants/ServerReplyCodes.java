@@ -6,14 +6,6 @@ public final class ServerReplyCodes {
 
     public static final int RPL_WELCOME = 1;
 
-    private static final int RPL_YOURHOST = 2;
-
-    private static final int RPL_CREATED = 3;
-
-    private static final int RPL_MYINFO = 4;
-
-    private static final int RPL_PROTOCTL = 5;
-
     public static final int RPL_TRACELINK = 200;
 
     public static final int RPL_TRACECONNECTING = 201;
@@ -82,18 +74,6 @@ public final class ServerReplyCodes {
 
     public static final int RPL_STATSDEBUG = 249;
 
-    private static final int RPL_STATSCONN = 250;
-
-    private static final int RPL_LUSERCLIENT = 251;
-
-    private static final int RPL_LUSEROP = 252;
-
-    private static final int RPL_LUSERUNKNOWN = 253;
-
-    private static final int RPL_LUSERCHANNELS = 254;
-
-    private static final int RPL_LUSERME = 255;
-
     public static final int RPL_ADMINME = 256;
 
     public static final int RPL_ADMINLOC1 = 257;
@@ -103,10 +83,6 @@ public final class ServerReplyCodes {
     public static final int RPL_ADMINEMAIL = 259;
 
     public static final int RPL_TRACELOG = 261;
-
-    private static final int RPL_LOCALUSERS = 265;
-
-    private static final int RPL_GLOBALUSERS = 266;
 
     public static final int RPL_SILELIST = 271;
 
@@ -136,10 +112,6 @@ public final class ServerReplyCodes {
 
     public static final int RPL_TEXT = 304;
 
-    private static final int RPL_UNAWAY = 305;
-
-    private static final int RPL_NOWAWAY = 306;
-
     public static final int RPL_WHOISREGNICK = 307;
 
     public static final int RPL_WHOISADMIN = 308;
@@ -148,23 +120,9 @@ public final class ServerReplyCodes {
 
     public static final int RPL_WHOISHELPOP = 310;
 
-    private static final int RPL_WHOISUSER = 311;
-
-    private static final int RPL_WHOISSERVER = 312;
-
-    private static final int RPL_WHOISOPERATOR = 313;
-
     public static final int RPL_WHOWASUSER = 314;
 
     public static final int RPL_ENDOFWHO = 315;
-
-    private static final int RPL_WHOISCHANOP = 316;
-
-    private static final int RPL_WHOISIDLE = 317;
-
-    private static final int RPL_ENDOFWHOIS = 318;
-
-    private static final int RPL_WHOISCHANNELS = 319;
 
     public static final int RPL_LISTSTART = 321;
 
@@ -271,8 +229,6 @@ public final class ServerReplyCodes {
     public static final int ERR_WILDTOPLEVEL = 414;
 
     public static final int ERR_UNKNOWNCOMMAND = 421;
-
-    private static final int ERR_NOMOTD = 422;
 
     public static final int ERR_NOADMININFO = 423;
 
@@ -396,18 +352,62 @@ public final class ServerReplyCodes {
     public static final ImmutableList<Integer> saslCodes = ImmutableList.of(RPL_SASL_LOGGED_IN,
             RPL_SASL_SUCCESSFUL, ERR_SASL_FAILED, ERR_SASL_FAILED_2);
 
+    private static final int RPL_YOURHOST = 2;
+
+    private static final int RPL_CREATED = 3;
+
+    private static final int RPL_MYINFO = 4;
+
+    private static final int RPL_PROTOCTL = 5;
+
+    // Codes we know about and choose to ignore
+    public static final ImmutableList<Integer> doNothingCodes = ImmutableList.of
+            (RPL_MYINFO, RPL_PROTOCTL);
+
+    private static final int RPL_STATSCONN = 250;
+
+    private static final int RPL_LUSERCLIENT = 251;
+
+    private static final int RPL_LUSEROP = 252;
+
+    private static final int RPL_LUSERUNKNOWN = 253;
+
+    private static final int RPL_LUSERCHANNELS = 254;
+
+    private static final int RPL_LUSERME = 255;
+
+    private static final int RPL_LOCALUSERS = 265;
+
+    private static final int RPL_GLOBALUSERS = 266;
+
+    private static final int RPL_UNAWAY = 305;
+
+    private static final int RPL_NOWAWAY = 306;
+
+    private static final int RPL_WHOISUSER = 311;
+
+    private static final int RPL_WHOISSERVER = 312;
+
+    private static final int RPL_WHOISOPERATOR = 313;
+
+    private static final int RPL_WHOISCHANOP = 316;
+
+    private static final int RPL_WHOISIDLE = 317;
+
+    private static final int RPL_ENDOFWHOIS = 318;
+
+    private static final int RPL_WHOISCHANNELS = 319;
+
     public static final ImmutableList<Integer> whoisCodes = ImmutableList.of(RPL_WHOISCHANNELS,
             RPL_WHOISCHANOP, RPL_WHOISIDLE, RPL_WHOISOPERATOR, RPL_WHOISSERVER,
             RPL_WHOISUSER, RPL_ENDOFWHOIS);
+
+    private static final int ERR_NOMOTD = 422;
 
     public static final ImmutableList<Integer> genericCodes = ImmutableList.of(RPL_WELCOME,
             RPL_YOURHOST, RPL_CREATED, RPL_LUSERCLIENT, RPL_LUSEROP, RPL_LUSERUNKNOWN,
             RPL_LUSERCHANNELS, RPL_LUSERME, RPL_STATSCONN, RPL_LOCALUSERS, RPL_GLOBALUSERS,
             RPL_NOWAWAY, RPL_UNAWAY, ERR_NOMOTD);
-
-    // Codes we know about and choose to ignore
-    public static final ImmutableList<Integer> doNothingCodes = ImmutableList.of
-            (RPL_MYINFO, RPL_PROTOCTL);
 
     /**
      * Should not be initialized.

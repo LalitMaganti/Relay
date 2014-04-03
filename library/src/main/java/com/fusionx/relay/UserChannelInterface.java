@@ -34,7 +34,7 @@ public final class UserChannelInterface {
     }
 
     public synchronized void coupleUserAndChannel(final WorldUser user, final Channel channel,
-                                                  final UserLevel userLevel) {
+            final UserLevel userLevel) {
         user.onModeChanged(channel, userLevel);
         addChannelToUser(user, channel);
         addUserToChannel(user, channel);
@@ -120,7 +120,7 @@ public final class UserChannelInterface {
     }
 
     public synchronized Channel getChannelFromSnapshot(final String name,
-                                                       final ChannelSnapshot snapshot) {
+            final ChannelSnapshot snapshot) {
         final Channel channel = getChannel(name);
         if (channel != null) {
             return channel;
@@ -166,7 +166,7 @@ public final class UserChannelInterface {
     }
 
     public void addNewPrivateMessageUser(final String nick, final String message,
-                                                       final boolean action) {
+            final boolean action) {
         final PrivateMessageUser user = new PrivateMessageUser(nick, this, message, action);
         mPrivateMessageUsers.add(user);
     }

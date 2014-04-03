@@ -1,6 +1,7 @@
 package com.fusionx.relay.call;
 
 public class ModeCall extends Call {
+
     public final String channelName;
 
     public final String mode;

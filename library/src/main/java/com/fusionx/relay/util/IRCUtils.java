@@ -2,16 +2,11 @@ package com.fusionx.relay.util;
 
 import com.google.common.base.CharMatcher;
 
-import com.fusionx.relay.constants.Theme;
-
 import org.apache.commons.lang3.StringUtils;
-
-import android.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 public class IRCUtils {
 

@@ -11,7 +11,7 @@ import java.util.List;
 public class MentionParser {
 
     public static void onMentionableCommand(final String message, final String userNick,
-                                            final ServerEventBus bus, final Channel channel) {
+            final ServerEventBus bus, final Channel channel) {
         final List<String> list = IRCUtils.splitRawLine(message, false);
         for (final String s : list) {
             if (s.startsWith(userNick)) {

@@ -6,7 +6,6 @@ import com.fusionx.relay.call.ChannelMessageCall;
 import com.fusionx.relay.call.ChannelPartCall;
 import com.squareup.otto.Subscribe;
 
-
 import android.text.TextUtils;
 
 import java.io.Writer;

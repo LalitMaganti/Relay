@@ -42,7 +42,7 @@ class NoticeParser extends CommandParser {
     }
 
     void onParseChannelNotice(final String channelName, final String sendingNick,
-                              final String notice) {
+            final String notice) {
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
         mServerEventBus.postAndStoreEvent(event, channel);

@@ -1,6 +1,7 @@
 package com.fusionx.relay.call;
 
-public class WhoisCall  extends Call {
+public class WhoisCall extends Call {
+
     public final String nick;
 
     public WhoisCall(String nick) {

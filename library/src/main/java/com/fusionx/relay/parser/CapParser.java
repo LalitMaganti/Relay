@@ -47,7 +47,7 @@ class CapParser {
     }
 
     static void parseCode(final int code, final List<String> parsedArray,
-                          final ServerEventBus sender, final ServerWriter writer) {
+            final ServerEventBus sender, final ServerWriter writer) {
         final ServerEvent event;
         switch (code) {
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:

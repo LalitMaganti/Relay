@@ -14,7 +14,6 @@ import com.fusionx.relay.call.PrivateActionCall;
 import com.fusionx.relay.call.PrivateMessageCall;
 import com.fusionx.relay.call.RawCall;
 import com.fusionx.relay.call.WhoisCall;
-import com.fusionx.relay.connection.ServerConnection;
 import com.fusionx.relay.event.SwitchToPrivateMessage;
 import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
@@ -35,13 +34,13 @@ import gnu.trove.set.hash.THashSet;
 
 public class ServerCallBus {
 
-    private Bus mBus;
-
     private final Set<RawWriter> mRawWriterSet = new THashSet<>();
 
     private final Server mServer;
 
     private final Handler mCallHandler;
+
+    private Bus mBus;
 
     public ServerCallBus(final Server server, final Handler callHandler) {
         mBus = new Bus(ThreadEnforcer.ANY);

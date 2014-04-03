@@ -17,14 +17,6 @@ public enum UserLevel {
         mName = users;
     }
 
-    public char getPrefix() {
-        return mPrefix;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
     public static UserLevel getLevelFromPrefix(final char prefix) {
         switch (prefix) {
             case '~':
@@ -57,5 +49,13 @@ public enum UserLevel {
             default:
                 return UserLevel.NONE;
         }
+    }
+
+    public char getPrefix() {
+        return mPrefix;
+    }
+
+    public String getName() {
+        return mName;
     }
 }
