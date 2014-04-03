@@ -18,12 +18,12 @@ public class ServerConnection {
         @Override
         public void run() {
             try {
-                mConnection.connectToServer();
+                mBaseConnection.connectToServer();
             } catch (final Exception ex) {
                 mUiThreadHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        throw new RuntimeException(mConnection.getCurrentLine(), ex);
+                        throw new RuntimeException(mBaseConnection.getCurrentLine(), ex);
                     }
                 });
             }
@@ -32,7 +32,7 @@ public class ServerConnection {
 
     private final Server mServer;
 
-    private final BaseConnection mConnection;
+    private final BaseConnection mBaseConnection;
 
     private final Handler mUiThreadHandler;
 
@@ -50,7 +50,7 @@ public class ServerConnection {
         mServerCallHandler = new Handler(handlerThread.getLooper());
 
         mServer = new Server(configuration, this);
-        mConnection = new BaseConnection(configuration, this);
+        mBaseConnection = new BaseConnection(configuration, this);
         mUiThreadHandler = handler;
     }
 
@@ -64,10 +64,10 @@ public class ServerConnection {
             public void run() {
                 final ConnectionStatus status = mServer.getStatus();
                 if (status == ConnectionStatus.CONNECTED) {
-                    mConnection.disconnect();
+                    mBaseConnection.disconnect();
                 } else if (mMainThread.isAlive()) {
                     mMainThread.interrupt();
-                    mConnection.closeSocket();
+                    mBaseConnection.closeSocket();
                 }
                 mServer.getServerEventBus().post(new DisconnectEvent("", true, false));
             }

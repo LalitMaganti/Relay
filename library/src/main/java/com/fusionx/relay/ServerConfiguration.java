@@ -336,6 +336,8 @@ public class ServerConfiguration implements Parcelable {
         private String mNickservPassword;
 
         public Builder() {
+            mId = -1;
+
             mTitle = "";
             mUrl = "";
             mPort = 6667;
@@ -359,6 +361,8 @@ public class ServerConfiguration implements Parcelable {
         }
 
         private Builder(final Parcel in) {
+            mId = in.readInt();
+
             mTitle = in.readString();
             mUrl = in.readString();
             mPort = in.readInt();
@@ -387,6 +391,8 @@ public class ServerConfiguration implements Parcelable {
         }
 
         public void writeToParcel(Parcel out, int flags) {
+            out.writeInt(mId);
+
             out.writeString(mTitle);
             out.writeString(mUrl);
             out.writeInt(mPort);

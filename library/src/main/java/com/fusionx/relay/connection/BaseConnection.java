@@ -236,9 +236,12 @@ public class BaseConnection {
 
         mServer.getServerEventBus().postAndStoreEvent(event);
 
-        for (final Channel channel : mServer.getUser().getChannels()) {
-            final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel, message);
-            mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
+        // User can be null if the server was not fully connected to
+        if (mServer.getUser() != null) {
+            for (final Channel channel : mServer.getUser().getChannels()) {
+                final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel, message);
+                mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
+            }
         }
 
         for (final PrivateMessageUser user : mServer.getUserChannelInterface()
