@@ -4,6 +4,7 @@ import com.fusionx.relay.communication.ServerCallBus;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.connection.ServerConnection;
 import com.fusionx.relay.event.server.ServerEvent;
+import com.fusionx.relay.interfaces.Conversation;
 import com.fusionx.relay.writers.ChannelWriter;
 import com.fusionx.relay.writers.ServerWriter;
 import com.fusionx.relay.writers.UserWriter;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class Server {
+public class Server implements Conversation<ServerEvent> {
 
     private final ServerConnection mServerConnection;
 
@@ -91,11 +92,23 @@ public class Server {
         return mIgnoreList.contains(userNick);
     }
 
-    // Getters and Setters
+    // Conversation Interface
+    @Override
     public List<ServerEvent> getBuffer() {
         return mBuffer;
     }
 
+    @Override
+    public String getId() {
+        return getTitle();
+    }
+
+    @Override
+    public Server getServer() {
+        return this;
+    }
+
+    // Getters and Setters
     public UserChannelInterface getUserChannelInterface() {
         return mUserChannelInterface;
     }

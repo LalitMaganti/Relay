@@ -3,13 +3,13 @@ package com.fusionx.relay;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
-import com.fusionx.relay.interfaces.SubServerObject;
+import com.fusionx.relay.interfaces.Conversation;
 import com.fusionx.relay.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PrivateMessageUser implements SubServerObject<UserEvent> {
+public class PrivateMessageUser implements Conversation<UserEvent> {
 
     private final Server mServer;
 
