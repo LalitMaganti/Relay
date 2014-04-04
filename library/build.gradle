@@ -18,7 +18,7 @@ android {
     buildToolsVersion '19.0.3'
 
     defaultConfig {
-        minSdkVersion 4
+        minSdkVersion 5
         targetSdkVersion 19
     }
 
@@ -31,6 +31,7 @@ android {
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.0'
     compile 'com.squareup:otto:1.3.2'
+    compile 'de.greenrobot:eventbus:2.2.0'
     compile 'com.google.guava:guava:16.0.+'
     compile 'net.sf.trove4j:trove4j:3.0.3'
 }

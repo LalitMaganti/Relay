@@ -50,12 +50,14 @@ public class ConnectionManager {
     public Pair<Boolean, Server> onConnectionRequested(final ServerConfiguration configuration,
             final Handler errorHandler) {
         ServerConnection connection = mConnectionMap.get(configuration.getTitle());
-        if (connection == null) {
+
+        final boolean exists = connection != null;
+        if (!exists) {
             connection = new ServerConnection(configuration, errorHandler);
             connection.connect();
             mConnectionMap.put(configuration.getTitle(), connection);
         }
-        return new Pair<>(connection != null, connection.getServer());
+        return new Pair<>(exists, connection.getServer());
     }
 
     /**
