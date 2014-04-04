@@ -15,6 +15,7 @@ import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.ServerEvent;
@@ -113,6 +114,7 @@ public class BaseConnection {
             final ServerWriter serverWriter = mServer.onOutputStreamCreated(writer);
 
             mServerConnection.onStatusChanged(ConnectionStatus.CONNECTING);
+            mServer.getServerEventBus().post(new ConnectingEvent());
 
             if (mServerConfiguration.isSaslAvailable()) {
                 // By sending this line, the server *should* wait until we end the CAP stuff with CAP
