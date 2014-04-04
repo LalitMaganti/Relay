@@ -146,6 +146,7 @@ public class UserInputParser {
                 }
                 break;
             case "/raw":
+            case "/quote":
                 server.getServerCallBus().sendRawLine(IRCUtils.concatenateStringList
                         (parsedArray));
                 return;
