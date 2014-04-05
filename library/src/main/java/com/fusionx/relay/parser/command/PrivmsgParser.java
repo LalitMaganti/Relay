@@ -4,7 +4,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.event.SwitchToPrivateMessage;
+import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
@@ -46,8 +46,8 @@ public class PrivmsgParser extends CommandParser {
     private void onParsePrivateMessage(final String nick, final String message) {
         final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
         if (user == null) {
-            mUserChannelInterface.addNewPrivateMessageUser(nick, message, false);
-            mServerEventBus.post(new SwitchToPrivateMessage(nick));
+            mUserChannelInterface.addNewPrivateMessageUser(nick, message, false, false);
+            mServerEventBus.post(new NewPrivateMessage(nick));
         } else {
             mServerEventBus.postAndStoreEvent(new WorldPrivateMessageEvent(user, message), user);
         }

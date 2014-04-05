@@ -166,8 +166,8 @@ public final class UserChannelInterface {
     }
 
     public void addNewPrivateMessageUser(final String nick, final String message,
-            final boolean action) {
-        final PrivateMessageUser user = new PrivateMessageUser(nick, this, message, action);
+            final boolean action, final boolean userSent) {
+        final PrivateMessageUser user = new PrivateMessageUser(nick, this, message, action, userSent);
         mPrivateMessageUsers.add(user);
     }
 

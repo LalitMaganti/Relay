@@ -5,7 +5,7 @@ import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.call.VersionCall;
-import com.fusionx.relay.event.SwitchToPrivateMessage;
+import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
@@ -54,8 +54,8 @@ class CtcpParser extends CommandParser {
     private void onParseUserAction(final String nick, final String action) {
         final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
         if (user == null) {
-            mUserChannelInterface.addNewPrivateMessageUser(nick, action, true);
-            mServerEventBus.post(new SwitchToPrivateMessage(nick));
+            mUserChannelInterface.addNewPrivateMessageUser(nick, action, true, false);
+            mServerEventBus.post(new NewPrivateMessage(nick));
         } else {
             mServerEventBus.postAndStoreEvent(new WorldPrivateActionEvent(user, action), user);
         }

@@ -14,7 +14,7 @@ import com.fusionx.relay.call.PrivateActionCall;
 import com.fusionx.relay.call.PrivateMessageCall;
 import com.fusionx.relay.call.RawCall;
 import com.fusionx.relay.call.WhoisCall;
-import com.fusionx.relay.event.SwitchToPrivateMessage;
+import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.MessageEvent;
@@ -93,10 +93,11 @@ public class ServerCallBus {
         final PrivateMessageUser user = getServer().getUserChannelInterface()
                 .getPrivateMessageUser(nick);
         if (user == null) {
-            getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, message, false);
-            getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
+            getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, message, false,
+                    true);
+            getServer().getServerEventBus().post(new NewPrivateMessage(nick));
         } else {
-            getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
+            getServer().getServerEventBus().post(new NewPrivateMessage(nick));
             if (Utils.isNotEmpty(message)) {
                 getServer().getServerEventBus().postAndStoreEvent(new PrivateMessageEvent(user,
                         getServer().getUser(), message), user);
@@ -112,10 +113,11 @@ public class ServerCallBus {
         final PrivateMessageUser user = getServer().getUserChannelInterface()
                 .getPrivateMessageUser(nick);
         if (user == null) {
-            getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, action, true);
-            getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
+            getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, action, true,
+                    true);
+            getServer().getServerEventBus().post(new NewPrivateMessage(nick));
         } else {
-            getServer().getServerEventBus().post(new SwitchToPrivateMessage(nick));
+            getServer().getServerEventBus().post(new NewPrivateMessage(nick));
             if (Utils.isNotEmpty(action)) {
                 getServer().getServerEventBus().postAndStoreEvent(new PrivateActionEvent(user,
                         getServer().getUser(), action), user);
