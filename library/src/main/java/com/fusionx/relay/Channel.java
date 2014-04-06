@@ -75,7 +75,8 @@ public class Channel implements Conversation<ChannelEvent> {
     public boolean equals(final Object o) {
         if (o != null && o instanceof Channel) {
             final Channel otherChannel = (Channel) o;
-            return otherChannel.getName().equalsIgnoreCase(mName);
+            return otherChannel.getServer().equals(getServer())
+                    && otherChannel.getName().equalsIgnoreCase(mName);
         }
         return false;
     }
