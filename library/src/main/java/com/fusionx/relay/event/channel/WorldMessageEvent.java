@@ -8,8 +8,8 @@ public class WorldMessageEvent extends WorldUserEvent {
     public final String message;
 
     public WorldMessageEvent(final Channel channel, final String message,
-            final WorldUser sendingUser, final String nick) {
-        super(channel, sendingUser == null ? nick : sendingUser.getPrettyNick(channel));
+            final WorldUser sendingUser, final String nick, final boolean mention) {
+        super(channel, sendingUser == null ? nick : sendingUser.getPrettyNick(channel), mention);
 
         this.message = message;
     }

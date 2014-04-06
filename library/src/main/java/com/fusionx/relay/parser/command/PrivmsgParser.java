@@ -57,14 +57,10 @@ public class PrivmsgParser extends CommandParser {
             final String message) {
         final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
-        // This occurs rarely - usually on BNCs - for example the ZNC buffer starts with a
-        // PRIVMSG from the nick ***. Also if someone said something on the channel during
-        // the buffer but is not in the channel now then this will also happen
+        final boolean mention = MentionParser.onMentionableCommand(message,
+                mServer.getUser().getNick());
         final ChannelEvent event = new WorldMessageEvent(channel, message, sendingUser,
-                sendingNick);
+                sendingNick, mention);
         mServerEventBus.postAndStoreEvent(event, channel);
-
-        MentionParser.onMentionableCommand(message, mServer.getUser().getNick(), mServerEventBus,
-                channel);
     }
 }
