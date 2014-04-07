@@ -12,7 +12,7 @@ import com.fusionx.relay.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PrivateMessageUser implements Conversation<UserEvent> {
+public class PrivateMessageUser implements Conversation {
 
     private final Server mServer;
 

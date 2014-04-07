@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class Server implements Conversation<ServerEvent> {
+public class Server implements Conversation {
 
     private final ServerConnection mServerConnection;
 

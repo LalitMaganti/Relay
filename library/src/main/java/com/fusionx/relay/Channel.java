@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 
-public class Channel implements Conversation<ChannelEvent> {
+public class Channel implements Conversation {
 
     // Static stuff
     private final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',

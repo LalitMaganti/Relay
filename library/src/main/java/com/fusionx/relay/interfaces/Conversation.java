@@ -4,9 +4,7 @@ import com.fusionx.relay.Server;
 
 import java.util.List;
 
-public interface Conversation<T> {
-
-    public List<T> getBuffer();
+public interface Conversation {
 
     public String getId();
 
