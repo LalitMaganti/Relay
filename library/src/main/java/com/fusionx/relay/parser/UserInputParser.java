@@ -162,6 +162,6 @@ public class UserInputParser {
     }
 
     private static void onUnknownEvent(final Server server, final String rawLine) {
-        server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
+        //server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
     }
 }

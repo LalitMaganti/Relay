@@ -2,6 +2,7 @@ package com.fusionx.relay;
 
 import com.fusionx.relay.event.user.PrivateActionEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
+import com.fusionx.relay.event.user.PrivateMessageOpenedEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
@@ -38,6 +39,8 @@ public class PrivateMessageUser implements Conversation<UserEvent> {
         mNick = new Nick(nick);
         mBuffer = new ArrayList<>();
         mServer = userChannelInterface.getServer();
+
+        mBuffer.add(new PrivateMessageOpenedEvent(this));
 
         if (Utils.isNotEmpty(message)) {
             final UserEvent event;

@@ -18,7 +18,9 @@ import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.MessageEvent;
+import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
+import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.Utils;
@@ -73,10 +75,6 @@ public class ServerCallBus {
         post(new ModeCall(channelName, destination, mode));
     }
 
-    public void sendUnknownEvent(final String event) {
-        //getServer().getServerEventBus().sendSwitchToServerEvent(event);
-    }
-
     public void sendUserWhois(final String nick) {
         post(new WhoisCall(nick));
     }
@@ -96,12 +94,9 @@ public class ServerCallBus {
             getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, message, false,
                     true);
             getServer().getServerEventBus().post(new NewPrivateMessage(nick));
-        } else {
-            getServer().getServerEventBus().post(new NewPrivateMessage(nick));
-            if (Utils.isNotEmpty(message)) {
-                getServer().getServerEventBus().postAndStoreEvent(new PrivateMessageEvent(user,
-                        getServer().getUser(), message), user);
-            }
+        } else if (Utils.isNotEmpty(message)) {
+            getServer().getServerEventBus().postAndStoreEvent(new PrivateMessageEvent(user,
+                    getServer().getUser(), message), user);
         }
     }
 
@@ -135,6 +130,11 @@ public class ServerCallBus {
 
     public void sendClosePrivateMessage(final PrivateMessageUser user) {
         getServer().getUserChannelInterface().removePrivateMessageUser(user);
+
+        if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
+            final ServerEvent event = new PrivateMessageClosedEvent(user);
+            getServer().getServerEventBus().post(event);
+        }
     }
 
     public void sendJoin(final String channelName) {
