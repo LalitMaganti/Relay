@@ -66,7 +66,6 @@ public class PrivateMessageUser implements Conversation {
     }
 
     // Getters and Setters
-    @Override
     public List<UserEvent> getBuffer() {
         return mBuffer;
     }
@@ -79,10 +78,6 @@ public class PrivateMessageUser implements Conversation {
     @Override
     public Server getServer() {
         return mServer;
-    }
-
-    public boolean isUserQuit() {
-        return mUserQuit;
     }
 
     public void setUserQuit(boolean userQuit) {

@@ -152,7 +152,7 @@ public class UserInputParser {
                 return;
             default:
                 if (command.startsWith("/")) {
-                    server.getServerCallBus().sendRawLine(command.substring(1) + IRCUtils
+                    server.getServerCallBus().sendRawLine(command.substring(1) + " " + IRCUtils
                             .concatenateStringList(parsedArray));
                     return;
                 }

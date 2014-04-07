@@ -81,16 +81,11 @@ public class Server implements Conversation {
         return serverWriter;
     }
 
-    public void setIgnoreList(final Collection<String> collection) {
-        mIgnoreList = new ArrayList<>(collection);
-    }
-
     public boolean shouldIgnoreUser(final String userNick) {
         return mIgnoreList.contains(userNick);
     }
 
     // Conversation Interface
-    @Override
     public List<ServerEvent> getBuffer() {
         return mBuffer;
     }

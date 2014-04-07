@@ -155,7 +155,6 @@ public class Channel implements Conversation {
      *
      * @return a list of the messages
      */
-    @Override
     public List<ChannelEvent> getBuffer() {
         return mBuffer;
     }
