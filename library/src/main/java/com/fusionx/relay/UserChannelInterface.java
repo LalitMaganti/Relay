@@ -6,6 +6,7 @@ import com.fusionx.relay.util.IRCUtils;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -119,19 +120,6 @@ public final class UserChannelInterface {
         return user != null ? user : new WorldUser(nick, this);
     }
 
-    public synchronized Channel getChannelFromSnapshot(final String name,
-            final ChannelSnapshot snapshot) {
-        final Channel channel = getChannel(name);
-        if (channel != null) {
-            return channel;
-        } else if (snapshot != null) {
-            mServer.getUser().getChannelSnapshots().remove(snapshot);
-            return new Channel(snapshot, this);
-        } else {
-            return new Channel(name, this);
-        }
-    }
-
     public synchronized WorldUser getUserIfExists(final String nick) {
         for (final WorldUser user : mUserToChannelMap.keySet()) {
             if (nick.equals(user.getNick())) {
@@ -150,6 +138,10 @@ public final class UserChannelInterface {
             }
         }
         return null;
+    }
+
+    public synchronized Channel getNewChannel(final String channelName) {
+        return new Channel(channelName, this);
     }
 
     public PrivateMessageUser getPrivateMessageUser(final String nick) {
@@ -180,12 +172,19 @@ public final class UserChannelInterface {
     }
 
     public void onDisconnect() {
-        mChannelToUserMap.clear();
         final Iterator<WorldUser> iterator = mUserToChannelMap.keySet().iterator();
         while (iterator.hasNext()) {
             final WorldUser user = iterator.next();
             if (!(user instanceof AppUser)) {
                 iterator.remove();
+            }
+        }
+        mChannelToUserMap.clear();
+
+        if (mServer.getUser() != null) {
+            final Collection<Channel> channelSet = mServer.getUser().getChannels();
+            for (final Channel channel : channelSet) {
+                addUserToChannel(mServer.getUser(), channel);
             }
         }
     }

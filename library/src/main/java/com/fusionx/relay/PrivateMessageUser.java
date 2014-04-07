@@ -99,7 +99,7 @@ public class PrivateMessageUser implements Conversation<UserEvent> {
         return mNick.getNick();
     }
 
-    public void setNick(String nick) {
+    public void setNick(final String nick) {
         mNick = new Nick(nick);
     }
 }

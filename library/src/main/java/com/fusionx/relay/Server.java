@@ -48,9 +48,6 @@ public class Server implements Conversation<ServerEvent> {
 
     public void onDisconnect() {
         // Null can occur if the connection does not occur on initial connect
-        if (mUser != null) {
-            mUser.onDisconnect();
-        }
         mUserChannelInterface.onDisconnect();
 
         // Need to remove old writers as they would be using the old socket OutputStream if a

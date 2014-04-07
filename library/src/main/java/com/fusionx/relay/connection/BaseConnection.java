@@ -2,7 +2,6 @@ package com.fusionx.relay.connection;
 
 import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelSnapshot;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
@@ -186,7 +185,7 @@ public class BaseConnection {
                     .getNickservPassword());
         }
 
-        final Collection<ChannelSnapshot> channels = mServer.getUser().getChannelSnapshots();
+        final Collection<Channel> channels = mServer.getUser().getChannels();
         if (channels.isEmpty()) {
             // Automatically join the channels specified in the configuration
             for (final String channelName : mServerConfiguration.getAutoJoinChannels()) {

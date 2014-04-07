@@ -26,39 +26,22 @@ public class Channel implements Conversation<ChannelEvent> {
 
     private final UserChannelInterface mUserChannelInterface;
 
-    Channel(final String channelName, final List<ChannelEvent> buffer) {
-        mName = channelName;
-        mBuffer = buffer;
-        mNumberOfUsers = null;
-        mUserChannelInterface = null;
-    }
-
     Channel(final String channelName, final UserChannelInterface userChannelInterface) {
         mName = channelName;
         mBuffer = new ArrayList<>();
         mNumberOfUsers = new EnumMap<>(UserLevel.class);
         mUserChannelInterface = userChannelInterface;
 
-        for (final UserLevel levelEnum : UserLevel.values()) {
-            mNumberOfUsers.put(levelEnum, 0);
-        }
-
-        // WorldJoinEvent is used as JoinEvent is a server event
-        mBuffer.add(new WorldJoinEvent(this, userChannelInterface.getServer().getUser()));
+        wipeChannelData();
     }
 
-    Channel(final ChannelSnapshot snapshot, final UserChannelInterface userChannelInterface) {
-        mName = snapshot.getName();
-        mBuffer = snapshot.getBuffer();
-        mNumberOfUsers = new EnumMap<>(UserLevel.class);
-        mUserChannelInterface = userChannelInterface;
-
+    public void wipeChannelData() {
         for (final UserLevel levelEnum : UserLevel.values()) {
             mNumberOfUsers.put(levelEnum, 0);
         }
 
         // WorldJoinEvent is used as JoinEvent is a server event
-        mBuffer.add(new WorldJoinEvent(this, userChannelInterface.getServer().getUser()));
+        mBuffer.add(new WorldJoinEvent(this, mUserChannelInterface.getServer().getUser()));
     }
 
     /**
