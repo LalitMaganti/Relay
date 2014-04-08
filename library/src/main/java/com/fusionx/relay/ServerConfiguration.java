@@ -148,7 +148,9 @@ public class ServerConfiguration implements Parcelable {
     // Helper methods
     public boolean isSaslAvailable() {
         return Utils.isNotEmpty(mSaslUsername) && Utils.isNotEmpty(mSaslPassword);
-    }    public void writeToParcel(final Parcel out, final int flags) {
+    }
+
+    public void writeToParcel(final Parcel out, final int flags) {
         out.writeString(mTitle);
         out.writeString(mUrl);
         out.writeInt(mPort);
@@ -187,7 +189,9 @@ public class ServerConfiguration implements Parcelable {
 
     public String getUrl() {
         return mUrl;
-    }    @Override
+    }
+
+    @Override
     public int hashCode() {
         return mTitle.hashCode();
     }
@@ -390,14 +394,22 @@ public class ServerConfiguration implements Parcelable {
                 throw new IllegalArgumentException("The server URL cannot be empty");
             }
             return new ServerConfiguration(this);
-        }        public int describeContents() {
+        }
+
+        public int describeContents() {
             return 0;
         }
 
         // Getters and setters
         public int getId() {
             return mId;
-        }        public void writeToParcel(Parcel out, int flags) {
+        }
+
+        public void setId(int id) {
+            mId = id;
+        }
+
+        public void writeToParcel(Parcel out, int flags) {
             out.writeInt(mId);
 
             out.writeString(mTitle);
@@ -422,13 +434,15 @@ public class ServerConfiguration implements Parcelable {
             out.writeStringList(mAutoJoinChannels);
         }
 
-        public void setId(int id) {
-            mId = id;
-        }
-
         public String getTitle() {
             return mTitle;
-        }        @Override
+        }
+
+        public void setTitle(String title) {
+            mTitle = title;
+        }
+
+        @Override
         public boolean equals(Object o) {
             if (o instanceof Builder) {
                 final Builder builder = (Builder) o;
@@ -437,9 +451,7 @@ public class ServerConfiguration implements Parcelable {
             return false;
         }
 
-        public void setTitle(String title) {
-            mTitle = title;
-        }        @Override
+        @Override
         public int hashCode() {
             return mTitle.hashCode();
         }
@@ -545,15 +557,7 @@ public class ServerConfiguration implements Parcelable {
         }
 
 
-
-
-
-
-
-
     }
-
-
 
 
 }

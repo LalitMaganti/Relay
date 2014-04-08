@@ -131,21 +131,26 @@ public class WorldUser implements Checkable {
     public String toString() {
         return mNick.toString();
     }    // Checkable interface
+
     @Override
     public boolean isChecked() {
         return mChecked;
     }
 
-    public String getNick() {
-        return mNick.getNick();
-    }    @Override
+    @Override
     public void setChecked(boolean b) {
         mChecked = b;
     }
 
+    public String getNick() {
+        return mNick.getNick();
+    }
+
     public void setNick(String nick) {
         mNick = new Nick(nick);
-    }    @Override
+    }
+
+    @Override
     public void toggle() {
         mChecked = !mChecked;
     }
@@ -153,10 +158,6 @@ public class WorldUser implements Checkable {
     String getPrefixedNick(final Channel channel) {
         return getUserPrefix(channel) + getNick();
     }
-
-
-
-
 
 
 }
