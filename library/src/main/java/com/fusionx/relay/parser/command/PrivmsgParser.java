@@ -32,7 +32,7 @@ public class PrivmsgParser extends CommandParser {
             mCtcpParser.onParseCommand(parsedArray, rawSource);
         } else {
             final String nick = IRCUtils.getNickFromRaw(rawSource);
-            if (!mServer.shouldIgnoreUser(nick)) {
+            if (!getUserChannelInterface().shouldIgnoreUser(nick)) {
                 final String recipient = parsedArray.get(2);
                 if (Channel.isChannelPrefix(recipient.charAt(0))) {
                     onParseChannelMessage(nick, recipient, message);
@@ -44,23 +44,24 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
+        final PrivateMessageUser user = getUserChannelInterface().getPrivateMessageUser(nick);
         if (user == null) {
-            mUserChannelInterface.addNewPrivateMessageUser(nick, message, false, false);
-            mServerEventBus.post(new NewPrivateMessage(nick));
+            getUserChannelInterface().addNewPrivateMessageUser(nick, message, false, false);
+            getServerEventBus().post(new NewPrivateMessage(nick));
         } else {
-            mServerEventBus.postAndStoreEvent(new WorldPrivateMessageEvent(user, message), user);
+            getServerEventBus()
+                    .postAndStoreEvent(new WorldPrivateMessageEvent(user, message), user);
         }
     }
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
             final String message) {
-        final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
+        final Channel channel = getUserChannelInterface().getChannel(channelName);
         final boolean mention = MentionParser.onMentionableCommand(message,
-                mServer.getUser().getNick());
+                getServer().getUser().getNick());
         final ChannelEvent event = new WorldMessageEvent(channel, message, sendingUser,
                 sendingNick, mention);
-        mServerEventBus.postAndStoreEvent(event, channel);
+        getServerEventBus().postAndStoreEvent(event, channel);
     }
 }

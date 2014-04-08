@@ -28,7 +28,7 @@ class ModeParser extends CommandParser {
         if (Channel.isChannelPrefix(recipient.charAt(0))) {
             // The recipient is a channel (i.e. the mode of a user in the channel is being changed
             // or possibly the mode of the channel itself)
-            final Channel channel = mUserChannelInterface.getChannel(recipient);
+            final Channel channel = getUserChannelInterface().getChannel(recipient);
             final int messageLength = parsedArray.size();
             if (messageLength == 4) {
                 // User not specified - therefore channel mode is being changed
@@ -47,8 +47,8 @@ class ModeParser extends CommandParser {
             final Channel channel, final String mode) {
         final String source = parsedArray.get(4);
         final String nick = IRCUtils.getNickFromRaw(source);
-        final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
-        final WorldUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
+        final WorldUser user = getUserChannelInterface().getUserIfExists(nick);
+        final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
 
         // TODO - investigate when this is null
         final String sendingPrettyNick = (sendingUser == null) ? sendingNick : sendingUser
@@ -65,10 +65,10 @@ class ModeParser extends CommandParser {
                 event = new WorldLevelChangeEvent(channel, mode, user, levelEnum,
                         sendingPrettyNick);
             }
-            mServerEventBus.postAndStoreEvent(event, channel);
+            getServerEventBus().postAndStoreEvent(event, channel);
         } else {
             final ChannelEvent event = new ModeEvent(channel, sendingPrettyNick, source, mode);
-            mServerEventBus.postAndStoreEvent(event, channel);
+            getServerEventBus().postAndStoreEvent(event, channel);
         }
     }
 }

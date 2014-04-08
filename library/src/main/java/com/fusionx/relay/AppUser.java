@@ -1,9 +1,6 @@
 package com.fusionx.relay;
 
 import java.util.Collection;
-import java.util.Set;
-
-import gnu.trove.set.hash.TLinkedHashSet;
 
 public class AppUser extends WorldUser {
 

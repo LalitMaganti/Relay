@@ -66,6 +66,10 @@ public class ServerLineParser {
         }
     }
 
+    public String getCurrentLine() {
+        return mLine;
+    }
+
     /**
      * Parses a line from the server
      *
@@ -139,9 +143,5 @@ public class ServerLineParser {
                 Log.d("HoloIRC", rawLine);
             }
         }
-    }
-
-    public String getCurrentLine() {
-        return mLine;
     }
 }

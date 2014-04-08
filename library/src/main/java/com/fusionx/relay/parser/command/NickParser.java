@@ -22,7 +22,7 @@ class NickParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String oldRawNick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser user = mUserChannelInterface.getUserIfExists(oldRawNick);
+        final WorldUser user = getUserChannelInterface().getUserIfExists(oldRawNick);
         final Collection<Channel> channels = user.getChannels();
 
         final String oldNick = user.getColorfulNick();
@@ -31,7 +31,7 @@ class NickParser extends CommandParser {
 
         if (user instanceof AppUser) {
             final ServerNickChangeEvent event = new ServerNickChangeEvent(oldNick, user);
-            mServerEventBus.postAndStoreEvent(event);
+            getServerEventBus().postAndStoreEvent(event);
         }
 
         for (final Channel channel : channels) {
@@ -42,7 +42,7 @@ class NickParser extends CommandParser {
                 event = new WorldNickChangeEvent(channel, oldNick, user);
             }
             user.onChannelNickChanged(channel);
-            mServerEventBus.postAndStoreEvent(event, channel);
+            getServerEventBus().postAndStoreEvent(event, channel);
         }
     }
 }

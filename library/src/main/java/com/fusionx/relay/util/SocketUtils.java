@@ -18,6 +18,25 @@ import javax.net.ssl.X509TrustManager;
 
 public class SocketUtils {
 
+    public static Socket openSocketConnection(final ServerConfiguration configuration) throws
+            IOException {
+        final Socket socket;
+        final InetSocketAddress address = new InetSocketAddress(configuration.getUrl(),
+                configuration.getPort());
+        if (configuration.isSslEnabled()) {
+            final SSLSocketFactory sslSocketFactory = getSSLSocketFactory(configuration
+                    .shouldAcceptAllSSLCertificates());
+            socket = sslSocketFactory.createSocket();
+        } else {
+            socket = new Socket();
+        }
+
+        socket.setKeepAlive(true);
+        socket.connect(address, 5000);
+
+        return socket;
+    }
+
     private static SSLSocketFactory getSSLSocketFactory(final boolean acceptAll) {
         if (acceptAll) {
             try {
@@ -43,24 +62,5 @@ public class SocketUtils {
             }
         }
         return (SSLSocketFactory) SSLSocketFactory.getDefault();
-    }
-
-    public static Socket openSocketConnection(final ServerConfiguration configuration) throws
-            IOException {
-        final Socket socket;
-        final InetSocketAddress address = new InetSocketAddress(configuration.getUrl(),
-                configuration.getPort());
-        if (configuration.isSslEnabled()) {
-            final SSLSocketFactory sslSocketFactory = getSSLSocketFactory(configuration
-                    .shouldAcceptAllSSLCertificates());
-            socket = sslSocketFactory.createSocket();
-        } else {
-            socket = new Socket();
-        }
-
-        socket.setKeepAlive(true);
-        socket.connect(address, 5000);
-
-        return socket;
     }
 }

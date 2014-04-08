@@ -16,22 +16,14 @@ public abstract class RemoveUserParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String channelName = parsedArray.get(2);
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final Channel channel = getUserChannelInterface().getChannel(channelName);
         final WorldUser removedUser = getRemovedUser(parsedArray, rawSource);
 
-        if (removedUser.isUserNickEqual(mServer.getUser())) {
+        if (removedUser.isUserNickEqual(getServer().getUser())) {
             onRemoved(parsedArray, rawSource, channel);
         } else {
             onUserRemoved(parsedArray, rawSource, channel, removedUser);
         }
-    }
-
-    private void onUserRemoved(final List<String> parsedArray, final String rawSource,
-            final Channel channel, final WorldUser removedUser) {
-        mUserChannelInterface.decoupleUserAndChannel(removedUser, channel);
-
-        final WorldUserEvent event = getEvent(parsedArray, rawSource, channel, removedUser);
-        mServerEventBus.postAndStoreEvent(event, channel);
     }
 
     abstract WorldUser getRemovedUser(final List<String> parsedArray,
@@ -42,4 +34,12 @@ public abstract class RemoveUserParser extends CommandParser {
 
     abstract void onRemoved(final List<String> parsedArray, final String rawSource,
             final Channel channel);
+
+    private void onUserRemoved(final List<String> parsedArray, final String rawSource,
+            final Channel channel, final WorldUser removedUser) {
+        getUserChannelInterface().decoupleUserAndChannel(removedUser, channel);
+
+        final WorldUserEvent event = getEvent(parsedArray, rawSource, channel, removedUser);
+        getServerEventBus().postAndStoreEvent(event, channel);
+    }
 }

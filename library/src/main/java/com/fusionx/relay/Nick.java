@@ -15,24 +15,6 @@ final class Nick {
         mColourCode = "<color=" + getColorFromNick() + ">%1$s</color>";
     }
 
-    private int getColorFromNick() {
-        final int colorOffset = InterfaceHolders.getPreferences().getTheme()
-                .getGetTextColourOffset();
-
-        final int hash = mNick.hashCode();
-
-        int red = (hash) & 0xFF;
-        int green = (hash >> 16) & 0xFF;
-        int blue = (hash >> 8) & 0xFF;
-
-        // mix the color
-        red = (red + colorOffset) / 2;
-        green = (green + colorOffset) / 2;
-        blue = (blue + colorOffset) / 2;
-
-        return Color.rgb(red, green, blue);
-    }
-
     public String getColorfulNick() {
         if (InterfaceHolders.getPreferences().shouldNickBeColourful()) {
             return String.format(mColourCode, mNick);
@@ -53,5 +35,23 @@ final class Nick {
 
     public String getColourCode() {
         return mColourCode;
+    }
+
+    private int getColorFromNick() {
+        final int colorOffset = InterfaceHolders.getPreferences().getTheme()
+                .getGetTextColourOffset();
+
+        final int hash = mNick.hashCode();
+
+        int red = (hash) & 0xFF;
+        int green = (hash >> 16) & 0xFF;
+        int blue = (hash >> 8) & 0xFF;
+
+        // mix the color
+        red = (red + colorOffset) / 2;
+        green = (green + colorOffset) / 2;
+        blue = (blue + colorOffset) / 2;
+
+        return Color.rgb(red, green, blue);
     }
 }

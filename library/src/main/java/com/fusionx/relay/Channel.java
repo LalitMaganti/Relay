@@ -35,15 +35,6 @@ public class Channel implements Conversation {
         wipeChannelData();
     }
 
-    public void wipeChannelData() {
-        for (final UserLevel levelEnum : UserLevel.values()) {
-            mNumberOfUsers.put(levelEnum, 0);
-        }
-
-        // WorldJoinEvent is used as JoinEvent is a server event
-        mBuffer.add(new WorldJoinEvent(this, mUserChannelInterface.getServer().getUser()));
-    }
-
     /**
      * Returns whether a string is a channel name based on the first character of the string
      *
@@ -52,6 +43,15 @@ public class Channel implements Conversation {
      */
     public static boolean isChannelPrefix(char firstCharacter) {
         return channelPrefixes.contains(firstCharacter);
+    }
+
+    public void wipeChannelData() {
+        for (final UserLevel levelEnum : UserLevel.values()) {
+            mNumberOfUsers.put(levelEnum, 0);
+        }
+
+        // WorldJoinEvent is used as JoinEvent is a server event
+        mBuffer.add(new WorldJoinEvent(this, mUserChannelInterface.getServer().getUser()));
     }
 
     @Override
@@ -69,21 +69,18 @@ public class Channel implements Conversation {
         return mName.toLowerCase().hashCode();
     }
 
-    public void onChannelEvent(final ChannelEvent event) {
-        mBuffer.add(event);
+    /**
+     * Overridden method which returns the channel's name
+     *
+     * @return the channel name
+     */
+    @Override
+    public String toString() {
+        return mName;
     }
 
-    /**
-     * Gets the number of people in the channel
-     *
-     * @return the number of users in the channel
-     */
-    int getNumberOfUsers() {
-        if (getUsers() != null) {
-            return getUsers().size();
-        } else {
-            return 0;
-        }
+    public void onChannelEvent(final ChannelEvent event) {
+        mBuffer.add(event);
     }
 
     /**
@@ -134,16 +131,6 @@ public class Channel implements Conversation {
         }
     }
 
-    /**
-     * Overridden method which returns the channel's name
-     *
-     * @return the channel name
-     */
-    @Override
-    public String toString() {
-        return mName;
-    }
-
     // Getters and setters
     public String getName() {
         return mName;
@@ -176,5 +163,18 @@ public class Channel implements Conversation {
      */
     public Collection<WorldUser> getUsers() {
         return mUserChannelInterface.getAllUsersInChannel(this);
+    }
+
+    /**
+     * Gets the number of people in the channel
+     *
+     * @return the number of users in the channel
+     */
+    int getNumberOfUsers() {
+        if (getUsers() != null) {
+            return getUsers().size();
+        } else {
+            return 0;
+        }
     }
 }

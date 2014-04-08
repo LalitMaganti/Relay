@@ -85,7 +85,7 @@ public class ConnectionManager {
     }
 
     /**
-     * This method should be called when the server has notified the user that a disconnect has
+     * This method SHOULD be called when the server has notified the user that a disconnect has
      * occurred and there are no retries pending
      *
      * @param serverName the name of the server that this event came from

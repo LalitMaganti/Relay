@@ -145,7 +145,10 @@ public class ServerConfiguration implements Parcelable {
         return 0;
     }
 
-    public void writeToParcel(final Parcel out, final int flags) {
+    // Helper methods
+    public boolean isSaslAvailable() {
+        return Utils.isNotEmpty(mSaslUsername) && Utils.isNotEmpty(mSaslPassword);
+    }    public void writeToParcel(final Parcel out, final int flags) {
         out.writeString(mTitle);
         out.writeString(mUrl);
         out.writeInt(mPort);
@@ -168,11 +171,6 @@ public class ServerConfiguration implements Parcelable {
         out.writeStringList(mAutoJoinChannels);
     }
 
-    // Helper methods
-    public boolean isSaslAvailable() {
-        return Utils.isNotEmpty(mSaslUsername) && Utils.isNotEmpty(mSaslPassword);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o instanceof ServerConfiguration) {
@@ -182,11 +180,6 @@ public class ServerConfiguration implements Parcelable {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        return mTitle.hashCode();
-    }
-
     // Getters and setters
     public String getTitle() {
         return mTitle;
@@ -194,6 +187,9 @@ public class ServerConfiguration implements Parcelable {
 
     public String getUrl() {
         return mUrl;
+    }    @Override
+    public int hashCode() {
+        return mTitle.hashCode();
     }
 
     public int getPort() {
@@ -387,11 +383,21 @@ public class ServerConfiguration implements Parcelable {
             in.readStringList(mAutoJoinChannels);
         }
 
-        public int describeContents() {
+        public ServerConfiguration build() {
+            if (TextUtils.isEmpty(mTitle)) {
+                throw new IllegalArgumentException("The server title cannot be empty");
+            } else if (TextUtils.isEmpty(mUrl)) {
+                throw new IllegalArgumentException("The server URL cannot be empty");
+            }
+            return new ServerConfiguration(this);
+        }        public int describeContents() {
             return 0;
         }
 
-        public void writeToParcel(Parcel out, int flags) {
+        // Getters and setters
+        public int getId() {
+            return mId;
+        }        public void writeToParcel(Parcel out, int flags) {
             out.writeInt(mId);
 
             out.writeString(mTitle);
@@ -416,16 +422,13 @@ public class ServerConfiguration implements Parcelable {
             out.writeStringList(mAutoJoinChannels);
         }
 
-        public ServerConfiguration build() {
-            if (TextUtils.isEmpty(mTitle)) {
-                throw new IllegalArgumentException("The server title cannot be empty");
-            } else if (TextUtils.isEmpty(mUrl)) {
-                throw new IllegalArgumentException("The server URL cannot be empty");
-            }
-            return new ServerConfiguration(this);
+        public void setId(int id) {
+            mId = id;
         }
 
-        @Override
+        public String getTitle() {
+            return mTitle;
+        }        @Override
         public boolean equals(Object o) {
             if (o instanceof Builder) {
                 final Builder builder = (Builder) o;
@@ -434,26 +437,11 @@ public class ServerConfiguration implements Parcelable {
             return false;
         }
 
-        @Override
-        public int hashCode() {
-            return mTitle.hashCode();
-        }
-
-        // Getters and setters
-        public int getId() {
-            return mId;
-        }
-
-        public void setId(int id) {
-            mId = id;
-        }
-
-        public String getTitle() {
-            return mTitle;
-        }
-
         public void setTitle(String title) {
             mTitle = title;
+        }        @Override
+        public int hashCode() {
+            return mTitle.hashCode();
         }
 
         public String getUrl() {
@@ -555,5 +543,17 @@ public class ServerConfiguration implements Parcelable {
         public ArrayList<String> getAutoJoinChannels() {
             return mAutoJoinChannels;
         }
+
+
+
+
+
+
+
+
     }
+
+
+
+
 }

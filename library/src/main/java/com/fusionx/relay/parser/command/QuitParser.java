@@ -22,40 +22,40 @@ public class QuitParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser user = mUserChannelInterface.getUserIfExists(nick);
-        if (mServer.getUser().isUserNickEqual(user)) {
+        final WorldUser user = getUserChannelInterface().getUserIfExists(nick);
+        if (getServer().getUser().isUserNickEqual(user)) {
             onQuit();
         } else {
             onUserQuit(parsedArray, user);
         }
     }
 
+    public boolean isUserQuit() {
+        return mIsUserQuit;
+    }
+
     private void onUserQuit(final List<String> parsedArray, final WorldUser user) {
-        final Collection<Channel> list = mUserChannelInterface.removeUser(user);
+        final Collection<Channel> list = getUserChannelInterface().removeUser(user);
         final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"", "") : "";
         for (final Channel channel : list) {
-            mUserChannelInterface.removeUserFromChannel(channel, user);
+            getUserChannelInterface().removeUserFromChannel(channel, user);
 
             final WorldQuitEvent event = new WorldQuitEvent(channel, user, reason);
-            mServerEventBus.postAndStoreEvent(event, channel);
+            getServerEventBus().postAndStoreEvent(event, channel);
         }
 
-        final PrivateMessageUser pmUser = mUserChannelInterface.getPrivateMessageUser(user
+        final PrivateMessageUser pmUser = getUserChannelInterface().getPrivateMessageUser(user
                 .getNick());
         if (pmUser != null) {
             pmUser.setUserQuit(true);
 
             final WorldPrivateQuitEvent event = new WorldPrivateQuitEvent(pmUser);
-            mServerEventBus.postAndStoreEvent(event, pmUser);
+            getServerEventBus().postAndStoreEvent(event, pmUser);
         }
     }
 
     private void onQuit() {
         // TODO - improve this
         mIsUserQuit = true;
-    }
-
-    public boolean isUserQuit() {
-        return mIsUserQuit;
     }
 }

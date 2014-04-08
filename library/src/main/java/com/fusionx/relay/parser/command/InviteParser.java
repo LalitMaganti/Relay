@@ -14,7 +14,7 @@ class InviteParser extends CommandParser {
     @Override
     public void onParseCommand(List<String> parsedArray, String rawSource) {
         final String invitingNick = IRCUtils.getNickFromRaw(rawSource);
-        if (parsedArray.get(2).equals(mServer.getUser().getNick())) {
+        if (parsedArray.get(2).equals(getServer().getUser().getNick())) {
             final String channelName = parsedArray.get(3);
             //mServerEventBus.sendInviteEvent(mServer, channelName);
         } else {

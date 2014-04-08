@@ -11,7 +11,6 @@ import com.fusionx.relay.writers.UserWriter;
 
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Server implements Conversation {
@@ -30,8 +29,6 @@ public class Server implements Conversation {
 
     private AppUser mUser;
 
-    private List<String> mIgnoreList;
-
     public Server(final ServerConfiguration configuration, final ServerConnection connection) {
         mServerConnection = connection;
         mConfiguration = configuration;
@@ -39,7 +36,6 @@ public class Server implements Conversation {
         mServerEventBus = new ServerEventBus(this);
         mServerCallBus = new ServerCallBus(this, connection.getServerCallHandler());
         mUserChannelInterface = new UserChannelInterface(this);
-        mIgnoreList = new ArrayList<>();
     }
 
     public void onServerEvent(final ServerEvent event) {
@@ -47,7 +43,6 @@ public class Server implements Conversation {
     }
 
     public void onDisconnect() {
-        // Null can occur if the connection does not occur on initial connect
         mUserChannelInterface.onDisconnect();
 
         // Need to remove old writers as they would be using the old socket OutputStream if a
@@ -79,10 +74,6 @@ public class Server implements Conversation {
         mServerCallBus.register(new ChannelWriter(writer));
         mServerCallBus.register(new UserWriter(writer));
         return serverWriter;
-    }
-
-    public boolean shouldIgnoreUser(final String userNick) {
-        return mIgnoreList.contains(userNick);
     }
 
     // Conversation Interface

@@ -20,21 +20,21 @@ class JoinParser extends CommandParser {
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String channelName = parsedArray.get(2);
 
-        final WorldUser user = mUserChannelInterface.getUserFromRaw(rawSource);
-        Channel channel = mUserChannelInterface.getChannel(channelName);
+        final WorldUser user = getUserChannelInterface().getUserFromRaw(rawSource);
+        Channel channel = getUserChannelInterface().getChannel(channelName);
         if (channel == null) {
-            channel = mUserChannelInterface.getNewChannel(channelName);
-        } else if (user.isUserNickEqual(mServer.getUser())) {
+            channel = getUserChannelInterface().getNewChannel(channelName);
+        } else if (user.isUserNickEqual(getServer().getUser())) {
             channel.wipeChannelData();
         }
-        mUserChannelInterface.coupleUserAndChannel(user, channel);
+        getUserChannelInterface().coupleUserAndChannel(user, channel);
 
-        if (user.isUserNickEqual(mServer.getUser())) {
+        if (user.isUserNickEqual(getServer().getUser())) {
             final ServerEvent event = new JoinEvent(channel);
-            mServerEventBus.post(event);
+            getServerEventBus().post(event);
         } else {
             final ChannelEvent event = new WorldJoinEvent(channel, user);
-            mServerEventBus.postAndStoreEvent(event, channel);
+            getServerEventBus().postAndStoreEvent(event, channel);
         }
     }
 }

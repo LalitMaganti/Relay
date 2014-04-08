@@ -18,9 +18,9 @@ import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.MessageEvent;
+import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
-import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.Utils;
@@ -170,11 +170,11 @@ public class ServerCallBus {
         }
     }
 
-    Server getServer() {
-        return mServer;
-    }
-
     public void sendKick(String channelName, String nick, String reason) {
         post(new ChannelKickCall(channelName, nick, reason));
+    }
+
+    Server getServer() {
+        return mServer;
     }
 }

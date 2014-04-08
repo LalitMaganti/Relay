@@ -19,7 +19,7 @@ public class PartParser extends RemoveUserParser {
     @Override
     public WorldUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
         final String userNick = IRCUtils.getNickFromRaw(rawSource);
-        return mUserChannelInterface.getUserIfExists(userNick);
+        return getUserChannelInterface().getUserIfExists(userNick);
     }
 
     @Override
@@ -31,9 +31,9 @@ public class PartParser extends RemoveUserParser {
 
     @Override
     void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
-        mUserChannelInterface.removeChannel(channel);
+        getUserChannelInterface().removeChannel(channel);
 
         final PartEvent event = new PartEvent(channel);
-        mServerEventBus.post(event);
+        getServerEventBus().post(event);
     }
 }

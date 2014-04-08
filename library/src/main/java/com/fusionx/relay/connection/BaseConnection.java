@@ -71,6 +71,17 @@ public class BaseConnection {
         mServerConfiguration = configuration;
     }
 
+    public boolean isUserDisconnected() {
+        return mUserDisconnected;
+    }
+
+    public String getCurrentLine() {
+        if (mLineParser != null) {
+            return mLineParser.getCurrentLine();
+        }
+        return "";
+    }
+
     /**
      * Method which keeps trying to reconnect to the server the number of times specified and if
      * the
@@ -98,6 +109,30 @@ public class BaseConnection {
 
         if (!mUserDisconnected) {
             sendDisconnectEvents("", false, false);
+        }
+    }
+
+    /**
+     * Called when the user explicitly requests a disconnect
+     */
+    void disconnect() {
+        mUserDisconnected = true;
+        mServer.getServerCallBus().post(new QuitCall(InterfaceHolders.getPreferences()
+                .getQuitReason()));
+        mServerConnection.onStatusChanged(ConnectionStatus.DISCONNECTED);
+    }
+
+    /**
+     * Closes the socket if it is not already closed
+     */
+    void closeSocket() {
+        try {
+            if (mSocket != null) {
+                mSocket.close();
+                mSocket = null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -252,43 +287,8 @@ public class BaseConnection {
         }
     }
 
-    /**
-     * Called when the user explicitly requests a disconnect
-     */
-    public void disconnect() {
-        mUserDisconnected = true;
-        mServer.getServerCallBus().post(new QuitCall(InterfaceHolders.getPreferences()
-                .getQuitReason()));
-        mServerConnection.onStatusChanged(ConnectionStatus.DISCONNECTED);
-    }
-
-    /**
-     * Closes the socket if it is not already closed
-     */
-    public void closeSocket() {
-        try {
-            if (mSocket != null) {
-                mSocket.close();
-                mSocket = null;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private boolean isReconnectNeeded() {
         return mReconnectAttempts < InterfaceHolders.getPreferences().getReconnectAttemptsCount()
                 && !mUserDisconnected;
-    }
-
-    public boolean isUserDisconnected() {
-        return mUserDisconnected;
-    }
-
-    public String getCurrentLine() {
-        if (mLineParser != null) {
-            return mLineParser.getCurrentLine();
-        }
-        return "";
     }
 }

@@ -24,6 +24,15 @@ class NameParser extends CodeParser {
         mUserChannelInterface = server.getUserChannelInterface();
     }
 
+    @Override
+    public void onParseCode(final int code, final List<String> parsedArray) {
+        if (code == RPL_NAMREPLY) {
+            onParseNameReply(parsedArray);
+        } else {
+            onParseNameFinished();
+        }
+    }
+
     private void onParseNameReply(final List<String> parsedArray) {
         if (mChannel == null) {
             mChannel = mUserChannelInterface.getChannel(parsedArray.get(1));
@@ -41,14 +50,5 @@ class NameParser extends CodeParser {
         mServer.getServerEventBus().post(new NameEvent(mChannel, mChannel.getUsers()));
 
         mChannel = null;
-    }
-
-    @Override
-    public void onParseCode(final int code, final List<String> parsedArray) {
-        if (code == RPL_NAMREPLY) {
-            onParseNameReply(parsedArray);
-        } else {
-            onParseNameFinished();
-        }
     }
 }

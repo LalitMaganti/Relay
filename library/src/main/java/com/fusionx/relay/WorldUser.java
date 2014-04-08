@@ -37,10 +37,6 @@ public class WorldUser implements Checkable {
         mChecked = false;
     }
 
-    String getPrefixedNick(final Channel channel) {
-        return getUserPrefix(channel) + getNick();
-    }
-
     public String getPrettyNick(final Channel channel) {
         if (InterfaceHolders.getPreferences().shouldNickBeColourful()) {
             return String.format(mNick.getColourCode(), getPrefixedNick(channel));
@@ -127,22 +123,6 @@ public class WorldUser implements Checkable {
         return mNick.getNick().equals(user.getNick());
     }
 
-    // Checkable interface
-    @Override
-    public boolean isChecked() {
-        return mChecked;
-    }
-
-    @Override
-    public void setChecked(boolean b) {
-        mChecked = b;
-    }
-
-    @Override
-    public void toggle() {
-        mChecked = !mChecked;
-    }
-
     public String getColorfulNick() {
         return mNick.getColorfulNick();
     }
@@ -150,13 +130,33 @@ public class WorldUser implements Checkable {
     @Override
     public String toString() {
         return mNick.toString();
+    }    // Checkable interface
+    @Override
+    public boolean isChecked() {
+        return mChecked;
     }
 
     public String getNick() {
         return mNick.getNick();
+    }    @Override
+    public void setChecked(boolean b) {
+        mChecked = b;
     }
 
     public void setNick(String nick) {
         mNick = new Nick(nick);
+    }    @Override
+    public void toggle() {
+        mChecked = !mChecked;
     }
+
+    String getPrefixedNick(final Channel channel) {
+        return getUserPrefix(channel) + getNick();
+    }
+
+
+
+
+
+
 }

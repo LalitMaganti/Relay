@@ -9,9 +9,6 @@ import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import de.greenrobot.event.EventBus;
 
 public class ServerEventBus {

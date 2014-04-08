@@ -27,14 +27,14 @@ class KickParser extends RemoveUserParser {
     @Override
     public WorldUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
         final String kickedNick = parsedArray.get(3);
-        return mUserChannelInterface.getUserIfExists(kickedNick);
+        return getUserChannelInterface().getUserIfExists(kickedNick);
     }
 
     @Override
     public WorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
             final Channel channel, final WorldUser kickedUser) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser kickingUser = mUserChannelInterface.getUserIfExists(kickingNick);
+        final WorldUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
 
         return new WorldKickEvent(channel, kickedUser, kickingUser, reason);
@@ -50,14 +50,14 @@ class KickParser extends RemoveUserParser {
     @Override
     void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser kickingUser = mUserChannelInterface.getUserIfExists(kickingNick);
+        final WorldUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
 
         // Remove the channel only after we've finished with it
-        mUserChannelInterface.removeChannel(channel);
+        getUserChannelInterface().removeChannel(channel);
 
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
         final KickEvent event = new KickEvent(channel, kickingUser, reason);
 
-        mServerEventBus.postAndStoreEvent(event);
+        getServerEventBus().postAndStoreEvent(event);
     }
 }

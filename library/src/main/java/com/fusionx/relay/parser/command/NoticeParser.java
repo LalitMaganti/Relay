@@ -35,7 +35,7 @@ class NoticeParser extends CommandParser {
 
             if (Channel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelNotice(recipient, notice, sendingNick);
-            } else if (recipient.equals(mServer.getUser().getNick())) {
+            } else if (recipient.equals(getServer().getUser().getNick())) {
                 onParseUserNotice(sendingNick, notice);
             }
         }
@@ -43,18 +43,18 @@ class NoticeParser extends CommandParser {
 
     void onParseChannelNotice(final String channelName, final String sendingNick,
             final String notice) {
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final Channel channel = getUserChannelInterface().getChannel(channelName);
         final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
-        mServerEventBus.postAndStoreEvent(event, channel);
+        getServerEventBus().postAndStoreEvent(event, channel);
     }
 
     void onParseUserNotice(final String sendingNick, final String notice) {
-        final PrivateMessageUser user = mUserChannelInterface
+        final PrivateMessageUser user = getUserChannelInterface()
                 .getPrivateMessageUser(sendingNick);
         if (user == null) {
-            mServerEventBus.postAndStoreEvent(new PrivateNoticeEvent(notice, sendingNick));
+            getServerEventBus().postAndStoreEvent(new PrivateNoticeEvent(notice, sendingNick));
         } else {
-            mServerEventBus.postAndStoreEvent(new WorldPrivateMessageEvent(user, notice), user);
+            getServerEventBus().postAndStoreEvent(new WorldPrivateMessageEvent(user, notice), user);
         }
     }
 }
