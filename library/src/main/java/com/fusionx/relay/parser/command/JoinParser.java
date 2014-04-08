@@ -24,7 +24,7 @@ class JoinParser extends CommandParser {
         Channel channel = mUserChannelInterface.getChannel(channelName);
         if (channel == null) {
             channel = mUserChannelInterface.getNewChannel(channelName);
-        } else {
+        } else if (user.isUserNickEqual(mServer.getUser())) {
             channel.wipeChannelData();
         }
         mUserChannelInterface.coupleUserAndChannel(user, channel);
