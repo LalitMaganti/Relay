@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.util.Pair;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
@@ -41,19 +42,20 @@ public class ConnectionManager {
      * Creates a connection with the IRC server and tries to connect to it
      *
      * @param configuration the configuration you want to connect with
+     * @param ignoreList    list of users who should be ignored - this can be changed in the
+     *                      future using the updateIgnoreList method on the returned Server object
      * @param errorHandler  a handler object which will be used if an error occurs on the
-     *                      background
-     *                      thread
+     *                      background thread
      * @return a pair of objects - the first item is a boolean which is true if the server already
      * exists in the manager. The second item is the server which was created.
      */
     public Pair<Boolean, Server> onConnectionRequested(final ServerConfiguration configuration,
-            final Handler errorHandler) {
+            final List<String> ignoreList, final Handler errorHandler) {
         ServerConnection connection = mConnectionMap.get(configuration.getTitle());
 
         final boolean exists = connection != null;
         if (!exists) {
-            connection = new ServerConnection(configuration, errorHandler);
+            connection = new ServerConnection(configuration, errorHandler, ignoreList);
             connection.connect();
             mConnectionMap.put(configuration.getTitle(), connection);
         }

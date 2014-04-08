@@ -63,7 +63,9 @@ public class BaseConnection {
      * Constructor for the object - package local since this object should always be contained only
      * within a {@link ServerConnection} object
      *
-     * @param configuration - the ServerConfiguration which should be used to connect to the server
+     * @param configuration the {@link ServerConfiguration} which should be used to connect to the
+     *                      server
+     * @param connection    the {@link ServerConnection} that created this object
      */
     BaseConnection(final ServerConfiguration configuration, final ServerConnection connection) {
         mServerConnection = connection;
@@ -75,7 +77,7 @@ public class BaseConnection {
         return mUserDisconnected;
     }
 
-    public String getCurrentLine() {
+    String getCurrentLine() {
         if (mLineParser != null) {
             return mLineParser.getCurrentLine();
         }
@@ -84,8 +86,7 @@ public class BaseConnection {
 
     /**
      * Method which keeps trying to reconnect to the server the number of times specified and if
-     * the
-     * user has not explicitly tried to disconnect
+     * the user has not explicitly tried to disconnect
      */
     void connectToServer() {
         mReconnectAttempts = 0;
@@ -136,9 +137,6 @@ public class BaseConnection {
         }
     }
 
-    /**
-     * Called by the connectToServer method ONLY
-     */
     private void connect() {
         String disconnectMessage = "";
         try {
@@ -238,9 +236,6 @@ public class BaseConnection {
         mLineParser.parseMain(reader, serverWriter);
     }
 
-    /**
-     * Called when we are connected to the server
-     */
     private void onConnected() {
         mServerConnection.onStatusChanged(ConnectionStatus.CONNECTED);
 

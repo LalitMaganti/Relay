@@ -3,6 +3,7 @@ package com.fusionx.relay;
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.util.IRCUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +31,7 @@ public final class UserChannelInterface {
         mUserToChannelMap = new THashMap<>();
         mChannelToUserMap = new THashMap<>();
         mPrivateMessageUsers = new TLinkedHashSet<>();
+        mUserIgnoreList = new ArrayList<>();
     }
 
     public synchronized void coupleUserAndChannel(final WorldUser user, final Channel channel) {
@@ -153,15 +155,6 @@ public final class UserChannelInterface {
         return mUserIgnoreList.contains(userNick);
     }
 
-    synchronized void addUserToChannel(final WorldUser user, final Channel channel) {
-        Collection<WorldUser> setOfUsers = mChannelToUserMap.get(channel);
-        if (setOfUsers == null) {
-            setOfUsers = new THashSet<>();
-            mChannelToUserMap.put(channel, setOfUsers);
-        }
-        setOfUsers.add(user);
-    }
-
     void removeChannelFromUser(final Channel channel, final WorldUser user) {
         final Collection<Channel> setOfChannels = mUserToChannelMap.get(user);
         // The app user check is to make sure that the list of channels returned for the app user
@@ -186,8 +179,23 @@ public final class UserChannelInterface {
     }
 
     // Getters and setters
+    void updateIgnoreList(final List<String> userIgnoreList) {
+        if (userIgnoreList != null) {
+            mUserIgnoreList = new ArrayList<>(userIgnoreList);
+        }
+    }
+
     Server getServer() {
         return mServer;
+    }
+
+    private synchronized void addUserToChannel(final WorldUser user, final Channel channel) {
+        Collection<WorldUser> setOfUsers = mChannelToUserMap.get(channel);
+        if (setOfUsers == null) {
+            setOfUsers = new THashSet<>();
+            mChannelToUserMap.put(channel, setOfUsers);
+        }
+        setOfUsers.add(user);
     }
 
     private synchronized void addChannelToUser(final WorldUser user, final Channel channel) {

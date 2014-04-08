@@ -29,13 +29,15 @@ public class Server implements Conversation {
 
     private AppUser mUser;
 
-    public Server(final ServerConfiguration configuration, final ServerConnection connection) {
+    public Server(final ServerConfiguration configuration, final ServerConnection connection,
+            List<String> ignoreList) {
         mServerConnection = connection;
         mConfiguration = configuration;
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus(this);
         mServerCallBus = new ServerCallBus(this, connection.getServerCallHandler());
         mUserChannelInterface = new UserChannelInterface(this);
+        mUserChannelInterface.updateIgnoreList(ignoreList);
     }
 
     public void onServerEvent(final ServerEvent event) {
@@ -77,10 +79,6 @@ public class Server implements Conversation {
     }
 
     // Conversation Interface
-    public List<ServerEvent> getBuffer() {
-        return mBuffer;
-    }
-
     @Override
     public String getId() {
         return getTitle();
@@ -92,6 +90,10 @@ public class Server implements Conversation {
     }
 
     // Getters and Setters
+    public List<ServerEvent> getBuffer() {
+        return mBuffer;
+    }
+
     public UserChannelInterface getUserChannelInterface() {
         return mUserChannelInterface;
     }
@@ -118,5 +120,9 @@ public class Server implements Conversation {
 
     public ServerEventBus getServerEventBus() {
         return mServerEventBus;
+    }
+
+    public void updateIgnoreList(List<String> list) {
+        mUserChannelInterface.updateIgnoreList(list);
     }
 }

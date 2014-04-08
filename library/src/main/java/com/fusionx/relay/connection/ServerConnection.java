@@ -8,6 +8,8 @@ import com.fusionx.relay.event.server.DisconnectEvent;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+import java.util.List;
+
 /**
  * A wrapper thread class for the interesting {@link BaseConnection} class
  */
@@ -42,14 +44,15 @@ public class ServerConnection {
 
     private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
 
-    ServerConnection(final ServerConfiguration configuration, final Handler handler) {
+    ServerConnection(final ServerConfiguration configuration, final Handler handler,
+            List<String> ignoreList) {
         mMainThread = new Thread(mRunnable);
 
         final HandlerThread handlerThread = new HandlerThread("ServerCalls");
         handlerThread.start();
         mServerCallHandler = new Handler(handlerThread.getLooper());
 
-        mServer = new Server(configuration, this);
+        mServer = new Server(configuration, this, ignoreList);
         mBaseConnection = new BaseConnection(configuration, this);
         mUiThreadHandler = handler;
     }
@@ -78,7 +81,7 @@ public class ServerConnection {
         return mServerCallHandler;
     }
 
-    public Server getServer() {
+    Server getServer() {
         return mServer;
     }
 
