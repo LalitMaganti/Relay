@@ -94,6 +94,9 @@ public class BaseConnection {
         connect();
 
         while (isReconnectNeeded()) {
+            // Set status to reconnecting
+            mServerConnection.updateStatus(ConnectionStatus.RECONNECTING);
+
             mServer.getServerEventBus().postAndStoreEvent(new GenericServerEvent("Trying to "
                     + "reconnect to the server in 5 seconds."));
             try {
@@ -109,6 +112,8 @@ public class BaseConnection {
         }
 
         if (!mUserDisconnected) {
+            // The final disconnect has occurred - update the status
+            mServerConnection.updateStatus(ConnectionStatus.DISCONNECTED);
             sendDisconnectEvents("", false, false);
         }
     }
@@ -120,7 +125,7 @@ public class BaseConnection {
         mUserDisconnected = true;
         mServer.getServerCallBus().post(new QuitCall(InterfaceHolders.getPreferences()
                 .getQuitReason()));
-        mServerConnection.onStatusChanged(ConnectionStatus.DISCONNECTED);
+        mServerConnection.updateStatus(ConnectionStatus.DISCONNECTED);
     }
 
     /**
@@ -145,7 +150,7 @@ public class BaseConnection {
                     .getOutputStream()));
             final ServerWriter serverWriter = mServer.onOutputStreamCreated(writer);
 
-            mServerConnection.onStatusChanged(ConnectionStatus.CONNECTING);
+            mServerConnection.updateStatus(ConnectionStatus.CONNECTING);
             mServer.getServerEventBus().post(new ConnectingEvent());
 
             if (mServerConfiguration.isSaslAvailable()) {
@@ -190,8 +195,6 @@ public class BaseConnection {
         }
 
         if (!mUserDisconnected) {
-            // We are disconnected :( - close up shop
-            mServerConnection.onStatusChanged(ConnectionStatus.DISCONNECTED);
             closeSocket();
 
             mServer.onDisconnect();
@@ -237,7 +240,7 @@ public class BaseConnection {
     }
 
     private void onConnected() {
-        mServerConnection.onStatusChanged(ConnectionStatus.CONNECTED);
+        mServerConnection.updateStatus(ConnectionStatus.CONNECTED);
 
         final ServerEventBus bus = mServer.getServerEventBus();
 
@@ -256,8 +259,8 @@ public class BaseConnection {
         }
     }
 
-    private void sendDisconnectEvents(final String serverMessage, boolean userSent,
-            boolean retryPending) {
+    private void sendDisconnectEvents(final String serverMessage, final boolean userSent,
+            final boolean retryPending) {
         final StringBuilder builder = new StringBuilder("Disconnected from the server");
         if (Utils.isNotEmpty(serverMessage)) {
             builder.append(" (").append(serverMessage).append(")");

@@ -45,7 +45,7 @@ public class ServerConnection {
     private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
 
     ServerConnection(final ServerConfiguration configuration, final Handler handler,
-            List<String> ignoreList) {
+            final List<String> ignoreList) {
         mMainThread = new Thread(mRunnable);
 
         final HandlerThread handlerThread = new HandlerThread("ServerCalls");
@@ -57,16 +57,23 @@ public class ServerConnection {
         mUiThreadHandler = handler;
     }
 
-    public void connect() {
+    public Handler getServerCallHandler() {
+        return mServerCallHandler;
+    }
+
+    public ConnectionStatus getStatus() {
+        return mStatus;
+    }
+
+    void connect() {
         mMainThread.start();
     }
 
-    public void disconnect() {
+    void disconnect() {
         mServerCallHandler.post(new Runnable() {
             @Override
             public void run() {
-                final ConnectionStatus status = mServer.getStatus();
-                if (status == ConnectionStatus.CONNECTED) {
+                if (mStatus == ConnectionStatus.CONNECTED) {
                     mBaseConnection.disconnect();
                 } else if (mMainThread.isAlive()) {
                     mMainThread.interrupt();
@@ -77,19 +84,11 @@ public class ServerConnection {
         });
     }
 
-    public Handler getServerCallHandler() {
-        return mServerCallHandler;
-    }
-
     Server getServer() {
         return mServer;
     }
 
-    public ConnectionStatus getStatus() {
-        return mStatus;
-    }
-
-    void onStatusChanged(final ConnectionStatus newStatus) {
+    void updateStatus(final ConnectionStatus newStatus) {
         mStatus = newStatus;
     }
 }

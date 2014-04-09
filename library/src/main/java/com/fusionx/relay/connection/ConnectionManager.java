@@ -1,5 +1,6 @@
 package com.fusionx.relay.connection;
 
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.interfaces.EventPreferences;
@@ -8,7 +9,6 @@ import com.fusionx.relay.misc.InterfaceHolders;
 import android.os.Handler;
 import android.util.Pair;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +49,7 @@ public class ConnectionManager {
      * @return a pair of objects - the first item is a boolean which is true if the server already
      * exists in the manager. The second item is the server which was created.
      */
-    public Pair<Boolean, Server> onConnectionRequested(final ServerConfiguration configuration,
+    public Pair<Boolean, Server> requestConnection(final ServerConfiguration configuration,
             final List<String> ignoreList, final Handler errorHandler) {
         ServerConnection connection = mConnectionMap.get(configuration.getTitle());
 
@@ -63,12 +63,20 @@ public class ConnectionManager {
     }
 
     /**
-     * Returns the number of servers which are currently managed by this manager
      *
-     * @return the number of servers which are managed
      */
-    public int getServerCount() {
-        return mConnectionMap.size();
+    public void requestReconnection(final Server server) {
+        final ServerConnection connection = mConnectionMap.get(server.getTitle());
+
+        if (connection == null) {
+            throw new IllegalArgumentException("Server not managed by this manager");
+        }
+
+        if (connection.getStatus() != ConnectionStatus.DISCONNECTED) {
+            throw new IllegalArgumentException("Server not in disconnected state");
+        }
+
+        connection.connect();
     }
 
     /**
@@ -77,7 +85,7 @@ public class ConnectionManager {
      * @param serverName the name of the server you're wanting to disconnect from
      * @return whether the list of connected servers is empty
      */
-    public boolean onDisconnectionRequested(final String serverName) {
+    public boolean requestDisconnection(final String serverName) {
         final ServerConnection connection = mConnectionMap.get(serverName);
         if (connection != null) {
             connection.disconnect();
@@ -87,21 +95,10 @@ public class ConnectionManager {
     }
 
     /**
-     * This method SHOULD be called when the server has notified the user that a disconnect has
-     * occurred and there are no retries pending
-     *
-     * @param serverName the name of the server that this event came from
-     */
-    public boolean onFinalUnexpectedDisconnect(final String serverName) {
-        mConnectionMap.remove(serverName);
-        return mConnectionMap.isEmpty();
-    }
-
-    /**
-     * Returns the server if it is already connected to
+     * Returns the server if it is already connected
      *
      * This is almost always NOT the method you want to call.
-     * In most cases the {@code onConnectionRequested} method should be called instead
+     * In most cases the {@code requestConnection} method should be called instead
      *
      * Only use this if you know what you're doing
      *
@@ -111,8 +108,16 @@ public class ConnectionManager {
     public Server getServerIfExists(final String serverName) {
         if (mConnectionMap.containsKey(serverName)) {
             return mConnectionMap.get(serverName).getServer();
-        } else {
-            return null;
         }
+        return null;
+    }
+
+    /**
+     * Returns the number of servers which are currently managed by this manager
+     *
+     * @return the number of servers which are managed
+     */
+    public int getServerCount() {
+        return mConnectionMap.size();
     }
 }
