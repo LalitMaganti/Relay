@@ -98,21 +98,10 @@ public class ConnectionManager {
     }
 
     /**
-     * Disconnects all the managed servers
-     */
-    public void disconnectAll() {
-        final Iterator<ServerConnection> iterator = mConnectionMap.values().iterator();
-        while (iterator.hasNext()) {
-            iterator.next().disconnect();
-            iterator.remove();
-        }
-    }
-
-    /**
      * Returns the server if it is already connected to
      *
-     * This is almost always NOT the method you want to call the {@code onConnectionRequested}
-     * method instead
+     * This is almost always NOT the method you want to call.
+     * In most cases the {@code onConnectionRequested} method should be called instead
      *
      * Only use this if you know what you're doing
      *
