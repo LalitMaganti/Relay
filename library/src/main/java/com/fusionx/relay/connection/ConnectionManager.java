@@ -9,6 +9,7 @@ import com.fusionx.relay.misc.InterfaceHolders;
 import android.os.Handler;
 import android.util.Pair;
 
+import java.lang.IllegalArgumentException;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +64,12 @@ public class ConnectionManager {
     }
 
     /**
+     * Reconnect to the specified server
      *
+     * @param server the server to reconnect to
+     *
+     * @throws IllegalArgumentException if the server is not in this manager or if the server is
+     * not in the ConnectionStatus.Disconnected state
      */
     public void requestReconnection(final Server server) {
         final ServerConnection connection = mConnectionMap.get(server.getTitle());
@@ -80,12 +86,17 @@ public class ConnectionManager {
     }
 
     /**
-     * Disconnect from the server with the specified name
+     * Disconnect from the server with the specified name and removes it from this manager
+     *
+     * This method should be called even when the server is in the DISCONNECTED state as the
+     * server needs to be removed from this manager in this state
+     *
+     * WARNING: the server associated with this server name is now not safe to call upon
      *
      * @param serverName the name of the server you're wanting to disconnect from
      * @return whether the list of connected servers is empty
      */
-    public boolean requestDisconnection(final String serverName) {
+    public boolean requestDisconnectionAndRemoval(final String serverName) {
         final ServerConnection connection = mConnectionMap.get(serverName);
         if (connection != null) {
             connection.disconnect();
