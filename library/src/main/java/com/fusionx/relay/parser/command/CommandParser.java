@@ -36,6 +36,7 @@ public abstract class CommandParser {
         parserMap.put(ServerCommands.KICK, new KickParser(server));
         parserMap.put(ServerCommands.INVITE, new InviteParser(server));
         parserMap.put(ServerCommands.PONG, new PongParser(server));
+        parserMap.put(ServerCommands.WALLOPS, new WallopsParser(server));
 
         return parserMap;
     }

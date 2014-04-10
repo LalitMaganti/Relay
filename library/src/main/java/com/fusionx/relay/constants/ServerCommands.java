@@ -32,6 +32,8 @@ public class ServerCommands {
 
     public final static String PONG = "PONG";
 
+    public static final String WALLOPS = "WALLOPS";
+
     private ServerCommands() {
     }
 }
