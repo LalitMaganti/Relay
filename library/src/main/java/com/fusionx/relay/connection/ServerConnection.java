@@ -40,14 +40,12 @@ public class ServerConnection {
 
     private final Handler mServerCallHandler;
 
-    private final Thread mMainThread;
+    private Thread mMainThread;
 
     private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
 
     ServerConnection(final ServerConfiguration configuration, final Handler handler,
             final List<String> ignoreList) {
-        mMainThread = new Thread(mRunnable);
-
         final HandlerThread handlerThread = new HandlerThread("ServerCalls");
         handlerThread.start();
         mServerCallHandler = new Handler(handlerThread.getLooper());
@@ -66,6 +64,7 @@ public class ServerConnection {
     }
 
     void connect() {
+        mMainThread = new Thread(mRunnable);
         mMainThread.start();
     }
 
