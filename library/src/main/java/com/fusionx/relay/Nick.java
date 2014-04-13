@@ -39,7 +39,7 @@ final class Nick {
 
     private int getColorFromNick() {
         final int colorOffset = InterfaceHolders.getPreferences().getTheme()
-                .getGetTextColourOffset();
+                .getTextColourOffset();
 
         final int hash = mNick.hashCode();
 
@@ -48,10 +48,20 @@ final class Nick {
         int blue = (hash >> 8) & 0xFF;
 
         // mix the color
-        red = (red + colorOffset) / 2;
-        green = (green + colorOffset) / 2;
-        blue = (blue + colorOffset) / 2;
+        red = normaliseColourInt((red + colorOffset) / 2);
+        green = normaliseColourInt((green + colorOffset) / 2);
+        blue = normaliseColourInt((blue + colorOffset) / 2);
 
         return Color.rgb(red, green, blue);
+    }
+
+    private int normaliseColourInt(final int colour) {
+        if (colour > 255) {
+            return 255;
+        } else if (colour < 0) {
+            return 0;
+        }
+
+        return colour;
     }
 }

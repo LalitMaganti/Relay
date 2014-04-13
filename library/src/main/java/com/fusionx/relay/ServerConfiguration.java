@@ -438,8 +438,9 @@ public class ServerConfiguration implements Parcelable {
             return mTitle;
         }
 
-        public void setTitle(String title) {
+        public Builder setTitle(String title) {
             mTitle = title;
+            return this;
         }
 
         @Override
@@ -460,104 +461,117 @@ public class ServerConfiguration implements Parcelable {
             return mUrl;
         }
 
-        public void setUrl(String url) {
+        public Builder setUrl(String url) {
             mUrl = url;
+            return this;
         }
 
         public int getPort() {
             return mPort;
         }
 
-        public void setPort(int port) {
+        public Builder setPort(int port) {
             mPort = port;
+            return this;
         }
 
         public boolean isSsl() {
             return mSsl;
         }
 
-        public void setSsl(boolean ssl) {
+        public Builder setSsl(boolean ssl) {
             mSsl = ssl;
+            return this;
         }
 
         public boolean isSslAcceptAllCertificates() {
             return mSslAcceptAllCertificates;
         }
 
-        public void setSslAcceptAllCertificates(boolean sslAcceptAllCertificates) {
+        public Builder setSslAcceptAllCertificates(boolean sslAcceptAllCertificates) {
             mSslAcceptAllCertificates = sslAcceptAllCertificates;
+            return this;
         }
 
         public NickStorage getNickStorage() {
             return mNickStorage;
         }
 
-        public void setNickStorage(NickStorage nickStorage) {
+        public Builder setNickStorage(NickStorage nickStorage) {
             mNickStorage = nickStorage;
+            return this;
         }
 
         public String getRealName() {
             return mRealName;
         }
 
-        public void setRealName(String realName) {
+        public Builder setRealName(String realName) {
             mRealName = realName;
+            return this;
         }
 
         public boolean isNickChangeable() {
             return mNickChangeable;
         }
 
-        public void setNickChangeable(boolean nickChangeable) {
+        public Builder setNickChangeable(boolean nickChangeable) {
             mNickChangeable = nickChangeable;
+            return this;
         }
 
         public String getServerUserName() {
             return mServerUserName;
         }
 
-        public void setServerUserName(String serverUserName) {
+        public Builder setServerUserName(String serverUserName) {
             mServerUserName = serverUserName;
+            return this;
         }
 
         public String getServerPassword() {
             return mServerPassword;
         }
 
-        public void setServerPassword(String serverPassword) {
+        public Builder setServerPassword(String serverPassword) {
             mServerPassword = serverPassword;
+            return this;
         }
 
         public String getSaslUsername() {
             return mSaslUsername;
         }
 
-        public void setSaslUsername(String saslUsername) {
+        public Builder setSaslUsername(String saslUsername) {
             mSaslUsername = saslUsername;
+            return this;
         }
 
         public String getSaslPassword() {
             return mSaslPassword;
         }
 
-        public void setSaslPassword(String saslPassword) {
+        public Builder setSaslPassword(String saslPassword) {
             mSaslPassword = saslPassword;
+            return this;
         }
 
         public String getNickservPassword() {
             return mNickservPassword;
         }
 
-        public void setNickservPassword(String nickservPassword) {
+        public Builder setNickservPassword(String nickservPassword) {
             mNickservPassword = nickservPassword;
+            return this;
         }
 
         public ArrayList<String> getAutoJoinChannels() {
             return mAutoJoinChannels;
         }
 
-
+        public Builder addAutoJoinChannel(final String channelName) {
+            mAutoJoinChannels.add(channelName);
+            return this;
+        }
     }
-
-
 }

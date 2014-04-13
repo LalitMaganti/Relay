@@ -1,9 +1,17 @@
 package com.fusionx.relay.event.channel;
 
+import com.google.common.collect.ImmutableList;
+
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
 
+import java.util.List;
+
 public abstract class WorldUserEvent extends ChannelEvent {
+
+    public static final List sUserListChangeEvents = ImmutableList
+            .of(WorldJoinEvent.class, WorldKickEvent.class, WorldLevelChangeEvent.class,
+                    WorldNickChangeEvent.class, WorldPartEvent.class, WorldQuitEvent.class);
 
     public final boolean userMentioned;
 

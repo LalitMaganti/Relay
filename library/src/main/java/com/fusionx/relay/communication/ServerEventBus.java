@@ -28,8 +28,8 @@ public class ServerEventBus {
     }
 
     public void postAndStoreEvent(final ChannelEvent event, final Channel channel) {
-        if (!(event instanceof WorldUserEvent) || InterfaceHolders.getPreferences()
-                .shouldLogUserListChanges()) {
+        if (!WorldUserEvent.sUserListChangeEvents.contains(event) || InterfaceHolders
+                .getPreferences().shouldLogUserListChanges()) {
             channel.onChannelEvent(event);
         }
         mBus.post(event);
