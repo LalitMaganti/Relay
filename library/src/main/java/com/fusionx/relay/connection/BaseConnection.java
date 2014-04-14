@@ -18,6 +18,7 @@ import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.ServerEvent;
+import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.event.user.UserConnectEvent;
 import com.fusionx.relay.event.user.UserDisconnectEvent;
 import com.fusionx.relay.event.user.UserEvent;
@@ -96,6 +97,7 @@ public class BaseConnection {
         while (isReconnectNeeded()) {
             // Set status to reconnecting
             mServerConnection.updateStatus(ConnectionStatus.RECONNECTING);
+            mServer.getServerEventBus().post(new StatusChangeEvent());
 
             mServer.getServerEventBus().postAndStoreEvent(new GenericServerEvent("Trying to "
                     + "reconnect to the server in 5 seconds."));

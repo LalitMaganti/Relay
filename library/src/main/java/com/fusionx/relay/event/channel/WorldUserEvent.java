@@ -9,9 +9,10 @@ import java.util.List;
 
 public abstract class WorldUserEvent extends ChannelEvent {
 
-    public static final List sUserListChangeEvents = ImmutableList
-            .of(WorldJoinEvent.class, WorldKickEvent.class, WorldLevelChangeEvent.class,
-                    WorldNickChangeEvent.class, WorldPartEvent.class, WorldQuitEvent.class);
+    public static final List<? extends Class<? extends WorldUserEvent>> sUserListChangeEvents =
+            ImmutableList.of(WorldJoinEvent.class, WorldKickEvent.class,
+                    WorldLevelChangeEvent.class, WorldNickChangeEvent.class,
+                    WorldPartEvent.class, WorldQuitEvent.class);
 
     public final boolean userMentioned;
 
@@ -35,5 +36,9 @@ public abstract class WorldUserEvent extends ChannelEvent {
         } else {
             throw new NullPointerException();
         }
+    }
+
+    public boolean isUserListChangeEvent() {
+        return sUserListChangeEvents.contains(getClass());
     }
 }
