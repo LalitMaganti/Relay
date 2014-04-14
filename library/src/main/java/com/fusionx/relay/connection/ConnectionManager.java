@@ -106,6 +106,16 @@ public class ConnectionManager {
     }
 
     /**
+     * Disconnect and remove all the servers in the manager
+     */
+    public void requestDisconnectAll() {
+        for (final ServerConnection connection : mConnectionMap.values()) {
+            connection.disconnect();
+        }
+        mConnectionMap.clear();
+    }
+
+    /**
      * Returns the server if it is already connected
      *
      * This is almost always NOT the method you want to call.
