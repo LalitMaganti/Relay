@@ -109,11 +109,14 @@ public class ServerLineParser {
 
         // Parse the command
         final CommandParser parser = mCommandParserMap.get(command);
-        parser.onParseCommand(parsedArray, rawSource);
+        // Silently fail if the parser is null - just ignore this line
+        if (parser != null) {
+            parser.onParseCommand(parsedArray, rawSource);
 
-        if (parser instanceof QuitParser) {
-            final QuitParser quitParser = (QuitParser) parser;
-            return quitParser.isUserQuit();
+            if (parser instanceof QuitParser) {
+                final QuitParser quitParser = (QuitParser) parser;
+                return quitParser.isUserQuit();
+            }
         }
 
         return false;
