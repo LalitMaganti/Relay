@@ -14,6 +14,11 @@ import static org.junit.Assert.assertEquals;
 @RunWith(RobolectricTestRunner.class)
 public class ServerConfigurationTest {
 
+    // Configuration statics
+    public static ServerConfiguration getFreenodeConfiguration() {
+        return getFreenodeConfigurationBuilder().build();
+    }
+
     // Builder statics
     private static ServerConfiguration.Builder getFreenodeConfigurationBuilder() {
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
@@ -23,11 +28,6 @@ public class ServerConfigurationTest {
         builder.setNickStorage(new NickStorage("holoirctester", "holoirctester", "holoirctester"));
         builder.setServerUserName("holoirctester");
         return builder;
-    }
-
-    // Configuration statics
-    public static ServerConfiguration getFreenodeConfiguration() {
-        return getFreenodeConfigurationBuilder().build();
     }
 
     // Builder tests

@@ -4,10 +4,8 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.user.UserEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
 
 import de.greenrobot.event.EventBus;
 

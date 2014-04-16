@@ -9,7 +9,6 @@ import com.fusionx.relay.misc.InterfaceHolders;
 import android.os.Handler;
 import android.util.Pair;
 
-import java.lang.IllegalArgumentException;
 import java.util.List;
 import java.util.Map;
 
@@ -67,9 +66,8 @@ public class ConnectionManager {
      * Reconnect to the specified server
      *
      * @param server the server to reconnect to
-     *
      * @throws IllegalArgumentException if the server is not in this manager or if the server is
-     * not in the ConnectionStatus.Disconnected state
+     *                                  not in the ConnectionStatus.Disconnected state
      */
     public void requestReconnection(final Server server) {
         final ServerConnection connection = mConnectionMap.get(server.getTitle());
