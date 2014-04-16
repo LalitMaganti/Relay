@@ -5,7 +5,7 @@ import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.call.VersionCall;
-import com.fusionx.relay.event.NewPrivateMessage;
+import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.parser.MentionParser;

@@ -14,7 +14,7 @@ import com.fusionx.relay.call.PrivateActionCall;
 import com.fusionx.relay.call.PrivateMessageCall;
 import com.fusionx.relay.call.RawCall;
 import com.fusionx.relay.call.WhoisCall;
-import com.fusionx.relay.event.NewPrivateMessage;
+import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.MessageEvent;

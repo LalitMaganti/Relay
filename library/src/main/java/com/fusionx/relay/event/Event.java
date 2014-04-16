@@ -6,8 +6,6 @@ public class Event {
 
     public final Time timestamp;
 
-    public Object store;
-
     public Event() {
         timestamp = new Time();
         timestamp.setToNow();
