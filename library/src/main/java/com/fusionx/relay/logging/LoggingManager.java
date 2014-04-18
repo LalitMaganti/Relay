@@ -3,6 +3,11 @@ package com.fusionx.relay.logging;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,13 +19,18 @@ import gnu.trove.map.hash.THashMap;
  */
 public abstract class LoggingManager {
 
+    private static final SimpleDateFormat sStaticFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    private final LoggingPreferences mLoggingPreferences;
+
     private final Map<Server, LogHandler> mLoggingServers;
 
     private ExecutorService sLoggingService;
 
     private boolean mStarted;
 
-    protected LoggingManager() {
+    protected LoggingManager(final LoggingPreferences preferences) {
+        mLoggingPreferences = preferences;
         mLoggingServers = new THashMap<>();
         mStarted = false;
     }
@@ -29,12 +39,21 @@ public abstract class LoggingManager {
         if (mLoggingServers.containsKey(server)) {
             throw new IllegalArgumentException("This server is already present in this manager");
         }
-        mLoggingServers.put(server, new LogHandler(server));
+        final LogHandler logHandler = new LogHandler(server);
+        mLoggingServers.put(server, logHandler);
+
+        if (mStarted) {
+            logHandler.startLogging();
+        }
     }
 
     public void removeServerFromManager(final Server server) {
-        if (!mLoggingServers.containsKey(server)) {
+        final LogHandler handler = mLoggingServers.get(server);
+        if (handler == null) {
             throw new IllegalArgumentException("This server is not present in this manager");
+        }
+        if (mStarted) {
+            handler.stopLogging();
         }
         mLoggingServers.remove(server);
     }
@@ -59,16 +78,24 @@ public abstract class LoggingManager {
         }
         mStarted = false;
 
-        // Kill the logging service
-        sLoggingService.shutdownNow();
-        sLoggingService = null;
-
         for (final Map.Entry<Server, LogHandler> entry : mLoggingServers.entrySet()) {
             entry.getValue().stopLogging();
         }
+
+        // Kill the logging service
+        sLoggingService.shutdownNow();
+        sLoggingService = null;
     }
 
-    public abstract CharSequence getMessageFromEvent(final Event event);
+    public abstract CharSequence getMessageFromEvent(final Server server, final Event event);
+
+    public boolean isStarted() {
+        return mStarted;
+    }
+
+    private String getServerPath(final Server server) {
+        return mLoggingPreferences.getLoggingPath() + "/" + server.getTitle();
+    }
 
     private final class LogHandler {
 
@@ -87,9 +114,10 @@ public abstract class LoggingManager {
         }
 
         public void onEvent(final Event event) {
-            final CharSequence sequence = getMessageFromEvent(event);
-            if (sequence != null) {
-                sLoggingService.submit(new LoggingRunnable(sequence.toString()));
+            final CharSequence sequence = getMessageFromEvent(mServer, event);
+            // If logging path is null then that's an issue
+            if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
+                sLoggingService.submit(new LoggingRunnable(mServer, event, sequence.toString()));
             } else {
                 // TODO - throw an exception
             }
@@ -100,13 +128,31 @@ public abstract class LoggingManager {
 
         public final String mLogString;
 
-        private LoggingRunnable(final String logString) {
+        private final Server mServer;
+
+        private final Event mEvent;
+
+        private LoggingRunnable(final Server server, final Event event, final String logString) {
+            mServer = server;
+            mEvent = event;
             mLogString = logString;
         }
 
         @Override
         public void run() {
+            final String path = getServerPath(mServer);
+            final String line = mLoggingPreferences.shouldLogTimestamps()
+                    ? String.format("%s: %s", mEvent.timestamp.toString(), mLogString)
+                    : mLogString;
+            final File file = new File(path, sStaticFormat.format(new Date()));
 
+            try {
+                final FileWriter writer = new FileWriter(file, true);
+                writer.append(line).append("\n");
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
