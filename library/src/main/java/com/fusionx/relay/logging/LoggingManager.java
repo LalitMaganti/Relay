@@ -94,7 +94,7 @@ public abstract class LoggingManager {
     }
 
     private String getServerPath(final Server server) {
-        return mLoggingPreferences.getLoggingPath() + "/" + server.getTitle();
+        return String.format("%s/%s", mLoggingPreferences.getLoggingPath(), server.getTitle());
     }
 
     private final class LogHandler {
@@ -144,7 +144,11 @@ public abstract class LoggingManager {
             final String line = mLoggingPreferences.shouldLogTimestamps()
                     ? String.format("%s: %s", mEvent.timestamp.toString(), mLogString)
                     : mLogString;
-            final File file = new File(path, sStaticFormat.format(new Date()));
+            final File file = new File(path, String.format("%s.txt",
+                    sStaticFormat.format(new Date())));
+            if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+                throw new IllegalArgumentException();
+            }
 
             try {
                 final FileWriter writer = new FileWriter(file, true);
