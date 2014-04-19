@@ -269,9 +269,6 @@ public class BaseConnection {
         }
         final String message = builder.toString();
 
-        final DisconnectEvent event = new DisconnectEvent(message, userSent, retryPending);
-        mServer.getServerEventBus().postAndStoreEvent(event);
-
         // User can be null if the server was not fully connected to
         if (mServer.getUser() != null) {
             for (final Channel channel : mServer.getUser().getChannels()) {
@@ -285,6 +282,9 @@ public class BaseConnection {
             final UserEvent userEvent = new UserDisconnectEvent(user, message);
             mServer.getServerEventBus().postAndStoreEvent(userEvent, user);
         }
+
+        final DisconnectEvent event = new DisconnectEvent(message, userSent, retryPending);
+        mServer.getServerEventBus().postAndStoreEvent(event);
     }
 
     private boolean isReconnectNeeded() {
