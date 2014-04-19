@@ -34,6 +34,6 @@ public class PartParser extends RemoveUserParser {
         getUserChannelInterface().removeChannel(channel);
 
         final PartEvent event = new PartEvent(channel);
-        getServerEventBus().post(event);
+        getServerEventBus().postAndStoreEvent(event);
     }
 }

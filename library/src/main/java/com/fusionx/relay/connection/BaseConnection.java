@@ -97,7 +97,7 @@ public class BaseConnection {
         while (isReconnectNeeded()) {
             // Set status to reconnecting
             mServerConnection.updateStatus(ConnectionStatus.RECONNECTING);
-            mServer.getServerEventBus().post(new StatusChangeEvent());
+            mServer.getServerEventBus().postAndStoreEvent(new StatusChangeEvent());
 
             mServer.getServerEventBus().postAndStoreEvent(new GenericServerEvent("Trying to "
                     + "reconnect to the server in 5 seconds."));
@@ -153,7 +153,7 @@ public class BaseConnection {
             final ServerWriter serverWriter = mServer.onOutputStreamCreated(writer);
 
             mServerConnection.updateStatus(ConnectionStatus.CONNECTING);
-            mServer.getServerEventBus().post(new ConnectingEvent());
+            mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent());
 
             if (mServerConfiguration.isSaslAvailable()) {
                 // By sending this line, the server *should* wait until we end the CAP stuff with CAP
