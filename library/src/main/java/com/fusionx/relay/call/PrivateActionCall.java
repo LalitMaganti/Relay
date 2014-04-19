@@ -10,4 +10,9 @@ public class PrivateActionCall extends Call {
         this.userNick = userNick;
         this.message = message;
     }
+
+    @Override
+    public String getLineToSendServer() {
+        return null;
+    }
 }

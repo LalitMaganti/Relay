@@ -56,7 +56,7 @@ public class ConnectionManager {
         final boolean exists = connection != null;
         if (!exists) {
             connection = new ServerConnection(configuration, errorHandler, ignoreList);
-            connection.connect();
+            connection.startConnection();
             mConnectionMap.put(configuration.getTitle(), connection);
         }
         return new Pair<>(exists, connection.getServer());
@@ -80,7 +80,7 @@ public class ConnectionManager {
             throw new IllegalArgumentException("Server not in disconnected state");
         }
 
-        connection.connect();
+        connection.startConnection();
     }
 
     /**
@@ -89,15 +89,13 @@ public class ConnectionManager {
      * This method should be called even when the server is in the DISCONNECTED state as the
      * server needs to be removed from this manager in this state
      *
-     * WARNING: the server associated with this server name is now not safe to call upon
-     *
      * @param serverName the name of the server you're wanting to disconnect from
      * @return whether the list of connected servers is empty
      */
-    public boolean requestDisconnectionAndRemoval(final String serverName) {
+    public boolean requestStoppageAndRemoval(final String serverName) {
         final ServerConnection connection = mConnectionMap.get(serverName);
         if (connection != null) {
-            connection.disconnect();
+            connection.stopConnection();
             mConnectionMap.remove(serverName);
         }
         return mConnectionMap.isEmpty();
@@ -108,7 +106,7 @@ public class ConnectionManager {
      */
     public void requestDisconnectAll() {
         for (final ServerConnection connection : mConnectionMap.values()) {
-            connection.disconnect();
+            connection.stopConnection();
         }
         mConnectionMap.clear();
     }

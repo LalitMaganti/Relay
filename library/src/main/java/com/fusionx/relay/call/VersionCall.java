@@ -10,4 +10,9 @@ public class VersionCall extends Call {
         this.askingUser = askingUser;
         this.version = version;
     }
+
+    @Override
+    public String getLineToSendServer() {
+        return null;
+    }
 }

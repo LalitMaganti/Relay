@@ -62,12 +62,12 @@ public class ServerConnection {
         return mStatus;
     }
 
-    void connect() {
+    void startConnection() {
         mMainThread = new Thread(mRunnable);
         mMainThread.start();
     }
 
-    void disconnect() {
+    void stopConnection() {
         mServerCallHandler.post(new Runnable() {
             @Override
             public void run() {

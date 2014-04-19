@@ -7,4 +7,9 @@ public class RawCall extends Call {
     public RawCall(String rawLine) {
         this.rawLine = rawLine;
     }
+
+    @Override
+    public String getLineToSendServer() {
+        return null;
+    }
 }

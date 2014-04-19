@@ -13,4 +13,9 @@ public class ModeCall extends Call {
         this.mode = mode;
         this.nick = nick;
     }
+
+    @Override
+    public String getLineToSendServer() {
+        return null;
+    }
 }

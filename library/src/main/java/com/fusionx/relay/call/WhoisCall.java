@@ -7,4 +7,9 @@ public class WhoisCall extends Call {
     public WhoisCall(String nick) {
         this.nick = nick;
     }
+
+    @Override
+    public String getLineToSendServer() {
+        return null;
+    }
 }
