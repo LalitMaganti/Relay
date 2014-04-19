@@ -17,29 +17,22 @@ public class ChannelWriter extends RawWriter {
     }
 
     @Subscribe
-    public void sendMessage(final ChannelMessageCall event) {
-        writeLineToServer(String.format(WriterCommands.PRIVMSG, event.channelName, event.message));
+    public void sendMessage(final ChannelMessageCall call) {
+        writeLineToServer(call.getLineToSendServer());
     }
 
     @Subscribe
-    public void sendAction(final ChannelActionCall event) {
-        final String line = String.format(WriterCommands.ACTION, event.channelName, event.action);
-        writeLineToServer(line);
+    public void sendAction(final ChannelActionCall call) {
+        writeLineToServer(call.getLineToSendServer());
     }
 
     @Subscribe
     public void partChannel(final ChannelPartCall event) {
-        writeLineToServer(TextUtils.isEmpty(event.channelName) ?
-                String.format(WriterCommands.Part, event.channelName) :
-                String.format(WriterCommands.PartWithReason, event.channelName, event.reason)
-                        .trim());
+        writeLineToServer(event.getLineToSendServer());
     }
 
     @Subscribe
     public void onKick(final ChannelKickCall event) {
-        writeLineToServer(TextUtils.isEmpty(event.channelName) ?
-                String.format(WriterCommands.Kick, event.channelName, event.userNick) :
-                String.format(WriterCommands.KickWithReason, event.channelName, event.userNick,
-                        event.reason).trim());
+        writeLineToServer(event.getLineToSendServer());
     }
 }

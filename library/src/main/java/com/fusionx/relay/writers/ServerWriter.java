@@ -5,6 +5,7 @@ import com.fusionx.relay.call.ModeCall;
 import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.QuitCall;
 import com.fusionx.relay.call.RawCall;
+import com.fusionx.relay.call.UserCall;
 import com.fusionx.relay.call.VersionCall;
 import com.fusionx.relay.call.WhoisCall;
 import com.squareup.otto.Subscribe;
@@ -20,24 +21,24 @@ public class ServerWriter extends RawWriter {
         super(out);
     }
 
-    public void sendUser(String userName, String realName) {
-        writeLineToServer("USER " + userName + " 8 * :" + realName);
+    @Subscribe
+    public void sendUser(final UserCall userCall) {
+        writeLineToServer(userCall.getLineToSendServer());
     }
 
     @Subscribe
     public void sendNick(final NickChangeCall nickChangeEvent) {
-        writeLineToServer("NICK " + nickChangeEvent.newNick);
+        writeLineToServer(nickChangeEvent.getLineToSendServer());
     }
 
     @Subscribe
     public void joinChannel(final ChannelJoinCall worldJoinEvent) {
-        writeLineToServer("JOIN " + worldJoinEvent.channelName);
+        writeLineToServer(worldJoinEvent.getLineToSendServer());
     }
 
     @Subscribe
     public void quitServer(final QuitCall quitEvent) {
-        writeLineToServer(TextUtils.isEmpty(quitEvent.quitReason) ? "QUIT" : "QUIT :" + quitEvent
-                .quitReason);
+        writeLineToServer(quitEvent.getLineToSendServer());
     }
 
     public void pongServer(final String absoluteURL) {

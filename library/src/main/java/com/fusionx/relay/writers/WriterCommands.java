@@ -1,6 +1,6 @@
 package com.fusionx.relay.writers;
 
-final class WriterCommands {
+public final class WriterCommands {
 
     public final static String PRIVMSG = "PRIVMSG %1$s :%2$s";
 

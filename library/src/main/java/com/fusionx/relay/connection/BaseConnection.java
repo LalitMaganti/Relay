@@ -9,6 +9,7 @@ import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.call.ChannelJoinCall;
 import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.QuitCall;
+import com.fusionx.relay.call.UserCall;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
@@ -151,10 +152,11 @@ public class BaseConnection {
 
             serverWriter.sendNick(new NickChangeCall(mServerConfiguration.getNickStorage()
                     .getFirstChoiceNick()));
-            serverWriter.sendUser(mServerConfiguration.getServerUserName(),
+            mServer.getServerCallBus().post(new UserCall(mServerConfiguration.getServerUserName(),
                     Utils.isNotEmpty(mServerConfiguration.getRealName())
-                            ? mServerConfiguration.getRealName() : "RelayUser"
-            );
+                            ? mServerConfiguration.getRealName()
+                            : "RelayUser"
+            ));
 
             final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
@@ -247,7 +249,7 @@ public class BaseConnection {
         }
     }
 
-    void onDisconnected(final String serverMessage, final boolean retryPending) {
+    private void onDisconnected(final String serverMessage, final boolean retryPending) {
         // User can be null if the server was not fully connected to
         if (mServer.getUser() != null) {
             for (final Channel channel : mServer.getUser().getChannels()) {

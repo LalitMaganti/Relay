@@ -2,9 +2,14 @@ package com.fusionx.relay.call;
 
 public class ChannelJoinCall extends Call {
 
-    public final String channelName;
+    private final String channelName;
 
     public ChannelJoinCall(String channelName) {
         this.channelName = channelName;
+    }
+
+    @Override
+    public String getLineToSendServer() {
+        return "JOIN " + channelName;
     }
 }

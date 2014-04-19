@@ -1,13 +1,20 @@
 package com.fusionx.relay.call;
 
+import com.fusionx.relay.writers.WriterCommands;
+
 public class ChannelMessageCall extends Call {
 
-    public final String channelName;
+    private final String channelName;
 
-    public final String message;
+    private final String message;
 
     public ChannelMessageCall(String channelName, String message) {
         this.channelName = channelName;
         this.message = message;
+    }
+
+    @Override
+    public String getLineToSendServer() {
+        return String.format(WriterCommands.PRIVMSG, channelName, message);
     }
 }
