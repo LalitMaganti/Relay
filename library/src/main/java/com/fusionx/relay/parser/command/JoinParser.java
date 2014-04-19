@@ -28,6 +28,8 @@ class JoinParser extends CommandParser {
             channel.wipeChannelData();
         }
         getUserChannelInterface().coupleUserAndChannel(user, channel);
+        getServerEventBus().postAndStoreEvent(new WorldJoinEvent(channel, getServer().getUser()),
+                channel);
 
         if (user.isUserNickEqual(getServer().getUser())) {
             final ServerEvent event = new JoinEvent(channel);

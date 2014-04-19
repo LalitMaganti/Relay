@@ -49,9 +49,6 @@ public class Channel implements Conversation {
         for (final UserLevel levelEnum : UserLevel.values()) {
             mNumberOfUsers.put(levelEnum, 0);
         }
-
-        // WorldJoinEvent is used as JoinEvent is a server event
-        mBuffer.add(new WorldJoinEvent(this, mUserChannelInterface.getServer().getUser()));
     }
 
     @Override

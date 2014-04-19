@@ -78,7 +78,7 @@ public class ServerConnection {
                     mMainThread.interrupt();
                     mBaseConnection.closeSocket();
                 }
-                mServer.getServerEventBus().postAndStoreEvent(new DisconnectEvent("", true, false));
+                mBaseConnection.sendDisconnectEvents("", true, false);
             }
         });
     }

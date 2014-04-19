@@ -261,15 +261,15 @@ public class BaseConnection {
         }
     }
 
-    private void sendDisconnectEvents(final String serverMessage, final boolean userSent,
+    void sendDisconnectEvents(final String serverMessage, final boolean userSent,
             final boolean retryPending) {
         final StringBuilder builder = new StringBuilder("Disconnected from the server");
         if (Utils.isNotEmpty(serverMessage)) {
             builder.append(" (").append(serverMessage).append(")");
         }
         final String message = builder.toString();
-        final DisconnectEvent event = new DisconnectEvent(message, userSent, retryPending);
 
+        final DisconnectEvent event = new DisconnectEvent(message, userSent, retryPending);
         mServer.getServerEventBus().postAndStoreEvent(event);
 
         // User can be null if the server was not fully connected to
