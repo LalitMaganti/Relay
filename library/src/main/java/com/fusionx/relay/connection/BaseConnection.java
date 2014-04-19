@@ -216,7 +216,7 @@ public class BaseConnection {
         }
 
         // Initialise the parser used to parse any lines from the server
-        mLineParser = new ServerLineParser(mServer, this);
+        mLineParser = new ServerLineParser(mServer);
         // Loops forever until broken
         mLineParser.parseMain(reader, serverWriter);
     }

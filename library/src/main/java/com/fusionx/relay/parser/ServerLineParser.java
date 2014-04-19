@@ -31,8 +31,6 @@ public class ServerLineParser {
 
     private final Server mServer;
 
-    private final BaseConnection mBaseConnection;
-
     private final Map<String, CommandParser> mCommandParserMap;
 
     private final SparseArray<CodeParser> mCodeParser;
@@ -41,9 +39,8 @@ public class ServerLineParser {
 
     private String mLine;
 
-    public ServerLineParser(final Server server, final BaseConnection connection) {
+    public ServerLineParser(final Server server) {
         mServer = server;
-        mBaseConnection = connection;
         mCodeParser = CodeParser.getParserMap(server);
         mCommandParserMap = CommandParser.getParserMap(server);
     }
@@ -58,7 +55,7 @@ public class ServerLineParser {
             IOException {
         mWriter = writer;
 
-        while ((mLine = reader.readLine()) != null && !mBaseConnection.isStopped()) {
+        while ((mLine = reader.readLine()) != null) {
             final boolean quit = parseLine();
             if (quit) {
                 return;
