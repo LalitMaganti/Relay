@@ -47,10 +47,10 @@ public class PrivmsgParser extends CommandParser {
         final PrivateMessageUser user = getUserChannelInterface().getPrivateMessageUser(nick);
         if (user == null) {
             getUserChannelInterface().addNewPrivateMessageUser(nick, message, false, false);
-            getServerEventBus().post(new NewPrivateMessage(nick));
+            getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
         } else {
-            getServerEventBus()
-                    .postAndStoreEvent(new WorldPrivateMessageEvent(user, message), user);
+            getServerEventBus().postAndStoreEvent(new WorldPrivateMessageEvent(user, message),
+                    user);
         }
     }
 

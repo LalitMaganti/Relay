@@ -54,7 +54,7 @@ class CtcpParser extends CommandParser {
         final PrivateMessageUser user = getUserChannelInterface().getPrivateMessageUser(nick);
         if (user == null) {
             getUserChannelInterface().addNewPrivateMessageUser(nick, action, true, false);
-            getServerEventBus().post(new NewPrivateMessage(nick));
+            getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
         } else {
             getServerEventBus().postAndStoreEvent(new WorldPrivateActionEvent(user, action), user);
         }

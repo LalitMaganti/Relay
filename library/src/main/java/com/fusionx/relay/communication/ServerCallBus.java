@@ -93,7 +93,7 @@ public class ServerCallBus {
         if (user == null) {
             getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, message, false,
                     true);
-            getServer().getServerEventBus().post(new NewPrivateMessage(nick));
+            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
         } else if (Utils.isNotEmpty(message)) {
             getServer().getServerEventBus().postAndStoreEvent(new PrivateMessageEvent(user,
                     getServer().getUser(), message), user);
@@ -110,9 +110,9 @@ public class ServerCallBus {
         if (user == null) {
             getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, action, true,
                     true);
-            getServer().getServerEventBus().post(new NewPrivateMessage(nick));
+            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
         } else {
-            getServer().getServerEventBus().post(new NewPrivateMessage(nick));
+            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
             if (Utils.isNotEmpty(action)) {
                 getServer().getServerEventBus().postAndStoreEvent(new PrivateActionEvent(user,
                         getServer().getUser(), action), user);
@@ -133,7 +133,7 @@ public class ServerCallBus {
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
             final ServerEvent event = new PrivateMessageClosedEvent(user);
-            getServer().getServerEventBus().post(event);
+            getServer().getServerEventBus().postAndStoreEvent(event);
         }
     }
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 public abstract class WorldUserEvent extends ChannelEvent {
 
-    public static final List<? extends Class<? extends WorldUserEvent>> sUserListChangeEvents =
+    public static final List<? extends Class<? extends ChannelEvent>> sUserListChangeEvents =
             ImmutableList.of(WorldJoinEvent.class, WorldKickEvent.class,
                     WorldLevelChangeEvent.class, WorldNickChangeEvent.class,
                     WorldPartEvent.class, WorldQuitEvent.class);
