@@ -58,7 +58,7 @@ public class ServerLineParser {
             IOException {
         mWriter = writer;
 
-        while ((mLine = reader.readLine()) != null && !mBaseConnection.isUserDisconnected()) {
+        while ((mLine = reader.readLine()) != null && !mBaseConnection.isStopped()) {
             final boolean quit = parseLine();
             if (quit) {
                 return;

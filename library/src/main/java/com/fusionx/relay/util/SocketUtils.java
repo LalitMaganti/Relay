@@ -2,7 +2,12 @@ package com.fusionx.relay.util;
 
 import com.fusionx.relay.ServerConfiguration;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.KeyManagementException;
@@ -62,5 +67,13 @@ public class SocketUtils {
             }
         }
         return (SSLSocketFactory) SSLSocketFactory.getDefault();
+    }
+
+    public static Writer getSocketWriter(final Socket socket) throws IOException {
+        return new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+    }
+
+    public static BufferedReader getSocketBufferedReader(Socket socket) throws IOException {
+        return new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 }

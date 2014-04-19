@@ -50,12 +50,12 @@ public class ServerCallBus {
         mCallHandler = callHandler;
     }
 
-    public void register(RawWriter rawWriter) {
+    public void register(final RawWriter rawWriter) {
         mBus.register(rawWriter);
         mRawWriterSet.add(rawWriter);
     }
 
-    public void onDisconnect() {
+    public void onConnectionTerminated() {
         for (final RawWriter writer : mRawWriterSet) {
             mBus.unregister(writer);
         }

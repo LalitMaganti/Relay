@@ -13,16 +13,17 @@ import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.ChannelStopEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
-import com.fusionx.relay.event.server.GenericServerEvent;
+import com.fusionx.relay.event.server.ReconnectEvent;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.event.server.StatusChangeEvent;
+import com.fusionx.relay.event.server.StopEvent;
 import com.fusionx.relay.event.user.UserConnectEvent;
 import com.fusionx.relay.event.user.UserDisconnectEvent;
 import com.fusionx.relay.event.user.UserEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.event.user.UserStopEvent;
 import com.fusionx.relay.parser.ServerConnectionParser;
 import com.fusionx.relay.parser.ServerLineParser;
 import com.fusionx.relay.util.SocketUtils;
@@ -30,13 +31,12 @@ import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ServerWriter;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.util.Collection;
+
+import static com.fusionx.relay.misc.InterfaceHolders.getPreferences;
 
 /**
  * Class which carries out all the interesting connection stuff including the initial setting up
@@ -54,11 +54,11 @@ public class BaseConnection {
 
     private Socket mSocket;
 
-    private boolean mUserDisconnected;
-
     private int mReconnectAttempts;
 
     private ServerLineParser mLineParser;
+
+    private boolean mStopped;
 
     /**
      * Constructor for the object - package local since this object should always be contained only
@@ -74,10 +74,6 @@ public class BaseConnection {
         mServerConfiguration = configuration;
     }
 
-    public boolean isUserDisconnected() {
-        return mUserDisconnected;
-    }
-
     String getCurrentLine() {
         if (mLineParser != null) {
             return mLineParser.getCurrentLine();
@@ -90,17 +86,11 @@ public class BaseConnection {
      * the user has not explicitly tried to disconnect
      */
     void connectToServer() {
-        mReconnectAttempts = 0;
-
         connect();
 
-        while (isReconnectNeeded()) {
-            // Set status to reconnecting
-            mServerConnection.updateStatus(ConnectionStatus.RECONNECTING);
-            mServer.getServerEventBus().postAndStoreEvent(new StatusChangeEvent());
+        for (mReconnectAttempts = 0; !mStopped && isReconnectNeeded(); mReconnectAttempts++) {
+            onReconnecting();
 
-            mServer.getServerEventBus().postAndStoreEvent(new GenericServerEvent("Trying to "
-                    + "reconnect to the server in 5 seconds."));
             try {
                 Thread.sleep(5000);
             } catch (final InterruptedException e) {
@@ -108,26 +98,22 @@ public class BaseConnection {
                 // reconnection
                 return;
             }
-
             connect();
-            ++mReconnectAttempts;
         }
+    }
 
-        if (!mUserDisconnected) {
-            // The final disconnect has occurred - update the status
-            mServerConnection.updateStatus(ConnectionStatus.DISCONNECTED);
-            sendDisconnectEvents("", false, false);
-        }
+    private void onReconnecting() {
+        // Set status to reconnecting
+        mServerConnection.updateStatus(ConnectionStatus.RECONNECTING);
+        mServer.getServerEventBus().postAndStoreEvent(new ReconnectEvent());
     }
 
     /**
      * Called when the user explicitly requests a disconnect
      */
-    void disconnect() {
-        mUserDisconnected = true;
-        mServer.getServerCallBus().post(new QuitCall(InterfaceHolders.getPreferences()
-                .getQuitReason()));
-        mServerConnection.updateStatus(ConnectionStatus.DISCONNECTED);
+    void stopConnection() {
+        mStopped = true;
+        mServer.getServerCallBus().post(new QuitCall(getPreferences().getQuitReason()));
     }
 
     /**
@@ -148,17 +134,15 @@ public class BaseConnection {
         String disconnectMessage = "";
         try {
             mSocket = SocketUtils.openSocketConnection(mServerConfiguration);
-            final Writer writer = new BufferedWriter(new OutputStreamWriter(mSocket
-                    .getOutputStream()));
+            final Writer writer = SocketUtils.getSocketWriter(mSocket);
             final ServerWriter serverWriter = mServer.onOutputStreamCreated(writer);
 
-            mServerConnection.updateStatus(ConnectionStatus.CONNECTING);
-            mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent());
+            onConnecting();
 
             if (mServerConfiguration.isSaslAvailable()) {
                 // By sending this line, the server *should* wait until we end the CAP stuff with CAP
                 // END
-                serverWriter.getSupportedCapabilities();
+                serverWriter.sendSupportedCAP();
             }
 
             if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
@@ -172,14 +156,14 @@ public class BaseConnection {
                             ? mServerConfiguration.getRealName() : "RelayUser"
             );
 
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
-                    .getInputStream()));
+            final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
                     mServerConfiguration, reader, serverWriter);
             final String nick = parser.parseConnect();
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
+            // If the nick is null then we have no hope of progressing
             if (nick != null) {
                 onStartParsing(nick, serverWriter, reader);
             }
@@ -189,18 +173,14 @@ public class BaseConnection {
             disconnectMessage = ex.getMessage();
         }
 
-        // If we have reached this point the connection has been broken - try to
-        // reconnect unless the disconnection was requested by the user or we have used
-        // all our lives
-        if (isReconnectNeeded()) {
-            sendDisconnectEvents(disconnectMessage, false, true);
+        if (mStopped) {
+            onStopped();
+        } else {
+            onDisconnected(disconnectMessage, isReconnectNeeded());
         }
 
-        if (!mUserDisconnected) {
-            closeSocket();
-
-            mServer.onDisconnect();
-        }
+        closeSocket();
+        mServer.onConnectionTerminated();
     }
 
     private void onStartParsing(final String nick, final ServerWriter serverWriter,
@@ -241,6 +221,12 @@ public class BaseConnection {
         mLineParser.parseMain(reader, serverWriter);
     }
 
+    private void onConnecting() {
+        mServerConnection.updateStatus(ConnectionStatus.CONNECTING);
+
+        mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent());
+    }
+
     private void onConnected() {
         mServerConnection.updateStatus(ConnectionStatus.CONNECTED);
 
@@ -261,34 +247,46 @@ public class BaseConnection {
         }
     }
 
-    void sendDisconnectEvents(final String serverMessage, final boolean userSent,
-            final boolean retryPending) {
-        final StringBuilder builder = new StringBuilder("Disconnected from the server");
-        if (Utils.isNotEmpty(serverMessage)) {
-            builder.append(" (").append(serverMessage).append(")");
-        }
-        final String message = builder.toString();
-
+    void onDisconnected(final String serverMessage, final boolean retryPending) {
         // User can be null if the server was not fully connected to
         if (mServer.getUser() != null) {
             for (final Channel channel : mServer.getUser().getChannels()) {
-                final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel, message);
+                final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel,
+                        serverMessage);
                 mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
             }
         }
 
         for (final PrivateMessageUser user : mServer.getUserChannelInterface()
                 .getPrivateMessageUsers()) {
-            final UserEvent userEvent = new UserDisconnectEvent(user, message);
+            final UserEvent userEvent = new UserDisconnectEvent(user, serverMessage);
             mServer.getServerEventBus().postAndStoreEvent(userEvent, user);
         }
 
-        final DisconnectEvent event = new DisconnectEvent(message, userSent, retryPending);
+        final ServerEvent event = new DisconnectEvent(serverMessage, retryPending);
+        mServer.getServerEventBus().postAndStoreEvent(event);
+    }
+
+    private void onStopped() {
+        // User can be null if the server was not fully connected to
+        if (mServer.getUser() != null) {
+            for (final Channel channel : mServer.getUser().getChannels()) {
+                final ChannelEvent channelEvent = new ChannelStopEvent(channel);
+                mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
+            }
+        }
+
+        for (final PrivateMessageUser user : mServer.getUserChannelInterface()
+                .getPrivateMessageUsers()) {
+            final UserEvent userEvent = new UserStopEvent(user);
+            mServer.getServerEventBus().postAndStoreEvent(userEvent, user);
+        }
+
+        final ServerEvent event = new StopEvent();
         mServer.getServerEventBus().postAndStoreEvent(event);
     }
 
     private boolean isReconnectNeeded() {
-        return mReconnectAttempts < InterfaceHolders.getPreferences().getReconnectAttemptsCount()
-                && !mUserDisconnected;
+        return mReconnectAttempts < getPreferences().getReconnectAttemptsCount();
     }
 }

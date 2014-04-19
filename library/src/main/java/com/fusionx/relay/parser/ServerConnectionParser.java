@@ -52,13 +52,13 @@ public class ServerConnectionParser {
     }
 
     public String parseConnect() throws IOException {
-        String line;
         final ServerEventBus eventBus = mServer.getServerEventBus();
 
+        String line;
         while ((line = mBufferedReader.readLine()) != null) {
             final List<String> parsedArray = IRCUtils.splitRawLine(line, true);
-            String s = parsedArray.get(0);
-            switch (s) {
+            final String command = parsedArray.get(0);
+            switch (command) {
                 case ServerCommands.PING:
                     // Immediately return
                     final String source = parsedArray.get(1);

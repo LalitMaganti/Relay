@@ -3,7 +3,6 @@ package com.fusionx.relay.connection;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.event.server.DisconnectEvent;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -73,12 +72,11 @@ public class ServerConnection {
             @Override
             public void run() {
                 if (mStatus == ConnectionStatus.CONNECTED) {
-                    mBaseConnection.disconnect();
+                    mBaseConnection.stopConnection();
                 } else if (mMainThread.isAlive()) {
                     mMainThread.interrupt();
                     mBaseConnection.closeSocket();
                 }
-                mBaseConnection.sendDisconnectEvents("", true, false);
             }
         });
     }

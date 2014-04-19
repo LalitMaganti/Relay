@@ -62,7 +62,7 @@ public class ServerWriter extends RawWriter {
         writeLineToServer("WHOIS " + event.nick);
     }
 
-    public void getSupportedCapabilities() {
+    public void sendSupportedCAP() {
         writeLineToServer("CAP LS");
     }
 

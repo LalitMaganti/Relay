@@ -44,20 +44,17 @@ public class Server implements Conversation {
         mBuffer.add(event);
     }
 
-    public void onDisconnect() {
-        mUserChannelInterface.onDisconnect();
+    public void onConnectionTerminated() {
+        mUserChannelInterface.onConnectionTerminated();
 
         // Need to remove old writers as they would be using the old socket OutputStream if a
         // reconnection occurs
-        mServerCallBus.onDisconnect();
+        mServerCallBus.onConnectionTerminated();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-        if (!(o instanceof Server)) {
+        if (o == null || !(o instanceof Server)) {
             return false;
         }
         final Server server = (Server) o;
@@ -76,6 +73,10 @@ public class Server implements Conversation {
         mServerCallBus.register(new ChannelWriter(writer));
         mServerCallBus.register(new UserWriter(writer));
         return serverWriter;
+    }
+
+    public void updateIgnoreList(final List<String> list) {
+        mUserChannelInterface.updateIgnoreList(list);
     }
 
     // Conversation Interface
@@ -120,9 +121,5 @@ public class Server implements Conversation {
 
     public ServerEventBus getServerEventBus() {
         return mServerEventBus;
-    }
-
-    public void updateIgnoreList(List<String> list) {
-        mUserChannelInterface.updateIgnoreList(list);
     }
 }

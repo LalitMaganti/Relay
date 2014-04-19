@@ -133,7 +133,7 @@ public final class UserChannelInterface {
         mPrivateMessageUsers.remove(user);
     }
 
-    public void onDisconnect() {
+    public void onConnectionTerminated() {
         final Iterator<WorldUser> iterator = mUserToChannelMap.keySet().iterator();
         while (iterator.hasNext()) {
             final WorldUser user = iterator.next();

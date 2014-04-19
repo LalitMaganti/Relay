@@ -22,17 +22,17 @@ public class ServerEventBus {
 
     public void postAndStoreEvent(final ServerEvent event) {
         mServer.onServerEvent(event);
-        mBus.post(event);
+        post(event);
     }
 
     public void postAndStoreEvent(final ChannelEvent event, final Channel channel) {
         channel.onChannelEvent(event);
-        mBus.post(event);
+        post(event);
     }
 
     public void postAndStoreEvent(final UserEvent event, final PrivateMessageUser user) {
         user.onUserEvent(event);
-        mBus.post(event);
+        post(event);
     }
 
     public void register(final Object object) {
