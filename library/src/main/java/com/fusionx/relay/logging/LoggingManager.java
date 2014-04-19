@@ -2,6 +2,9 @@ package com.fusionx.relay.logging;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.server.ServerEvent;
+import com.fusionx.relay.event.user.UserEvent;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -113,16 +116,47 @@ public abstract class LoggingManager {
             mServer.getServerEventBus().unregister(this);
         }
 
-        public void onEvent(final Event event) {
-            final CharSequence sequence = getMessageFromEvent(mServer, event);
-            // If logging path is null then that's an issue
-            if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
-                sLoggingService.submit(new LoggingRunnable(mServer, event, sequence.toString()));
-            } else {
-                // TODO - throw an exception
+        public void onEvent(final ServerEvent event) {
+            if (shouldLogEvent(event)) {
+                final CharSequence sequence = getMessageFromEvent(mServer, event);
+                // If logging path is null then that's an issue
+                if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
+                    sLoggingService.submit(new LoggingRunnable(mServer, event,
+                            sequence.toString(), ""));
+                } else {
+                    // TODO - throw an exception
+                }
+            }
+        }
+
+        public void onEvent(final ChannelEvent event) {
+            if (shouldLogEvent(event)) {
+                final CharSequence sequence = getMessageFromEvent(mServer, event);
+                // If logging path is null then that's an issue
+                if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
+                    sLoggingService.submit(new LoggingRunnable(mServer, event, sequence.toString(),
+                            event.channelName));
+                } else {
+                    // TODO - throw an exception
+                }
+            }
+        }
+
+        public void onEvent(final UserEvent event) {
+            if (shouldLogEvent(event)) {
+                final CharSequence sequence = getMessageFromEvent(mServer, event);
+                // If logging path is null then that's an issue
+                if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
+                    sLoggingService.submit(new LoggingRunnable(mServer, event, sequence.toString(),
+                            event.user.getNick()));
+                } else {
+                    // TODO - throw an exception
+                }
             }
         }
     }
+
+    protected abstract boolean shouldLogEvent(final Event event);
 
     private final class LoggingRunnable implements Runnable {
 
@@ -132,20 +166,24 @@ public abstract class LoggingManager {
 
         private final Event mEvent;
 
-        private LoggingRunnable(final Server server, final Event event, final String logString) {
+        private final String mDirectory;
+
+        private LoggingRunnable(final Server server, final Event event, final String logString,
+                final String directory) {
             mServer = server;
             mEvent = event;
             mLogString = logString;
+            mDirectory = directory;
         }
 
         @Override
         public void run() {
             final String path = getServerPath(mServer);
             final String line = mLoggingPreferences.shouldLogTimestamps()
-                    ? String.format("%s: %s", mEvent.timestamp.toString(), mLogString)
+                    ? String.format("%s: %s", mEvent.timestamp.format("%H:%M:%S"), mLogString)
                     : mLogString;
-            final File file = new File(path, String.format("%s.txt",
-                    sStaticFormat.format(new Date())));
+            final File file = new File(String.format("%s/%s", path, mDirectory),
+                    String.format("%s.txt", sStaticFormat.format(new Date())));
             if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
                 throw new IllegalArgumentException();
             }
