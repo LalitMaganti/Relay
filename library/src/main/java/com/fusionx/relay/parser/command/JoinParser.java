@@ -27,18 +27,14 @@ class JoinParser extends CommandParser {
         } else if (user.isUserNickEqual(getServer().getUser())) {
             channel.wipeChannelData();
         }
-        if (user.isUserNickEqual(getServer().getUser())) {
-            getUserChannelInterface().coupleUserAndChannel(user, channel);
-            getServerEventBus().postAndStoreEvent(
-                    new WorldJoinEvent(channel, getServer().getUser()), channel);
-        }
+        getUserChannelInterface().coupleUserAndChannel(user, channel);
+
+        final ChannelEvent event = new WorldJoinEvent(channel, user);
+        getServerEventBus().postAndStoreEvent(event, channel);
 
         if (user.isUserNickEqual(getServer().getUser())) {
-            final ServerEvent event = new JoinEvent(channel);
-            getServerEventBus().postAndStoreEvent(event);
-        } else {
-            final ChannelEvent event = new WorldJoinEvent(channel, user);
-            getServerEventBus().postAndStoreEvent(event, channel);
+            final ServerEvent joinEvent = new JoinEvent(channel);
+            getServerEventBus().postAndStoreEvent(joinEvent);
         }
     }
 }
