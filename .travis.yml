@@ -15,13 +15,6 @@ before_install:
   - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch; fi
   # for gradle output style
   - export TERM=dumb
-  # newer version of gradle
-  - wget http://services.gradle.org/distributions/gradle-1.11-bin.zip
-  - unzip -qq gradle-1.11-bin.zip
-  - export GRADLE_HOME=$PWD/gradle-1.11
-  - export PATH=$GRADLE_HOME/bin:$PATH
-  # just to test gradle version, against our provided one
-  - gradle -v
   # newest android SDK 22.6.1
   - wget http://dl.google.com/android/android-sdk_r22.6.1-linux.tgz
   - tar -zxf android-sdk_r22.6.1-linux.tgz
