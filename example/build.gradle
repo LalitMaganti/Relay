@@ -29,14 +29,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-
-    sourceSets {
-        instrumentTest.setRoot('src/test')
-    }
-
-    defaultConfig {
-        packageName "com.fusionx.relay"
-    }
 }
 
 apply plugin: 'android-unit-test'
