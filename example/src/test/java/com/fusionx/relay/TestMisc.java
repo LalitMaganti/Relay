@@ -28,16 +28,6 @@ public class TestMisc {
         }
 
         @Override
-        public boolean shouldIgnoreUser(String nick) {
-            return false;
-        }
-
-        @Override
-        public boolean shouldLogUserListChanges() {
-            return false;
-        }
-
-        @Override
         public boolean isSelfEventBroadcast() {
             return false;
         }

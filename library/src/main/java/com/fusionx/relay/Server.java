@@ -30,7 +30,7 @@ public class Server implements Conversation {
     private AppUser mUser;
 
     public Server(final ServerConfiguration configuration, final ServerConnection connection,
-            List<String> ignoreList) {
+            final List<String> ignoreList) {
         mServerConnection = connection;
         mConfiguration = configuration;
         mBuffer = new ArrayList<>();

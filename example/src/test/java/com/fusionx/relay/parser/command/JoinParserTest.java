@@ -82,7 +82,7 @@ public class JoinParserTest {
 
         assertThat(e[0]).isNotNull();
 
-        final Channel channel = mServer.getUserChannelInterface().getChannelIfExists("#holoirc");
+        final Channel channel = mServer.getUserChannelInterface().getChannel("#holoirc");
         final WorldUser user = mServer.getUserChannelInterface().getUserIfExists(nick);
 
         // Check that the channel exists and has the correct message in buffer

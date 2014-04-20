@@ -11,7 +11,7 @@ public class ServerTest {
         final Server server;
         final ServerConfiguration freenode = ServerConfigurationTest
                 .getFreenodeConfiguration();
-        server = new Server(freenode, null);
+        server = new Server(freenode, null, null);
         final String nick = freenode.getNickStorage().getFirstChoiceNick();
         final AppUser user = new AppUser(nick, server.getUserChannelInterface());
         server.setUser(user);

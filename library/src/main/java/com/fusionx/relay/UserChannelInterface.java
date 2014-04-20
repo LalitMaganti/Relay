@@ -105,7 +105,7 @@ public final class UserChannelInterface {
         return null;
     }
 
-    public synchronized Channel getNewChannel(final String channelName) {
+    public Channel getNewChannel(final String channelName) {
         return new Channel(channelName, this);
     }
 
