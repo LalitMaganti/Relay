@@ -5,12 +5,15 @@ import com.fusionx.relay.misc.NickStorage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import android.os.Parcel;
 
+import static com.fusionx.relay.ServerConfiguration.Builder.CREATOR;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
+@Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class ServerConfigurationTest {
 
@@ -40,8 +43,7 @@ public class ServerConfigurationTest {
         // done writing, now reset parcel for reading
         parcel.setDataPosition(0);
 
-        final ServerConfiguration.Builder actual = ServerConfiguration.Builder.CREATOR
-                .createFromParcel(parcel);
+        final ServerConfiguration.Builder actual = CREATOR.createFromParcel(parcel);
 
         assertThat(actual).isNotNull();
         assertThat(actual).isEqualsToByComparingFields(expected);

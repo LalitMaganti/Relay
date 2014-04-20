@@ -18,11 +18,14 @@ import com.squareup.otto.Subscribe;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.List;
 
+import static com.fusionx.relay.ServerConfigurationTest.getFreenodeConfiguration;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+@Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class JoinParserTest {
 
@@ -45,7 +48,7 @@ public class JoinParserTest {
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
         mJoinParser.onParseCommand(list, "otheruser!otheruser@test");
 
-        final Channel channel = mServer.getUserChannelInterface().getChannelIfExists("#holoirc");
+        final Channel channel = mServer.getUserChannelInterface().getChannel("#holoirc");
         final WorldUser user = mServer.getUserChannelInterface().getUserIfExists("otheruser");
 
         // Check that the channel exists and has the correct message in buffer
@@ -64,23 +67,13 @@ public class JoinParserTest {
     // This method tests that when our user joins, everything is set up correctly
     @Test
     public void testOnJoin() {
-        final Event[] e = new Event[1];
-        final String nick = ServerConfigurationTest.getFreenodeConfiguration()
-                .getNickStorage().getFirstChoiceNick();
-        mServer.getServerEventBus().register(new Object() {
-            @Subscribe
-            public void onJoin(final JoinEvent event) {
-                e[0] = event;
-                assertThat(event.channelName).isEqualTo("#holoirc");
-                mServer.getServerEventBus().unregister(this);
-            }
-        });
+        final String nick = getFreenodeConfiguration().getNickStorage().getFirstChoiceNick();
+
+        // TODO - check the events
 
         final String joinLine = ":holoirctester!holoirctester@test JOIN #holoirc";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
         mJoinParser.onParseCommand(list, "holoirctester!holoirctester@test");
-
-        assertThat(e[0]).isNotNull();
 
         final Channel channel = mServer.getUserChannelInterface().getChannel("#holoirc");
         final WorldUser user = mServer.getUserChannelInterface().getUserIfExists(nick);
