@@ -1,5 +1,6 @@
 notifications:
   email: false
+  webhooks: http://n.tkte.ch/h/2560/u51lpT2YLz1Qrzqh_lTUdRLa
 branches:
   only:
     - develop
