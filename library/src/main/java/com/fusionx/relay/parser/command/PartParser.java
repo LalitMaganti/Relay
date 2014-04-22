@@ -31,9 +31,13 @@ public class PartParser extends RemoveUserParser {
 
     @Override
     void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
-        getUserChannelInterface().removeChannel(channel);
+        // ZNCs can be stupid and can sometimes send PART commands for channels they didn't send
+        // JOIN commands for...
+        if (channel != null) {
+            getUserChannelInterface().removeChannel(channel);
 
-        final PartEvent event = new PartEvent(channel);
-        getServerEventBus().postAndStoreEvent(event);
+            final PartEvent event = new PartEvent(channel);
+            getServerEventBus().postAndStoreEvent(event);
+        }
     }
 }
