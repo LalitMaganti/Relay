@@ -23,11 +23,6 @@ public class TestMisc {
         }
 
         @Override
-        public Theme getTheme() {
-            return Theme.LIGHT;
-        }
-
-        @Override
         public boolean isSelfEventBroadcast() {
             return false;
         }
@@ -35,16 +30,6 @@ public class TestMisc {
         @Override
         public boolean isMOTDShown() {
             return false;
-        }
-
-        @Override
-        public boolean shouldHighlightLine() {
-            return false;
-        }
-
-        @Override
-        public boolean shouldNickBeColourful() {
-            return true;
         }
     }
 }
