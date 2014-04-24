@@ -2,6 +2,7 @@ package com.fusionx.relay.event.channel;
 
 import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.UserLevel;
 
 public class UserLevelChangeEvent extends ChannelEvent {
@@ -10,17 +11,17 @@ public class UserLevelChangeEvent extends ChannelEvent {
 
     public final String rawMode;
 
-    public final String nick;
+    public final AppUser user;
 
-    public final String changingNick;
+    public final WorldUser changingUser;
 
     public UserLevelChangeEvent(final Channel channel, final String rawMode, final AppUser user,
-            final UserLevel level, final String changingNick) {
+            final UserLevel level, final WorldUser changingUser) {
         super(channel);
 
         this.rawMode = rawMode;
         this.level = level;
-        this.nick = user.getColorfulNick();
-        this.changingNick = changingNick;
+        this.user = user;
+        this.changingUser = changingUser;
     }
 }

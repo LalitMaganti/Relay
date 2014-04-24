@@ -7,6 +7,8 @@ import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
 import com.fusionx.relay.interfaces.Conversation;
+import com.fusionx.relay.nick.BasicNick;
+import com.fusionx.relay.nick.Nick;
 import com.fusionx.relay.util.Utils;
 
 import java.util.ArrayList;
@@ -23,20 +25,9 @@ public class PrivateMessageUser implements Conversation {
 
     private Nick mNick;
 
-    /**
-     * Retains whether the person on the other end of the PM quit in the middle of the conversation
-     */
-    private boolean mUserQuit;
-
-    PrivateMessageUser(final String nick, final List<UserEvent> buffer) {
-        mNick = new Nick(nick);
-        mBuffer = buffer;
-        mServer = null;
-    }
-
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface,
             final String message, final boolean action, boolean userSent) {
-        mNick = new Nick(nick);
+        mNick = new BasicNick(nick);
         mBuffer = new ArrayList<>();
         mServer = userChannelInterface.getServer();
 
@@ -72,7 +63,7 @@ public class PrivateMessageUser implements Conversation {
 
     @Override
     public String getId() {
-        return getNick();
+        return mNick.getNickAsString();
     }
 
     @Override
@@ -80,24 +71,12 @@ public class PrivateMessageUser implements Conversation {
         return mServer;
     }
 
-    public void setUserQuit(boolean userQuit) {
-        mUserQuit = userQuit;
-    }
-
     // Nick delegates
-    public String getColorfulNick() {
-        return mNick.getColorfulNick();
-    }
-
-    public String toString() {
-        return mNick.toString();
-    }
-
-    public String getNick() {
-        return mNick.getNick();
+    public Nick getNick() {
+        return mNick;
     }
 
     public void setNick(final String nick) {
-        mNick = new Nick(nick);
+        mNick = new BasicNick(nick);
     }
 }

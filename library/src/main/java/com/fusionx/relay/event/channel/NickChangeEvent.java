@@ -2,17 +2,21 @@ package com.fusionx.relay.event.channel;
 
 import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.nick.Nick;
 
 public class NickChangeEvent extends ChannelEvent {
 
-    public final String oldNick;
+    public final Nick oldNick;
 
-    public final String newNick;
+    public final Nick newNick;
 
-    public NickChangeEvent(final Channel channel, final String oldNick, final AppUser user) {
+    public final AppUser appUser;
+
+    public NickChangeEvent(final Channel channel, final Nick oldNick, final AppUser user) {
         super(channel);
 
         this.oldNick = oldNick;
-        this.newNick = user.getColorfulNick();
+        this.newNick = user.getNick();
+        this.appUser = user;
     }
 }

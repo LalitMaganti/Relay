@@ -5,11 +5,11 @@ import com.fusionx.relay.PrivateMessageUser;
 
 public abstract class PrivateUserEvent extends UserEvent {
 
-    public final String appUserNick;
+    public final AppUser ourUser;
 
-    PrivateUserEvent(final PrivateMessageUser user, AppUser appUser) {
+    PrivateUserEvent(final PrivateMessageUser user, final AppUser appUser) {
         super(user);
 
-        this.appUserNick = appUser.getColorfulNick();
+        this.ourUser = appUser;
     }
 }

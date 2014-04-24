@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -23,7 +24,7 @@ public final class UserChannelInterface {
 
     private final Server mServer;
 
-    private List<String> mUserIgnoreList;
+    private Set<String> mUserIgnoreList;
 
     public UserChannelInterface(final Server server) {
         mServer = server;
@@ -31,7 +32,7 @@ public final class UserChannelInterface {
         mUserToChannelMap = new THashMap<>();
         mChannelToUserMap = new THashMap<>();
         mPrivateMessageUsers = new TLinkedHashSet<>();
-        mUserIgnoreList = new ArrayList<>();
+        mUserIgnoreList = new THashSet<>();
     }
 
     public synchronized void coupleUserAndChannel(final WorldUser user, final Channel channel) {
@@ -87,7 +88,7 @@ public final class UserChannelInterface {
 
     public synchronized WorldUser getUserIfExists(final String nick) {
         for (final WorldUser user : mUserToChannelMap.keySet()) {
-            if (nick.equals(user.getNick())) {
+            if (nick.equals(user.getNick().getNickAsString())) {
                 return user;
             }
         }
@@ -111,7 +112,7 @@ public final class UserChannelInterface {
 
     public PrivateMessageUser getPrivateMessageUser(final String nick) {
         for (final PrivateMessageUser user : mPrivateMessageUsers) {
-            if (nick.equals(user.getNick())) {
+            if (nick.equals(user.getNick().getNickAsString())) {
                 return user;
             }
         }
@@ -179,9 +180,9 @@ public final class UserChannelInterface {
     }
 
     // Getters and setters
-    void updateIgnoreList(final List<String> userIgnoreList) {
+    void updateIgnoreList(final Collection<String> userIgnoreList) {
         if (userIgnoreList != null) {
-            mUserIgnoreList = new ArrayList<>(userIgnoreList);
+            mUserIgnoreList = new THashSet<>(userIgnoreList);
         }
     }
 

@@ -135,7 +135,7 @@ public abstract class LoggingManager {
                 // If logging path is null then that's an issue
                 if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
                     sLoggingService.submit(new LoggingRunnable(mServer, event, sequence.toString(),
-                            event.channelName));
+                            event.channel.getName()));
                 } else {
                     // TODO - throw an exception
                 }
@@ -148,7 +148,7 @@ public abstract class LoggingManager {
                 // If logging path is null then that's an issue
                 if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
                     sLoggingService.submit(new LoggingRunnable(mServer, event, sequence.toString(),
-                            event.user.getNick()));
+                            event.user.getNick().getNickAsString()));
                 } else {
                     // TODO - throw an exception
                 }

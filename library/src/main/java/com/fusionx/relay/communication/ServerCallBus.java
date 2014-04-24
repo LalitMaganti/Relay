@@ -148,7 +148,7 @@ public class ServerCallBus {
             final Channel channel = getServer().getUserChannelInterface().getChannel(
                     channelName);
             final ChannelEvent event = new MessageEvent(channel, message,
-                    getServer().getUser().getPrettyNick(channel));
+                    getServer().getUser());
             getServer().getServerEventBus().postAndStoreEvent(event, channel);
         }
     }
@@ -165,7 +165,7 @@ public class ServerCallBus {
             final Channel channel = getServer().getUserChannelInterface()
                     .getChannel(channelName);
             final ChannelEvent event = new ActionEvent(channel, action,
-                    getServer().getUser().getPrettyNick(channel));
+                    getServer().getUser());
             getServer().getServerEventBus().postAndStoreEvent(event, channel);
         }
     }

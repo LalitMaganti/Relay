@@ -8,7 +8,7 @@ public class WorldPartEvent extends WorldUserEvent {
     public final String reason;
 
     public WorldPartEvent(final Channel channel, final WorldUser user, final String reason) {
-        super(channel, user);
+        super(channel, user.getNick());
 
         this.reason = reason;
     }

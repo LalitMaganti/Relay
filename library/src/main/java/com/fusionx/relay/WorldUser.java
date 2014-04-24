@@ -1,10 +1,9 @@
 package com.fusionx.relay;
 
 import com.fusionx.relay.constants.UserLevel;
-import com.fusionx.relay.misc.InterfaceHolders;
-import com.fusionx.relay.util.ColourParserUtils;
+import com.fusionx.relay.nick.BasicNick;
+import com.fusionx.relay.nick.Nick;
 
-import android.text.Spanned;
 import android.widget.Checkable;
 
 import java.util.Collection;
@@ -18,68 +17,31 @@ public class WorldUser implements Checkable {
 
     private final Map<Channel, UserLevel> mUserLevelMap;
 
-    private final Map<Channel, Spanned> mChannelSpannedMap;
-
     private Nick mNick;
 
     // Checkable interface
     private boolean mChecked;
 
     public WorldUser(final String nick, final UserChannelInterface userChannelInterface) {
-        mNick = new Nick(nick);
-
-        mUserChannelInterface = userChannelInterface;
-
         mUserLevelMap = new THashMap<>();
-        mChannelSpannedMap = new THashMap<>();
+        mNick = new BasicNick(nick);
+        mUserChannelInterface = userChannelInterface;
 
         // Checkable interface
         mChecked = false;
     }
 
-    public String getPrettyNick(final Channel channel) {
-        if (InterfaceHolders.getPreferences().shouldNickBeColourful()) {
-            return String.format(mNick.getColourCode(), getPrefixedNick(channel));
-        } else {
-            return getPrefixedNick(channel);
-        }
-    }
-
-    public Spanned getSpannedNick(final Channel channel) {
-        final Spanned spannable = mChannelSpannedMap.get(channel);
-        if (spannable == null) {
-            onChannelNickChanged(channel);
-        }
-        return spannable;
-    }
-
     // Called either on part of other or on quit of our user
     public void onRemove(final Channel channel) {
         mUserLevelMap.remove(channel);
-        mChannelSpannedMap.remove(channel);
     }
 
     public void onModeChanged(final Channel channel, final UserLevel mode) {
         mUserLevelMap.put(channel, mode);
-        onChannelNickChanged(channel);
     }
 
     public UserLevel getChannelPrivileges(final Channel channel) {
         return mUserLevelMap.get(channel);
-    }
-
-    public void onChannelNickChanged(final Channel channel) {
-        final Spanned spannable = ColourParserUtils.onParseMarkup(getPrettyNick(channel));
-        mChannelSpannedMap.put(channel, spannable);
-    }
-
-    public char getUserPrefix(final Channel channel) {
-        final UserLevel levelEnum = mUserLevelMap.get(channel);
-        if (levelEnum != null) {
-            return mUserLevelMap.get(channel).getPrefix();
-        } else {
-            return '\0';
-        }
     }
 
     public Collection<Channel> getChannels() {
@@ -114,17 +76,8 @@ public class WorldUser implements Checkable {
                     }
             }
         }
-        onChannelNickChanged(channel);
 
         return UserLevel.NONE;
-    }
-
-    public boolean isUserNickEqual(final WorldUser user) {
-        return mNick.getNick().equals(user.getNick());
-    }
-
-    public String getColorfulNick() {
-        return mNick.getColorfulNick();
     }
 
     @Override
@@ -142,22 +95,16 @@ public class WorldUser implements Checkable {
         mChecked = b;
     }
 
-    public String getNick() {
-        return mNick.getNick();
+    public void setNick(final String nick) {
+        mNick = new BasicNick(nick);
     }
 
-    public void setNick(String nick) {
-        mNick = new Nick(nick);
+    public Nick getNick() {
+        return mNick;
     }
 
     @Override
     public void toggle() {
         mChecked = !mChecked;
     }
-
-    String getPrefixedNick(final Channel channel) {
-        return getUserPrefix(channel) + getNick();
-    }
-
-
 }

@@ -31,8 +31,8 @@ public class IRCUserComparator implements Comparator<WorldUser> {
         }
 
         if (firstUserMode.equals(secondUserMode)) {
-            final String firstRemoved = user1.getNick();
-            final String secondRemoved = user2.getNick();
+            final String firstRemoved = user1.getNick().getNickAsString();
+            final String secondRemoved = user2.getNick().getNickAsString();
 
             return firstRemoved.compareToIgnoreCase(secondRemoved);
         } else if (firstUserMode.ordinal() > secondUserMode.ordinal()) {

@@ -9,6 +9,7 @@ import com.fusionx.relay.misc.InterfaceHolders;
 import android.os.Handler;
 import android.util.Pair;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class ConnectionManager {
      * exists in the manager. The second item is the server which was created.
      */
     public Pair<Boolean, Server> requestConnection(final ServerConfiguration configuration,
-            final List<String> ignoreList, final Handler errorHandler) {
+            final Collection<String> ignoreList, final Handler errorHandler) {
         ServerConnection connection = mConnectionMap.get(configuration.getTitle());
 
         final boolean exists = connection != null;

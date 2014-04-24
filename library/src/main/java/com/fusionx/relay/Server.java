@@ -11,6 +11,7 @@ import com.fusionx.relay.writers.UserWriter;
 
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Server implements Conversation {
@@ -30,7 +31,7 @@ public class Server implements Conversation {
     private AppUser mUser;
 
     public Server(final ServerConfiguration configuration, final ServerConnection connection,
-            final List<String> ignoreList) {
+            final Collection<String> ignoreList) {
         mServerConnection = connection;
         mConfiguration = configuration;
         mBuffer = new ArrayList<>();
@@ -75,7 +76,7 @@ public class Server implements Conversation {
         return serverWriter;
     }
 
-    public void updateIgnoreList(final List<String> list) {
+    public void updateIgnoreList(final Collection<String> list) {
         mUserChannelInterface.updateIgnoreList(list);
     }
 

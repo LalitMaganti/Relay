@@ -59,9 +59,13 @@ public class PrivmsgParser extends CommandParser {
         final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
         final Channel channel = getUserChannelInterface().getChannel(channelName);
         final boolean mention = MentionParser.onMentionableCommand(message,
-                getServer().getUser().getNick());
-        final ChannelEvent event = new WorldMessageEvent(channel, message, sendingUser,
-                sendingNick, mention);
+                getServer().getUser().getNick().getNickAsString());
+        final ChannelEvent event;
+        if (sendingUser == null) {
+            event = new WorldMessageEvent(channel, message, sendingNick, mention);
+        } else {
+            event = new WorldMessageEvent(channel, message, sendingUser, mention);
+        }
         getServerEventBus().postAndStoreEvent(event, channel);
     }
 }

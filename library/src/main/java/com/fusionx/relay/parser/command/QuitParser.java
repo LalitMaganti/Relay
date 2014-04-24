@@ -23,7 +23,7 @@ public class QuitParser extends CommandParser {
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
         final WorldUser user = getUserChannelInterface().getUserIfExists(nick);
-        if (getServer().getUser().isUserNickEqual(user)) {
+        if (getServer().getUser().getNick().equals(user.getNick())) {
             onQuit();
         } else {
             onUserQuit(parsedArray, user);
@@ -45,10 +45,8 @@ public class QuitParser extends CommandParser {
         }
 
         final PrivateMessageUser pmUser = getUserChannelInterface().getPrivateMessageUser(user
-                .getNick());
+                .getNick().getNickAsString());
         if (pmUser != null) {
-            pmUser.setUserQuit(true);
-
             final WorldPrivateQuitEvent event = new WorldPrivateQuitEvent(pmUser);
             getServerEventBus().postAndStoreEvent(event, pmUser);
         }

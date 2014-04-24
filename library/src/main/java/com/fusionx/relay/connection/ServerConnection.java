@@ -7,6 +7,7 @@ import com.fusionx.relay.ServerConfiguration;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class ServerConnection {
     private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
 
     ServerConnection(final ServerConfiguration configuration, final Handler handler,
-            final List<String> ignoreList) {
+            final Collection<String> ignoreList) {
         final HandlerThread handlerThread = new HandlerThread("ServerCalls");
         handlerThread.start();
         mServerCallHandler = new Handler(handlerThread.getLooper());

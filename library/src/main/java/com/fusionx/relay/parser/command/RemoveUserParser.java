@@ -19,7 +19,7 @@ public abstract class RemoveUserParser extends CommandParser {
         final Channel channel = getUserChannelInterface().getChannel(channelName);
         final WorldUser removedUser = getRemovedUser(parsedArray, rawSource);
 
-        if (removedUser.isUserNickEqual(getServer().getUser())) {
+        if (removedUser.getNick().equals(getServer().getUser().getNick())) {
             onRemoved(parsedArray, rawSource, channel);
         } else {
             onUserRemoved(parsedArray, rawSource, channel, removedUser);

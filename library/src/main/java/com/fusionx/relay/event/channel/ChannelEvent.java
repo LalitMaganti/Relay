@@ -5,9 +5,9 @@ import com.fusionx.relay.event.Event;
 
 public abstract class ChannelEvent extends Event {
 
-    public final String channelName;
+    public final Channel channel;
 
     ChannelEvent(final Channel channel) {
-        this.channelName = channel.getName();
+        this.channel = channel;
     }
 }

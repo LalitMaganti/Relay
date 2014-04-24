@@ -9,7 +9,7 @@ public class WorldActionEvent extends WorldUserEvent {
 
     public WorldActionEvent(final Channel channel, final String action,
             final WorldUser sendingUser, final String nick, final boolean mention) {
-        super(channel, sendingUser == null ? nick : sendingUser.getPrettyNick(channel), mention);
+        super(channel, sendingUser, mention);
 
         this.action = action;
     }

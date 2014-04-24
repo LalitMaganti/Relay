@@ -65,7 +65,7 @@ class CtcpParser extends CommandParser {
         final Channel channel = getUserChannelInterface().getChannel(channelName);
         final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(userNick);
         final boolean mention = MentionParser.onMentionableCommand(action,
-                getServer().getUser().getNick());
+                getServer().getUser().getNick().getNickAsString());
         final WorldActionEvent event = new WorldActionEvent(channel, action, sendingUser,
                 userNick, mention);
         getServerEventBus().postAndStoreEvent(event, channel);

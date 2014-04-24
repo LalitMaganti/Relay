@@ -53,12 +53,12 @@ public class Channel implements Conversation {
 
     @Override
     public boolean equals(final Object o) {
-        if (o != null && o instanceof Channel) {
-            final Channel otherChannel = (Channel) o;
-            return otherChannel.getServer().equals(getServer())
-                    && otherChannel.getName().equalsIgnoreCase(mName);
+        if (o == null || !(o instanceof Channel)) {
+            return false;
         }
-        return false;
+        final Channel otherChannel = (Channel) o;
+        return otherChannel.getServer().equals(getServer())
+                && otherChannel.getName().equalsIgnoreCase(mName);
     }
 
     @Override

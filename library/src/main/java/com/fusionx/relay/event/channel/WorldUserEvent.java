@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.nick.Nick;
 
 import java.util.List;
 
@@ -16,26 +17,41 @@ public abstract class WorldUserEvent extends ChannelEvent {
 
     public final boolean userMentioned;
 
-    public final String nick;
+    public final WorldUser user;
+
+    public final Nick userNick;
+
+    public final String userNickString;
 
     WorldUserEvent(final Channel channel, final WorldUser user) {
-        this(channel, user != null ? user.getPrettyNick(channel) : null);
+        this(channel, user, false);
     }
 
-    WorldUserEvent(final Channel channel, final String nick) {
-        this(channel, nick, false);
-    }
-
-    WorldUserEvent(final Channel channel, final String nick, final boolean userMentioned) {
+    WorldUserEvent(final Channel channel, final WorldUser user, final boolean mentioned) {
         super(channel);
-        this.userMentioned = userMentioned;
 
-        // NICK should never be null
-        if (nick != null) {
-            this.nick = nick;
-        } else {
-            throw new NullPointerException();
-        }
+        this.user = user;
+        this.userMentioned = mentioned;
+        this.userNick = user.getNick();
+        this.userNickString = user.getNick().getNickAsString();
+    }
+
+    WorldUserEvent(final Channel channel, final Nick nick) {
+        super(channel);
+
+        this.user = null;
+        this.userMentioned = false;
+        this.userNick = nick;
+        this.userNickString = nick.getNickAsString();
+    }
+
+    public WorldUserEvent(final Channel channel, final String sendingNick, final boolean mention) {
+        super(channel);
+
+        this.user = null;
+        this.userMentioned = mention;
+        this.userNick = null;
+        this.userNickString = sendingNick;
     }
 
     public boolean isUserListChangeEvent() {

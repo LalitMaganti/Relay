@@ -1,15 +1,16 @@
 package com.fusionx.relay.event.server;
 
 import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.nick.Nick;
 
 public class ServerNickChangeEvent extends ServerEvent {
 
-    public final String oldNick;
+    public final Nick oldNick;
 
-    public final String newNick;
+    public final Nick newNick;
 
-    public ServerNickChangeEvent(final String oldNick, final WorldUser user) {
+    public ServerNickChangeEvent(final Nick oldNick, final WorldUser user) {
         this.oldNick = oldNick;
-        this.newNick = user.getColorfulNick();
+        this.newNick = user.getNick();
     }
 }
