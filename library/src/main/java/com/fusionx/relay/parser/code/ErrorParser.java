@@ -41,6 +41,12 @@ class ErrorParser extends CodeParser {
         final String nick = parsedArray.get(0);
         final String message = parsedArray.get(1);
         final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
-        mServerEventBus.postAndStoreEvent(new NoSuchNickEvent(user, message), user);
+
+        // If the user is null then this no such nick event happened for another reason
+        if (user != null) {
+            mServerEventBus.postAndStoreEvent(new NoSuchNickEvent(user, message), user);
+        } else {
+            // TODO - fix this
+        }
     }
 }

@@ -43,13 +43,6 @@ public class UserInputParser {
                         return;
                     }
                     break;
-                /*case "/slap":
-                    if (arrayLength == 1) {
-                        final String nick = parsedArray.get(0);
-                        server.getServerCallBus().sendSlap(channelName, nick);
-                        return;
-                    }
-                    break;*/
                 default:
                     onParseServerCommand(server, message);
                     return;
