@@ -8,6 +8,7 @@ import com.fusionx.relay.call.ChannelJoinCall;
 import com.fusionx.relay.call.ChannelKickCall;
 import com.fusionx.relay.call.ChannelMessageCall;
 import com.fusionx.relay.call.ChannelPartCall;
+import com.fusionx.relay.call.ChannelTopicCall;
 import com.fusionx.relay.call.ModeCall;
 import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.PrivateActionCall;
@@ -153,11 +154,6 @@ public class ServerCallBus {
         }
     }
 
-    public void sendSlap(final String channelName, final String nick) {
-        //final String message = InterfaceHolders.getEventResponses().getSlapMessage(nick);
-        //sendActionToChannel(channelName, message);
-    }
-
     public void sendActionToChannel(final String channelName, final String action) {
         post(new ChannelActionCall(channelName, action));
 
@@ -172,6 +168,10 @@ public class ServerCallBus {
 
     public void sendKick(String channelName, String nick, String reason) {
         post(new ChannelKickCall(channelName, nick, reason));
+    }
+
+    public void sendTopic(final String channelName, final String newTopic) {
+        post(new ChannelTopicCall(channelName, newTopic));
     }
 
     Server getServer() {

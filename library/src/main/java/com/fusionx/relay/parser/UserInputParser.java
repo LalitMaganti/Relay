@@ -17,9 +17,12 @@ public class UserInputParser {
         if (command.startsWith("/")) {
             switch (command) {
                 case "/me":
-                    final String action = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallBus().sendActionToChannel(channelName, action);
-                    return;
+                    if (arrayLength >= 1) {
+                        final String action = IRCUtils.concatenateStringList(parsedArray);
+                        server.getServerCallBus().sendActionToChannel(channelName, action);
+                        return;
+                    }
+                    break;
                 case "/part":
                 case "/p":
                     if (arrayLength == 0) {
@@ -37,9 +40,16 @@ public class UserInputParser {
                 case "/kick":
                     if (arrayLength >= 1) {
                         final String nick = parsedArray.remove(0);
-                        final String reason = parsedArray.size() >= 1 ? IRCUtils
+                        final String reason = arrayLength >= 1 ? IRCUtils
                                 .concatenateStringList(parsedArray) : "";
                         server.getServerCallBus().sendKick(channelName, nick, reason);
+                        return;
+                    }
+                    break;
+                case "/topic":
+                    if (arrayLength >= 1) {
+                        final String topic = IRCUtils.concatenateStringList(parsedArray);
+                        server.getServerCallBus().sendTopic(channelName, topic);
                         return;
                     }
                     break;
