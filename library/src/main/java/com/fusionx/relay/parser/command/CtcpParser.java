@@ -5,7 +5,9 @@ import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.call.VersionCall;
+import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
+import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.parser.MentionParser;
@@ -60,14 +62,18 @@ class CtcpParser extends CommandParser {
         }
     }
 
-    private void onParseChannelAction(final String channelName, final String userNick,
+    private void onParseChannelAction(final String channelName, final String sendingNick,
             final String action) {
         final Channel channel = getUserChannelInterface().getChannel(channelName);
-        final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(userNick);
+        final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
         final boolean mention = MentionParser.onMentionableCommand(action,
                 getServer().getUser().getNick().getNickAsString());
-        final WorldActionEvent event = new WorldActionEvent(channel, action, sendingUser,
-                userNick, mention);
+        final ChannelEvent event;
+        if (sendingUser == null) {
+            event = new WorldMessageEvent(channel, action, sendingNick, mention);
+        } else {
+            event = new WorldActionEvent(channel, action, sendingUser, mention);
+        }
         getServerEventBus().postAndStoreEvent(event, channel);
     }
 }
