@@ -27,8 +27,8 @@ public class PrivmsgParser extends CommandParser {
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String message = parsedArray.get(3);
 
-        // PRIVMSGs can be CTCP commands - e.g. actions to a channel or in a PM etc.
-        if (CtcpParser.isCtcpCommand(message)) {
+        // PRIVMSGs can be CTCP commands
+        if (CtcpParser.isCtcp(message)) {
             mCtcpParser.onParseCommand(parsedArray, rawSource);
         } else {
             final String nick = IRCUtils.getNickFromRaw(rawSource);

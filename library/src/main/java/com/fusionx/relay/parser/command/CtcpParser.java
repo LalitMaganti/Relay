@@ -3,29 +3,38 @@ package com.fusionx.relay.parser.command;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.call.VersionCall;
+import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;
+import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
+import com.fusionx.relay.event.server.VersionEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 
-class CtcpParser extends CommandParser {
+class CtcpParser {
+
+    private final Server mServer;
+
+    private final ServerEventBus mEventBus;
 
     public CtcpParser(Server server) {
-        super(server);
+        mServer = server;
+        mEventBus = server.getServerEventBus();
     }
 
-    public static boolean isCtcpCommand(final String message) {
+    public static boolean isCtcp(final String message) {
         return message.startsWith("\u0001") && message.endsWith("\u0001");
     }
 
-    @Override
+    // Commands start here
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String normalMessage = parsedArray.get(3);
         final String message = normalMessage.substring(1, normalMessage.length() - 1);
@@ -75,5 +84,35 @@ class CtcpParser extends CommandParser {
             event = new WorldActionEvent(channel, action, sendingUser, mention);
         }
         getServerEventBus().postAndStoreEvent(event, channel);
+    }
+    // Commands End Here
+
+    // Replies start here
+    public void onParseReply(final List<String> parsedArray, final String rawSource) {
+        final String normalMessage = parsedArray.get(3);
+        final String message = normalMessage.substring(1, normalMessage.length() - 1);
+
+        // TODO - THIS IS INCOMPLETE
+        if (message.startsWith("ACTION")) {
+            // Nothing should be done for an action reply - it is technically invalid
+        } else if (message.startsWith("VERSION")) {
+            // Pass this on to the server
+            final String nick = IRCUtils.getNickFromRaw(rawSource);
+            final String version = message.replace("VERSION", "");
+            getServerEventBus().postAndStoreEvent(new VersionEvent(nick, version));
+        }
+    }
+    // Replies end here
+
+    private ServerEventBus getServerEventBus() {
+        return mEventBus;
+    }
+
+    private Server getServer() {
+        return mServer;
+    }
+
+    private UserChannelInterface getUserChannelInterface() {
+        return mServer.getUserChannelInterface();
     }
 }

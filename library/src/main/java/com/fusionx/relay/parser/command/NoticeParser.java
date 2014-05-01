@@ -25,9 +25,9 @@ class NoticeParser extends CommandParser {
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String message = parsedArray.get(3);
 
-        // Notices can be CTCP commands
-        if (CtcpParser.isCtcpCommand(message)) {
-            mCtcpParser.onParseCommand(parsedArray, rawSource);
+        // Notices can be CTCP replies
+        if (CtcpParser.isCtcp(message)) {
+            mCtcpParser.onParseReply(parsedArray, rawSource);
         } else {
             final String sendingNick = IRCUtils.getNickFromRaw(rawSource);
             final String recipient = parsedArray.get(2);
@@ -35,7 +35,7 @@ class NoticeParser extends CommandParser {
 
             if (Channel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelNotice(recipient, notice, sendingNick);
-            } else if (recipient.equals(getServer().getUser().getNick())) {
+            } else if (recipient.equals(getServer().getUser().getNick().getNickAsString())) {
                 onParseUserNotice(sendingNick, notice);
             }
         }
