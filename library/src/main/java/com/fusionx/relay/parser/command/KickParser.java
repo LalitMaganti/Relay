@@ -37,7 +37,7 @@ class KickParser extends RemoveUserParser {
         final WorldUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
 
-        return new WorldKickEvent(channel, kickedUser, kickingUser, reason);
+        return new WorldKickEvent(channel, kickedUser, kickingUser, kickingNick, reason);
     }
 
     /**

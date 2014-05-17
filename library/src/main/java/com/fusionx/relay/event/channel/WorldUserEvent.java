@@ -31,8 +31,8 @@ public abstract class WorldUserEvent extends ChannelEvent {
         super(channel);
 
         this.user = user;
-        this.userMentioned = mentioned;
         this.userNick = user.getNick();
+        this.userMentioned = mentioned;
         this.userNickString = user.getNick().getNickAsString();
     }
 
@@ -40,18 +40,18 @@ public abstract class WorldUserEvent extends ChannelEvent {
         super(channel);
 
         this.user = null;
-        this.userMentioned = false;
         this.userNick = nick;
+        this.userMentioned = false;
         this.userNickString = nick.getNickAsString();
     }
 
-    public WorldUserEvent(final Channel channel, final String sendingNick, final boolean mention) {
+    public WorldUserEvent(final Channel channel, final String nick, final boolean mention) {
         super(channel);
 
         this.user = null;
-        this.userMentioned = mention;
         this.userNick = null;
-        this.userNickString = sendingNick;
+        this.userMentioned = mention;
+        this.userNickString = nick;
     }
 
     public boolean isUserListChangeEvent() {
