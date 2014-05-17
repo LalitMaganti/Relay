@@ -1,6 +1,5 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
 
 public class TestMisc {
