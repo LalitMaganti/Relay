@@ -1,11 +1,11 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.event.channel.WorldQuitEvent;
-import com.fusionx.relay.event.user.WorldPrivateQuitEvent;
+import com.fusionx.relay.event.channel.ChannelWorldQuitEvent;
+import com.fusionx.relay.event.query.QueryQuitWorldEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.Collection;
@@ -40,14 +40,14 @@ public class QuitParser extends CommandParser {
         for (final Channel channel : list) {
             getUserChannelInterface().removeUserFromChannel(channel, user);
 
-            final WorldQuitEvent event = new WorldQuitEvent(channel, user, reason);
+            final ChannelWorldQuitEvent event = new ChannelWorldQuitEvent(channel, user, reason);
             getServerEventBus().postAndStoreEvent(event, channel);
         }
 
-        final PrivateMessageUser pmUser = getUserChannelInterface().getPrivateMessageUser(user
+        final QueryUser pmUser = getUserChannelInterface().getQueryUser(user
                 .getNick().getNickAsString());
         if (pmUser != null) {
-            final WorldPrivateQuitEvent event = new WorldPrivateQuitEvent(pmUser);
+            final QueryQuitWorldEvent event = new QueryQuitWorldEvent(pmUser);
             getServerEventBus().postAndStoreEvent(event, pmUser);
         }
     }

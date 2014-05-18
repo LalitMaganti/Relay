@@ -5,7 +5,7 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.UserLevel;
-import com.fusionx.relay.event.channel.NameEvent;
+import com.fusionx.relay.event.channel.ChannelNameEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -47,7 +47,7 @@ class NameParser extends CodeParser {
     }
 
     private void onParseNameFinished() {
-        mServer.getServerEventBus().postAndStoreEvent(new NameEvent(mChannel,
+        mServer.getServerEventBus().postAndStoreEvent(new ChannelNameEvent(mChannel,
                 mChannel.getUsers()), mChannel);
 
         mChannel = null;

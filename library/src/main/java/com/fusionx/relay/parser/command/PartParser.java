@@ -3,8 +3,8 @@ package com.fusionx.relay.parser.command;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.event.channel.WorldPartEvent;
-import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.event.channel.ChannelWorldPartEvent;
+import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -23,10 +23,10 @@ public class PartParser extends RemoveUserParser {
     }
 
     @Override
-    public WorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
+    public ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
             final Channel channel, final WorldUser user) {
         final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"", "") : "";
-        return new WorldPartEvent(channel, user, reason);
+        return new ChannelWorldPartEvent(channel, user, reason);
     }
 
     @Override

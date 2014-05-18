@@ -1,7 +1,7 @@
 package com.fusionx.relay.communication;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.call.ChannelActionCall;
 import com.fusionx.relay.call.ChannelJoinCall;
@@ -15,14 +15,14 @@ import com.fusionx.relay.call.PrivateActionCall;
 import com.fusionx.relay.call.PrivateMessageCall;
 import com.fusionx.relay.call.RawCall;
 import com.fusionx.relay.call.WhoisCall;
-import com.fusionx.relay.event.channel.ActionEvent;
+import com.fusionx.relay.event.channel.ChannelActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.MessageEvent;
+import com.fusionx.relay.event.channel.ChannelMessageEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.event.user.PrivateActionEvent;
-import com.fusionx.relay.event.user.PrivateMessageEvent;
+import com.fusionx.relay.event.query.QueryActionSelfEvent;
+import com.fusionx.relay.event.query.QueryMessageSelfEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.RawWriter;
@@ -89,14 +89,14 @@ public class ServerCallBus {
             post(new PrivateMessageCall(nick, message));
         }
 
-        final PrivateMessageUser user = getServer().getUserChannelInterface()
-                .getPrivateMessageUser(nick);
+        final QueryUser user = getServer().getUserChannelInterface()
+                .getQueryUser(nick);
         if (user == null) {
             getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, message, false,
                     true);
             getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
         } else if (Utils.isNotEmpty(message)) {
-            getServer().getServerEventBus().postAndStoreEvent(new PrivateMessageEvent(user,
+            getServer().getServerEventBus().postAndStoreEvent(new QueryMessageSelfEvent(user,
                     getServer().getUser(), message), user);
         }
     }
@@ -106,8 +106,8 @@ public class ServerCallBus {
             post(new PrivateActionCall(nick, action));
         }
 
-        final PrivateMessageUser user = getServer().getUserChannelInterface()
-                .getPrivateMessageUser(nick);
+        final QueryUser user = getServer().getUserChannelInterface()
+                .getQueryUser(nick);
         if (user == null) {
             getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, action, true,
                     true);
@@ -115,7 +115,7 @@ public class ServerCallBus {
         } else {
             getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
             if (Utils.isNotEmpty(action)) {
-                getServer().getServerEventBus().postAndStoreEvent(new PrivateActionEvent(user,
+                getServer().getServerEventBus().postAndStoreEvent(new QueryActionSelfEvent(user,
                         getServer().getUser(), action), user);
             }
         }
@@ -129,7 +129,7 @@ public class ServerCallBus {
         post(new ChannelPartCall(channelName, InterfaceHolders.getPreferences().getPartReason()));
     }
 
-    public void sendClosePrivateMessage(final PrivateMessageUser user) {
+    public void sendClosePrivateMessage(final QueryUser user) {
         getServer().getUserChannelInterface().removePrivateMessageUser(user);
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
@@ -148,7 +148,7 @@ public class ServerCallBus {
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
             final Channel channel = getServer().getUserChannelInterface().getChannel(
                     channelName);
-            final ChannelEvent event = new MessageEvent(channel, message,
+            final ChannelEvent event = new ChannelMessageEvent(channel, message,
                     getServer().getUser());
             getServer().getServerEventBus().postAndStoreEvent(event, channel);
         }
@@ -160,7 +160,7 @@ public class ServerCallBus {
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
             final Channel channel = getServer().getUserChannelInterface()
                     .getChannel(channelName);
-            final ChannelEvent event = new ActionEvent(channel, action,
+            final ChannelEvent event = new ChannelActionEvent(channel, action,
                     getServer().getUser());
             getServer().getServerEventBus().postAndStoreEvent(event, channel);
         }

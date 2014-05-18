@@ -1,6 +1,6 @@
 package com.fusionx.relay.parser;
 
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -69,8 +69,8 @@ public class UserInputParser {
         final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
-        final PrivateMessageUser user = server.getUserChannelInterface()
-                .getPrivateMessageUser(userNick);
+        final QueryUser user = server.getUserChannelInterface()
+                .getQueryUser(userNick);
 
         if (command.startsWith("/")) {
             switch (command) {

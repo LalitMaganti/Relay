@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.WorldJoinEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
 import java.util.ArrayList;

@@ -1,19 +1,18 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.call.VersionCall;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.WorldActionEvent;
-import com.fusionx.relay.event.channel.WorldMessageEvent;
-import com.fusionx.relay.event.server.GenericServerEvent;
+import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
+import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.server.VersionEvent;
-import com.fusionx.relay.event.user.WorldPrivateActionEvent;
+import com.fusionx.relay.event.query.QueryActionWorldEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -62,12 +61,12 @@ class CtcpParser {
     }
 
     private void onParseUserAction(final String nick, final String action) {
-        final PrivateMessageUser user = getUserChannelInterface().getPrivateMessageUser(nick);
+        final QueryUser user = getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
             getUserChannelInterface().addNewPrivateMessageUser(nick, action, true, false);
             getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
         } else {
-            getServerEventBus().postAndStoreEvent(new WorldPrivateActionEvent(user, action), user);
+            getServerEventBus().postAndStoreEvent(new QueryActionWorldEvent(user, action), user);
         }
     }
 
@@ -79,9 +78,9 @@ class CtcpParser {
                 getServer().getUser().getNick().getNickAsString());
         final ChannelEvent event;
         if (sendingUser == null) {
-            event = new WorldMessageEvent(channel, action, sendingNick, mention);
+            event = new ChannelWorldMessageEvent(channel, action, sendingNick, mention);
         } else {
-            event = new WorldActionEvent(channel, action, sendingUser, mention);
+            event = new ChannelWorldActionEvent(channel, action, sendingUser, mention);
         }
         getServerEventBus().postAndStoreEvent(event, channel);
     }

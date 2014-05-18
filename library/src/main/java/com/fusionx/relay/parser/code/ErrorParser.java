@@ -1,8 +1,8 @@
 package com.fusionx.relay.parser.code;
 
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.user.NoSuchNickEvent;
+import com.fusionx.relay.event.query.QueryNoSuchNickWorldEvent;
 
 import java.util.List;
 
@@ -40,11 +40,11 @@ class ErrorParser extends CodeParser {
     private void onNoSuchNickError(final List<String> parsedArray) {
         final String nick = parsedArray.get(0);
         final String message = parsedArray.get(1);
-        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
+        final QueryUser user = mUserChannelInterface.getQueryUser(nick);
 
         // If the user is null then this no such nick event happened for another reason
         if (user != null) {
-            mServerEventBus.postAndStoreEvent(new NoSuchNickEvent(user, message), user);
+            mServerEventBus.postAndStoreEvent(new QueryNoSuchNickWorldEvent(user, message), user);
         } else {
             // TODO - fix this
         }

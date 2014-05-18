@@ -4,7 +4,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.TopicEvent;
+import com.fusionx.relay.event.channel.ChannelTopicEvent;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class TopicParser extends CommandParser {
         final Channel channel = getUserChannelInterface().getChannel(parsedArray.get(2));
         final String newTopic = parsedArray.get(3);
 
-        final ChannelEvent event = new TopicEvent(channel, user, newTopic);
+        final ChannelEvent event = new ChannelTopicEvent(channel, user, newTopic);
         getServerEventBus().postAndStoreEvent(event, channel);
     }
 }

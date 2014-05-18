@@ -3,8 +3,8 @@ package com.fusionx.relay.parser.command;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.event.channel.WorldKickEvent;
-import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.event.channel.ChannelWorldKickEvent;
+import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -31,13 +31,13 @@ class KickParser extends RemoveUserParser {
     }
 
     @Override
-    public WorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
+    public ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
             final Channel channel, final WorldUser kickedUser) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
         final WorldUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
 
-        return new WorldKickEvent(channel, kickedUser, kickingUser, kickingNick, reason);
+        return new ChannelWorldKickEvent(channel, kickedUser, kickingUser, kickingNick, reason);
     }
 
     /**

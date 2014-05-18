@@ -1,12 +1,12 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
 import com.fusionx.relay.event.server.PrivateNoticeEvent;
-import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
+import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -49,12 +49,12 @@ class NoticeParser extends CommandParser {
     }
 
     void onParseUserNotice(final String sendingNick, final String notice) {
-        final PrivateMessageUser user = getUserChannelInterface()
-                .getPrivateMessageUser(sendingNick);
+        final QueryUser user = getUserChannelInterface()
+                .getQueryUser(sendingNick);
         if (user == null) {
             getServerEventBus().postAndStoreEvent(new PrivateNoticeEvent(notice, sendingNick));
         } else {
-            getServerEventBus().postAndStoreEvent(new WorldPrivateMessageEvent(user, notice), user);
+            getServerEventBus().postAndStoreEvent(new QueryMessageWorldEvent(user, notice), user);
         }
     }
 }

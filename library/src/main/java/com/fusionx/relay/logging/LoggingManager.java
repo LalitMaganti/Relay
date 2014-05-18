@@ -4,7 +4,7 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.event.user.UserEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -142,7 +142,7 @@ public abstract class LoggingManager {
             }
         }
 
-        public void onEvent(final UserEvent event) {
+        public void onEvent(final QueryEvent event) {
             if (shouldLogEvent(event)) {
                 final CharSequence sequence = getMessageFromEvent(mServer, event);
                 // If logging path is null then that's an issue

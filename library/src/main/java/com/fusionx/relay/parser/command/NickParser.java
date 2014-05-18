@@ -2,12 +2,11 @@ package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.nick.BasicNick;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.NickChangeEvent;
-import com.fusionx.relay.event.channel.WorldNickChangeEvent;
+import com.fusionx.relay.event.channel.ChannelNickChangeEvent;
+import com.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import com.fusionx.relay.event.server.ServerNickChangeEvent;
 import com.fusionx.relay.nick.Nick;
 import com.fusionx.relay.util.IRCUtils;
@@ -38,9 +37,9 @@ class NickParser extends CommandParser {
         for (final Channel channel : channels) {
             final ChannelEvent event;
             if (user instanceof AppUser) {
-                event = new NickChangeEvent(channel, oldNick, (AppUser) user);
+                event = new ChannelNickChangeEvent(channel, oldNick, (AppUser) user);
             } else {
-                event = new WorldNickChangeEvent(channel, oldNick, user);
+                event = new ChannelWorldNickChangeEvent(channel, oldNick, user);
             }
             getServerEventBus().postAndStoreEvent(event, channel);
         }

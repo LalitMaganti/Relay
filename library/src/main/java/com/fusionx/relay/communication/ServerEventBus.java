@@ -1,11 +1,11 @@
 package com.fusionx.relay.communication;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.event.user.UserEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 
 import de.greenrobot.event.EventBus;
 
@@ -30,7 +30,7 @@ public class ServerEventBus {
         post(event);
     }
 
-    public void postAndStoreEvent(final UserEvent event, final PrivateMessageUser user) {
+    public void postAndStoreEvent(final QueryEvent event, final QueryUser user) {
         user.onUserEvent(event);
         post(event);
     }

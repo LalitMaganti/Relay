@@ -1,13 +1,13 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.WorldMessageEvent;
+import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
-import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
+import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -44,12 +44,12 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final PrivateMessageUser user = getUserChannelInterface().getPrivateMessageUser(nick);
+        final QueryUser user = getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
             getUserChannelInterface().addNewPrivateMessageUser(nick, message, false, false);
             getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
         } else {
-            getServerEventBus().postAndStoreEvent(new WorldPrivateMessageEvent(user, message),
+            getServerEventBus().postAndStoreEvent(new QueryMessageWorldEvent(user, message),
                     user);
         }
     }
@@ -62,9 +62,9 @@ public class PrivmsgParser extends CommandParser {
                 getServer().getUser().getNick().getNickAsString());
         final ChannelEvent event;
         if (sendingUser == null) {
-            event = new WorldMessageEvent(channel, message, sendingNick, mention);
+            event = new ChannelWorldMessageEvent(channel, message, sendingNick, mention);
         } else {
-            event = new WorldMessageEvent(channel, message, sendingUser, mention);
+            event = new ChannelWorldMessageEvent(channel, message, sendingUser, mention);
         }
         getServerEventBus().postAndStoreEvent(event, channel);
     }

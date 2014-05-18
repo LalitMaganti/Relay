@@ -3,7 +3,7 @@ package com.fusionx.relay.connection;
 import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.call.ChannelJoinCall;
@@ -15,16 +15,16 @@ import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelStopEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.ReconnectEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.server.StopEvent;
-import com.fusionx.relay.event.user.UserConnectEvent;
-import com.fusionx.relay.event.user.UserDisconnectEvent;
-import com.fusionx.relay.event.user.UserEvent;
-import com.fusionx.relay.event.user.UserStopEvent;
+import com.fusionx.relay.event.query.QueryConnectEvent;
+import com.fusionx.relay.event.query.QueryDisconnectEvent;
+import com.fusionx.relay.event.query.QueryStopEvent;
 import com.fusionx.relay.parser.ServerConnectionParser;
 import com.fusionx.relay.parser.ServerLineParser;
 import com.fusionx.relay.util.SocketUtils;
@@ -242,10 +242,10 @@ public class BaseConnection {
             bus.postAndStoreEvent(channelEvent, channel);
         }
 
-        for (final PrivateMessageUser user : mServer.getUserChannelInterface()
-                .getPrivateMessageUsers()) {
-            final UserEvent userEvent = new UserConnectEvent(user);
-            bus.postAndStoreEvent(userEvent, user);
+        for (final QueryUser user : mServer.getUserChannelInterface()
+                .getQueryUsers()) {
+            final QueryEvent queryEvent = new QueryConnectEvent(user);
+            bus.postAndStoreEvent(queryEvent, user);
         }
     }
 
@@ -259,10 +259,10 @@ public class BaseConnection {
             }
         }
 
-        for (final PrivateMessageUser user : mServer.getUserChannelInterface()
-                .getPrivateMessageUsers()) {
-            final UserEvent userEvent = new UserDisconnectEvent(user, serverMessage);
-            mServer.getServerEventBus().postAndStoreEvent(userEvent, user);
+        for (final QueryUser user : mServer.getUserChannelInterface()
+                .getQueryUsers()) {
+            final QueryEvent queryEvent = new QueryDisconnectEvent(user, serverMessage);
+            mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }
 
         final ServerEvent event = new DisconnectEvent(serverMessage, retryPending);
@@ -278,10 +278,10 @@ public class BaseConnection {
             }
         }
 
-        for (final PrivateMessageUser user : mServer.getUserChannelInterface()
-                .getPrivateMessageUsers()) {
-            final UserEvent userEvent = new UserStopEvent(user);
-            mServer.getServerEventBus().postAndStoreEvent(userEvent, user);
+        for (final QueryUser user : mServer.getUserChannelInterface()
+                .getQueryUsers()) {
+            final QueryEvent queryEvent = new QueryStopEvent(user);
+            mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }
 
         final ServerEvent event = new StopEvent();

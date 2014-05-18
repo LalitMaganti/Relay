@@ -3,10 +3,8 @@ package com.fusionx.relay;
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.util.IRCUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +18,7 @@ public final class UserChannelInterface {
 
     private final Map<Channel, Collection<WorldUser>> mChannelToUserMap;
 
-    private final Collection<PrivateMessageUser> mPrivateMessageUsers;
+    private final Collection<QueryUser> mQueryUsers;
 
     private final Server mServer;
 
@@ -31,7 +29,7 @@ public final class UserChannelInterface {
 
         mUserToChannelMap = new THashMap<>();
         mChannelToUserMap = new THashMap<>();
-        mPrivateMessageUsers = new TLinkedHashSet<>();
+        mQueryUsers = new TLinkedHashSet<>();
         mUserIgnoreList = new THashSet<>();
     }
 
@@ -110,8 +108,8 @@ public final class UserChannelInterface {
         return new Channel(channelName, this);
     }
 
-    public PrivateMessageUser getPrivateMessageUser(final String nick) {
-        for (final PrivateMessageUser user : mPrivateMessageUsers) {
+    public QueryUser getQueryUser(final String nick) {
+        for (final QueryUser user : mQueryUsers) {
             if (nick.equals(user.getNick().getNickAsString())) {
                 return user;
             }
@@ -119,19 +117,19 @@ public final class UserChannelInterface {
         return null;
     }
 
-    public Collection<PrivateMessageUser> getPrivateMessageUsers() {
-        return mPrivateMessageUsers;
+    public Collection<QueryUser> getQueryUsers() {
+        return mQueryUsers;
     }
 
     public void addNewPrivateMessageUser(final String nick, final String message,
             final boolean action, final boolean userSent) {
-        final PrivateMessageUser user = new PrivateMessageUser(nick, this, message, action,
+        final QueryUser user = new QueryUser(nick, this, message, action,
                 userSent);
-        mPrivateMessageUsers.add(user);
+        mQueryUsers.add(user);
     }
 
-    public void removePrivateMessageUser(final PrivateMessageUser user) {
-        mPrivateMessageUsers.remove(user);
+    public void removePrivateMessageUser(final QueryUser user) {
+        mQueryUsers.remove(user);
     }
 
     public void onConnectionTerminated() {

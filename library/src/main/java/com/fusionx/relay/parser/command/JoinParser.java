@@ -4,7 +4,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.WorldJoinEvent;
+import com.fusionx.relay.event.channel.ChannelWorldJoinEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 
@@ -29,7 +29,7 @@ class JoinParser extends CommandParser {
         }
         getUserChannelInterface().coupleUserAndChannel(user, channel);
 
-        final ChannelEvent event = new WorldJoinEvent(channel, user);
+        final ChannelEvent event = new ChannelWorldJoinEvent(channel, user);
         getServerEventBus().postAndStoreEvent(event, channel);
 
         if (user.getNick().equals(getServer().getUser().getNick())) {

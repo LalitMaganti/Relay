@@ -3,7 +3,7 @@ package com.fusionx.relay.parser.command;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public abstract class RemoveUserParser extends CommandParser {
     abstract WorldUser getRemovedUser(final List<String> parsedArray,
             final String rawSource);
 
-    abstract WorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
+    abstract ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
             final Channel channel, final WorldUser user);
 
     abstract void onRemoved(final List<String> parsedArray, final String rawSource,
@@ -39,7 +39,7 @@ public abstract class RemoveUserParser extends CommandParser {
             final Channel channel, final WorldUser removedUser) {
         getUserChannelInterface().decoupleUserAndChannel(removedUser, channel);
 
-        final WorldUserEvent event = getEvent(parsedArray, rawSource, channel, removedUser);
+        final ChannelWorldUserEvent event = getEvent(parsedArray, rawSource, channel, removedUser);
         getServerEventBus().postAndStoreEvent(event, channel);
     }
 }

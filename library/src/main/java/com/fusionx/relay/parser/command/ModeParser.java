@@ -6,9 +6,9 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.ModeEvent;
-import com.fusionx.relay.event.channel.UserLevelChangeEvent;
-import com.fusionx.relay.event.channel.WorldLevelChangeEvent;
+import com.fusionx.relay.event.channel.ChannelModeEvent;
+import com.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
+import com.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -55,15 +55,15 @@ class ModeParser extends CommandParser {
             final UserLevel levelEnum = user.onModeChange(channel, mode);
             final ChannelEvent event;
             if (user instanceof AppUser) {
-                event = new UserLevelChangeEvent(channel, mode, (AppUser) user, levelEnum,
+                event = new ChannelUserLevelChangeEvent(channel, mode, (AppUser) user, levelEnum,
                         sendingUser);
             } else {
-                event = new WorldLevelChangeEvent(channel, mode, user, levelEnum,
+                event = new ChannelWorldLevelChangeEvent(channel, mode, user, levelEnum,
                         sendingUser);
             }
             getServerEventBus().postAndStoreEvent(event, channel);
         } else {
-            final ChannelEvent event = new ModeEvent(channel, sendingUser, source, mode);
+            final ChannelEvent event = new ChannelModeEvent(channel, sendingUser, source, mode);
             getServerEventBus().postAndStoreEvent(event, channel);
         }
     }

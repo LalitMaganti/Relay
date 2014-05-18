@@ -3,7 +3,7 @@ package com.fusionx.relay.parser.code;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.constants.ServerReplyCodes;
-import com.fusionx.relay.event.channel.InitialTopicEvent;
+import com.fusionx.relay.event.channel.ChannelInitialTopicEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -34,7 +34,7 @@ class TopicParser extends CodeParser {
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
         final Channel channel = mUserChannelInterface.getChannel(channelName);
 
-        final InitialTopicEvent topicEvent = new InitialTopicEvent(channel, nick, tempTopic);
+        final ChannelInitialTopicEvent topicEvent = new ChannelInitialTopicEvent(channel, nick, tempTopic);
         mServerEventBus.postAndStoreEvent(topicEvent, channel);
 
         tempTopic = null;
