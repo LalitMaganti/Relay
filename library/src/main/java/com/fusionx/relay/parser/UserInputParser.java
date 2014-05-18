@@ -76,12 +76,12 @@ public class UserInputParser {
             switch (command) {
                 case "/me":
                     final String action = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallBus().sendActionToUser(userNick, action);
+                    server.getServerCallBus().sendActionToQueryUser(userNick, action);
                     return;
                 case "/close":
                 case "/c":
                     if (arrayLength == 0) {
-                        server.getServerCallBus().sendClosePrivateMessage(user);
+                        server.getServerCallBus().sendCloseQuery(user);
                         return;
                     }
                     break;
@@ -90,7 +90,7 @@ public class UserInputParser {
                     return;
             }
         } else {
-            server.getServerCallBus().sendMessageToUser(userNick, message);
+            server.getServerCallBus().sendMessageToQueryUser(userNick, message);
             return;
         }
         onUnknownEvent(server, message);
@@ -124,7 +124,7 @@ public class UserInputParser {
                     final String nick = parsedArray.remove(0);
                     final String message = parsedArray.size() >= 1 ? IRCUtils.concatenateStringList
                             (parsedArray) : "";
-                    server.getServerCallBus().sendMessageToUser(nick, message);
+                    server.getServerCallBus().sendMessageToQueryUser(nick, message);
                     return;
                 }
                 break;
@@ -144,7 +144,7 @@ public class UserInputParser {
             case "/ns":
                 if (arrayLength > 1) {
                     final String message = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallBus().sendMessageToUser("NickServ", message);
+                    server.getServerCallBus().sendMessageToQueryUser("NickServ", message);
                     return;
                 }
                 break;

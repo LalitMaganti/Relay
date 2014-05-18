@@ -128,7 +128,7 @@ public final class UserChannelInterface {
         mQueryUsers.add(user);
     }
 
-    public void removePrivateMessageUser(final QueryUser user) {
+    public void removeQueryUser(final QueryUser user) {
         mQueryUsers.remove(user);
     }
 

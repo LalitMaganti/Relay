@@ -84,7 +84,7 @@ public class ServerCallBus {
         post(new RawCall(rawLine));
     }
 
-    public void sendMessageToUser(final String nick, final String message) {
+    public void sendMessageToQueryUser(final String nick, final String message) {
         if (Utils.isNotEmpty(message)) {
             post(new PrivateMessageCall(nick, message));
         }
@@ -101,7 +101,7 @@ public class ServerCallBus {
         }
     }
 
-    public void sendActionToUser(final String nick, final String action) {
+    public void sendActionToQueryUser(final String nick, final String action) {
         if (Utils.isNotEmpty(action)) {
             post(new PrivateActionCall(nick, action));
         }
@@ -129,8 +129,8 @@ public class ServerCallBus {
         post(new ChannelPartCall(channelName, InterfaceHolders.getPreferences().getPartReason()));
     }
 
-    public void sendClosePrivateMessage(final QueryUser user) {
-        getServer().getUserChannelInterface().removePrivateMessageUser(user);
+    public void sendCloseQuery(final QueryUser user) {
+        getServer().getUserChannelInterface().removeQueryUser(user);
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
             final ServerEvent event = new PrivateMessageClosedEvent(user);
