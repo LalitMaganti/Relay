@@ -102,6 +102,8 @@ public abstract class LoggingManager {
 
     private final class LogHandler {
 
+        private static final int LOG_PRIORITY = 500;
+
         private final Server mServer;
 
         public LogHandler(final Server server) {
@@ -109,7 +111,7 @@ public abstract class LoggingManager {
         }
 
         public void startLogging() {
-            mServer.getServerEventBus().register(this);
+            mServer.getServerEventBus().register(this, LOG_PRIORITY);
         }
 
         public void stopLogging() {

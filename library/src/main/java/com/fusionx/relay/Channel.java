@@ -52,7 +52,7 @@ public class Channel implements Conversation {
 
     @Override
     public boolean equals(final Object o) {
-        if (o == null || !(o instanceof Channel)) {
+        if (!(o instanceof Channel)) {
             return false;
         }
         final Channel otherChannel = (Channel) o;

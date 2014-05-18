@@ -55,7 +55,7 @@ public class Server implements Conversation {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof Server)) {
+        if (!(o instanceof Server)) {
             return false;
         }
         final Server server = (Server) o;
