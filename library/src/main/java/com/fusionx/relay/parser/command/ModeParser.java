@@ -63,7 +63,8 @@ class ModeParser extends CommandParser {
             }
             getServerEventBus().postAndStoreEvent(event, channel);
         } else {
-            final ChannelEvent event = new ChannelModeEvent(channel, sendingUser, source, mode);
+            final ChannelEvent event = new ChannelModeEvent(channel, sendingUser, sendingNick,
+                    source, mode);
             getServerEventBus().postAndStoreEvent(event, channel);
         }
     }
