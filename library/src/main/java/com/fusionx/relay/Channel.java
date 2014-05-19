@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Channel implements Conversation {
 
-    // Static stuff
+    // As set out in RFC2812
     private final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',
             '+', '!');
 
