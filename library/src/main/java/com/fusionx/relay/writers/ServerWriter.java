@@ -6,11 +6,10 @@ import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.QuitCall;
 import com.fusionx.relay.call.RawCall;
 import com.fusionx.relay.call.UserCall;
-import com.fusionx.relay.call.VersionCall;
+import com.fusionx.relay.call.VersionResponseCall;
 import com.fusionx.relay.call.WhoisCall;
 import com.squareup.otto.Subscribe;
 
-import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.Writer;
@@ -80,7 +79,7 @@ public class ServerWriter extends RawWriter {
     }
 
     @Subscribe
-    public void sendVersion(final VersionCall event) {
+    public void sendVersion(final VersionResponseCall event) {
         writeLineToServer("PRIVMSG " + event.askingUser + " :\u0001VERSION " + event.version +
                 "\u0001");
     }

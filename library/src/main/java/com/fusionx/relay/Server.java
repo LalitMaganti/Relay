@@ -123,4 +123,8 @@ public class Server implements Conversation {
     public ServerEventBus getServerEventBus() {
         return mServerEventBus;
     }
+
+    public ServerConfiguration getConfiguration() {
+        return mConfiguration;
+    }
 }

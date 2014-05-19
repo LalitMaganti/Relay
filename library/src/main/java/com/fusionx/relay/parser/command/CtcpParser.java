@@ -5,14 +5,15 @@ import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.call.VersionCall;
+import com.fusionx.relay.call.ERRMSGResponseCall;
+import com.fusionx.relay.call.VersionResponseCall;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
+import com.fusionx.relay.event.query.QueryActionWorldEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.server.VersionEvent;
-import com.fusionx.relay.event.query.QueryActionWorldEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -38,12 +39,24 @@ class CtcpParser {
         final String normalMessage = parsedArray.get(3);
         final String message = normalMessage.substring(1, normalMessage.length() - 1);
 
+        final String nick = IRCUtils.getNickFromRaw(rawSource);
         // TODO - THIS IS INCOMPLETE
         if (message.startsWith("ACTION")) {
             onAction(parsedArray, rawSource);
+        } else if (message.startsWith("FINGER")) {
+            getServer().getServerCallBus().post(new FingerResponseCall(nick, mServer));
         } else if (message.startsWith("VERSION")) {
-            final String nick = IRCUtils.getNickFromRaw(rawSource);
-            getServer().getServerCallBus().post(new VersionCall(nick, "Relay Android Library"));
+            getServer().getServerCallBus().post(new VersionResponseCall(nick));
+        } else if (message.startsWith("SOURCE")) {
+        } else if (message.startsWith("USERINFO")) {
+        } else if (message.startsWith("ERRMSG")) {
+            final String query = message.replace("ERRMSG ", "");
+            getServer().getServerCallBus().post(new ERRMSGResponseCall(nick, query));
+        } else if (message.startsWith("PING")) {
+            final String timestamp = message.replace("PING ", "");
+            getServer().getServerCallBus().post(new PingResponseCall(nick, timestamp));
+        } else if (message.startsWith("TIME")) {
+            getServer().getServerCallBus().post(new TimeResponseCall(nick));
         }
     }
 
@@ -94,11 +107,17 @@ class CtcpParser {
         // TODO - THIS IS INCOMPLETE
         if (message.startsWith("ACTION")) {
             // Nothing should be done for an action reply - it is technically invalid
+        } else if (message.startsWith("FINGER")) {
         } else if (message.startsWith("VERSION")) {
             // Pass this on to the server
             final String nick = IRCUtils.getNickFromRaw(rawSource);
             final String version = message.replace("VERSION", "");
             getServerEventBus().postAndStoreEvent(new VersionEvent(nick, version));
+        } else if (message.startsWith("SOURCE")) {
+        } else if (message.startsWith("USERINFO")) {
+        } else if (message.startsWith("ERRMSG")) {
+        } else if (message.startsWith("PING")) {
+        } else if (message.startsWith("TIME")) {
         }
     }
     // Replies end here
