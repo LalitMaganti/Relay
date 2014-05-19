@@ -15,13 +15,16 @@ public class UserLevelChangeEvent extends ChannelEvent {
 
     public final WorldUser changingUser;
 
+    public final String changingNick;
+
     public UserLevelChangeEvent(final Channel channel, final String rawMode, final AppUser user,
-            final UserLevel level, final WorldUser changingUser) {
+            final UserLevel level, final WorldUser changingUser, String changingNick) {
         super(channel);
 
         this.rawMode = rawMode;
         this.level = level;
         this.user = user;
         this.changingUser = changingUser;
+        this.changingNick = changingNick;
     }
 }

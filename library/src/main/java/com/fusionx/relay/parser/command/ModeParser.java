@@ -56,10 +56,10 @@ class ModeParser extends CommandParser {
             final ChannelEvent event;
             if (user instanceof AppUser) {
                 event = new UserLevelChangeEvent(channel, mode, (AppUser) user, levelEnum,
-                        sendingUser);
+                        sendingUser, sendingNick);
             } else {
                 event = new WorldLevelChangeEvent(channel, mode, user, levelEnum,
-                        sendingUser);
+                        sendingUser, sendingNick);
             }
             getServerEventBus().postAndStoreEvent(event, channel);
         } else {
