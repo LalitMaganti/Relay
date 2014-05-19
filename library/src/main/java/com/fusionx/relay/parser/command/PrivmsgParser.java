@@ -6,7 +6,7 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
-import com.fusionx.relay.event.server.NewPrivateMessage;
+import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
@@ -47,7 +47,7 @@ public class PrivmsgParser extends CommandParser {
         final QueryUser user = getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
             getUserChannelInterface().addNewPrivateMessageUser(nick, message, false, false);
-            getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
+            getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
         } else {
             getServerEventBus().postAndStoreEvent(new QueryMessageWorldEvent(user, message),
                     user);

@@ -1,4 +1,4 @@
-package com.fusionx.relay.parser.command;
+package com.fusionx.relay.call;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.call.Call;

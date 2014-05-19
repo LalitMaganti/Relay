@@ -6,13 +6,16 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.call.ERRMSGResponseCall;
+import com.fusionx.relay.call.FingerResponseCall;
+import com.fusionx.relay.call.PingResponseCall;
+import com.fusionx.relay.call.TimeResponseCall;
 import com.fusionx.relay.call.VersionResponseCall;
 import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import com.fusionx.relay.event.query.QueryActionWorldEvent;
-import com.fusionx.relay.event.server.NewPrivateMessage;
+import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.VersionEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
@@ -77,7 +80,7 @@ class CtcpParser {
         final QueryUser user = getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
             getUserChannelInterface().addNewPrivateMessageUser(nick, action, true, false);
-            getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
+            getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
         } else {
             getServerEventBus().postAndStoreEvent(new QueryActionWorldEvent(user, action), user);
         }

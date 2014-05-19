@@ -18,7 +18,7 @@ import com.fusionx.relay.call.WhoisCall;
 import com.fusionx.relay.event.channel.ChannelActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelMessageEvent;
-import com.fusionx.relay.event.server.NewPrivateMessage;
+import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.query.QueryActionSelfEvent;
@@ -94,7 +94,7 @@ public class ServerCallBus {
         if (user == null) {
             getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, message, false,
                     true);
-            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
+            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
         } else if (Utils.isNotEmpty(message)) {
             getServer().getServerEventBus().postAndStoreEvent(new QueryMessageSelfEvent(user,
                     getServer().getUser(), message), user);
@@ -111,9 +111,9 @@ public class ServerCallBus {
         if (user == null) {
             getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, action, true,
                     true);
-            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
+            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
         } else {
-            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
+            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
             if (Utils.isNotEmpty(action)) {
                 getServer().getServerEventBus().postAndStoreEvent(new QueryActionSelfEvent(user,
                         getServer().getUser(), action), user);

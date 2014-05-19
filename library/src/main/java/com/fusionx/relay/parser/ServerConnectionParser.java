@@ -100,8 +100,7 @@ public class ServerConnectionParser {
                 if (!triedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
                     mWriter.sendNick(new NickChangeCall(nickStorage.getSecondChoiceNick()));
                     triedSecondNick = true;
-                } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage
-                        .getThirdChoiceNick())) {
+                } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage.getThirdChoiceNick())) {
                     mWriter.sendNick(new NickChangeCall(nickStorage.getThirdChoiceNick()));
                     triedThirdNick = true;
                 } else {

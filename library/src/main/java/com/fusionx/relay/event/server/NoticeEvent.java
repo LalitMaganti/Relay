@@ -1,10 +1,10 @@
 package com.fusionx.relay.event.server;
 
-public class PrivateNoticeEvent extends ImportantServerEvent {
+public class NoticeEvent extends ImportantServerEvent {
 
     public final String sendingNick;
 
-    public PrivateNoticeEvent(final String message, String sendingNick) {
+    public NoticeEvent(final String message, String sendingNick) {
         super(message);
 
         this.sendingNick = sendingNick;

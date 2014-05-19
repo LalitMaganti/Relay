@@ -5,7 +5,7 @@ import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
-import com.fusionx.relay.event.server.PrivateNoticeEvent;
+import com.fusionx.relay.event.server.NoticeEvent;
 import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -52,7 +52,7 @@ class NoticeParser extends CommandParser {
         final QueryUser user = getUserChannelInterface()
                 .getQueryUser(sendingNick);
         if (user == null) {
-            getServerEventBus().postAndStoreEvent(new PrivateNoticeEvent(notice, sendingNick));
+            getServerEventBus().postAndStoreEvent(new NoticeEvent(notice, sendingNick));
         } else {
             getServerEventBus().postAndStoreEvent(new QueryMessageWorldEvent(user, notice), user);
         }

@@ -2,7 +2,8 @@ package com.fusionx.relay.parser.code;
 
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.query.QueryNoSuchNickWorldEvent;
+import com.fusionx.relay.event.query.QueryNoSuchNickEvent;
+import com.fusionx.relay.event.server.GenericServerEvent;
 
 import java.util.List;
 
@@ -44,9 +45,9 @@ class ErrorParser extends CodeParser {
 
         // If the user is null then this no such nick event happened for another reason
         if (user != null) {
-            mServerEventBus.postAndStoreEvent(new QueryNoSuchNickWorldEvent(user, message), user);
+            mServerEventBus.postAndStoreEvent(new QueryNoSuchNickEvent(user, message), user);
         } else {
-            // TODO - fix this
+            mServerEventBus.postAndStoreEvent(new GenericServerEvent(message));
         }
     }
 }
