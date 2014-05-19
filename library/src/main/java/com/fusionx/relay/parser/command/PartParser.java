@@ -3,6 +3,7 @@ package com.fusionx.relay.parser.command;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.channel.ChannelPartEvent;
 import com.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.PartEvent;
@@ -34,6 +35,9 @@ public class PartParser extends RemoveUserParser {
         // ZNCs can be stupid and can sometimes send PART commands for channels they didn't send
         // JOIN commands for...
         if (channel != null) {
+            final ChannelPartEvent partEvent = new ChannelPartEvent(channel);
+            getServerEventBus().postAndStoreEvent(partEvent, channel);
+
             getUserChannelInterface().removeChannel(channel);
 
             final PartEvent event = new PartEvent(channel);

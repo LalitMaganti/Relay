@@ -278,8 +278,7 @@ public class BaseConnection {
             }
         }
 
-        for (final QueryUser user : mServer.getUserChannelInterface()
-                .getQueryUsers()) {
+        for (final QueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
             final QueryEvent queryEvent = new QueryStopEvent(user);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }
