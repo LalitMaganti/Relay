@@ -18,11 +18,11 @@ import com.fusionx.relay.call.WhoisCall;
 import com.fusionx.relay.event.channel.ChannelActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelMessageEvent;
+import com.fusionx.relay.event.query.QueryActionSelfEvent;
+import com.fusionx.relay.event.query.QueryMessageSelfEvent;
 import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.event.query.QueryActionSelfEvent;
-import com.fusionx.relay.event.query.QueryMessageSelfEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.RawWriter;
@@ -31,6 +31,7 @@ import com.squareup.otto.ThreadEnforcer;
 
 import android.os.Handler;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
@@ -57,10 +58,11 @@ public class ServerCallBus {
     }
 
     public void onConnectionTerminated() {
-        for (final RawWriter writer : mRawWriterSet) {
+        for (Iterator<RawWriter> iterator = mRawWriterSet.iterator(); iterator.hasNext(); ) {
+            final RawWriter writer = iterator.next();
+            iterator.remove();
             mBus.unregister(writer);
         }
-        mRawWriterSet.clear();
     }
 
     public void post(final Object event) {

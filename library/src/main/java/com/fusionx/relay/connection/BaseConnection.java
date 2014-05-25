@@ -225,27 +225,23 @@ public class BaseConnection {
 
     private void onConnecting() {
         mServerConnection.updateStatus(ConnectionStatus.CONNECTING);
-
         mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent());
     }
 
     private void onConnected() {
         mServerConnection.updateStatus(ConnectionStatus.CONNECTED);
 
-        final ServerEventBus bus = mServer.getServerEventBus();
-
         final ServerEvent event = new ConnectEvent(mServerConfiguration.getUrl());
-        bus.postAndStoreEvent(event);
+        mServer.getServerEventBus().postAndStoreEvent(event);
 
         for (final Channel channel : mServer.getUser().getChannels()) {
             final ChannelEvent channelEvent = new ChannelConnectEvent(channel);
-            bus.postAndStoreEvent(channelEvent, channel);
+            mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
         }
 
-        for (final QueryUser user : mServer.getUserChannelInterface()
-                .getQueryUsers()) {
+        for (final QueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
             final QueryEvent queryEvent = new QueryConnectEvent(user);
-            bus.postAndStoreEvent(queryEvent, user);
+            mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }
     }
 
@@ -259,8 +255,7 @@ public class BaseConnection {
             }
         }
 
-        for (final QueryUser user : mServer.getUserChannelInterface()
-                .getQueryUsers()) {
+        for (final QueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
             final QueryEvent queryEvent = new QueryDisconnectEvent(user, serverMessage);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }
@@ -269,7 +264,7 @@ public class BaseConnection {
         mServer.getServerEventBus().postAndStoreEvent(event);
     }
 
-    private void onStopped() {
+    void onStopped() {
         // User can be null if the server was not fully connected to
         if (mServer.getUser() != null) {
             for (final Channel channel : mServer.getUser().getChannels()) {

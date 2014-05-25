@@ -80,8 +80,7 @@ public class ServerWriter extends RawWriter {
 
     @Subscribe
     public void sendVersion(final VersionResponseCall event) {
-        writeLineToServer("PRIVMSG " + event.askingUser + " :\u0001VERSION " + event.version +
-                "\u0001");
+        writeLineToServer(event.getLineToSendServer());
     }
 
     public void sendSaslAuthentication(final String saslUsername, final String saslPassword) {

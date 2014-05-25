@@ -76,7 +76,9 @@ public class ServerConnection {
                     mBaseConnection.stopConnection();
                 } else if (mMainThread.isAlive()) {
                     mMainThread.interrupt();
+                    mBaseConnection.onStopped();
                     mBaseConnection.closeSocket();
+                    mServer.onConnectionTerminated();
                 }
             }
         });
