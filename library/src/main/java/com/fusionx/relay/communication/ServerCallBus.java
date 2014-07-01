@@ -13,6 +13,7 @@ import com.fusionx.relay.call.ModeCall;
 import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.PrivateActionCall;
 import com.fusionx.relay.call.PrivateMessageCall;
+import com.fusionx.relay.call.QuitCall;
 import com.fusionx.relay.call.RawCall;
 import com.fusionx.relay.call.WhoisCall;
 import com.fusionx.relay.event.channel.ChannelActionEvent;
@@ -58,7 +59,7 @@ public class ServerCallBus {
     }
 
     public void onConnectionTerminated() {
-        for (Iterator<RawWriter> iterator = mRawWriterSet.iterator(); iterator.hasNext(); ) {
+        for (final Iterator<RawWriter> iterator = mRawWriterSet.iterator(); iterator.hasNext(); ) {
             final RawWriter writer = iterator.next();
             iterator.remove();
             mBus.unregister(writer);
@@ -108,8 +109,7 @@ public class ServerCallBus {
             post(new PrivateActionCall(nick, action));
         }
 
-        final QueryUser user = getServer().getUserChannelInterface()
-                .getQueryUser(nick);
+        final QueryUser user = getServer().getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
             getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, action, true,
                     true);
@@ -168,7 +168,7 @@ public class ServerCallBus {
         }
     }
 
-    public void sendKick(String channelName, String nick, String reason) {
+    public void sendKick(final String channelName, final String nick, final String reason) {
         post(new ChannelKickCall(channelName, nick, reason));
     }
 
@@ -178,5 +178,9 @@ public class ServerCallBus {
 
     Server getServer() {
         return mServer;
+    }
+
+    public void postImmediately(final QuitCall quitCall) {
+        mBus.post(quitCall);
     }
 }

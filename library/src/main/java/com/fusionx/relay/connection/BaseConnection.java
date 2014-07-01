@@ -114,7 +114,7 @@ public class BaseConnection {
      */
     void stopConnection() {
         mStopped = true;
-        mServer.getServerCallBus().post(new QuitCall(getPreferences().getQuitReason()));
+        mServer.getServerCallBus().postImmediately(new QuitCall(getPreferences().getQuitReason()));
     }
 
     /**
@@ -175,14 +175,12 @@ public class BaseConnection {
             disconnectMessage = ex.getMessage();
         }
 
-        if (mStopped) {
-            onStopped();
-        } else {
+        // If it was stopped then this cleanup would have already been performed
+        if (!mStopped) {
             onDisconnected(disconnectMessage, isReconnectNeeded());
+            closeSocket();
+            mServer.onConnectionTerminated();
         }
-
-        closeSocket();
-        mServer.onConnectionTerminated();
     }
 
     private void onStartParsing(final String nick, final ServerWriter serverWriter,
@@ -246,6 +244,8 @@ public class BaseConnection {
     }
 
     private void onDisconnected(final String serverMessage, final boolean retryPending) {
+        mServerConnection.updateStatus(ConnectionStatus.DISCONNECTED);
+
         // User can be null if the server was not fully connected to
         if (mServer.getUser() != null) {
             for (final Channel channel : mServer.getUser().getChannels()) {
