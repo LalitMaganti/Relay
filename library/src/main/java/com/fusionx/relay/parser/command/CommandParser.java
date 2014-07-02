@@ -2,7 +2,7 @@ package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
-import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.constants.ServerCommands;
 
 import java.util.List;

@@ -1,8 +1,5 @@
-package com.fusionx.relay.connection;
+package com.fusionx.relay;
 
-import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.interfaces.EventPreferences;
 import com.fusionx.relay.misc.InterfaceHolders;
 
@@ -10,7 +7,6 @@ import android.os.Handler;
 import android.util.Pair;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;

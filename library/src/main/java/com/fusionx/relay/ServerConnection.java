@@ -1,14 +1,9 @@
-package com.fusionx.relay.connection;
-
-import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
+package com.fusionx.relay;
 
 import android.os.Handler;
 import android.os.HandlerThread;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A wrapper thread class for the interesting {@link BaseConnection} class

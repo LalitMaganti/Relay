@@ -10,7 +10,7 @@ import com.fusionx.relay.call.FingerResponseCall;
 import com.fusionx.relay.call.PingResponseCall;
 import com.fusionx.relay.call.TimeResponseCall;
 import com.fusionx.relay.call.VersionResponseCall;
-import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;

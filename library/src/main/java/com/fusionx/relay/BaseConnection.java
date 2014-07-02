@@ -1,30 +1,23 @@
-package com.fusionx.relay.connection;
+package com.fusionx.relay;
 
-import com.fusionx.relay.AppUser;
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.QueryUser;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.call.ChannelJoinCall;
 import com.fusionx.relay.call.NickChangeCall;
 import com.fusionx.relay.call.QuitCall;
 import com.fusionx.relay.call.UserCall;
-import com.fusionx.relay.communication.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelStopEvent;
+import com.fusionx.relay.event.query.QueryConnectEvent;
+import com.fusionx.relay.event.query.QueryDisconnectEvent;
 import com.fusionx.relay.event.query.QueryEvent;
+import com.fusionx.relay.event.query.QueryStopEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.ReconnectEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.server.StopEvent;
-import com.fusionx.relay.event.query.QueryConnectEvent;
-import com.fusionx.relay.event.query.QueryDisconnectEvent;
-import com.fusionx.relay.event.query.QueryStopEvent;
 import com.fusionx.relay.parser.ServerConnectionParser;
 import com.fusionx.relay.parser.ServerLineParser;
 import com.fusionx.relay.util.SocketUtils;
@@ -45,7 +38,7 @@ import static com.fusionx.relay.misc.InterfaceHolders.getPreferences;
  *
  * @author Lalit Maganti
  */
-public class BaseConnection {
+class BaseConnection {
 
     private final ServerConnection mServerConnection;
 
@@ -103,9 +96,13 @@ public class BaseConnection {
         }
     }
 
+    /**
+     * Called when the we reconnect to the server
+     */
     private void onReconnecting() {
         // Set status to reconnecting
         mServerConnection.updateStatus(ConnectionStatus.RECONNECTING);
+
         mServer.getServerEventBus().postAndStoreEvent(new ReconnectEvent());
     }
 
@@ -135,14 +132,15 @@ public class BaseConnection {
         String disconnectMessage = "";
         try {
             mSocket = SocketUtils.openSocketConnection(mServerConfiguration);
+
             final Writer writer = SocketUtils.getSocketWriter(mSocket);
             final ServerWriter serverWriter = mServer.onOutputStreamCreated(writer);
 
             onConnecting();
 
             if (mServerConfiguration.isSaslAvailable()) {
-                // By sending this line, the server *should* wait until we end the CAP stuff with CAP
-                // END
+                // By sending this line, the server *should* wait until we end the CAP stuff with
+                // CAP END
                 serverWriter.sendSupportedCAP();
             }
 
@@ -223,14 +221,12 @@ public class BaseConnection {
 
     private void onConnecting() {
         mServerConnection.updateStatus(ConnectionStatus.CONNECTING);
+
         mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent());
     }
 
     private void onConnected() {
         mServerConnection.updateStatus(ConnectionStatus.CONNECTED);
-
-        final ServerEvent event = new ConnectEvent(mServerConfiguration.getUrl());
-        mServer.getServerEventBus().postAndStoreEvent(event);
 
         for (final Channel channel : mServer.getUser().getChannels()) {
             final ChannelEvent channelEvent = new ChannelConnectEvent(channel);
@@ -241,6 +237,9 @@ public class BaseConnection {
             final QueryEvent queryEvent = new QueryConnectEvent(user);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }
+
+        final ServerEvent event = new ConnectEvent(mServerConfiguration.getUrl());
+        mServer.getServerEventBus().postAndStoreEvent(event);
     }
 
     private void onDisconnected(final String serverMessage, final boolean retryPending) {
@@ -265,6 +264,8 @@ public class BaseConnection {
     }
 
     void onStopped() {
+        mServerConnection.updateStatus(ConnectionStatus.STOPPED);
+
         // User can be null if the server was not fully connected to
         if (mServer.getUser() != null) {
             for (final Channel channel : mServer.getUser().getChannels()) {

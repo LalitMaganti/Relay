@@ -1,4 +1,4 @@
-package com.fusionx.relay.communication;
+package com.fusionx.relay.bus;
 
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.QueryUser;

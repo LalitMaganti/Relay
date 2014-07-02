@@ -2,7 +2,7 @@ package com.fusionx.relay.parser.code;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
-import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.constants.ServerReplyCodes;
 
 import android.util.SparseArray;

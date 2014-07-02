@@ -1,8 +1,7 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.communication.ServerCallBus;
-import com.fusionx.relay.communication.ServerEventBus;
-import com.fusionx.relay.connection.ServerConnection;
+import com.fusionx.relay.bus.ServerCallBus;
+import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.fusionx.relay.writers.ChannelWriter;
