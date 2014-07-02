@@ -148,8 +148,7 @@ public class ServerCallBus {
         post(new ChannelMessageCall(channelName, message));
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final Channel channel = getServer().getUserChannelInterface().getChannel(
-                    channelName);
+            final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
             final ChannelEvent event = new ChannelMessageEvent(channel, message,
                     getServer().getUser());
             getServer().getServerEventBus().postAndStoreEvent(event, channel);
@@ -160,8 +159,7 @@ public class ServerCallBus {
         post(new ChannelActionCall(channelName, action));
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final Channel channel = getServer().getUserChannelInterface()
-                    .getChannel(channelName);
+            final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
             final ChannelEvent event = new ChannelActionEvent(channel, action,
                     getServer().getUser());
             getServer().getServerEventBus().postAndStoreEvent(event, channel);

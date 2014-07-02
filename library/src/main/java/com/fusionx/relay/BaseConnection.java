@@ -94,6 +94,7 @@ class BaseConnection {
             }
             connect();
         }
+        onDisconnected("Disconnected from server (no reconnect pending).", false);
     }
 
     /**
