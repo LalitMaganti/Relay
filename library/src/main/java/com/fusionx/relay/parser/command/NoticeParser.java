@@ -5,8 +5,8 @@ import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
-import com.fusionx.relay.event.server.NoticeEvent;
 import com.fusionx.relay.event.query.QueryMessageWorldEvent;
+import com.fusionx.relay.event.server.NoticeEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -41,16 +41,21 @@ class NoticeParser extends CommandParser {
         }
     }
 
-    void onParseChannelNotice(final String channelName, final String sendingNick,
+    private void onParseChannelNotice(final String channelName, final String sendingNick,
             final String notice) {
         final Channel channel = getUserChannelInterface().getChannel(channelName);
+        if (channel == null) {
+            // If we're not in this channel then send the notice to the server instead
+            // TODO - maybe figure out why this is happening
+            getServerEventBus().postAndStoreEvent(new NoticeEvent(notice, sendingNick));
+            return;
+        }
         final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
         getServerEventBus().postAndStoreEvent(event, channel);
     }
 
-    void onParseUserNotice(final String sendingNick, final String notice) {
-        final QueryUser user = getUserChannelInterface()
-                .getQueryUser(sendingNick);
+    private void onParseUserNotice(final String sendingNick, final String notice) {
+        final QueryUser user = getUserChannelInterface().getQueryUser(sendingNick);
         if (user == null) {
             getServerEventBus().postAndStoreEvent(new NoticeEvent(notice, sendingNick));
         } else {

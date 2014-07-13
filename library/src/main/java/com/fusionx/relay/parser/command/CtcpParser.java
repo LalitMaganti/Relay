@@ -65,14 +65,15 @@ class CtcpParser {
 
     private void onAction(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        if (!getUserChannelInterface().shouldIgnoreUser(nick)) {
-            final String action = parsedArray.get(3).replace("ACTION ", "");
-            final String recipient = parsedArray.get(2);
-            if (Channel.isChannelPrefix(recipient.charAt(0))) {
-                onParseChannelAction(recipient, nick, action);
-            } else {
-                onParseUserAction(nick, action);
-            }
+        if (getUserChannelInterface().shouldIgnoreUser(nick)) {
+            return;
+        }
+        final String action = parsedArray.get(3).replace("ACTION ", "");
+        final String recipient = parsedArray.get(2);
+        if (Channel.isChannelPrefix(recipient.charAt(0))) {
+            onParseChannelAction(recipient, nick, action);
+        } else {
+            onParseUserAction(nick, action);
         }
     }
 
