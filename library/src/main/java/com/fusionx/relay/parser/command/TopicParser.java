@@ -1,8 +1,8 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelTopicEvent;
 
@@ -16,7 +16,7 @@ public class TopicParser extends CommandParser {
 
     @Override
     public void onParseCommand(List<String> parsedArray, String rawSource) {
-        final WorldUser user = getUserChannelInterface().getUserFromRaw(rawSource);
+        final ChannelUser user = getUserChannelInterface().getUserFromRaw(rawSource);
         final Channel channel = getUserChannelInterface().getChannel(parsedArray.get(2));
         final String newTopic = parsedArray.get(3);
 

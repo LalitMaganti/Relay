@@ -1,8 +1,8 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelWorldKickEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.KickEvent;
@@ -25,16 +25,16 @@ class KickParser extends RemoveUserParser {
      * @return the WorldUser object associated with the nick
      */
     @Override
-    public WorldUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
+    public ChannelUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
         final String kickedNick = parsedArray.get(3);
         return getUserChannelInterface().getUserIfExists(kickedNick);
     }
 
     @Override
     public ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
-            final Channel channel, final WorldUser kickedUser) {
+            final Channel channel, final ChannelUser kickedUser) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
+        final ChannelUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
 
         return new ChannelWorldKickEvent(channel, kickedUser, kickingUser, kickingNick, reason);
@@ -50,7 +50,7 @@ class KickParser extends RemoveUserParser {
     @Override
     void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
+        final ChannelUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
 
         // Remove the channel only after we've finished with it
         getUserChannelInterface().removeChannel(channel);

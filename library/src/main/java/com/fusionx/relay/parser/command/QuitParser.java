@@ -1,9 +1,9 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import com.fusionx.relay.event.query.QueryQuitWorldEvent;
 import com.fusionx.relay.util.IRCUtils;
@@ -22,7 +22,7 @@ public class QuitParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser user = getUserChannelInterface().getUserIfExists(nick);
+        final ChannelUser user = getUserChannelInterface().getUserIfExists(nick);
         if (getServer().getUser().getNick().equals(user.getNick())) {
             onQuit();
         } else {
@@ -34,7 +34,7 @@ public class QuitParser extends CommandParser {
         return mIsUserQuit;
     }
 
-    private void onUserQuit(final List<String> parsedArray, final WorldUser user) {
+    private void onUserQuit(final List<String> parsedArray, final ChannelUser user) {
         final Collection<Channel> list = getUserChannelInterface().removeUser(user);
         final String reason = parsedArray.size() == 3 ? parsedArray.get(2).replace("\"", "") : "";
         for (final Channel channel : list) {

@@ -1,9 +1,9 @@
 package com.fusionx.relay.parser.code;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.ChannelNameEvent;
 import com.fusionx.relay.util.IRCUtils;
@@ -41,7 +41,7 @@ class NameParser extends CodeParser {
         for (final String rawNick : listOfUsers) {
             final UserLevel level = UserLevel.getLevelFromPrefix(rawNick.charAt(0));
             final String nick = level == UserLevel.NONE ? rawNick : rawNick.substring(1);
-            final WorldUser user = mUserChannelInterface.getUser(nick);
+            final ChannelUser user = mUserChannelInterface.getUser(nick);
             mUserChannelInterface.coupleUserAndChannel(user, mChannel, level);
         }
     }

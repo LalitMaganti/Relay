@@ -1,8 +1,8 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelPartEvent;
 import com.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
@@ -18,14 +18,14 @@ public class PartParser extends RemoveUserParser {
     }
 
     @Override
-    public WorldUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
+    public ChannelUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
         final String userNick = IRCUtils.getNickFromRaw(rawSource);
         return getUserChannelInterface().getUserIfExists(userNick);
     }
 
     @Override
     public ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
-            final Channel channel, final WorldUser user) {
+            final Channel channel, final ChannelUser user) {
         final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"", "") : "";
         return new ChannelWorldPartEvent(channel, user, reason);
     }

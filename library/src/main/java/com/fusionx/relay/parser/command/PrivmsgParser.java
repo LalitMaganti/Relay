@@ -1,9 +1,9 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import com.fusionx.relay.event.server.NewPrivateMessageEvent;
@@ -56,7 +56,7 @@ public class PrivmsgParser extends CommandParser {
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
             final String message) {
-        final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
+        final ChannelUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
         final Channel channel = getUserChannelInterface().getChannel(channelName);
         final boolean mention = MentionParser.onMentionableCommand(message,
                 getServer().getUser().getNick().getNickAsString());

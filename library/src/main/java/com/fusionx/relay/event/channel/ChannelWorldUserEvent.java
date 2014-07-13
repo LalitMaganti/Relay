@@ -3,7 +3,7 @@ package com.fusionx.relay.event.channel;
 import com.google.common.collect.ImmutableList;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.nick.Nick;
 
 import java.util.List;
@@ -17,17 +17,17 @@ public abstract class ChannelWorldUserEvent extends ChannelEvent {
 
     public final boolean userMentioned;
 
-    public final WorldUser user;
+    public final ChannelUser user;
 
     public final Nick userNick;
 
     public final String userNickString;
 
-    ChannelWorldUserEvent(final Channel channel, final WorldUser user) {
+    ChannelWorldUserEvent(final Channel channel, final ChannelUser user) {
         this(channel, user, false);
     }
 
-    ChannelWorldUserEvent(final Channel channel, final WorldUser user, final boolean mentioned) {
+    ChannelWorldUserEvent(final Channel channel, final ChannelUser user, final boolean mentioned) {
         super(channel);
 
         this.user = user;

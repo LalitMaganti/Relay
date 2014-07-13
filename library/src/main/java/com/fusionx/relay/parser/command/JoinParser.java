@@ -1,8 +1,8 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldJoinEvent;
 import com.fusionx.relay.event.server.JoinEvent;
@@ -20,7 +20,7 @@ class JoinParser extends CommandParser {
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String channelName = parsedArray.get(2);
 
-        final WorldUser user = getUserChannelInterface().getUserFromRaw(rawSource);
+        final ChannelUser user = getUserChannelInterface().getUserFromRaw(rawSource);
         Channel channel = getUserChannelInterface().getChannel(channelName);
         if (channel == null) {
             channel = getUserChannelInterface().getNewChannel(channelName);

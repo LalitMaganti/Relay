@@ -2,8 +2,8 @@ package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.AppUser;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelModeEvent;
@@ -47,8 +47,8 @@ class ModeParser extends CommandParser {
             final Channel channel, final String mode) {
         final String source = parsedArray.get(4);
         final String nick = IRCUtils.getNickFromRaw(source);
-        final WorldUser user = getUserChannelInterface().getUserIfExists(nick);
-        final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
+        final ChannelUser user = getUserChannelInterface().getUserIfExists(nick);
+        final ChannelUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
 
         // Nullity can occur when a ban is being added/removed on a whole range using wildcards
         if (user != null) {

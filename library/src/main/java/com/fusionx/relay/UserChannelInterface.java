@@ -14,9 +14,9 @@ import gnu.trove.set.hash.TLinkedHashSet;
 
 public final class UserChannelInterface {
 
-    private final Map<WorldUser, Collection<Channel>> mUserToChannelMap;
+    private final Map<ChannelUser, Collection<Channel>> mUserToChannelMap;
 
-    private final Map<Channel, Collection<WorldUser>> mChannelToUserMap;
+    private final Map<Channel, Collection<ChannelUser>> mChannelToUserMap;
 
     private final Collection<QueryUser> mQueryUsers;
 
@@ -33,11 +33,11 @@ public final class UserChannelInterface {
         mUserIgnoreList = new THashSet<>();
     }
 
-    public synchronized void coupleUserAndChannel(final WorldUser user, final Channel channel) {
+    public synchronized void coupleUserAndChannel(final ChannelUser user, final Channel channel) {
         coupleUserAndChannel(user, channel, UserLevel.NONE);
     }
 
-    public synchronized void coupleUserAndChannel(final WorldUser user, final Channel channel,
+    public synchronized void coupleUserAndChannel(final ChannelUser user, final Channel channel,
             final UserLevel userLevel) {
         user.onModeChanged(channel, userLevel);
         addChannelToUser(user, channel);
@@ -46,16 +46,16 @@ public final class UserChannelInterface {
         channel.onIncrementUserType(userLevel);
     }
 
-    public synchronized void decoupleUserAndChannel(final WorldUser user, final Channel channel) {
+    public synchronized void decoupleUserAndChannel(final ChannelUser user, final Channel channel) {
         removeUserFromChannel(channel, user);
         removeChannelFromUser(channel, user);
         user.onRemove(channel);
     }
 
-    public void removeUserFromChannel(final Channel channel, final WorldUser user) {
+    public void removeUserFromChannel(final Channel channel, final ChannelUser user) {
         channel.onDecrementUserType(user.getChannelPrivileges(channel));
 
-        final Collection<WorldUser> setOfUsers = mChannelToUserMap.get(channel);
+        final Collection<ChannelUser> setOfUsers = mChannelToUserMap.get(channel);
         if (setOfUsers.size() > 1) {
             setOfUsers.remove(user);
         } else {
@@ -63,29 +63,29 @@ public final class UserChannelInterface {
         }
     }
 
-    public synchronized Collection<Channel> removeUser(final WorldUser user) {
+    public synchronized Collection<Channel> removeUser(final ChannelUser user) {
         return mUserToChannelMap.remove(user);
     }
 
     public synchronized void removeChannel(final Channel channel) {
-        for (final WorldUser user : mChannelToUserMap.remove(channel)) {
+        for (final ChannelUser user : mChannelToUserMap.remove(channel)) {
             user.onRemove(channel);
             removeChannelFromUser(channel, user);
         }
     }
 
-    public synchronized WorldUser getUserFromRaw(final String rawSource) {
+    public synchronized ChannelUser getUserFromRaw(final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
         return getUser(nick);
     }
 
-    public synchronized WorldUser getUser(final String nick) {
-        final WorldUser user = getUserIfExists(nick);
-        return user != null ? user : new WorldUser(nick, this);
+    public synchronized ChannelUser getUser(final String nick) {
+        final ChannelUser user = getUserIfExists(nick);
+        return user != null ? user : new ChannelUser(nick, this);
     }
 
-    public synchronized WorldUser getUserIfExists(final String nick) {
-        for (final WorldUser user : mUserToChannelMap.keySet()) {
+    public synchronized ChannelUser getUserIfExists(final String nick) {
+        for (final ChannelUser user : mUserToChannelMap.keySet()) {
             if (nick.equals(user.getNick().getNickAsString())) {
                 return user;
             }
@@ -133,20 +133,23 @@ public final class UserChannelInterface {
     }
 
     public void onConnectionTerminated() {
-        final Iterator<WorldUser> iterator = mUserToChannelMap.keySet().iterator();
+        final Iterator<ChannelUser> iterator = mUserToChannelMap.keySet().iterator();
         while (iterator.hasNext()) {
-            final WorldUser user = iterator.next();
-            if (!(user instanceof AppUser)) {
-                iterator.remove();
+            final ChannelUser user = iterator.next();
+            if (user instanceof AppUser) {
+                continue;
             }
+            iterator.remove();
         }
         mChannelToUserMap.clear();
 
-        if (mServer.getUser() != null) {
-            final Collection<Channel> channelSet = mServer.getUser().getChannels();
-            for (final Channel channel : channelSet) {
-                addUserToChannel(mServer.getUser(), channel);
-            }
+        final AppUser appUser = mServer.getUser();
+        if (appUser == null) {
+            return;
+        }
+        final Collection<Channel> channelSet = appUser.getChannels();
+        for (final Channel channel : channelSet) {
+            addUserToChannel(appUser, channel);
         }
     }
 
@@ -154,7 +157,7 @@ public final class UserChannelInterface {
         return mUserIgnoreList.contains(userNick);
     }
 
-    void removeChannelFromUser(final Channel channel, final WorldUser user) {
+    void removeChannelFromUser(final Channel channel, final ChannelUser user) {
         final Collection<Channel> setOfChannels = mUserToChannelMap.get(user);
         // The app user check is to make sure that the list of channels returned for the app user
         // is never null
@@ -165,11 +168,11 @@ public final class UserChannelInterface {
         }
     }
 
-    synchronized Collection<Channel> getAllChannelsInUser(final WorldUser user) {
+    synchronized Collection<Channel> getAllChannelsInUser(final ChannelUser user) {
         return mUserToChannelMap.get(user);
     }
 
-    synchronized Collection<WorldUser> getAllUsersInChannel(final Channel channel) {
+    synchronized Collection<ChannelUser> getAllUsersInChannel(final Channel channel) {
         return mChannelToUserMap.get(channel);
     }
 
@@ -188,8 +191,8 @@ public final class UserChannelInterface {
         return mServer;
     }
 
-    private synchronized void addUserToChannel(final WorldUser user, final Channel channel) {
-        Collection<WorldUser> setOfUsers = mChannelToUserMap.get(channel);
+    private synchronized void addUserToChannel(final ChannelUser user, final Channel channel) {
+        Collection<ChannelUser> setOfUsers = mChannelToUserMap.get(channel);
         if (setOfUsers == null) {
             setOfUsers = new THashSet<>();
             mChannelToUserMap.put(channel, setOfUsers);
@@ -197,7 +200,7 @@ public final class UserChannelInterface {
         setOfUsers.add(user);
     }
 
-    private synchronized void addChannelToUser(final WorldUser user, final Channel channel) {
+    private synchronized void addChannelToUser(final ChannelUser user, final Channel channel) {
         Collection<Channel> setOfChannels = mUserToChannelMap.get(user);
         if (setOfChannels == null) {
             // Linked hash set used to preserve insertion order - so that the channels are always

@@ -1,10 +1,10 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.call.ERRMSGResponseCall;
 import com.fusionx.relay.call.FingerResponseCall;
 import com.fusionx.relay.call.PingResponseCall;
@@ -89,7 +89,7 @@ class CtcpParser {
     private void onParseChannelAction(final String channelName, final String sendingNick,
             final String action) {
         final Channel channel = getUserChannelInterface().getChannel(channelName);
-        final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
+        final ChannelUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
         final boolean mention = MentionParser.onMentionableCommand(action,
                 getServer().getUser().getNick().getNickAsString());
         final ChannelEvent event;

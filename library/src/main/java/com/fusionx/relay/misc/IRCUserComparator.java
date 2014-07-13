@@ -1,12 +1,12 @@
 package com.fusionx.relay.misc;
 
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.constants.UserLevel;
 
 import java.util.Comparator;
 
-public class IRCUserComparator implements Comparator<WorldUser> {
+public class IRCUserComparator implements Comparator<ChannelUser> {
 
     private final Channel channel;
 
@@ -15,7 +15,7 @@ public class IRCUserComparator implements Comparator<WorldUser> {
     }
 
     @Override
-    public int compare(final WorldUser user1, final WorldUser user2) {
+    public int compare(final ChannelUser user1, final ChannelUser user2) {
         final UserLevel firstUserMode = user1.getChannelPrivileges(channel);
         final UserLevel secondUserMode = user2.getChannelPrivileges(channel);
 

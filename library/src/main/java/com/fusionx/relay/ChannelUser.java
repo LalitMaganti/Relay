@@ -11,7 +11,7 @@ import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
 
-public class WorldUser implements Checkable {
+public class ChannelUser implements Checkable {
 
     protected final UserChannelInterface mUserChannelInterface;
 
@@ -22,7 +22,7 @@ public class WorldUser implements Checkable {
     // Checkable interface
     private boolean mChecked;
 
-    public WorldUser(final String nick, final UserChannelInterface userChannelInterface) {
+    public ChannelUser(final String nick, final UserChannelInterface userChannelInterface) {
         mUserLevelMap = new THashMap<>();
         mNick = new BasicNick(nick);
         mUserChannelInterface = userChannelInterface;
@@ -70,10 +70,9 @@ public class WorldUser implements Checkable {
                         channel.onIncrementUserType(levelEnum);
                         onModeChanged(channel, levelEnum);
                         return levelEnum;
-                    } else {
-                        onModeChanged(channel, UserLevel.NONE);
-                        return UserLevel.NONE;
                     }
+                    onModeChanged(channel, UserLevel.NONE);
+                    return UserLevel.NONE;
             }
         }
 
@@ -83,7 +82,7 @@ public class WorldUser implements Checkable {
     @Override
     public String toString() {
         return mNick.toString();
-    }    // Checkable interface
+    }
 
     @Override
     public boolean isChecked() {
@@ -95,12 +94,12 @@ public class WorldUser implements Checkable {
         mChecked = b;
     }
 
-    public void setNick(final String nick) {
-        mNick = new BasicNick(nick);
-    }
-
     public Nick getNick() {
         return mNick;
+    }
+
+    public void setNick(final String nick) {
+        mNick = new BasicNick(nick);
     }
 
     @Override

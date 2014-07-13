@@ -84,12 +84,13 @@ public class Channel implements Conversation {
      *
      * @param userLevel the type of user
      */
-    public void onIncrementUserType(final UserLevel userLevel) {
-        if (userLevel != UserLevel.NONE) {
-            synchronized (mNumberOfUsers) {
-                Integer users = mNumberOfUsers.get(userLevel);
-                mNumberOfUsers.put(userLevel, ++users);
-            }
+    void onIncrementUserType(final UserLevel userLevel) {
+        if (userLevel == UserLevel.NONE) {
+            return;
+        }
+        synchronized (mNumberOfUsers) {
+            Integer users = mNumberOfUsers.get(userLevel);
+            mNumberOfUsers.put(userLevel, ++users);
         }
     }
 
@@ -98,12 +99,13 @@ public class Channel implements Conversation {
      *
      * @param userLevel the type of user
      */
-    public void onDecrementUserType(final UserLevel userLevel) {
-        if (userLevel != UserLevel.NONE) {
-            synchronized (mNumberOfUsers) {
-                Integer users = mNumberOfUsers.get(userLevel);
-                mNumberOfUsers.put(userLevel, --users);
-            }
+    void onDecrementUserType(final UserLevel userLevel) {
+        if (userLevel == UserLevel.NONE) {
+            return;
+        }
+        synchronized (mNumberOfUsers) {
+            Integer users = mNumberOfUsers.get(userLevel);
+            mNumberOfUsers.put(userLevel, --users);
         }
     }
 
@@ -115,15 +117,14 @@ public class Channel implements Conversation {
      */
     public int getNumberOfUsersType(final UserLevel userLevel) {
         synchronized (mNumberOfUsers) {
-            if (userLevel != UserLevel.NONE) {
-                return mNumberOfUsers.get(userLevel);
-            } else {
+            if (userLevel == UserLevel.NONE) {
                 int normalUsers = getNumberOfUsers();
                 for (UserLevel levelEnum : UserLevel.values()) {
                     normalUsers -= mNumberOfUsers.get(levelEnum);
                 }
                 return normalUsers;
             }
+            return mNumberOfUsers.get(userLevel);
         }
     }
 
@@ -157,7 +158,7 @@ public class Channel implements Conversation {
      *
      * @return list of users currently in the channel
      */
-    public Collection<WorldUser> getUsers() {
+    public Collection<ChannelUser> getUsers() {
         return mUserChannelInterface.getAllUsersInChannel(this);
     }
 
@@ -167,10 +168,7 @@ public class Channel implements Conversation {
      * @return the number of users in the channel
      */
     int getNumberOfUsers() {
-        if (getUsers() != null) {
-            return getUsers().size();
-        } else {
-            return 0;
-        }
+        final Collection<ChannelUser> users = getUsers();
+        return users != null ? users.size() : 0;
     }
 }
