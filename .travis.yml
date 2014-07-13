@@ -15,3 +15,4 @@ before_install:
   - "android-update-sdk --components='build-tools-20.0.0' --accept-licenses='.+'"
   - "android-update-sdk --components='android-19' --accept-licenses='.+'"
   - "android-update-sdk --components='extra-android-m2repository,extra-google-m2repository' --accept-licenses='.+'"
+script: ./graldlew test
