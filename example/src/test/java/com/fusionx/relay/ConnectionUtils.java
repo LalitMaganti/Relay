@@ -1,7 +1,8 @@
-package com.fusionx.relay.connection;
+package com.fusionx.relay;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.ServerConnection;
 
 import android.os.Handler;
 import android.os.Looper;

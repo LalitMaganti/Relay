@@ -4,16 +4,4 @@ allprojects {
             mavenCentral()
         }
     }
-
-    dependencies {
-        repositories {
-            mavenCentral()
-        }
-    }
-
-    apply plugin: 'maven'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
 }

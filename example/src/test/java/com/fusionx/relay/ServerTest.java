@@ -1,8 +1,5 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.connection.ConnectionUtils;
-import com.fusionx.relay.connection.ServerConnection;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;

@@ -10,7 +10,7 @@ import org.robolectric.annotation.Config;
 import android.os.Parcel;
 
 import static com.fusionx.relay.ServerConfiguration.Builder.CREATOR;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 @Config(emulateSdk = 18)
@@ -46,7 +46,7 @@ public class ServerConfigurationTest {
         final ServerConfiguration.Builder actual = CREATOR.createFromParcel(parcel);
 
         assertThat(actual).isNotNull();
-        assertThat(actual).isEqualsToByComparingFields(expected);
+        assertThat(actual).isEqualToComparingFieldByField(expected);
     }
 
     // Configuration tests
@@ -69,6 +69,6 @@ public class ServerConfigurationTest {
         final ServerConfiguration actual = ServerConfiguration.CREATOR.createFromParcel(parcel);
 
         assertThat(actual).isNotNull();
-        assertThat(actual).isEqualsToByComparingFields(expected);
+        assertThat(actual).isEqualToComparingFieldByField(expected);
     }
 }
