@@ -11,10 +11,11 @@ import com.fusionx.relay.event.server.ServerNickChangeEvent;
 import com.fusionx.relay.nick.Nick;
 import com.fusionx.relay.util.IRCUtils;
 
-import java.util.Collection;
 import java.util.List;
 
 class NickParser extends CommandParser {
+
+    private static final int NEW_NICK_INDEX = 2;
 
     public NickParser(final Server server) {
         super(server);
@@ -27,17 +28,27 @@ class NickParser extends CommandParser {
         final ChannelUser user = appUser
                 ? getServer().getUser()
                 : getUserChannelInterface().getUser(oldRawNick);
-        final Collection<Channel> channels = user.getChannels();
 
+        // The can happen in cases where gave a nick to the server but it ignored this nick and
+        // gave use another one instead. Then half way through the server notice phase it
+        // randomly decides to change our nick from the one we provided to the one which we have
+        // already been given and using - simply ignore this bad nick change - Miau is a BNC
+        // which displays this behaviour
+        if (user == null) {
+            // TODO - maybe send an event which indicates an unexpected case has occurred
+            return;
+        }
+
+        final String newNick = parsedArray.get(NEW_NICK_INDEX);
         final Nick oldNick = user.getNick();
-        user.setNick(parsedArray.get(2));
+        user.setNick(newNick);
 
         if (appUser) {
             final ServerNickChangeEvent event = new ServerNickChangeEvent(oldNick, user);
             getServerEventBus().postAndStoreEvent(event);
         }
 
-        for (final Channel channel : channels) {
+        for (final Channel channel : user.getChannels()) {
             final ChannelEvent event;
             if (appUser) {
                 event = new ChannelNickChangeEvent(channel, oldNick, (AppUser) user);
