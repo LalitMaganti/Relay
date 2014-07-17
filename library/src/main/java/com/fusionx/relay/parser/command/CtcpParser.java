@@ -80,7 +80,7 @@ class CtcpParser {
     private void onParseUserAction(final String nick, final String action) {
         final QueryUser user = getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
-            getUserChannelInterface().addNewPrivateMessageUser(nick, action, true, false);
+            getUserChannelInterface().addQueryUser(nick, action, true, false);
             getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
         } else {
             getServerEventBus().postAndStoreEvent(new QueryActionWorldEvent(user, action), user);
@@ -90,7 +90,7 @@ class CtcpParser {
     private void onParseChannelAction(final String channelName, final String sendingNick,
             final String action) {
         final Channel channel = getUserChannelInterface().getChannel(channelName);
-        final ChannelUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
+        final ChannelUser sendingUser = getUserChannelInterface().getUser(sendingNick);
         final boolean mention = MentionParser.onMentionableCommand(action,
                 getServer().getUser().getNick().getNickAsString());
         final ChannelEvent event;

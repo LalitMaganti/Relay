@@ -23,20 +23,23 @@ class NickParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String oldRawNick = IRCUtils.getNickFromRaw(rawSource);
-        final ChannelUser user = getUserChannelInterface().getUserIfExists(oldRawNick);
+        final boolean appUser = getServer().getUser().isNickEqual(oldRawNick);
+        final ChannelUser user = appUser
+                ? getServer().getUser()
+                : getUserChannelInterface().getUser(oldRawNick);
         final Collection<Channel> channels = user.getChannels();
 
         final Nick oldNick = user.getNick();
         user.setNick(parsedArray.get(2));
 
-        if (user instanceof AppUser) {
+        if (appUser) {
             final ServerNickChangeEvent event = new ServerNickChangeEvent(oldNick, user);
             getServerEventBus().postAndStoreEvent(event);
         }
 
         for (final Channel channel : channels) {
             final ChannelEvent event;
-            if (user instanceof AppUser) {
+            if (appUser) {
                 event = new ChannelNickChangeEvent(channel, oldNick, (AppUser) user);
             } else {
                 event = new ChannelWorldNickChangeEvent(channel, oldNick, user);

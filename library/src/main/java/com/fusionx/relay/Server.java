@@ -11,31 +11,43 @@ import com.fusionx.relay.writers.UserWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Server implements Conversation {
 
+    private final ServerConfiguration mConfiguration;
+
     private final ServerConnection mServerConnection;
 
-    private final UserChannelInterface mUserChannelInterface;
-
     private final List<ServerEvent> mBuffer;
-
-    private final ServerConfiguration mConfiguration;
 
     private final ServerEventBus mServerEventBus;
 
     private final ServerCallBus mServerCallBus;
 
+    private final Set<ChannelUser> mUsers;
+
+    private final UserChannelInterface mUserChannelInterface;
+
     private AppUser mUser;
 
     public Server(final ServerConfiguration configuration, final ServerConnection connection,
             final Collection<String> ignoreList) {
-        mServerConnection = connection;
         mConfiguration = configuration;
+        mServerConnection = connection;
+
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus(this);
         mServerCallBus = new ServerCallBus(this, connection.getServerCallHandler());
+
+        // Set the nick name to the first choice nick
+        mUser = new AppUser(configuration.getNickStorage().getFirstChoiceNick());
+
+        mUsers = new HashSet<>();
+        mUsers.add(mUser);
+
         mUserChannelInterface = new UserChannelInterface(this);
         mUserChannelInterface.updateIgnoreList(ignoreList);
     }
@@ -79,6 +91,18 @@ public class Server implements Conversation {
         mUserChannelInterface.updateIgnoreList(list);
     }
 
+    void addUser(final ChannelUser user) {
+        mUsers.add(user);
+    }
+
+    void removeUser(final ChannelUser user) {
+        mUsers.remove(user);
+    }
+
+    public Collection<ChannelUser> getUsers() {
+        return mUsers;
+    }
+
     // Conversation Interface
     @Override
     public String getId() {
@@ -101,10 +125,6 @@ public class Server implements Conversation {
 
     public AppUser getUser() {
         return mUser;
-    }
-
-    public void setUser(final AppUser user) {
-        mUser = user;
     }
 
     public String getTitle() {

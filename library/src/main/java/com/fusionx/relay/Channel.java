@@ -9,29 +9,35 @@ import com.fusionx.relay.interfaces.Conversation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Channel implements Conversation {
 
     // As set out in RFC2812
-    private final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',
+    private final static ImmutableList<Character> CHANNEL_PREFIXES = ImmutableList.of('#', '&',
             '+', '!');
 
-    private final String mName;
+    private final Server mServer;
 
-    private final List<ChannelEvent> mBuffer;
+    private final String mChannelName;
+
+    private final Set<ChannelUser> mUsers;
 
     private final EnumMap<UserLevel, Integer> mNumberOfUsers;
 
-    private final UserChannelInterface mUserChannelInterface;
+    private final List<ChannelEvent> mBuffer;
 
-    Channel(final String channelName, final UserChannelInterface userChannelInterface) {
-        mName = channelName;
+    Channel(final Server server, final String channelName) {
+        mServer = server;
+        mChannelName = channelName;
+
         mBuffer = new ArrayList<>();
         mNumberOfUsers = new EnumMap<>(UserLevel.class);
-        mUserChannelInterface = userChannelInterface;
+        mUsers = new HashSet<>();
 
-        wipeChannelData();
+        clearInternalData();
     }
 
     /**
@@ -41,50 +47,68 @@ public class Channel implements Conversation {
      * @return whether the character can be one at the start of a channel
      */
     public static boolean isChannelPrefix(char firstCharacter) {
-        return channelPrefixes.contains(firstCharacter);
+        return CHANNEL_PREFIXES.contains(firstCharacter);
     }
 
-    public void wipeChannelData() {
+    // TODO - change this method name to clearUsers()
+    public void clearInternalData() {
         for (final UserLevel levelEnum : UserLevel.values()) {
             mNumberOfUsers.put(levelEnum, 0);
         }
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        if (!(o instanceof Channel)) {
-            return false;
-        }
-        final Channel otherChannel = (Channel) o;
-        return otherChannel.getServer().equals(getServer())
-                && otherChannel.getName().equalsIgnoreCase(mName);
-    }
-
-    @Override
-    public int hashCode() {
-        return mName.toLowerCase().hashCode();
-    }
-
     /**
-     * Overridden method which returns the channel's name
+     * Called when a event occurs on this channel
      *
-     * @return the channel name
+     * @param event the event which occured
      */
-    @Override
-    public String toString() {
-        return mName;
-    }
-
     public void onChannelEvent(final ChannelEvent event) {
         mBuffer.add(event);
     }
 
+    // User stuff starts here
     /**
-     * Increments the type of user in the channel by 1 - for internal use only
+     * Returns a list of all the users currently in the channel
+     *
+     * @return list of users currently in the channel
+     */
+    public Collection<ChannelUser> getUsers() {
+        return mUsers;
+    }
+
+    /**
+     *
+     *
+     * @param user
+     * @param userLevel
+     */
+    void addUser(final ChannelUser user, final UserLevel userLevel) {
+        if (mUsers.contains(user)) {
+            // TODO - this is invalid - need to track it down if it does happen
+        }
+
+        mUsers.add(user);
+        incrementUserType(userLevel);
+    }
+
+    /**
+     *
+     * @param user
+     */
+    void removeUser(final ChannelUser user) {
+        if (!mUsers.contains(user)) {
+            // TODO - this is invalid - need to track it down if it does happen
+        }
+        mUsers.remove(user);
+        decrementUserType(user.getChannelPrivileges(this));
+    }
+
+    /**
+     * Increments the type of user in the channel by 1
      *
      * @param userLevel the type of user
      */
-    void onIncrementUserType(final UserLevel userLevel) {
+    void incrementUserType(final UserLevel userLevel) {
         if (userLevel == UserLevel.NONE) {
             return;
         }
@@ -95,11 +119,11 @@ public class Channel implements Conversation {
     }
 
     /**
-     * Decrements the type of user in the channel by 1 - for internal use only
+     * Decrements the type of user in the channel by 1
      *
      * @param userLevel the type of user
      */
-    void onDecrementUserType(final UserLevel userLevel) {
+    void decrementUserType(final UserLevel userLevel) {
         if (userLevel == UserLevel.NONE) {
             return;
         }
@@ -107,6 +131,16 @@ public class Channel implements Conversation {
             Integer users = mNumberOfUsers.get(userLevel);
             mNumberOfUsers.put(userLevel, --users);
         }
+    }
+
+    /**
+     * Gets the number of users in the channel
+     *
+     * @return the number of users in the channel
+     */
+    public int getUserCount() {
+        final Collection<ChannelUser> users = getUsers();
+        return users != null ? users.size() : 0;
     }
 
     /**
@@ -118,7 +152,7 @@ public class Channel implements Conversation {
     public int getNumberOfUsersType(final UserLevel userLevel) {
         synchronized (mNumberOfUsers) {
             if (userLevel == UserLevel.NONE) {
-                int normalUsers = getNumberOfUsers();
+                int normalUsers = getUserCount();
                 for (UserLevel levelEnum : UserLevel.values()) {
                     normalUsers -= mNumberOfUsers.get(levelEnum);
                 }
@@ -129,46 +163,73 @@ public class Channel implements Conversation {
     }
 
     // Getters and setters
+
+    /**
+     * Gets the name of the channel
+     *
+     * @return the name of the channel
+     */
     public String getName() {
-        return mName;
+        return mChannelName;
     }
 
     /**
-     * Gets the buffer of the channel - the messages which were received since the start of
-     * observation
+     * Gets the buffer of the channel - the events which occured since this channel was created
      *
-     * @return a list of the messages
+     * @return a list of the events
      */
     public List<ChannelEvent> getBuffer() {
         return mBuffer;
     }
 
+    /**
+     * Returns the id of the channel which is simply its name
+     *
+     * @return the id (name) of the channel
+     */
     @Override
     public String getId() {
-        return mName;
+        return mChannelName;
     }
 
+    /**
+     * Returns the server this channel is attached to
+     *
+     * @return the server this channel belongs to
+     */
     @Override
     public Server getServer() {
-        return mUserChannelInterface.getServer();
+        return mServer;
     }
 
-    /**
-     * Returns a list of all the users currently in the channel
-     *
-     * @return list of users currently in the channel
+    /*
+     * A channel is equal to another if the servers are equal and if the channel's names are
+     * equal regardless of case
      */
-    public Collection<ChannelUser> getUsers() {
-        return mUserChannelInterface.getAllUsersInChannel(this);
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof Channel)) {
+            return false;
+        }
+        final Channel otherChannel = (Channel) o;
+        return otherChannel.getServer().equals(getServer())
+                && otherChannel.getName().equalsIgnoreCase(mChannelName);
     }
 
-    /**
-     * Gets the number of people in the channel
-     *
-     * @return the number of users in the channel
+    /*
+     * The hashcode of a channel can simply be the same as that of its name
      */
-    int getNumberOfUsers() {
-        final Collection<ChannelUser> users = getUsers();
-        return users != null ? users.size() : 0;
+    @Override
+    public int hashCode() {
+        return mChannelName.toLowerCase().hashCode();
     }
+
+    /*
+     * A channel's string representation is simply its name
+     */
+    @Override
+    public String toString() {
+        return mChannelName;
+    }
+
 }

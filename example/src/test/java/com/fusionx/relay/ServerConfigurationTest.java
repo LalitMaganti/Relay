@@ -45,8 +45,9 @@ public class ServerConfigurationTest {
 
         final ServerConfiguration.Builder actual = CREATOR.createFromParcel(parcel);
 
-        assertThat(actual).isNotNull();
-        assertThat(actual).isEqualToComparingFieldByField(expected);
+        assertThat(actual)
+                .isNotNull()
+                .isEqualToComparingFieldByField(expected);
     }
 
     // Configuration tests
@@ -68,7 +69,8 @@ public class ServerConfigurationTest {
 
         final ServerConfiguration actual = ServerConfiguration.CREATOR.createFromParcel(parcel);
 
-        assertThat(actual).isNotNull();
-        assertThat(actual).isEqualToComparingFieldByField(expected);
+        assertThat(actual)
+                .isNotNull()
+                .isEqualToComparingFieldByField(expected);
     }
 }

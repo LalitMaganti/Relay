@@ -9,6 +9,7 @@ import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.util.IRCUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 public class PartParser extends RemoveUserParser {
@@ -20,7 +21,7 @@ public class PartParser extends RemoveUserParser {
     @Override
     public ChannelUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
         final String userNick = IRCUtils.getNickFromRaw(rawSource);
-        return getUserChannelInterface().getUserIfExists(userNick);
+        return getUserChannelInterface().getUser(userNick);
     }
 
     @Override
@@ -34,14 +35,18 @@ public class PartParser extends RemoveUserParser {
     void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
         // ZNCs can be stupid and can sometimes send PART commands for channels they didn't send
         // JOIN commands for...
-        if (channel != null) {
-            final ChannelPartEvent partEvent = new ChannelPartEvent(channel);
-            getServerEventBus().postAndStoreEvent(partEvent, channel);
-
-            getUserChannelInterface().removeChannel(channel);
-
-            final PartEvent event = new PartEvent(channel);
-            getServerEventBus().postAndStoreEvent(event);
+        if (channel == null) {
+            return;
         }
+        final ChannelPartEvent partEvent = new ChannelPartEvent(channel);
+        getServerEventBus().postAndStoreEvent(partEvent, channel);
+
+        final Collection<ChannelUser> users = getUserChannelInterface().removeChannel(channel);
+        for (final ChannelUser user : users) {
+            getUserChannelInterface().removeChannelFromUser(channel, user);
+        }
+
+        final PartEvent event = new PartEvent(channel);
+        getServerEventBus().postAndStoreEvent(event);
     }
 }

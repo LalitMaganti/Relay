@@ -187,12 +187,7 @@ class BaseConnection {
         // Since we are now connected, reset the reconnect attempts
         mReconnectAttempts = 0;
 
-        if (mServer.getUser() == null) {
-            final AppUser user = new AppUser(nick, mServer.getUserChannelInterface());
-            mServer.setUser(user);
-        } else {
-            mServer.getUser().setNick(nick);
-        }
+        mServer.getUser().setNick(nick);
 
         onConnected();
 

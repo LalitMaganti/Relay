@@ -3,6 +3,7 @@ package com.fusionx.relay.parser.command;
 import com.google.common.collect.Iterables;
 
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelTest;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerTest;
@@ -40,18 +41,24 @@ public class JoinParserTest {
     // This method tests that when another user joins, everything is set up correctly
     @Test
     public void testOnUserJoin() {
-        final String joinLine = ":otheruser!otheruser@test JOIN #holoirc";
+        // Make sure the channel is set up first
+        mServer.getUserChannelInterface().coupleUserAndChannel(mServer.getUser(),
+                ChannelTest.getTestChannel());
+
+        final String joinLine = ":otheruser!otheruser@test JOIN #relay";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
         mJoinParser.onParseCommand(list, "otheruser!otheruser@test");
 
-        final Channel channel = mServer.getUserChannelInterface().getChannel("#holoirc");
-        final ChannelUser user = mServer.getUserChannelInterface().getUserIfExists("otheruser");
+        final Channel channel = mServer.getUserChannelInterface().getChannel("#relay");
+        final ChannelUser user = mServer.getUserChannelInterface().getUser("otheruser");
 
         // Check that the channel exists and has the correct message in buffer
         assertThat(channel).isNotNull();
-        assertThat(channel.getBuffer()).hasSize(1);
-        assertThat(Iterables.getLast(channel.getBuffer())).isNotNull().isInstanceOf
-                (ChannelWorldJoinEvent.class);
+        assertThat(channel.getBuffer())
+                .hasSize(1);
+        assertThat(Iterables.getLast(channel.getBuffer()))
+                .isNotNull()
+                .isInstanceOf(ChannelWorldJoinEvent.class);
         assertThat(channel.getUsers()).contains(user);
 
         // Check that the user exists and has been added to the channel and that the
@@ -67,18 +74,20 @@ public class JoinParserTest {
 
         // TODO - check the events
 
-        final String joinLine = ":holoirctester!holoirctester@test JOIN #holoirc";
+        final String joinLine = ":holoirctester!holoirctester@test JOIN #relay";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
         mJoinParser.onParseCommand(list, "holoirctester!holoirctester@test");
 
-        final Channel channel = mServer.getUserChannelInterface().getChannel("#holoirc");
-        final ChannelUser user = mServer.getUserChannelInterface().getUserIfExists(nick);
+        final Channel channel = mServer.getUserChannelInterface().getChannel("#relay");
+        final ChannelUser user = mServer.getUserChannelInterface().getUser(nick);
 
         // Check that the channel exists and has the correct message in buffer
         assertThat(channel).isNotNull();
-        assertThat(channel.getBuffer()).hasSize(1);
-        assertThat(Iterables.getLast(channel.getBuffer())).isNotNull().isInstanceOf
-                (ChannelWorldJoinEvent.class);
+        assertThat(channel.getBuffer())
+                .hasSize(1);
+        assertThat(Iterables.getLast(channel.getBuffer()))
+                .isNotNull()
+                .isInstanceOf(ChannelWorldJoinEvent.class);
         assertThat(channel.getUsers()).contains(user);
 
         // Check that the user exists and has been added to the channel and that the

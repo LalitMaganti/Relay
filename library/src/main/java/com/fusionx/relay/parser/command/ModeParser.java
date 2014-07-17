@@ -47,24 +47,27 @@ class ModeParser extends CommandParser {
             final Channel channel, final String mode) {
         final String source = parsedArray.get(4);
         final String nick = IRCUtils.getNickFromRaw(source);
-        final ChannelUser user = getUserChannelInterface().getUserIfExists(nick);
-        final ChannelUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
+        final boolean appUser = getServer().getUser().isNickEqual(nick);
+        final ChannelUser user = appUser
+                ? getServer().getUser()
+                : getUserChannelInterface().getUser(nick);
+        final ChannelUser sendingUser = getUserChannelInterface().getUser(sendingNick);
 
         // Nullity can occur when a ban is being added/removed on a whole range using wildcards
-        if (user != null) {
+        if (user == null) {
+            final ChannelEvent event = new ChannelModeEvent(channel, sendingUser, sendingNick,
+                    source, mode);
+            getServerEventBus().postAndStoreEvent(event, channel);
+        } else {
             final UserLevel levelEnum = user.onModeChange(channel, mode);
             final ChannelEvent event;
-            if (user instanceof AppUser) {
+            if (appUser) {
                 event = new ChannelUserLevelChangeEvent(channel, mode, (AppUser) user, levelEnum,
                         sendingUser, sendingNick);
             } else {
                 event = new ChannelWorldLevelChangeEvent(channel, mode, user, levelEnum,
                         sendingUser, sendingNick);
             }
-            getServerEventBus().postAndStoreEvent(event, channel);
-        } else {
-            final ChannelEvent event = new ChannelModeEvent(channel, sendingUser, sendingNick,
-                    source, mode);
             getServerEventBus().postAndStoreEvent(event, channel);
         }
     }

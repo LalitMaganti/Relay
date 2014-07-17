@@ -4,48 +4,44 @@ import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.nick.BasicNick;
 import com.fusionx.relay.nick.Nick;
 
-import android.widget.Checkable;
-
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
-import gnu.trove.map.hash.THashMap;
-
-public class ChannelUser implements Checkable {
-
-    protected final UserChannelInterface mUserChannelInterface;
+public class ChannelUser {
 
     private final Map<Channel, UserLevel> mUserLevelMap;
 
     private Nick mNick;
 
-    // Checkable interface
-    private boolean mChecked;
-
-    public ChannelUser(final String nick, final UserChannelInterface userChannelInterface) {
-        mUserLevelMap = new THashMap<>();
+    public ChannelUser(final String nick) {
         mNick = new BasicNick(nick);
-        mUserChannelInterface = userChannelInterface;
 
-        // Checkable interface
-        mChecked = false;
+        // Linked hash map used to preserve insertion order - so that the channels are always
+        // displayed to the user in the order they were joined
+        mUserLevelMap = new LinkedHashMap<>();
     }
 
-    // Called either on part of other or on quit of our user
-    public void onRemove(final Channel channel) {
+    // Channel
+    public Set<Channel> getChannels() {
+        return mUserLevelMap.keySet();
+    }
+
+    public void addChannel(final Channel channel, final UserLevel level) {
+        mUserLevelMap.put(channel, level);
+    }
+
+    public void removeChannel(final Channel channel) {
         mUserLevelMap.remove(channel);
     }
 
+    // TODO this is the same as addChannel
     public void onModeChanged(final Channel channel, final UserLevel mode) {
         mUserLevelMap.put(channel, mode);
     }
 
     public UserLevel getChannelPrivileges(final Channel channel) {
         return mUserLevelMap.get(channel);
-    }
-
-    public Collection<Channel> getChannels() {
-        return mUserChannelInterface.getAllChannelsInUser(this);
     }
 
     public UserLevel onModeChange(final Channel channel, final String mode) {
@@ -65,9 +61,9 @@ public class ChannelUser implements Checkable {
                 case 'q':
                     // TODO - don't return straight away - more checking may need to be done
                     final UserLevel levelEnum = UserLevel.getLevelFromMode(character);
-                    channel.onDecrementUserType(mUserLevelMap.get(channel));
+                    channel.decrementUserType(mUserLevelMap.get(channel));
                     if (addingMode) {
-                        channel.onIncrementUserType(levelEnum);
+                        channel.incrementUserType(levelEnum);
                         onModeChanged(channel, levelEnum);
                         return levelEnum;
                     }
@@ -84,16 +80,6 @@ public class ChannelUser implements Checkable {
         return mNick.toString();
     }
 
-    @Override
-    public boolean isChecked() {
-        return mChecked;
-    }
-
-    @Override
-    public void setChecked(boolean b) {
-        mChecked = b;
-    }
-
     public Nick getNick() {
         return mNick;
     }
@@ -102,8 +88,7 @@ public class ChannelUser implements Checkable {
         mNick = new BasicNick(nick);
     }
 
-    @Override
-    public void toggle() {
-        mChecked = !mChecked;
+    public boolean isNickEqual(String oldRawNick) {
+        return mNick.getNickAsString().equals(oldRawNick);
     }
 }

@@ -13,8 +13,8 @@ public class ChannelModeEvent extends ChannelEvent {
 
     public final String mode;
 
-    public ChannelModeEvent(final Channel channel, final ChannelUser sendingUser, String sendingNick,
-            final String recipient, final String mode) {
+    public ChannelModeEvent(final Channel channel, final ChannelUser sendingUser,
+            final String sendingNick, final String recipient, final String mode) {
         super(channel);
 
         this.recipient = recipient;

@@ -34,7 +34,8 @@ class TopicParser extends CodeParser {
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
         final Channel channel = mUserChannelInterface.getChannel(channelName);
 
-        final ChannelInitialTopicEvent topicEvent = new ChannelInitialTopicEvent(channel, nick, tempTopic);
+        final ChannelInitialTopicEvent topicEvent = new ChannelInitialTopicEvent(channel, nick,
+                tempTopic);
         mServerEventBus.postAndStoreEvent(topicEvent, channel);
 
         tempTopic = null;

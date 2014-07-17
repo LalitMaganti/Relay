@@ -41,7 +41,7 @@ class NameParser extends CodeParser {
         for (final String rawNick : listOfUsers) {
             final UserLevel level = UserLevel.getLevelFromPrefix(rawNick.charAt(0));
             final String nick = level == UserLevel.NONE ? rawNick : rawNick.substring(1);
-            final ChannelUser user = mUserChannelInterface.getUser(nick);
+            final ChannelUser user = mUserChannelInterface.getNonNullUser(nick);
             mUserChannelInterface.coupleUserAndChannel(user, mChannel, level);
         }
     }

@@ -7,8 +7,6 @@ import com.fusionx.relay.call.ChannelPartCall;
 import com.fusionx.relay.call.ChannelTopicCall;
 import com.squareup.otto.Subscribe;
 
-import android.text.TextUtils;
-
 import java.io.Writer;
 
 public class ChannelWriter extends RawWriter {

@@ -45,7 +45,7 @@ public class ServerCallBus {
 
     private final Handler mCallHandler;
 
-    private Bus mBus;
+    private final Bus mBus;
 
     public ServerCallBus(final Server server, final Handler callHandler) {
         mBus = new Bus(ThreadEnforcer.ANY);
@@ -95,7 +95,7 @@ public class ServerCallBus {
         final QueryUser user = getServer().getUserChannelInterface()
                 .getQueryUser(nick);
         if (user == null) {
-            getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, message, false,
+            getServer().getUserChannelInterface().addQueryUser(nick, message, false,
                     true);
             getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
         } else if (Utils.isNotEmpty(message)) {
@@ -111,7 +111,7 @@ public class ServerCallBus {
 
         final QueryUser user = getServer().getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
-            getServer().getUserChannelInterface().addNewPrivateMessageUser(nick, action, true,
+            getServer().getUserChannelInterface().addQueryUser(nick, action, true,
                     true);
             getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
         } else {
