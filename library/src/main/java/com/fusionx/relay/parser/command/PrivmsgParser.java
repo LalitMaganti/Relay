@@ -10,6 +10,7 @@ import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.Utils;
 
 import java.util.List;
 
@@ -55,11 +56,14 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
-            final String message) {
+            final String rawMessage) {
         final ChannelUser sendingUser = getUserChannelInterface().getUser(sendingNick);
         final Channel channel = getUserChannelInterface().getChannel(channelName);
+        // TODO - actually parse the colours
+        final String message = Utils.stripColorsFromMessage(rawMessage);
         final boolean mention = MentionParser.onMentionableCommand(message,
                 getServer().getUser().getNick().getNickAsString());
+
         final ChannelEvent event;
         if (sendingUser == null) {
             event = new ChannelWorldMessageEvent(channel, message, sendingNick, mention);
