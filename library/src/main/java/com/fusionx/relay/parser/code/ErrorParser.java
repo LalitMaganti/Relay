@@ -34,7 +34,7 @@ class ErrorParser extends CodeParser {
 
     /**
      * Example line:
-     * :some.server.url 401 holoirc holoirctester :No such nick/channel
+     * :some.server.url 401 relay relaytester :No such nick/channel
      *
      * @param parsedArray - the array of the line (split by spaces)
      */
@@ -44,10 +44,10 @@ class ErrorParser extends CodeParser {
         final QueryUser user = mUserChannelInterface.getQueryUser(nick);
 
         // If the user is null then this no such nick event happened for another reason
-        if (user != null) {
-            mServerEventBus.postAndStoreEvent(new QueryNoSuchNickEvent(user, message), user);
-        } else {
+        if (user == null) {
             mServerEventBus.postAndStoreEvent(new GenericServerEvent(message));
+        } else {
+            mServerEventBus.postAndStoreEvent(new QueryNoSuchNickEvent(user, message), user);
         }
     }
 }

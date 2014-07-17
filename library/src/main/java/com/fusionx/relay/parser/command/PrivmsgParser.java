@@ -32,13 +32,14 @@ public class PrivmsgParser extends CommandParser {
             mCtcpParser.onParseCommand(parsedArray, rawSource);
         } else {
             final String nick = IRCUtils.getNickFromRaw(rawSource);
-            if (!getUserChannelInterface().shouldIgnoreUser(nick)) {
-                final String recipient = parsedArray.get(2);
-                if (Channel.isChannelPrefix(recipient.charAt(0))) {
-                    onParseChannelMessage(nick, recipient, message);
-                } else {
-                    onParsePrivateMessage(nick, message);
-                }
+            if (getUserChannelInterface().shouldIgnoreUser(nick)) {
+                return;
+            }
+            final String recipient = parsedArray.get(2);
+            if (Channel.isChannelPrefix(recipient.charAt(0))) {
+                onParseChannelMessage(nick, recipient, message);
+            } else {
+                onParsePrivateMessage(nick, message);
             }
         }
     }

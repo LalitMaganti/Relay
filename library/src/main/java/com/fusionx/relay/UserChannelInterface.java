@@ -4,10 +4,11 @@ import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TLinkedHashSet;
 
 public final class UserChannelInterface {
 
@@ -20,15 +21,15 @@ public final class UserChannelInterface {
     public UserChannelInterface(final Server server) {
         mServer = server;
 
-        mQueryUsers = new TLinkedHashSet<>();
-        mUserIgnoreList = new THashSet<>();
+        mQueryUsers = new LinkedHashSet<>();
+        mUserIgnoreList = new HashSet<>();
     }
 
     /**
      * Add the channel to the user and user to the channel. Also add the user to the global list
      * of users. The user is given a default user level in the channel of {@link UserLevel#NONE}
      *
-     * @param user the user to add to the channel
+     * @param user    the user to add to the channel
      * @param channel the channel to add to the user
      */
     public void coupleUserAndChannel(final ChannelUser user, final Channel channel) {
@@ -37,10 +38,10 @@ public final class UserChannelInterface {
 
     /**
      * Add the channel to the user and user to the channel. Also add the user to the global list
-     * of users. The user is given the user level in the channel as specified by {@param userLevel}
+     * of users. The user is given the user level in the channel as specified by userLevel
      *
-     * @param user the user to add to the channel
-     * @param channel the channel to add to the user
+     * @param user      the user to add to the channel
+     * @param channel   the channel to add to the user
      * @param userLevel the level to give the user in the channel
      */
     public void coupleUserAndChannel(final ChannelUser user, final Channel channel,
@@ -53,7 +54,7 @@ public final class UserChannelInterface {
      * Remove the channel from the user and the user from the channel. Also if this channel is
      * the last one that we know the user has joined then remove the user from the global list
      *
-     * @param user the user to remove from the channel and/or remove it from the global list
+     * @param user    the user to remove from the channel and/or remove it from the global list
      * @param channel the channel to remove from the user
      */
     public void decoupleUserAndChannel(final ChannelUser user, final Channel channel) {
@@ -86,8 +87,8 @@ public final class UserChannelInterface {
     /**
      * Add the user to the list of users of the channel
      *
-     * @param channel the channel to add the user to
-     * @param user the user to add to the channel
+     * @param channel   the channel to add the user to
+     * @param user      the user to add to the channel
      * @param userLevel the level to give the user in the channel
      */
     public void addUserToChannel(final Channel channel, final ChannelUser user,
@@ -98,8 +99,8 @@ public final class UserChannelInterface {
     /**
      * Add the channel to the list of channels of the user
      *
-     * @param channel the channel to add to the user
-     * @param user the user to add to the channel to
+     * @param channel   the channel to add to the user
+     * @param user      the user to add to the channel to
      * @param userLevel the level to give the user in the channel
      */
     public void addChannelToUser(final Channel channel, final ChannelUser user,
@@ -114,7 +115,7 @@ public final class UserChannelInterface {
      * Removes the channel from the list of channels in the user
      *
      * @param channel the channel to remove from the user
-     * @param user the user the channel is to be removed from
+     * @param user    the user the channel is to be removed from
      */
     public void removeUserFromChannel(Channel channel, ChannelUser user) {
         channel.removeUser(user);
@@ -125,7 +126,7 @@ public final class UserChannelInterface {
      * in, remove the channel from the global list of users
      *
      * @param channel the channel to remove from the user
-     * @param user the user to remove the channel from or remove from the global list
+     * @param user    the user to remove the channel from or remove from the global list
      */
     public void removeChannelFromUser(final Channel channel, final ChannelUser user) {
         final Collection<Channel> setOfChannels = user.getChannels();

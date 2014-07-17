@@ -50,11 +50,13 @@ public class Channel implements Conversation {
         return CHANNEL_PREFIXES.contains(firstCharacter);
     }
 
-    // TODO - change this method name to clearUsers()
     public void clearInternalData() {
+        // Clear the user count
         for (final UserLevel levelEnum : UserLevel.values()) {
             mNumberOfUsers.put(levelEnum, 0);
         }
+        // Clear the list of users
+        mUsers.clear();
     }
 
     /**

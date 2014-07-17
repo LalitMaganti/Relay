@@ -33,17 +33,18 @@ public class QueryUser implements Conversation {
 
         mBuffer.add(new QueryOpenedEvent(this));
 
-        if (Utils.isNotEmpty(message)) {
-            final QueryEvent event;
-            event = userSent
-                    ? action
-                    ? new QueryActionSelfEvent(this, mServer.getUser(), message)
-                    : new QueryMessageSelfEvent(this, mServer.getUser(), message)
-                    : action
-                    ? new QueryActionWorldEvent(this, message)
-                    : new QueryMessageWorldEvent(this, message);
-            mBuffer.add(event);
+        if (!Utils.isNotEmpty(message)) {
+            return;
         }
+        final QueryEvent event;
+        event = userSent
+                ? action
+                ? new QueryActionSelfEvent(this, mServer.getUser(), message)
+                : new QueryMessageSelfEvent(this, mServer.getUser(), message)
+                : action
+                ? new QueryActionWorldEvent(this, message)
+                : new QueryMessageWorldEvent(this, message);
+        mBuffer.add(event);
     }
 
     public void onUserEvent(final QueryEvent event) {

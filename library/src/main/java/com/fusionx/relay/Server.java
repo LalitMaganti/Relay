@@ -57,8 +57,11 @@ public class Server implements Conversation {
     }
 
     public void onConnectionTerminated() {
-        // Clear the global list of users - it's now totally invalid
+        // Clear the global list of users - it's now invalid
         mUsers.clear();
+
+        // Keep our own user inside though
+        mUsers.add(mUser);
 
         // Need to remove old writers as they would be using the old socket OutputStream if a
         // reconnection occurs

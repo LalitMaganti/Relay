@@ -74,26 +74,28 @@ public class ServerLineParser {
     boolean parseLine() {
         final List<String> parsedArray = IRCUtils.splitRawLine(mLine, true);
         // For stupid servers that send blank lines - like seriously - why??
-        if (!parsedArray.isEmpty()) {
-            String command = parsedArray.get(0);
-            switch (command) {
-                case ServerCommands.PING:
-                    // Immediately respond & return
-                    final String source = parsedArray.get(1);
-                    CoreListener.respondToPing(mWriter, source);
-                    break;
-                case ServerCommands.ERROR:
-                    // We are finished - the server has kicked us
-                    // out for some reason
-                    return true;
-                default:
-                    // Check if the second thing is a code or a command
-                    if (StringUtils.isNumeric(parsedArray.get(1))) {
-                        onParseServerCode(mLine, parsedArray);
-                    } else {
-                        return onParseServerCommand(parsedArray);
-                    }
-            }
+        if (parsedArray.isEmpty()) {
+            return false;
+        }
+
+        final String command = parsedArray.get(0);
+        switch (command) {
+            case ServerCommands.PING:
+                // Immediately respond & return
+                final String source = parsedArray.get(1);
+                CoreListener.respondToPing(mWriter, source);
+                break;
+            case ServerCommands.ERROR:
+                // We are finished - the server has kicked us
+                // out for some reason
+                return true;
+            default:
+                // Check if the second thing is a code or a command
+                if (StringUtils.isNumeric(parsedArray.get(1))) {
+                    onParseServerCode(mLine, parsedArray);
+                } else {
+                    return onParseServerCommand(parsedArray);
+                }
         }
         return false;
     }
@@ -106,15 +108,15 @@ public class ServerLineParser {
         // Parse the command
         final CommandParser parser = mCommandParserMap.get(command);
         // Silently fail if the parser is null - just ignore this line
-        if (parser != null) {
-            parser.onParseCommand(parsedArray, rawSource);
-
-            if (parser instanceof QuitParser) {
-                final QuitParser quitParser = (QuitParser) parser;
-                return quitParser.isUserQuit();
-            }
+        if (parser == null) {
+            return false;
         }
+        parser.onParseCommand(parsedArray, rawSource);
 
+        if (parser instanceof QuitParser) {
+            final QuitParser quitParser = (QuitParser) parser;
+            return quitParser.isUserQuit();
+        }
         return false;
     }
 
@@ -136,10 +138,10 @@ public class ServerLineParser {
             // Do nothing
         } else {
             final CodeParser parser = mCodeParser.get(code);
-            if (parser != null) {
-                parser.onParseCode(code, parsedArray);
+            if (parser == null) {
+                Log.d("Relay", rawLine);
             } else {
-                Log.d("HoloIRC", rawLine);
+                parser.onParseCode(code, parsedArray);
             }
         }
     }

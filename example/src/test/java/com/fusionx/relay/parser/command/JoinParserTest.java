@@ -30,17 +30,11 @@ public class JoinParserTest {
 
     private JoinParser mJoinParser;
 
-    // Setup work for the tests
-    public JoinParserTest() {
-        InterfaceHolders.onInterfaceReceived(new TestMisc.DefaultEventPreferences());
-
-        mServer = ServerTest.getDefaultServer();
-        mJoinParser = new JoinParser(mServer);
-    }
-
     // This method tests that when another user joins, everything is set up correctly
     @Test
     public void testOnUserJoin() {
+        resetFields();
+
         // Make sure the channel is set up first
         mServer.getUserChannelInterface().coupleUserAndChannel(mServer.getUser(),
                 ChannelTest.getTestChannel());
@@ -52,27 +46,46 @@ public class JoinParserTest {
         final Channel channel = mServer.getUserChannelInterface().getChannel("#relay");
         final ChannelUser user = mServer.getUserChannelInterface().getUser("otheruser");
 
-        // Check that the channel exists and has the correct message in buffer
-        assertThat(channel).isNotNull();
+        // Check that the channel exists
+        assertThat(channel)
+                .isNotNull();
+
+        // Check that the user exists
+        assertThat(user)
+                .isNotNull();
+
+        // Check that the user is the the global list
+        assertThat(mServer.getUsers())
+                .isNotNull()
+                .containsOnly(mServer.getUser(), user);
+
+        // Check that the channel has been added to the user
+        assertThat(user.getChannels())
+                .isNotNull()
+                .containsOnly(channel);
+
+        // Check that the user has been added to the channel
+        assertThat(channel.getUsers())
+                .isNotNull()
+                .containsOnly(mServer.getUser(), user);
+
+        // Check that the channel has the correct message in buffer
         assertThat(channel.getBuffer())
+                .isNotNull()
                 .hasSize(1);
         assertThat(Iterables.getLast(channel.getBuffer()))
                 .isNotNull()
                 .isInstanceOf(ChannelWorldJoinEvent.class);
-        assertThat(channel.getUsers()).contains(user);
 
-        // Check that the user exists and has been added to the channel and that the
-        // correct user has been sent in the event
-        assertThat(user).isNotNull();
-        assertThat(user.getChannels()).contains(channel);
+        // TODO - check events
     }
 
     // This method tests that when our user joins, everything is set up correctly
     @Test
     public void testOnJoin() {
-        final String nick = getFreenodeConfiguration().getNickStorage().getFirstChoiceNick();
+        resetFields();
 
-        // TODO - check the events
+        final String nick = getFreenodeConfiguration().getNickStorage().getFirstChoiceNick();
 
         final String joinLine = ":holoirctester!holoirctester@test JOIN #relay";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
@@ -81,18 +94,46 @@ public class JoinParserTest {
         final Channel channel = mServer.getUserChannelInterface().getChannel("#relay");
         final ChannelUser user = mServer.getUserChannelInterface().getUser(nick);
 
-        // Check that the channel exists and has the correct message in buffer
-        assertThat(channel).isNotNull();
+        // Check that the channel exists
+        assertThat(channel)
+                .isNotNull();
+
+        // Check that the user exists
+        assertThat(user)
+                .isNotNull();
+
+        // Check that the user is the the global list
+        assertThat(mServer.getUsers())
+                .isNotNull()
+                .containsOnly(user);
+
+        // Check that the channel has been added to the user
+        assertThat(user.getChannels())
+                .isNotNull()
+                .containsOnly(channel);
+
+        // Check that the user has been added to the channel
+        assertThat(channel.getUsers())
+                .isNotNull()
+                .containsOnly(user);
+
+        // Check that the channel has the correct message in buffer
         assertThat(channel.getBuffer())
+                .isNotNull()
                 .hasSize(1);
         assertThat(Iterables.getLast(channel.getBuffer()))
                 .isNotNull()
                 .isInstanceOf(ChannelWorldJoinEvent.class);
-        assertThat(channel.getUsers()).contains(user);
 
-        // Check that the user exists and has been added to the channel and that the
-        // correct user has been sent in the event
-        assertThat(user).isNotNull();
-        assertThat(user.getChannels()).contains(channel);
+        // TODO - check events
+    }
+
+    // TODO - simulate disconnection/reconnection and test what happens then
+
+    private void resetFields() {
+        InterfaceHolders.onInterfaceReceived(new TestMisc.DefaultEventPreferences());
+
+        mServer = ServerTest.getDefaultServer();
+        mJoinParser = new JoinParser(mServer);
     }
 }
