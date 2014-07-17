@@ -25,19 +25,23 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Add the channel to the user and user to the channel. Also add the user to the global list
+     * of users. The user is given a default user level in the channel of {@link UserLevel#NONE}
      *
-     * @param user
-     * @param channel
+     * @param user the user to add to the channel
+     * @param channel the channel to add to the user
      */
     public void coupleUserAndChannel(final ChannelUser user, final Channel channel) {
         coupleUserAndChannel(user, channel, UserLevel.NONE);
     }
 
     /**
+     * Add the channel to the user and user to the channel. Also add the user to the global list
+     * of users. The user is given the user level in the channel as specified by {@param userLevel}
      *
-     * @param user
-     * @param channel
-     * @param userLevel
+     * @param user the user to add to the channel
+     * @param channel the channel to add to the user
+     * @param userLevel the level to give the user in the channel
      */
     public void coupleUserAndChannel(final ChannelUser user, final Channel channel,
             final UserLevel userLevel) {
@@ -46,9 +50,11 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Remove the channel from the user and the user from the channel. Also if this channel is
+     * the last one that we know the user has joined then remove the user from the global list
      *
-     * @param user
-     * @param channel
+     * @param user the user to remove from the channel and/or remove it from the global list
+     * @param channel the channel to remove from the user
      */
     public void decoupleUserAndChannel(final ChannelUser user, final Channel channel) {
         removeUserFromChannel(channel, user);
@@ -56,9 +62,10 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Remove the user from the global list and return the channels the user joined
      *
-     * @param user
-     * @return
+     * @param user the user to remove from the global list
+     * @return the channels the user had joined
      */
     public Collection<Channel> removeUser(final ChannelUser user) {
         mServer.removeUser(user);
@@ -66,9 +73,10 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Remove the channel from our list of channels and return the users in the channel
      *
-     * @param channel
-     * @return
+     * @param channel the channel to remove
+     * @return the users that were in the channel
      */
     public Collection<ChannelUser> removeChannel(final Channel channel) {
         mServer.getUser().getChannels().remove(channel);
@@ -76,10 +84,11 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Add the user to the list of users of the channel
      *
-     * @param channel
-     * @param user
-     * @param userLevel
+     * @param channel the channel to add the user to
+     * @param user the user to add to the channel
+     * @param userLevel the level to give the user in the channel
      */
     public void addUserToChannel(final Channel channel, final ChannelUser user,
             final UserLevel userLevel) {
@@ -87,10 +96,11 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Add the channel to the list of channels of the user
      *
-     * @param channel
-     * @param user
-     * @param userLevel
+     * @param channel the channel to add to the user
+     * @param user the user to add to the channel to
+     * @param userLevel the level to give the user in the channel
      */
     public void addChannelToUser(final Channel channel, final ChannelUser user,
             final UserLevel userLevel) {
@@ -101,18 +111,21 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Removes the channel from the list of channels in the user
      *
-     * @param channel
-     * @param user
+     * @param channel the channel to remove from the user
+     * @param user the user the channel is to be removed from
      */
     public void removeUserFromChannel(Channel channel, ChannelUser user) {
         channel.removeUser(user);
     }
 
     /**
+     * Removes the channel from the user and if this was the last channel we knew the user was
+     * in, remove the channel from the global list of users
      *
-     * @param channel
-     * @param user
+     * @param channel the channel to remove from the user
+     * @param user the user to remove the channel from or remove from the global list
      */
     public void removeChannelFromUser(final Channel channel, final ChannelUser user) {
         final Collection<Channel> setOfChannels = user.getChannels();
@@ -126,9 +139,10 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Get the channel by name from the list of channels which have been joined by the user
      *
-     * @param name
-     * @return
+     * @param name the name of channel to retrieve
+     * @return the channel matching the specified name or null if none match
      */
     public Channel getChannel(final String name) {
         for (final Channel channel : mServer.getUser().getChannels()) {
@@ -142,9 +156,10 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Get the user by source from the list of users which are in all the channels we know about
      *
-     * @param rawSource
-     * @return
+     * @param rawSource the source of the user to retrieve
+     * @return the user matching the source or null of none match
      */
     public ChannelUser getUserFromRaw(final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
@@ -152,9 +167,10 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Get the user by nick from the global list of users
      *
-     * @param nick
-     * @return
+     * @param nick the nick of user to retrieve
+     * @return the user matching the specified nick or null if none match
      */
     public ChannelUser getUser(final String nick) {
         for (final ChannelUser user : mServer.getUsers()) {
@@ -166,9 +182,11 @@ public final class UserChannelInterface {
     }
 
     /**
+     * Get the user by nick from the global list of users or a new user with the specified
+     * nick if none match
      *
-     * @param nick
-     * @return
+     * @param nick the nick of user to retrieve
+     * @return the user matching the specified nick or a new user with the specified nick
      */
     public ChannelUser getNonNullUser(final String nick) {
         final ChannelUser user = getUser(nick);
@@ -200,30 +218,6 @@ public final class UserChannelInterface {
 
     public void removeQueryUser(final QueryUser user) {
         mQueryUsers.remove(user);
-    }
-
-    public void onConnectionTerminated() {
-        mServer.getUsers().clear();
-        /*
-        final Iterator<ChannelUser> iterator = mUserToChannelMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            final ChannelUser user = iterator.next();
-            if (user instanceof AppUser) {
-                continue;
-            }
-            iterator.remove();
-        }
-        mChannelToUserMap.clear();
-
-        final AppUser appUser = mServer.getUser();
-        if (appUser == null) {
-            return;
-        }
-        final Collection<Channel> channelSet = appUser.getChannels();
-        for (final Channel channel : channelSet) {
-            addUser(appUser, channel);
-        }
-        */
     }
 
     public boolean shouldIgnoreUser(final String userNick) {

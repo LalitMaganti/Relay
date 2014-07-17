@@ -57,7 +57,8 @@ public class Server implements Conversation {
     }
 
     public void onConnectionTerminated() {
-        mUserChannelInterface.onConnectionTerminated();
+        // Clear the global list of users - it's now totally invalid
+        mUsers.clear();
 
         // Need to remove old writers as they would be using the old socket OutputStream if a
         // reconnection occurs
