@@ -19,6 +19,7 @@ public abstract class CommandParser {
     CommandParser(final Server server) {
         mServer = server;
         mServerEventBus = server.getServerEventBus();
+
     }
 
     public static Map<String, CommandParser> getParserMap(final Server server) {

@@ -1,10 +1,12 @@
-package com.fusionx.relay.call;
+package com.fusionx.relay.call.server;
+
+import com.fusionx.relay.call.Call;
 
 public class VersionResponseCall extends Call {
 
     private final String mRecipient;
 
-    public VersionResponseCall(String askingUser) {
+    public VersionResponseCall(final String askingUser) {
         mRecipient = askingUser;
     }
 

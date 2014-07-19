@@ -1,4 +1,4 @@
-package com.fusionx.relay.call;
+package com.fusionx.relay.call.server;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.call.Call;
@@ -9,9 +9,9 @@ public class FingerResponseCall extends Call {
 
     private final String mFingerResponse;
 
-    public FingerResponseCall(String nick, Server user) {
+    public FingerResponseCall(final String nick, final Server server) {
         mRecipient = nick;
-        mFingerResponse = user.getServer().getConfiguration().getRealName();
+        mFingerResponse = server.getConfiguration().getRealName();
     }
 
     @Override

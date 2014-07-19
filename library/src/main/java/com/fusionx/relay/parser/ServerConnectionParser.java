@@ -2,7 +2,7 @@ package com.fusionx.relay.parser;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.call.NickChangeCall;
+import com.fusionx.relay.call.server.NickChangeCall;
 import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.constants.ServerCommands;
 import com.fusionx.relay.event.server.GenericServerEvent;

@@ -1,5 +1,6 @@
-package com.fusionx.relay.call;
+package com.fusionx.relay.call.channel;
 
+import com.fusionx.relay.call.Call;
 import com.fusionx.relay.writers.WriterCommands;
 
 public class ChannelActionCall extends Call {

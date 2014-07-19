@@ -1,4 +1,4 @@
-package com.fusionx.relay.call;
+package com.fusionx.relay.call.server;
 
 import com.fusionx.relay.call.Call;
 

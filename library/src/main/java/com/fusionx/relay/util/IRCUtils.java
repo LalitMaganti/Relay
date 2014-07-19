@@ -4,6 +4,8 @@ import com.google.common.base.CharMatcher;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.text.TextUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +31,7 @@ public class IRCUtils {
      */
     public static List<String> splitRawLine(final String input, final boolean colonDelimiter) {
         final List<String> stringParts = new ArrayList<>();
-        if (input == null || input.length() == 0) {
+        if (TextUtils.isEmpty(input)) {
             return stringParts;
         }
 

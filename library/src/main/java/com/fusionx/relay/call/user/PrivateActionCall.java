@@ -1,4 +1,6 @@
-package com.fusionx.relay.call;
+package com.fusionx.relay.call.user;
+
+import com.fusionx.relay.call.Call;
 
 public class PrivateActionCall extends Call {
 

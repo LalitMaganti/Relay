@@ -1,13 +1,13 @@
 package com.fusionx.relay.writers;
 
-import com.fusionx.relay.call.ChannelJoinCall;
-import com.fusionx.relay.call.ModeCall;
-import com.fusionx.relay.call.NickChangeCall;
-import com.fusionx.relay.call.QuitCall;
-import com.fusionx.relay.call.RawCall;
-import com.fusionx.relay.call.UserCall;
-import com.fusionx.relay.call.VersionResponseCall;
-import com.fusionx.relay.call.WhoisCall;
+import com.fusionx.relay.call.channel.ChannelJoinCall;
+import com.fusionx.relay.call.server.ModeCall;
+import com.fusionx.relay.call.server.NickChangeCall;
+import com.fusionx.relay.call.server.QuitCall;
+import com.fusionx.relay.call.server.RawCall;
+import com.fusionx.relay.call.server.UserCall;
+import com.fusionx.relay.call.server.VersionResponseCall;
+import com.fusionx.relay.call.server.WhoisCall;
 import com.squareup.otto.Subscribe;
 
 import android.util.Base64;

@@ -1,4 +1,6 @@
-package com.fusionx.relay.call;
+package com.fusionx.relay.call.channel;
+
+import com.fusionx.relay.call.Call;
 
 public class ChannelJoinCall extends Call {
 

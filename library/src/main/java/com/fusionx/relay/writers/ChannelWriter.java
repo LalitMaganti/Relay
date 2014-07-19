@@ -1,10 +1,10 @@
 package com.fusionx.relay.writers;
 
-import com.fusionx.relay.call.ChannelActionCall;
-import com.fusionx.relay.call.ChannelKickCall;
-import com.fusionx.relay.call.ChannelMessageCall;
-import com.fusionx.relay.call.ChannelPartCall;
-import com.fusionx.relay.call.ChannelTopicCall;
+import com.fusionx.relay.call.channel.ChannelActionCall;
+import com.fusionx.relay.call.channel.ChannelKickCall;
+import com.fusionx.relay.call.channel.ChannelMessageCall;
+import com.fusionx.relay.call.channel.ChannelPartCall;
+import com.fusionx.relay.call.channel.ChannelTopicCall;
 import com.squareup.otto.Subscribe;
 
 import java.io.Writer;

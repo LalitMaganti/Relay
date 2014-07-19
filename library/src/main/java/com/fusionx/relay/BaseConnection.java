@@ -1,9 +1,9 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.call.ChannelJoinCall;
-import com.fusionx.relay.call.NickChangeCall;
-import com.fusionx.relay.call.QuitCall;
-import com.fusionx.relay.call.UserCall;
+import com.fusionx.relay.call.channel.ChannelJoinCall;
+import com.fusionx.relay.call.server.NickChangeCall;
+import com.fusionx.relay.call.server.QuitCall;
+import com.fusionx.relay.call.server.UserCall;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
