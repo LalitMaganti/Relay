@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.nick.Nick;
+import com.fusionx.relay.Nick;
 
 import java.util.List;
 

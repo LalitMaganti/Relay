@@ -1,7 +1,6 @@
 package com.fusionx.relay;
 
 import com.fusionx.relay.constants.UserLevel;
-import com.fusionx.relay.nick.Nick;
 
 import java.util.Set;
 

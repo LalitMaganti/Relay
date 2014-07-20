@@ -1,8 +1,6 @@
 package com.fusionx.relay;
 
 import com.fusionx.relay.constants.UserLevel;
-import com.fusionx.relay.nick.Nick;
-import com.fusionx.relay.nick.RelayNick;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,7 +10,7 @@ public class RelayChannelUser implements ChannelUser {
 
     private final Map<RelayChannel, UserLevel> mUserLevelMap;
 
-    private Nick mNick;
+    private RelayNick mNick;
 
     public RelayChannelUser(final String nick) {
         mNick = new RelayNick(nick);
@@ -42,8 +40,12 @@ public class RelayChannelUser implements ChannelUser {
     }
 
     @Override
-    public UserLevel getChannelPrivileges(final Channel channel) {
-        return mUserLevelMap.get(channel);
+    public UserLevel getChannelPrivileges(final Channel rawChannel) {
+        if (rawChannel instanceof RelayChannel) {
+            final RelayChannel channel = (RelayChannel) rawChannel;
+            return mUserLevelMap.get(channel);
+        }
+        return null;
     }
 
     public UserLevel onModeChange(final RelayChannel channel, final String mode) {

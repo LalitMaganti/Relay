@@ -8,7 +8,7 @@ import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import com.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import com.fusionx.relay.event.server.ServerNickChangeEvent;
-import com.fusionx.relay.nick.Nick;
+import com.fusionx.relay.Nick;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;

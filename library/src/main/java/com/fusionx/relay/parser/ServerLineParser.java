@@ -29,6 +29,12 @@ import static com.fusionx.relay.constants.ServerReplyCodes.whoisCodes;
 
 public class ServerLineParser {
 
+    private static final int SERVER_COMMAND_SOURCE = 0;
+
+    private static final int SERVER_COMMAND_COMMAND = 1;
+
+    private static final int SERVER_CODE_CODE = 1;
+
     private final Server mServer;
 
     private final Map<String, CommandParser> mCommandParserMap;
@@ -79,32 +85,32 @@ public class ServerLineParser {
             return false;
         }
 
-        final String command = parsedArray.get(0);
+        final String command = parsedArray.get(SERVER_COMMAND_COMMAND);
         switch (command) {
             case ServerCommands.PING:
                 // Immediately respond & return
                 final String source = parsedArray.get(1);
                 CoreListener.respondToPing(mWriter, source);
-                break;
+                return false;
             case ServerCommands.ERROR:
                 // We are finished - the server has kicked us
                 // out for some reason
                 return true;
             default:
                 // Check if the second thing is a code or a command
-                if (StringUtils.isNumeric(parsedArray.get(1))) {
+                if (StringUtils.isNumeric(parsedArray.get(SERVER_CODE_CODE))) {
                     onParseServerCode(mLine, parsedArray);
                 } else {
                     return onParseServerCommand(parsedArray);
                 }
+                return false;
         }
-        return false;
     }
 
     // The server is sending a command to us - parse what it is
     private boolean onParseServerCommand(final List<String> parsedArray) {
-        final String rawSource = parsedArray.get(0);
-        final String command = parsedArray.get(1).toUpperCase();
+        final String rawSource = parsedArray.get(SERVER_COMMAND_SOURCE);
+        final String command = parsedArray.get(SERVER_COMMAND_COMMAND).toUpperCase();
 
         // Parse the command
         final CommandParser parser = mCommandParserMap.get(command);
@@ -122,7 +128,7 @@ public class ServerLineParser {
     }
 
     private void onParseServerCode(final String rawLine, final List<String> parsedArray) {
-        final int code = Integer.parseInt(parsedArray.get(1));
+        final int code = Integer.parseInt(parsedArray.get(SERVER_CODE_CODE));
 
         // Pretty common across all the codes
         IRCUtils.removeFirstElementFromList(parsedArray, 3);

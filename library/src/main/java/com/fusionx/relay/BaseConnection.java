@@ -24,6 +24,8 @@ import com.fusionx.relay.util.SocketUtils;
 import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.ServerWriter;
 
+import android.text.TextUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
@@ -165,7 +167,7 @@ class BaseConnection {
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
             // If the nick is null then we have no hope of progressing
-            if (nick != null) {
+            if (!TextUtils.isEmpty(nick)) {
                 onStartParsing(nick, serverWriter, reader);
             }
         } catch (final IOException ex) {
@@ -193,8 +195,7 @@ class BaseConnection {
 
         // Identifies with NickServ if the password exists
         if (Utils.isNotEmpty(mServerConfiguration.getNickservPassword())) {
-            serverWriter.sendNickServPassword(mServerConfiguration
-                    .getNickservPassword());
+            serverWriter.sendNickServPassword(mServerConfiguration.getNickservPassword());
         }
 
         final Collection<RelayChannel> channels = mServer.getUser().getChannels();
@@ -241,13 +242,9 @@ class BaseConnection {
     private void onDisconnected(final String serverMessage, final boolean retryPending) {
         mServerConnection.updateStatus(ConnectionStatus.DISCONNECTED);
 
-        // User can be null if the server was not fully connected to
-        if (mServer.getUser() != null) {
-            for (final RelayChannel channel : mServer.getUser().getChannels()) {
-                final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel,
-                        serverMessage);
-                mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
-            }
+        for (final RelayChannel channel : mServer.getUser().getChannels()) {
+            final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel, serverMessage);
+            mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
         }
 
         for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
@@ -262,12 +259,9 @@ class BaseConnection {
     void onStopped() {
         mServerConnection.updateStatus(ConnectionStatus.STOPPED);
 
-        // User can be null if the server was not fully connected to
-        if (mServer.getUser() != null) {
-            for (final RelayChannel channel : mServer.getUser().getChannels()) {
-                final ChannelEvent channelEvent = new ChannelStopEvent(channel);
-                mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
-            }
+        for (final RelayChannel channel : mServer.getUser().getChannels()) {
+            final ChannelEvent channelEvent = new ChannelStopEvent(channel);
+            mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
         }
 
         for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {

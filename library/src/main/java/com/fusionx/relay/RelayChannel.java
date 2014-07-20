@@ -215,7 +215,7 @@ public class RelayChannel implements Channel {
      */
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof Channel)) {
+        if (!(o instanceof RelayChannel)) {
             return false;
         }
         final RelayChannel otherChannel = (RelayChannel) o;

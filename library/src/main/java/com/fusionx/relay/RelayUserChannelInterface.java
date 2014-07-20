@@ -10,7 +10,7 @@ import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
 
-public final class RelayUserChannelInterface implements UserChannelInterface {
+public class RelayUserChannelInterface implements UserChannelInterface {
 
     private final Collection<RelayQueryUser> mQueryUsers;
 
@@ -18,7 +18,7 @@ public final class RelayUserChannelInterface implements UserChannelInterface {
 
     private Set<String> mUserIgnoreList;
 
-    public RelayUserChannelInterface(final RelayServer server) {
+    RelayUserChannelInterface(final RelayServer server) {
         mServer = server;
 
         mQueryUsers = new LinkedHashSet<>();
@@ -169,10 +169,7 @@ public final class RelayUserChannelInterface implements UserChannelInterface {
     }
 
     /**
-     * Get the user by nick from the global list of users
-     *
-     * @param nick the nick of user to retrieve
-     * @return the user matching the specified nick or null if none match
+     * {@inheritDoc}
      */
     @Override
     public RelayChannelUser getUser(final String nick) {
@@ -185,11 +182,7 @@ public final class RelayUserChannelInterface implements UserChannelInterface {
     }
 
     /**
-     * Get the user by nick from the global list of users or a new user with the specified
-     * nick if none match
-     *
-     * @param nick the nick of user to retrieve
-     * @return the user matching the specified nick or a new user with the specified nick
+     * {@inheritDoc}
      */
     public RelayChannelUser getNonNullUser(final String nick) {
         final RelayChannelUser user = getUser(nick);

@@ -6,8 +6,6 @@ import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.query.QueryMessageSelfEvent;
 import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.event.query.QueryOpenedEvent;
-import com.fusionx.relay.nick.Nick;
-import com.fusionx.relay.nick.RelayNick;
 import com.fusionx.relay.util.Utils;
 
 import java.util.ArrayList;

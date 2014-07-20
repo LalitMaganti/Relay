@@ -1,4 +1,4 @@
-package com.fusionx.relay.nick;
+package com.fusionx.relay;
 
 public final class RelayNick implements Nick {
 
@@ -25,7 +25,7 @@ public final class RelayNick implements Nick {
 
     @Override
     public boolean equals(final Object o) {
-        if (o == null || !(o instanceof RelayNick)) {
+        if (!(o instanceof RelayNick)) {
             return false;
         }
 

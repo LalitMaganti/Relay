@@ -1,4 +1,4 @@
-package com.fusionx.relay.nick;
+package com.fusionx.relay;
 
 public interface Nick {
 

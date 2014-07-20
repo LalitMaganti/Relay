@@ -4,11 +4,23 @@ import java.util.Collection;
 
 public interface UserChannelInterface {
 
-    Channel getChannel(String name);
+    /**
+     * Get the channel by name from the list of channels which have been joined by the user
+     *
+     * @param name the name of channel to retrieve
+     * @return the channel matching the specified name or null if none match
+     */
+    public Channel getChannel(final String name);
 
-    ChannelUser getUser(String nick);
+    /**
+     * Get the user by nick from the global list of users
+     *
+     * @param nick the nick of user to retrieve
+     * @return the user matching the specified nick or null if none match
+     */
+    public ChannelUser getUser(final String nick);
 
-    Collection<? extends QueryUser> getQueryUsers();
+    public Collection<? extends QueryUser> getQueryUsers();
 
-    QueryUser getQueryUser(String nick);
+    public QueryUser getQueryUser(final String nick);
 }
