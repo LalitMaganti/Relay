@@ -1,8 +1,9 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelWorldKickEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.KickEvent;
@@ -13,7 +14,7 @@ import java.util.List;
 
 class KickParser extends RemoveUserParser {
 
-    public KickParser(Server server) {
+    public KickParser(RelayServer server) {
         super(server);
     }
 
@@ -26,14 +27,14 @@ class KickParser extends RemoveUserParser {
      * @return the WorldUser object associated with the nick
      */
     @Override
-    public ChannelUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
+    public RelayChannelUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
         final String kickedNick = parsedArray.get(3);
         return getUserChannelInterface().getUser(kickedNick);
     }
 
     @Override
     public ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
-            final Channel channel, final ChannelUser kickedUser) {
+            final RelayChannel channel, final ChannelUser kickedUser) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
         final ChannelUser kickingUser = getUserChannelInterface().getUser(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
@@ -49,13 +50,14 @@ class KickParser extends RemoveUserParser {
      * @param channel     the channel we were kicked from
      */
     @Override
-    void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
+    void onRemoved(final List<String> parsedArray, final String rawSource,
+            final RelayChannel channel) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
         final ChannelUser kickingUser = getUserChannelInterface().getUser(kickingNick);
 
         // Remove the channel only after we've finished with it
-        final Collection<ChannelUser> users = getUserChannelInterface().removeChannel(channel);
-        for (final ChannelUser user : users) {
+        final Collection<RelayChannelUser> users = getUserChannelInterface().removeChannel(channel);
+        for (final RelayChannelUser user : users) {
             getUserChannelInterface().removeChannelFromUser(channel, user);
         }
 

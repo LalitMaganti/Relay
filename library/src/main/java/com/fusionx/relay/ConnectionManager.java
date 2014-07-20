@@ -46,8 +46,8 @@ public class ConnectionManager {
      * @return a pair of objects - the first item is a boolean which is true if the server already
      * exists in the manager. The second item is the server which was created.
      */
-    public Pair<Boolean, Server> requestConnection(final ServerConfiguration configuration,
-            final Collection<String> ignoreList, final Handler errorHandler) {
+    public Pair<Boolean, ? extends Server> requestConnection(final ServerConfiguration
+            configuration, final Collection<String> ignoreList, final Handler errorHandler) {
         ServerConnection connection = mConnectionMap.get(configuration.getTitle());
 
         final boolean exists = connection != null;

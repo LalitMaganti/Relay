@@ -1,21 +1,21 @@
 package com.fusionx.relay.bus;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.QueryUser;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayQueryUser;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.query.QueryEvent;
+import com.fusionx.relay.event.server.ServerEvent;
 
 import de.greenrobot.event.EventBus;
 
 public class ServerEventBus {
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final EventBus mBus;
 
-    public ServerEventBus(final Server server) {
+    public ServerEventBus(final RelayServer server) {
         mBus = new EventBus();
         mServer = server;
     }
@@ -25,12 +25,12 @@ public class ServerEventBus {
         post(event);
     }
 
-    public void postAndStoreEvent(final ChannelEvent event, final Channel channel) {
+    public void postAndStoreEvent(final ChannelEvent event, final RelayChannel channel) {
         channel.onChannelEvent(event);
         post(event);
     }
 
-    public void postAndStoreEvent(final QueryEvent event, final QueryUser user) {
+    public void postAndStoreEvent(final QueryEvent event, final RelayQueryUser user) {
         user.onUserEvent(event);
         post(event);
     }

@@ -1,7 +1,8 @@
 package com.fusionx.relay.parser.command;
 
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.RelayUserChannelInterface;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.constants.ServerCommands;
 
@@ -12,17 +13,17 @@ import gnu.trove.map.hash.THashMap;
 
 public abstract class CommandParser {
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final ServerEventBus mServerEventBus;
 
-    CommandParser(final Server server) {
+    CommandParser(final RelayServer server) {
         mServer = server;
         mServerEventBus = server.getServerEventBus();
 
     }
 
-    public static Map<String, CommandParser> getParserMap(final Server server) {
+    public static Map<String, CommandParser> getParserMap(final RelayServer server) {
         final CtcpParser ctcpParser = new CtcpParser(server);
 
         final Map<String, CommandParser> parserMap = new THashMap<>();
@@ -48,7 +49,7 @@ public abstract class CommandParser {
         return mServer;
     }
 
-    UserChannelInterface getUserChannelInterface() {
+    RelayUserChannelInterface getUserChannelInterface() {
         return mServer.getUserChannelInterface();
     }
 

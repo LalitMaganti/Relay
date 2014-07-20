@@ -1,16 +1,17 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.QueryUser;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayQueryUser;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.RelayUserChannelInterface;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.UserChannelInterface;
+import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.call.server.ERRMSGResponseCall;
 import com.fusionx.relay.call.server.FingerResponseCall;
 import com.fusionx.relay.call.server.PingResponseCall;
 import com.fusionx.relay.call.server.TimeResponseCall;
 import com.fusionx.relay.call.server.VersionResponseCall;
-import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
@@ -24,11 +25,11 @@ import java.util.List;
 
 class CtcpParser {
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final ServerEventBus mEventBus;
 
-    public CtcpParser(Server server) {
+    public CtcpParser(RelayServer server) {
         mServer = server;
         mEventBus = server.getServerEventBus();
     }
@@ -70,7 +71,7 @@ class CtcpParser {
         }
         final String action = parsedArray.get(3).replace("ACTION ", "");
         final String recipient = parsedArray.get(2);
-        if (Channel.isChannelPrefix(recipient.charAt(0))) {
+        if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
             onParseChannelAction(recipient, nick, action);
         } else {
             onParseUserAction(nick, action);
@@ -78,7 +79,7 @@ class CtcpParser {
     }
 
     private void onParseUserAction(final String nick, final String action) {
-        final QueryUser user = getUserChannelInterface().getQueryUser(nick);
+        final RelayQueryUser user = getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
             getUserChannelInterface().addQueryUser(nick, action, true, false);
             getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
@@ -89,7 +90,7 @@ class CtcpParser {
 
     private void onParseChannelAction(final String channelName, final String sendingNick,
             final String action) {
-        final Channel channel = getUserChannelInterface().getChannel(channelName);
+        final RelayChannel channel = getUserChannelInterface().getChannel(channelName);
         final ChannelUser sendingUser = getUserChannelInterface().getUser(sendingNick);
         final boolean mention = MentionParser.onMentionableCommand(action,
                 getServer().getUser().getNick().getNickAsString());
@@ -134,7 +135,7 @@ class CtcpParser {
         return mServer;
     }
 
-    private UserChannelInterface getUserChannelInterface() {
+    private RelayUserChannelInterface getUserChannelInterface() {
         return mServer.getUserChannelInterface();
     }
 }

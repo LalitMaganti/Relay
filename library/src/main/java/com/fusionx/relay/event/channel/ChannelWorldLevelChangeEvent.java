@@ -14,7 +14,8 @@ public class ChannelWorldLevelChangeEvent extends ChannelWorldUserEvent {
 
     public final UserLevel level;
 
-    public ChannelWorldLevelChangeEvent(final Channel channel, String rawMode, final ChannelUser user,
+    public ChannelWorldLevelChangeEvent(final Channel channel, String rawMode,
+            final ChannelUser user,
             final UserLevel level, final ChannelUser changingUser, String changingNick) {
         super(channel, user);
 

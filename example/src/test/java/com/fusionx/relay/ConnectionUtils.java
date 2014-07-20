@@ -10,7 +10,7 @@ public class ConnectionUtils {
         return new ServerConnection(configuration, handler, null);
     }
 
-    public static Server getServerFromConnection(final ServerConnection connection) {
+    public static RelayServer getServerFromConnection(final ServerConnection connection) {
         return connection.getServer();
     }
 }

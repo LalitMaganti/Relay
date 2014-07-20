@@ -1,9 +1,9 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.AppUser;
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import com.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
@@ -17,7 +17,7 @@ class NickParser extends CommandParser {
 
     private static final int NEW_NICK_INDEX = 2;
 
-    public NickParser(final Server server) {
+    public NickParser(final RelayServer server) {
         super(server);
     }
 
@@ -25,7 +25,7 @@ class NickParser extends CommandParser {
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String oldRawNick = IRCUtils.getNickFromRaw(rawSource);
         final boolean appUser = getServer().getUser().isNickEqual(oldRawNick);
-        final ChannelUser user = appUser
+        final RelayChannelUser user = appUser
                 ? getServer().getUser()
                 : getUserChannelInterface().getUser(oldRawNick);
 
@@ -48,7 +48,7 @@ class NickParser extends CommandParser {
             getServerEventBus().postAndStoreEvent(event);
         }
 
-        for (final Channel channel : user.getChannels()) {
+        for (final RelayChannel channel : user.getChannels()) {
             final ChannelEvent event;
             if (appUser) {
                 event = new ChannelNickChangeEvent(channel, oldNick, (AppUser) user);

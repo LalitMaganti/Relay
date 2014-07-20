@@ -1,9 +1,10 @@
 package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.AppUser;
-import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelModeEvent;
@@ -15,7 +16,7 @@ import java.util.List;
 
 class ModeParser extends CommandParser {
 
-    public ModeParser(Server server) {
+    public ModeParser(final RelayServer server) {
         super(server);
     }
 
@@ -25,10 +26,10 @@ class ModeParser extends CommandParser {
         final String recipient = parsedArray.get(2);
         final String mode = parsedArray.get(3);
 
-        if (Channel.isChannelPrefix(recipient.charAt(0))) {
+        if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
             // The recipient is a channel (i.e. the mode of a user in the channel is being changed
             // or possibly the mode of the channel itself)
-            final Channel channel = getUserChannelInterface().getChannel(recipient);
+            final RelayChannel channel = getUserChannelInterface().getChannel(recipient);
             final int messageLength = parsedArray.size();
             if (messageLength == 4) {
                 // User not specified - therefore channel mode is being changed
@@ -44,11 +45,11 @@ class ModeParser extends CommandParser {
     }
 
     private void onUserModeInChannel(final List<String> parsedArray, final String sendingNick,
-            final Channel channel, final String mode) {
+            final RelayChannel channel, final String mode) {
         final String source = parsedArray.get(4);
         final String nick = IRCUtils.getNickFromRaw(source);
         final boolean appUser = getServer().getUser().isNickEqual(nick);
-        final ChannelUser user = appUser
+        final RelayChannelUser user = appUser
                 ? getServer().getUser()
                 : getUserChannelInterface().getUser(nick);
         final ChannelUser sendingUser = getUserChannelInterface().getUser(sendingNick);

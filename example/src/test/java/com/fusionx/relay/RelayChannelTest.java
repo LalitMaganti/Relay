@@ -5,19 +5,19 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.fusionx.relay.ServerTest.getDefaultServer;
+import static com.fusionx.relay.RelayServerTest.getDefaultServer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class ChannelTest {
+public class RelayChannelTest {
 
-    public static Channel getTestChannel() {
+    public static RelayChannel getTestChannel() {
         return getTestChannel("#relay");
     }
 
-    public static Channel getTestChannel(final String channelName) {
-        return new Channel(getDefaultServer(), channelName);
+    public static RelayChannel getTestChannel(final String channelName) {
+        return new RelayChannel(getDefaultServer(), channelName);
     }
 
     public static void populateTestChannel(final Channel channel) {
@@ -26,13 +26,13 @@ public class ChannelTest {
 
     @Test
     public void testIsChannelPrefix() {
-        assertThat(Channel.isChannelPrefix('+'))
+        assertThat(RelayChannel.isChannelPrefix('+'))
                 .isTrue();
-        assertThat(Channel.isChannelPrefix('#'))
+        assertThat(RelayChannel.isChannelPrefix('#'))
                 .isTrue();
-        assertThat(Channel.isChannelPrefix('&'))
+        assertThat(RelayChannel.isChannelPrefix('&'))
                 .isTrue();
-        assertThat(Channel.isChannelPrefix('!'))
+        assertThat(RelayChannel.isChannelPrefix('!'))
                 .isTrue();
         // TODO - any other character should be false
     }

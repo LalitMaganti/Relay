@@ -1,12 +1,12 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayServer;
 
 import java.util.List;
 
 public class PongParser extends CommandParser {
 
-    public PongParser(Server server) {
+    public PongParser(final RelayServer server) {
         super(server);
     }
 

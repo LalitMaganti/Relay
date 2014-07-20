@@ -13,9 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class ServerTest {
+public class RelayServerTest {
 
-    public static Server getDefaultServer() {
+    public static RelayServer getDefaultServer() {
         final ServerConfiguration freenode = getFreenodeConfiguration();
         final ServerConnection connection = ConnectionUtils.getConnection(freenode);
         return ConnectionUtils.getServerFromConnection(connection);
@@ -23,7 +23,7 @@ public class ServerTest {
 
     @Test
     public void testOnServerEvent() {
-        final Server server = getDefaultServer();
+        final RelayServer server = getDefaultServer();
         final ServerEvent event = new GenericServerEvent("This is a test message");
         server.onServerEvent(event);
         assertThat(server.getBuffer())

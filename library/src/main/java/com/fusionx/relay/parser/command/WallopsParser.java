@@ -1,6 +1,6 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.server.WallopsEvent;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 public class WallopsParser extends CommandParser {
 
-    WallopsParser(Server server) {
+    WallopsParser(final RelayServer server) {
         super(server);
     }
 

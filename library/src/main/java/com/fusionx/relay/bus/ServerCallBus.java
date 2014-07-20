@@ -1,8 +1,9 @@
 package com.fusionx.relay.bus;
 
-import com.fusionx.relay.Channel;
 import com.fusionx.relay.QueryUser;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayQueryUser;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.call.channel.ChannelActionCall;
 import com.fusionx.relay.call.channel.ChannelJoinCall;
 import com.fusionx.relay.call.channel.ChannelKickCall;
@@ -11,11 +12,11 @@ import com.fusionx.relay.call.channel.ChannelPartCall;
 import com.fusionx.relay.call.channel.ChannelTopicCall;
 import com.fusionx.relay.call.server.ModeCall;
 import com.fusionx.relay.call.server.NickChangeCall;
-import com.fusionx.relay.call.user.PrivateActionCall;
-import com.fusionx.relay.call.user.PrivateMessageCall;
 import com.fusionx.relay.call.server.QuitCall;
 import com.fusionx.relay.call.server.RawCall;
 import com.fusionx.relay.call.server.WhoisCall;
+import com.fusionx.relay.call.user.PrivateActionCall;
+import com.fusionx.relay.call.user.PrivateMessageCall;
 import com.fusionx.relay.event.channel.ChannelActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelMessageEvent;
@@ -41,13 +42,13 @@ public class ServerCallBus {
 
     private final Set<RawWriter> mRawWriterSet = new THashSet<>();
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final Handler mCallHandler;
 
     private final Bus mBus;
 
-    public ServerCallBus(final Server server, final Handler callHandler) {
+    public ServerCallBus(final RelayServer server, final Handler callHandler) {
         mBus = new Bus(ThreadEnforcer.ANY);
         mServer = server;
         mCallHandler = callHandler;
@@ -92,8 +93,7 @@ public class ServerCallBus {
             post(new PrivateMessageCall(nick, message));
         }
 
-        final QueryUser user = getServer().getUserChannelInterface()
-                .getQueryUser(nick);
+        final RelayQueryUser user = getServer().getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
             getServer().getUserChannelInterface().addQueryUser(nick, message, false,
                     true);
@@ -109,7 +109,7 @@ public class ServerCallBus {
             post(new PrivateActionCall(nick, action));
         }
 
-        final QueryUser user = getServer().getUserChannelInterface().getQueryUser(nick);
+        final RelayQueryUser user = getServer().getUserChannelInterface().getQueryUser(nick);
         if (user == null) {
             getServer().getUserChannelInterface().addQueryUser(nick, action, true,
                     true);
@@ -131,7 +131,12 @@ public class ServerCallBus {
         post(new ChannelPartCall(channelName, InterfaceHolders.getPreferences().getPartReason()));
     }
 
-    public void sendCloseQuery(final QueryUser user) {
+    public void sendCloseQuery(final QueryUser rawUser) {
+        if (!(rawUser instanceof RelayQueryUser)) {
+            // TODO - this is invalid and unexpected. What should be done here?
+            return;
+        }
+        final RelayQueryUser user = (RelayQueryUser) rawUser;
         getServer().getUserChannelInterface().removeQueryUser(user);
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
@@ -148,7 +153,8 @@ public class ServerCallBus {
         post(new ChannelMessageCall(channelName, message));
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
+            final RelayChannel channel = getServer().getUserChannelInterface()
+                    .getChannel(channelName);
             final ChannelEvent event = new ChannelMessageEvent(channel, message,
                     getServer().getUser());
             getServer().getServerEventBus().postAndStoreEvent(event, channel);
@@ -159,7 +165,8 @@ public class ServerCallBus {
         post(new ChannelActionCall(channelName, action));
 
         if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final Channel channel = getServer().getUserChannelInterface().getChannel(channelName);
+            final RelayChannel channel = getServer().getUserChannelInterface()
+                    .getChannel(channelName);
             final ChannelEvent event = new ChannelActionEvent(channel, action,
                     getServer().getUser());
             getServer().getServerEventBus().postAndStoreEvent(event, channel);
@@ -174,7 +181,7 @@ public class ServerCallBus {
         post(new ChannelTopicCall(channelName, newTopic));
     }
 
-    Server getServer() {
+    private RelayServer getServer() {
         return mServer;
     }
 

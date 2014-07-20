@@ -1,10 +1,10 @@
 package com.fusionx.relay.nick;
 
-public final class BasicNick implements Nick {
+public final class RelayNick implements Nick {
 
     private final String mNick;
 
-    public BasicNick(final String nick) {
+    public RelayNick(final String nick) {
         mNick = nick;
     }
 
@@ -25,11 +25,11 @@ public final class BasicNick implements Nick {
 
     @Override
     public boolean equals(final Object o) {
-        if (o == null || !(o instanceof BasicNick)) {
+        if (o == null || !(o instanceof RelayNick)) {
             return false;
         }
 
-        final BasicNick other = (BasicNick) o;
+        final RelayNick other = (RelayNick) o;
         return mNick.equals(other.getNickAsString());
     }
 }

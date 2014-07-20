@@ -1,6 +1,6 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.server.InviteEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.util.IRCUtils;
@@ -9,7 +9,7 @@ import java.util.List;
 
 class InviteParser extends CommandParser {
 
-    public InviteParser(Server server) {
+    public InviteParser(final RelayServer server) {
         super(server);
     }
 

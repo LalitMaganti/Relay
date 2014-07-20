@@ -7,8 +7,7 @@ public class QueryActionSelfEvent extends QuerySelfEvent {
 
     public final String action;
 
-    public QueryActionSelfEvent(final QueryUser user, final AppUser appUser,
-            final String action) {
+    public QueryActionSelfEvent(final QueryUser user, final AppUser appUser, final String action) {
         super(user, appUser);
 
         this.action = action;

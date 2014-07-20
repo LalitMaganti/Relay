@@ -3,8 +3,8 @@ package com.fusionx.relay.logging;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.query.QueryEvent;
+import com.fusionx.relay.event.server.ServerEvent;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -100,6 +100,8 @@ public abstract class LoggingManager {
         return String.format("%s/%s", mLoggingPreferences.getLoggingPath(), server.getTitle());
     }
 
+    protected abstract boolean shouldLogEvent(final Event event);
+
     private final class LogHandler {
 
         private static final int LOG_PRIORITY = 500;
@@ -157,8 +159,6 @@ public abstract class LoggingManager {
             }
         }
     }
-
-    protected abstract boolean shouldLogEvent(final Event event);
 
     private final class LoggingRunnable implements Runnable {
 

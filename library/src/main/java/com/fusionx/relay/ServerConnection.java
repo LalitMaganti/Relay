@@ -27,7 +27,7 @@ public class ServerConnection {
         }
     };
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final BaseConnection mBaseConnection;
 
@@ -45,7 +45,7 @@ public class ServerConnection {
         handlerThread.start();
         mServerCallHandler = new Handler(handlerThread.getLooper());
 
-        mServer = new Server(configuration, this, ignoreList);
+        mServer = new RelayServer(configuration, this, ignoreList);
         mBaseConnection = new BaseConnection(configuration, this);
         mUiThreadHandler = handler;
     }
@@ -79,7 +79,7 @@ public class ServerConnection {
         });
     }
 
-    Server getServer() {
+    RelayServer getServer() {
         return mServer;
     }
 

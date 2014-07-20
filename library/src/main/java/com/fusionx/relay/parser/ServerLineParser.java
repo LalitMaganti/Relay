@@ -1,5 +1,6 @@
 package com.fusionx.relay.parser;
 
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.constants.ServerCommands;
 import com.fusionx.relay.event.server.GenericServerEvent;
@@ -38,7 +39,7 @@ public class ServerLineParser {
 
     private String mLine;
 
-    public ServerLineParser(final Server server) {
+    public ServerLineParser(final RelayServer server) {
         mServer = server;
         mCodeParser = CodeParser.getParserMap(server);
         mCommandParserMap = CommandParser.getParserMap(server);

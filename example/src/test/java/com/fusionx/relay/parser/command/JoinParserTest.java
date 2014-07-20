@@ -2,11 +2,11 @@ package com.fusionx.relay.parser.command;
 
 import com.google.common.collect.Iterables;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelTest;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerTest;
+import com.fusionx.relay.RelayChannelTest;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.RelayServerTest;
 import com.fusionx.relay.TestMisc;
 import com.fusionx.relay.event.channel.ChannelWorldJoinEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(RobolectricTestRunner.class)
 public class JoinParserTest {
 
-    private Server mServer;
+    private RelayServer mServer;
 
     private JoinParser mJoinParser;
 
@@ -37,14 +37,14 @@ public class JoinParserTest {
 
         // Make sure the channel is set up first
         mServer.getUserChannelInterface().coupleUserAndChannel(mServer.getUser(),
-                ChannelTest.getTestChannel());
+                RelayChannelTest.getTestChannel());
 
         final String joinLine = ":otheruser!otheruser@test JOIN #relay";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
         mJoinParser.onParseCommand(list, "otheruser!otheruser@test");
 
-        final Channel channel = mServer.getUserChannelInterface().getChannel("#relay");
-        final ChannelUser user = mServer.getUserChannelInterface().getUser("otheruser");
+        final RelayChannel channel = mServer.getUserChannelInterface().getChannel("#relay");
+        final RelayChannelUser user = mServer.getUserChannelInterface().getUser("otheruser");
 
         // Check that the channel exists
         assertThat(channel)
@@ -91,8 +91,8 @@ public class JoinParserTest {
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
         mJoinParser.onParseCommand(list, "holoirctester!holoirctester@test");
 
-        final Channel channel = mServer.getUserChannelInterface().getChannel("#relay");
-        final ChannelUser user = mServer.getUserChannelInterface().getUser(nick);
+        final RelayChannel channel = mServer.getUserChannelInterface().getChannel("#relay");
+        final RelayChannelUser user = mServer.getUserChannelInterface().getUser(nick);
 
         // Check that the channel exists
         assertThat(channel)
@@ -133,7 +133,7 @@ public class JoinParserTest {
     private void resetFields() {
         InterfaceHolders.onInterfaceReceived(new TestMisc.DefaultEventPreferences());
 
-        mServer = ServerTest.getDefaultServer();
+        mServer = RelayServerTest.getDefaultServer();
         mJoinParser = new JoinParser(mServer);
     }
 }

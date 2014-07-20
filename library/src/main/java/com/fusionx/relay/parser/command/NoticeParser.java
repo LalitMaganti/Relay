@@ -1,8 +1,8 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.QueryUser;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayQueryUser;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
 import com.fusionx.relay.event.query.QueryMessageWorldEvent;
@@ -15,7 +15,7 @@ class NoticeParser extends CommandParser {
 
     private final CtcpParser mCtcpParser;
 
-    public NoticeParser(Server server, final CtcpParser ctcpParser) {
+    public NoticeParser(final RelayServer server, final CtcpParser ctcpParser) {
         super(server);
 
         mCtcpParser = ctcpParser;
@@ -33,7 +33,7 @@ class NoticeParser extends CommandParser {
             final String recipient = parsedArray.get(2);
             final String notice = parsedArray.get(3);
 
-            if (Channel.isChannelPrefix(recipient.charAt(0))) {
+            if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelNotice(recipient, notice, sendingNick);
             } else if (recipient.equals(getServer().getUser().getNick().getNickAsString())) {
                 onParseUserNotice(sendingNick, notice);
@@ -43,7 +43,7 @@ class NoticeParser extends CommandParser {
 
     private void onParseChannelNotice(final String channelName, final String sendingNick,
             final String notice) {
-        final Channel channel = getUserChannelInterface().getChannel(channelName);
+        final RelayChannel channel = getUserChannelInterface().getChannel(channelName);
         if (channel == null) {
             // If we're not in this channel then send the notice to the server instead
             // TODO - maybe figure out why this is happening
@@ -55,7 +55,7 @@ class NoticeParser extends CommandParser {
     }
 
     private void onParseUserNotice(final String sendingNick, final String notice) {
-        final QueryUser user = getUserChannelInterface().getQueryUser(sendingNick);
+        final RelayQueryUser user = getUserChannelInterface().getQueryUser(sendingNick);
         if (user == null) {
             getServerEventBus().postAndStoreEvent(new NoticeEvent(notice, sendingNick));
         } else {

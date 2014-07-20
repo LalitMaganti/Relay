@@ -1,6 +1,4 @@
-package com.fusionx.relay.interfaces;
-
-import com.fusionx.relay.Server;
+package com.fusionx.relay;
 
 public interface Conversation {
 

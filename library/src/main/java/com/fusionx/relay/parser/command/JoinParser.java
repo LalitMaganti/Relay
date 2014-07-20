@@ -1,8 +1,8 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldJoinEvent;
 import com.fusionx.relay.event.server.JoinEvent;
@@ -14,7 +14,7 @@ class JoinParser extends CommandParser {
 
     private static final int CHANNEL_NAME_INDEX = 2;
 
-    public JoinParser(final Server server) {
+    public JoinParser(final RelayServer server) {
         super(server);
     }
 
@@ -23,8 +23,8 @@ class JoinParser extends CommandParser {
         final String channelName = parsedArray.get(CHANNEL_NAME_INDEX);
 
         // Retrieve the user and channel
-        final ChannelUser user = getUserChannelInterface().getUserFromRaw(rawSource);
-        Channel channel = getUserChannelInterface().getChannel(channelName);
+        final RelayChannelUser user = getUserChannelInterface().getUserFromRaw(rawSource);
+        RelayChannel channel = getUserChannelInterface().getChannel(channelName);
 
         // Store whether the user is the app user
         final boolean appUser = getServer().getUser().isNickEqual(user.getNick().getNickAsString());

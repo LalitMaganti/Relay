@@ -1,7 +1,7 @@
 package com.fusionx.relay.parser.code;
 
-import com.fusionx.relay.Server;
-import com.fusionx.relay.UserChannelInterface;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.RelayUserChannelInterface;
 import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.constants.ServerReplyCodes;
 
@@ -19,19 +19,19 @@ import static com.fusionx.relay.constants.ServerReplyCodes.RPL_NAMREPLY;
 
 public abstract class CodeParser {
 
-    final UserChannelInterface mUserChannelInterface;
+    final RelayUserChannelInterface mUserChannelInterface;
 
-    final Server mServer;
+    final RelayServer mServer;
 
     final ServerEventBus mServerEventBus;
 
-    CodeParser(final Server server) {
+    CodeParser(final RelayServer server) {
         mServer = server;
         mUserChannelInterface = server.getUserChannelInterface();
         mServerEventBus = server.getServerEventBus();
     }
 
-    public static SparseArray<CodeParser> getParserMap(final Server server) {
+    public static SparseArray<CodeParser> getParserMap(final RelayServer server) {
         final SparseArray<CodeParser> parserMap = new SparseArray<>();
 
         final TopicParser topicParser = new TopicParser(server);

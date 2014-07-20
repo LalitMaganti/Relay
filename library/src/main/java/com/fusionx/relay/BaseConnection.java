@@ -42,7 +42,7 @@ class BaseConnection {
 
     private final ServerConnection mServerConnection;
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final ServerConfiguration mServerConfiguration;
 
@@ -197,7 +197,7 @@ class BaseConnection {
                     .getNickservPassword());
         }
 
-        final Collection<Channel> channels = mServer.getUser().getChannels();
+        final Collection<RelayChannel> channels = mServer.getUser().getChannels();
         if (channels.isEmpty()) {
             // Automatically join the channels specified in the configuration
             for (final String channelName : mServerConfiguration.getAutoJoinChannels()) {
@@ -224,12 +224,12 @@ class BaseConnection {
     private void onConnected() {
         mServerConnection.updateStatus(ConnectionStatus.CONNECTED);
 
-        for (final Channel channel : mServer.getUser().getChannels()) {
+        for (final RelayChannel channel : mServer.getUser().getChannels()) {
             final ChannelEvent channelEvent = new ChannelConnectEvent(channel);
             mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
         }
 
-        for (final QueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
             final QueryEvent queryEvent = new QueryConnectEvent(user);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }
@@ -243,14 +243,14 @@ class BaseConnection {
 
         // User can be null if the server was not fully connected to
         if (mServer.getUser() != null) {
-            for (final Channel channel : mServer.getUser().getChannels()) {
+            for (final RelayChannel channel : mServer.getUser().getChannels()) {
                 final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel,
                         serverMessage);
                 mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
             }
         }
 
-        for (final QueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
             final QueryEvent queryEvent = new QueryDisconnectEvent(user, serverMessage);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }
@@ -264,13 +264,13 @@ class BaseConnection {
 
         // User can be null if the server was not fully connected to
         if (mServer.getUser() != null) {
-            for (final Channel channel : mServer.getUser().getChannels()) {
+            for (final RelayChannel channel : mServer.getUser().getChannels()) {
                 final ChannelEvent channelEvent = new ChannelStopEvent(channel);
                 mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
             }
         }
 
-        for (final QueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
             final QueryEvent queryEvent = new QueryStopEvent(user);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
         }

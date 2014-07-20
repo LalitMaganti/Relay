@@ -4,7 +4,7 @@ import com.fusionx.relay.QueryUser;
 
 public class QueryConnectEvent extends QueryEvent {
 
-    public QueryConnectEvent(QueryUser user) {
+    public QueryConnectEvent(final QueryUser user) {
         super(user);
     }
 }
