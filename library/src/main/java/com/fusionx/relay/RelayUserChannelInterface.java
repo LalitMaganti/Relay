@@ -9,6 +9,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
+import java8.util.Comparators;
+import java8.util.stream.StreamSupport;
 
 public class RelayUserChannelInterface implements UserChannelInterface {
 
@@ -148,14 +150,11 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     @Override
     public RelayChannel getChannel(final String name) {
-        for (final RelayChannel channel : mServer.getUser().getChannels()) {
-            // Channel names have to unique disregarding case - not having ignore-case here leads
-            // to null channels when the channel does actually exist
-            if (name.equalsIgnoreCase(channel.getName())) {
-                return channel;
-            }
-        }
-        return null;
+        // Channel names have to unique disregarding case - not having ignore-case here leads
+        // to null channels when the channel does actually exist
+        return StreamSupport.stream(mServer.getUser().getChannels())
+                .filter(c -> name.equalsIgnoreCase(c.getName()))
+                .findFirst().orElse(null);
     }
 
     /**
@@ -174,12 +173,9 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     @Override
     public RelayChannelUser getUser(final String nick) {
-        for (final RelayChannelUser user : mServer.getUsers()) {
-            if (nick.equals(user.getNick().getNickAsString())) {
-                return user;
-            }
-        }
-        return null;
+        return StreamSupport.stream(mServer.getUsers())
+                .filter(u -> nick.equals(u.getNick().getNickAsString()))
+                .findFirst().orElse(null);
     }
 
     /**
@@ -201,12 +197,9 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
     @Override
     public RelayQueryUser getQueryUser(final String nick) {
-        for (final RelayQueryUser user : mQueryUsers) {
-            if (nick.equals(user.getNick().getNickAsString())) {
-                return user;
-            }
-        }
-        return null;
+        return StreamSupport.stream(mQueryUsers)
+                .filter(u -> nick.equals(u.getNick().getNickAsString()))
+                .findFirst().orElse(null);
     }
 
     public void addQueryUser(final String nick, final String message, final boolean action,

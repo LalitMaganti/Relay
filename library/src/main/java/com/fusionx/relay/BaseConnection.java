@@ -32,6 +32,8 @@ import java.io.Writer;
 import java.net.Socket;
 import java.util.Collection;
 
+import java8.util.stream.StreamSupport;
+
 import static com.fusionx.relay.misc.InterfaceHolders.getPreferences;
 
 /**
@@ -201,13 +203,11 @@ class BaseConnection {
         final Collection<RelayChannel> channels = mServer.getUser().getChannels();
         if (channels.isEmpty()) {
             // Automatically join the channels specified in the configuration
-            for (final String channelName : mServerConfiguration.getAutoJoinChannels()) {
-                mServer.getServerCallBus().post(new ChannelJoinCall(channelName));
-            }
+            StreamSupport.stream(mServerConfiguration.getAutoJoinChannels())
+                    .map(ChannelJoinCall::new).forEach(mServer.getServerCallBus()::post);
         } else {
-            for (final Channel channel : channels) {
-                mServer.getServerCallBus().post(new ChannelJoinCall(channel.getName()));
-            }
+            StreamSupport.stream(channels).map(Channel::getName).map(ChannelJoinCall::new)
+                    .forEach(mServer.getServerCallBus()::post);
         }
 
         // Initialise the parser used to parse any lines from the server
@@ -225,15 +225,15 @@ class BaseConnection {
     private void onConnected() {
         mServerConnection.updateStatus(ConnectionStatus.CONNECTED);
 
-        for (final RelayChannel channel : mServer.getUser().getChannels()) {
+        StreamSupport.stream(mServer.getUser().getChannels()).forEach(channel -> {
             final ChannelEvent channelEvent = new ChannelConnectEvent(channel);
             mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
-        }
+        });
 
-        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+        StreamSupport.stream(mServer.getUserChannelInterface().getQueryUsers()).forEach(user -> {
             final QueryEvent queryEvent = new QueryConnectEvent(user);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
-        }
+        });
 
         final ServerEvent event = new ConnectEvent(mServerConfiguration.getUrl());
         mServer.getServerEventBus().postAndStoreEvent(event);
@@ -242,15 +242,16 @@ class BaseConnection {
     private void onDisconnected(final String serverMessage, final boolean retryPending) {
         mServerConnection.updateStatus(ConnectionStatus.DISCONNECTED);
 
-        for (final RelayChannel channel : mServer.getUser().getChannels()) {
-            final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel, serverMessage);
+        StreamSupport.stream(mServer.getUser().getChannels()).forEach(channel -> {
+            final ChannelEvent channelEvent = new ChannelDisconnectEvent(channel,
+                    serverMessage);
             mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
-        }
+        });
 
-        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+        StreamSupport.stream(mServer.getUserChannelInterface().getQueryUsers()).forEach(user -> {
             final QueryEvent queryEvent = new QueryDisconnectEvent(user, serverMessage);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
-        }
+        });
 
         final ServerEvent event = new DisconnectEvent(serverMessage, retryPending);
         mServer.getServerEventBus().postAndStoreEvent(event);
@@ -259,15 +260,15 @@ class BaseConnection {
     void onStopped() {
         mServerConnection.updateStatus(ConnectionStatus.STOPPED);
 
-        for (final RelayChannel channel : mServer.getUser().getChannels()) {
+        StreamSupport.stream(mServer.getUser().getChannels()).forEach(channel -> {
             final ChannelEvent channelEvent = new ChannelStopEvent(channel);
             mServer.getServerEventBus().postAndStoreEvent(channelEvent, channel);
-        }
+        });
 
-        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+        StreamSupport.stream(mServer.getUserChannelInterface().getQueryUsers()).forEach(user -> {
             final QueryEvent queryEvent = new QueryStopEvent(user);
             mServer.getServerEventBus().postAndStoreEvent(queryEvent, user);
-        }
+        });
 
         final ServerEvent event = new StopEvent();
         mServer.getServerEventBus().postAndStoreEvent(event);

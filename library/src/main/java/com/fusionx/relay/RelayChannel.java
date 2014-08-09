@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import java8.util.stream.StreamSupport;
+
 public class RelayChannel implements Channel {
 
     // As set out in RFC2812
@@ -55,9 +57,8 @@ public class RelayChannel implements Channel {
 
     public void clearInternalData() {
         // Clear the user count
-        for (final UserLevel levelEnum : UserLevel.values()) {
-            mNumberOfUsers.put(levelEnum, 0);
-        }
+        StreamSupport.of(UserLevel.values())
+                .forEach((levelEnum) -> mNumberOfUsers.put(levelEnum, 0));
         // Clear the list of users
         mUsers.clear();
     }

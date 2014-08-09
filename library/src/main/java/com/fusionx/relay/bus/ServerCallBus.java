@@ -68,12 +68,7 @@ public class ServerCallBus {
     }
 
     public void post(final Object event) {
-        mCallHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mBus.post(event);
-            }
-        });
+        mCallHandler.post(() -> mBus.post(event));
     }
 
     public void sendMode(final String channelName, final String destination, final String mode) {

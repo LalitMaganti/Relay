@@ -10,23 +10,6 @@ import java.util.Collection;
  */
 public class ServerConnection {
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                mBaseConnection.connectToServer();
-            } catch (final Exception ex) {
-                mUiThreadHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        throw new RuntimeException(mBaseConnection.getCurrentLine(), ex);
-                    }
-                });
-            }
-        }
-    };
-
     private final RelayServer mServer;
 
     private final BaseConnection mBaseConnection;
@@ -59,23 +42,28 @@ public class ServerConnection {
     }
 
     void startConnection() {
-        mMainThread = new Thread(mRunnable);
+        mMainThread = new Thread(() -> {
+            try {
+                mBaseConnection.connectToServer();
+            } catch (final Exception ex) {
+                mUiThreadHandler.post(() -> {
+                    throw new RuntimeException(mBaseConnection.getCurrentLine(), ex);
+                });
+            }
+        });
         mMainThread.start();
     }
 
     void stopConnection() {
-        mServerCallHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mStatus == ConnectionStatus.CONNECTED) {
-                    mBaseConnection.stopConnection();
-                } else if (mMainThread.isAlive()) {
-                    mMainThread.interrupt();
-                }
-                mBaseConnection.onStopped();
-                mBaseConnection.closeSocket();
-                mServer.onConnectionTerminated();
+        mServerCallHandler.post(() -> {
+            if (mStatus == ConnectionStatus.CONNECTED) {
+                mBaseConnection.stopConnection();
+            } else if (mMainThread.isAlive()) {
+                mMainThread.interrupt();
             }
+            mBaseConnection.onStopped();
+            mBaseConnection.closeSocket();
+            mServer.onConnectionTerminated();
         });
     }
 
