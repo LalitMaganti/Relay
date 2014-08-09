@@ -30,12 +30,16 @@ public class RelayServer implements Server {
 
     private final RelayUserChannelInterface mUserChannelInterface;
 
+    private boolean mValid;
+
     private AppUser mUser;
 
     public RelayServer(final ServerConfiguration configuration, final ServerConnection connection,
             final Collection<String> ignoreList) {
         mConfiguration = configuration;
         mServerConnection = connection;
+
+        mValid = true;
 
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus(this);
@@ -117,6 +121,11 @@ public class RelayServer implements Server {
     @Override
     public RelayServer getServer() {
         return this;
+    }
+
+    @Override
+    public boolean isConversationValid() {
+        return mValid;
     }
 
     // Getters and Setters

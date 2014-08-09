@@ -9,24 +9,24 @@ import java.util.List;
 
 public interface Server extends Conversation {
 
-    void updateIgnoreList(Collection<String> list);
+    public void updateIgnoreList(Collection<String> list);
 
-    Collection<? extends ChannelUser> getUsers();
+    public Collection<? extends ChannelUser> getUsers();
 
     // Getters and Setters
-    List<? extends ServerEvent> getBuffer();
+    public List<? extends ServerEvent> getBuffer();
 
-    UserChannelInterface getUserChannelInterface();
+    public UserChannelInterface getUserChannelInterface();
 
-    AppUser getUser();
+    public AppUser getUser();
 
-    String getTitle();
+    public  String getTitle();
 
-    ConnectionStatus getStatus();
+    public ConnectionStatus getStatus();
 
-    ServerCallBus getServerCallBus();
+    public ServerCallBus getServerCallBus();
 
-    ServerEventBus getServerEventBus();
+    public ServerEventBus getServerEventBus();
 
-    ServerConfiguration getConfiguration();
+    public ServerConfiguration getConfiguration();
 }

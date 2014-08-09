@@ -28,6 +28,8 @@ public class RelayChannel implements Channel {
 
     private final List<ChannelEvent> mBuffer;
 
+    private boolean mValid;
+
     RelayChannel(final Server server, final String channelName) {
         mServer = server;
         mChannelName = channelName;
@@ -35,6 +37,8 @@ public class RelayChannel implements Channel {
         mBuffer = new ArrayList<>();
         mNumberOfUsers = new EnumMap<>(UserLevel.class);
         mUsers = new HashSet<>();
+
+        mValid = true;
 
         clearInternalData();
     }
@@ -167,6 +171,15 @@ public class RelayChannel implements Channel {
         }
     }
 
+    @Override
+    public boolean isConversationValid() {
+        return mValid;
+    }
+
+    public void markInvalid() {
+        mValid = false;
+    }
+
     // Getters and setters
 
     /**
@@ -238,5 +251,4 @@ public class RelayChannel implements Channel {
     public String toString() {
         return mChannelName;
     }
-
 }

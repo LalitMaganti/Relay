@@ -22,6 +22,8 @@ public class RelayQueryUser implements QueryUser {
 
     private Nick mNick;
 
+    private boolean mValid;
+
     public RelayQueryUser(final String nick, final RelayServer server, final String message,
             final boolean action, boolean userSent) {
         mNick = new RelayNick(nick);
@@ -29,6 +31,8 @@ public class RelayQueryUser implements QueryUser {
         mServer = server;
 
         mBuffer.add(new QueryOpenedEvent(this));
+
+        mValid = true;
 
         if (!Utils.isNotEmpty(message)) {
             return;
@@ -46,6 +50,15 @@ public class RelayQueryUser implements QueryUser {
 
     public void onUserEvent(final QueryEvent event) {
         mBuffer.add(event);
+    }
+
+    @Override
+    public boolean isConversationValid() {
+        return mValid;
+    }
+
+    public void markInvalid() {
+        mValid = false;
     }
 
     // Getters and Setters

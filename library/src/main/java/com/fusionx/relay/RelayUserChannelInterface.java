@@ -81,6 +81,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     public Collection<RelayChannelUser> removeChannel(final RelayChannel channel) {
         mServer.getUser().getChannels().remove(channel);
+        channel.markInvalid();
         return channel.getUsers();
     }
 
@@ -216,6 +217,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
     public void removeQueryUser(final RelayQueryUser user) {
         mQueryUsers.remove(user);
+        user.markInvalid();
     }
 
     public boolean shouldIgnoreUser(final String userNick) {
