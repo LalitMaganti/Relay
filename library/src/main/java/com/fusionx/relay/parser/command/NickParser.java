@@ -1,7 +1,6 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.AppUser;
-import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayMainUser;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelEvent;
@@ -51,7 +50,7 @@ class NickParser extends CommandParser {
 
             StreamSupport.stream(user.getChannels()).forEach(channel -> {
                 final ChannelEvent event  = appUser
-                        ? new ChannelNickChangeEvent(channel, oldNick, (AppUser) user)
+                        ? new ChannelNickChangeEvent(channel, oldNick, (RelayMainUser) user)
                         : new ChannelWorldNickChangeEvent(channel, oldNick, user);
                 mServerEventBus.postAndStoreEvent(event, channel);
             });

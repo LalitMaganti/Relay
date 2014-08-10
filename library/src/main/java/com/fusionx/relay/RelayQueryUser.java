@@ -13,7 +13,7 @@ import java.util.List;
 
 public class RelayQueryUser implements QueryUser {
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     /**
      * Contains a copy of the messages when the conversation
@@ -38,13 +38,19 @@ public class RelayQueryUser implements QueryUser {
             return;
         }
         final QueryEvent event;
-        event = userSent
-                ? action
-                ? new QueryActionSelfEvent(this, mServer.getUser(), message)
-                : new QueryMessageSelfEvent(this, mServer.getUser(), message)
-                : action
-                        ? new QueryActionWorldEvent(this, message)
-                        : new QueryMessageWorldEvent(this, message);
+        if (userSent) {
+            if (action) {
+                event = new QueryActionSelfEvent(this, server.getUser(), message);
+            } else {
+                event = new QueryMessageSelfEvent(this, server.getUser(), message);
+            }
+        } else {
+            if (action) {
+                event = new QueryActionWorldEvent(this, message);
+            } else {
+                event = new QueryMessageWorldEvent(this, message);
+            }
+        }
         mBuffer.add(event);
     }
 
@@ -53,7 +59,7 @@ public class RelayQueryUser implements QueryUser {
     }
 
     @Override
-    public boolean isConversationValid() {
+    public boolean isValid() {
         return mValid;
     }
 

@@ -28,6 +28,46 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<RelayChannel> getChannel(final String name) {
+        // Channel names have to unique disregarding case - not having ignore-case here leads
+        // to null channels when the channel does actually exist
+        return StreamSupport.stream(mServer.getUser().getChannels())
+                .filter(c -> name.equalsIgnoreCase(c.getName()))
+                .findFirst();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<RelayChannelUser> getUser(final String nick) {
+        return StreamSupport.stream(mServer.getUsers())
+                .filter(u -> nick.equals(u.getNick().getNickAsString()))
+                .findFirst();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<RelayQueryUser> getQueryUsers() {
+        return mQueryUsers;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<RelayQueryUser> getQueryUser(final String nick) {
+        return StreamSupport.stream(mQueryUsers)
+                .filter(u -> nick.equals(u.getNick().getNickAsString()))
+                .findFirst();
+    }
+
+    /**
      * Add the channel to the user and user to the channel. Also add the user to the global list
      * of users. The user is given a default user level in the channel of {@link UserLevel#NONE}
      *
@@ -135,26 +175,11 @@ public class RelayUserChannelInterface implements UserChannelInterface {
         final Collection<RelayChannel> setOfChannels = user.getChannels();
         // The app user check is to make sure that the app user isn't removed from the list of
         // users
-        if (setOfChannels.size() > 1 || user instanceof AppUser) {
+        if (setOfChannels.size() > 1 || user instanceof RelayMainUser) {
             user.removeChannel(channel);
         } else {
             mServer.removeUser(user);
         }
-    }
-
-    /**
-     * Get the channel by name from the list of channels which have been joined by the user
-     *
-     * @param name the name of channel to retrieve
-     * @return the channel matching the specified name or null if none match
-     */
-    @Override
-    public Optional<RelayChannel> getChannel(final String name) {
-        // Channel names have to unique disregarding case - not having ignore-case here leads
-        // to null channels when the channel does actually exist
-        return StreamSupport.stream(mServer.getUser().getChannels())
-                .filter(c -> name.equalsIgnoreCase(c.getName()))
-                .findFirst();
     }
 
     /**
@@ -171,34 +196,12 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Optional<RelayChannelUser> getUser(final String nick) {
-        return StreamSupport.stream(mServer.getUsers())
-                .filter(u -> nick.equals(u.getNick().getNickAsString()))
-                .findFirst();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public RelayChannelUser getNonNullUser(final String nick) {
         return getUser(nick).orElse(new RelayChannelUser(nick));
     }
 
     public RelayChannel getNewChannel(final String channelName) {
         return new RelayChannel(mServer, channelName);
-    }
-
-    @Override
-    public Collection<RelayQueryUser> getQueryUsers() {
-        return mQueryUsers;
-    }
-
-    @Override
-    public Optional<RelayQueryUser> getQueryUser(final String nick) {
-        return StreamSupport.stream(mQueryUsers)
-                .filter(u -> nick.equals(u.getNick().getNickAsString()))
-                .findFirst();
     }
 
     public RelayQueryUser addQueryUser(final String nick, final String message,

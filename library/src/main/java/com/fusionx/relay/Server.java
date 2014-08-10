@@ -18,9 +18,9 @@ public interface Server extends Conversation {
 
     public UserChannelInterface getUserChannelInterface();
 
-    public AppUser getUser();
+    public ChannelUser getUser();
 
-    public  String getTitle();
+    public String getTitle();
 
     public ConnectionStatus getStatus();
 

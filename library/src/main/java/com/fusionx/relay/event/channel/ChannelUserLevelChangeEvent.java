@@ -1,6 +1,6 @@
 package com.fusionx.relay.event.channel;
 
-import com.fusionx.relay.AppUser;
+import com.fusionx.relay.RelayMainUser;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.constants.UserLevel;
@@ -13,14 +13,14 @@ public class ChannelUserLevelChangeEvent extends ChannelEvent {
 
     public final String rawMode;
 
-    public final AppUser user;
+    public final RelayMainUser user;
 
     public final Optional<? extends ChannelUser> changingUser;
 
     public final String changingNick;
 
     public ChannelUserLevelChangeEvent(final Channel channel, final String rawMode,
-            final AppUser user, final UserLevel level,
+            final RelayMainUser user, final UserLevel level,
             final Optional<? extends ChannelUser> changingUser,
             final String changingNick) {
         super(channel);

@@ -173,7 +173,7 @@ public class RelayChannel implements Channel {
     }
 
     @Override
-    public boolean isConversationValid() {
+    public boolean isValid() {
         return mValid;
     }
 

@@ -1,6 +1,6 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.AppUser;
+import com.fusionx.relay.RelayMainUser;
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayServer;
@@ -66,7 +66,7 @@ class ModeParser extends CommandParser {
             final UserLevel levelEnum = user.onModeChange(channel, mode);
 
             final ChannelEvent event = appUser
-                    ? new ChannelUserLevelChangeEvent(channel, mode, (AppUser) user, levelEnum,
+                    ? new ChannelUserLevelChangeEvent(channel, mode, (RelayMainUser) user, levelEnum,
                     optSending, sendingNick)
                     : new ChannelWorldLevelChangeEvent(channel, mode, user, levelEnum,
                             optSending, sendingNick);
