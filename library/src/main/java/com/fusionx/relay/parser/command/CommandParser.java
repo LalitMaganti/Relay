@@ -13,14 +13,16 @@ import gnu.trove.map.hash.THashMap;
 
 public abstract class CommandParser {
 
-    private final RelayServer mServer;
+    final RelayServer mServer;
 
-    private final ServerEventBus mServerEventBus;
+    final RelayUserChannelInterface mUserChannelInterface;
+
+    final ServerEventBus mServerEventBus;
 
     CommandParser(final RelayServer server) {
         mServer = server;
+        mUserChannelInterface = server.getUserChannelInterface();
         mServerEventBus = server.getServerEventBus();
-
     }
 
     public static Map<String, CommandParser> getParserMap(final RelayServer server) {
@@ -44,16 +46,4 @@ public abstract class CommandParser {
     }
 
     public abstract void onParseCommand(final List<String> parsedArray, final String rawSource);
-
-    Server getServer() {
-        return mServer;
-    }
-
-    RelayUserChannelInterface getUserChannelInterface() {
-        return mServer.getUserChannelInterface();
-    }
-
-    ServerEventBus getServerEventBus() {
-        return mServerEventBus;
-    }
 }

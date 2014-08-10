@@ -17,10 +17,10 @@ class InviteParser extends CommandParser {
     public void onParseCommand(List<String> parsedArray, String rawSource) {
         final String invitingNick = IRCUtils.getNickFromRaw(rawSource);
         final String invitedNick = parsedArray.get(2);
-        if (getServer().getUser().isNickEqual(invitedNick)) {
+        if (mServer.getUser().isNickEqual(invitedNick)) {
             final String channelName = parsedArray.get(3);
             final ServerEvent event = new InviteEvent(channelName, invitingNick);
-            getServerEventBus().postAndStoreEvent(event);
+            mServerEventBus.postAndStoreEvent(event);
         } else {
             // This is impossible - breaks RFC if it occurs - just ignore it
         }

@@ -5,8 +5,11 @@ import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import com.fusionx.relay.util.LogUtils;
 
 import java.util.List;
+
+import java8.util.Optional;
 
 public abstract class RemoveUserParser extends CommandParser {
 
@@ -17,30 +20,37 @@ public abstract class RemoveUserParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String channelName = parsedArray.get(2);
-        final RelayChannel channel = getUserChannelInterface().getChannel(channelName);
-        final RelayChannelUser removedUser = getRemovedUser(parsedArray, rawSource);
+        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
-        if (getServer().getUser().isNickEqual(removedUser.getNick().getNickAsString())) {
-            onRemoved(parsedArray, rawSource, channel);
-        } else {
-            onUserRemoved(parsedArray, rawSource, channel, removedUser);
-        }
+        LogUtils.logOptionalBug(optChannel);
+        optChannel.ifPresent(channel -> {
+            final Optional<RelayChannelUser> optUser = getRemovedUser(parsedArray, rawSource);
+            LogUtils.logOptionalBug(optUser);
+
+            optUser.ifPresent(user -> {
+                if (mServer.getUser().isNickEqual(user.getNick().getNickAsString())) {
+                    onRemoved(parsedArray, rawSource, channel);
+                } else {
+                    onUserRemoved(parsedArray, rawSource, channel, user);
+                }
+            });
+        });
     }
 
-    abstract RelayChannelUser getRemovedUser(final List<String> parsedArray,
+    abstract Optional<RelayChannelUser> getRemovedUser(final List<String> parsedArray,
             final String rawSource);
 
-    abstract ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
-            final RelayChannel channel, final ChannelUser user);
+    abstract ChannelWorldUserEvent getEvent(final List<String> parsedArray,
+            final String rawSource, final RelayChannel channel, final ChannelUser user);
 
     abstract void onRemoved(final List<String> parsedArray, final String rawSource,
             final RelayChannel channel);
 
     private void onUserRemoved(final List<String> parsedArray, final String rawSource,
             final RelayChannel channel, final RelayChannelUser removedUser) {
-        getUserChannelInterface().decoupleUserAndChannel(removedUser, channel);
+        mUserChannelInterface.decoupleUserAndChannel(removedUser, channel);
 
         final ChannelWorldUserEvent event = getEvent(parsedArray, rawSource, channel, removedUser);
-        getServerEventBus().postAndStoreEvent(event, channel);
+        mServerEventBus.postAndStoreEvent(event, channel);
     }
 }

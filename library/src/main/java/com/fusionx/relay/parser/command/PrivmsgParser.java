@@ -1,7 +1,7 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayQueryUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelEvent;
@@ -10,9 +10,12 @@ import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.LogUtils;
 import com.fusionx.relay.util.Utils;
 
 import java.util.List;
+
+import java8.util.Optional;
 
 public class PrivmsgParser extends CommandParser {
 
@@ -33,7 +36,7 @@ public class PrivmsgParser extends CommandParser {
             mCtcpParser.onParseCommand(parsedArray, rawSource);
         } else {
             final String nick = IRCUtils.getNickFromRaw(rawSource);
-            if (getUserChannelInterface().shouldIgnoreUser(nick)) {
+            if (mUserChannelInterface.shouldIgnoreUser(nick)) {
                 return;
             }
             final String recipient = parsedArray.get(2);
@@ -46,30 +49,36 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final RelayQueryUser user = getUserChannelInterface().getQueryUser(nick);
-        if (user == null) {
-            getUserChannelInterface().addQueryUser(nick, message, false, false);
-            getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
+        final Optional<RelayQueryUser> optUser = mUserChannelInterface.getQueryUser(nick);
+        if (optUser.isPresent()) {
+            final RelayQueryUser user = optUser.get();
+            mServerEventBus.postAndStoreEvent(new QueryMessageWorldEvent(user, message), user);
         } else {
-            getServerEventBus().postAndStoreEvent(new QueryMessageWorldEvent(user, message), user);
+            final RelayQueryUser user = mUserChannelInterface
+                    .addQueryUser(nick, message, false, false);
+            mServerEventBus.postAndStoreEvent(new NewPrivateMessageEvent(user));
         }
     }
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
             final String rawMessage) {
-        final ChannelUser sendingUser = getUserChannelInterface().getUser(sendingNick);
-        final RelayChannel channel = getUserChannelInterface().getChannel(channelName);
-        // TODO - actually parse the colours
-        final String message = Utils.stripColorsFromMessage(rawMessage);
-        final boolean mention = MentionParser.onMentionableCommand(message,
-                getServer().getUser().getNick().getNickAsString());
+        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
-        final ChannelEvent event;
-        if (sendingUser == null) {
-            event = new ChannelWorldMessageEvent(channel, message, sendingNick, mention);
-        } else {
-            event = new ChannelWorldMessageEvent(channel, message, sendingUser, mention);
-        }
-        getServerEventBus().postAndStoreEvent(event, channel);
+        LogUtils.logOptionalBug(optChannel);
+        optChannel.ifPresent(channel -> {
+            // TODO - actually parse the colours
+            final String message = Utils.stripColorsFromMessage(rawMessage);
+            final boolean mention = MentionParser.onMentionableCommand(message,
+                    mServer.getUser().getNick().getNickAsString());
+
+            final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
+            final ChannelEvent event;
+            if (optUser.isPresent()) {
+                event = new ChannelWorldMessageEvent(channel, message, optUser.get(), mention);
+            } else {
+                event = new ChannelWorldMessageEvent(channel, message, sendingNick, mention);
+            }
+            mServerEventBus.postAndStoreEvent(event, channel);
+        });
     }
 }

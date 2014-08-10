@@ -11,6 +11,9 @@ import com.fusionx.relay.util.IRCUtils;
 import java.util.Collection;
 import java.util.List;
 
+import java8.util.Optional;
+import java8.util.stream.StreamSupport;
+
 public class QuitParser extends CommandParser {
 
     private boolean mIsUserQuit;
@@ -22,11 +25,10 @@ public class QuitParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        final RelayChannelUser user = getUserChannelInterface().getUser(nick);
-        if (getServer().getUser().isNickEqual(nick)) {
+        if (mServer.getUser().isNickEqual(nick)) {
             onQuit();
         } else {
-            onUserQuit(parsedArray, user);
+            onUserQuit(parsedArray, nick);
         }
     }
 
@@ -34,23 +36,25 @@ public class QuitParser extends CommandParser {
         return mIsUserQuit;
     }
 
-    private void onUserQuit(final List<String> parsedArray, final RelayChannelUser user) {
-        final Collection<RelayChannel> list = getUserChannelInterface().removeUser(user);
-        final String reason = parsedArray.size() == 3 ? parsedArray.get(2).replace("\"", "") : "";
-        for (final RelayChannel channel : list) {
-            getUserChannelInterface().removeUserFromChannel(channel, user);
+    private void onUserQuit(final List<String> parsed, final String userNick) {
+        final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(userNick);
+        optUser.ifPresent(user -> {
+            final Collection<RelayChannel> channels = mUserChannelInterface.removeUser(user);
+            final String reason = parsed.size() == 3 ? parsed.get(2).replace("\"", "") : "";
+            StreamSupport.stream(channels).forEach(channel -> {
+                mUserChannelInterface.removeUserFromChannel(channel, user);
 
-            final ChannelWorldQuitEvent event = new ChannelWorldQuitEvent(channel, user, reason);
-            getServerEventBus().postAndStoreEvent(event, channel);
-        }
+                final ChannelWorldQuitEvent event = new ChannelWorldQuitEvent(channel, user,
+                        reason);
+                mServerEventBus.postAndStoreEvent(event, channel);
+            });
+        });
 
-        final RelayQueryUser pmUser = getUserChannelInterface().getQueryUser(user.getNick()
-                .getNickAsString());
-        if (pmUser == null) {
-            return;
-        }
-        final QueryQuitWorldEvent event = new QueryQuitWorldEvent(pmUser);
-        getServerEventBus().postAndStoreEvent(event, pmUser);
+        final Optional<RelayQueryUser> optQuery = mUserChannelInterface.getQueryUser(userNick);
+        optQuery.ifPresent(queryUser -> {
+            final QueryQuitWorldEvent event = new QueryQuitWorldEvent(queryUser);
+            mServerEventBus.postAndStoreEvent(event, queryUser);
+        });
     }
 
     private void onQuit() {

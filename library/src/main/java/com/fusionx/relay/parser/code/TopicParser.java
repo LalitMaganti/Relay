@@ -5,8 +5,11 @@ import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.constants.ServerReplyCodes;
 import com.fusionx.relay.event.channel.ChannelInitialTopicEvent;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.LogUtils;
 
 import java.util.List;
+
+import java8.util.Optional;
 
 class TopicParser extends CodeParser {
 
@@ -32,12 +35,15 @@ class TopicParser extends CodeParser {
     private void onTopicInfo(final List<String> parsedArray) {
         final String channelName = parsedArray.get(0);
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
-        final RelayChannel channel = mUserChannelInterface.getChannel(channelName);
+        final Optional<RelayChannel> optional = mUserChannelInterface.getChannel(channelName);
 
-        final ChannelInitialTopicEvent topicEvent = new ChannelInitialTopicEvent(channel, nick,
-                tempTopic);
-        mServerEventBus.postAndStoreEvent(topicEvent, channel);
+        LogUtils.logOptionalBug(optional);
+        optional.ifPresent(channel -> {
+            final ChannelInitialTopicEvent topicEvent = new ChannelInitialTopicEvent(channel, nick,
+                    tempTopic);
+            mServerEventBus.postAndStoreEvent(topicEvent, channel);
 
-        tempTopic = null;
+            tempTopic = null;
+        });
     }
 }

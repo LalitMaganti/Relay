@@ -2,6 +2,8 @@ package com.fusionx.relay;
 
 import java.util.Collection;
 
+import java8.util.Optional;
+
 public interface UserChannelInterface {
 
     /**
@@ -10,7 +12,7 @@ public interface UserChannelInterface {
      * @param name the name of channel to retrieve
      * @return the channel matching the specified name or null if none match
      */
-    public Channel getChannel(final String name);
+    public Optional<? extends Channel> getChannel(final String name);
 
     /**
      * Get the user by nick from the global list of users
@@ -18,9 +20,9 @@ public interface UserChannelInterface {
      * @param nick the nick of user to retrieve
      * @return the user matching the specified nick or null if none match
      */
-    public ChannelUser getUser(final String nick);
+    public Optional<? extends ChannelUser> getUser(final String nick);
 
     public Collection<? extends QueryUser> getQueryUsers();
 
-    public QueryUser getQueryUser(final String nick);
+    public Optional<? extends QueryUser> getQueryUser(final String nick);
 }

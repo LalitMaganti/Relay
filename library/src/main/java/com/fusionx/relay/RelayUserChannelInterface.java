@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
-import java8.util.Comparators;
+import java8.util.Optional;
 import java8.util.stream.StreamSupport;
 
 public class RelayUserChannelInterface implements UserChannelInterface {
@@ -149,12 +149,12 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      * @return the channel matching the specified name or null if none match
      */
     @Override
-    public RelayChannel getChannel(final String name) {
+    public Optional<RelayChannel> getChannel(final String name) {
         // Channel names have to unique disregarding case - not having ignore-case here leads
         // to null channels when the channel does actually exist
         return StreamSupport.stream(mServer.getUser().getChannels())
                 .filter(c -> name.equalsIgnoreCase(c.getName()))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     /**
@@ -172,18 +172,17 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      * {@inheritDoc}
      */
     @Override
-    public RelayChannelUser getUser(final String nick) {
+    public Optional<RelayChannelUser> getUser(final String nick) {
         return StreamSupport.stream(mServer.getUsers())
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     /**
      * {@inheritDoc}
      */
     public RelayChannelUser getNonNullUser(final String nick) {
-        final RelayChannelUser user = getUser(nick);
-        return user != null ? user : new RelayChannelUser(nick);
+        return getUser(nick).orElse(new RelayChannelUser(nick));
     }
 
     public RelayChannel getNewChannel(final String channelName) {
@@ -196,16 +195,17 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     }
 
     @Override
-    public RelayQueryUser getQueryUser(final String nick) {
+    public Optional<RelayQueryUser> getQueryUser(final String nick) {
         return StreamSupport.stream(mQueryUsers)
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
-    public void addQueryUser(final String nick, final String message, final boolean action,
-            final boolean userSent) {
+    public RelayQueryUser addQueryUser(final String nick, final String message,
+            final boolean action, final boolean userSent) {
         final RelayQueryUser user = new RelayQueryUser(nick, mServer, message, action, userSent);
         mQueryUsers.add(user);
+        return user;
     }
 
     public void removeQueryUser(final RelayQueryUser user) {
@@ -219,8 +219,9 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
     // Getters and setters
     void updateIgnoreList(final Collection<String> userIgnoreList) {
-        if (userIgnoreList != null) {
-            mUserIgnoreList = new THashSet<>(userIgnoreList);
+        if (userIgnoreList == null) {
+            return;
         }
+        mUserIgnoreList = new THashSet<>(userIgnoreList);
     }
 }
