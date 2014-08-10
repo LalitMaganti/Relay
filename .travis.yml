@@ -8,9 +8,4 @@ language: android
 android:
   components:
     - build-tools-20.0.0
-    - add-on
-    - extra
-  licenses:
-    - 'android-sdk-license-.+'
-    - 'google-gdk-license-.+'
 script: ./gradlew test
