@@ -2,13 +2,14 @@ package com.fusionx.relay.parser.command;
 
 import com.google.common.collect.Iterables;
 
-import com.fusionx.relay.RelayChannelTest;
 import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelTest;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.RelayServerTest;
 import com.fusionx.relay.TestMisc;
 import com.fusionx.relay.event.channel.ChannelWorldJoinEvent;
+import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.misc.InterfaceHolders;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -18,6 +19,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
+
+import java8.util.Optional;
 
 import static com.fusionx.relay.ServerConfigurationTest.getFreenodeConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,41 +46,37 @@ public class JoinParserTest {
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
         mJoinParser.onParseCommand(list, "otheruser!otheruser@test");
 
-        final RelayChannel channel = mServer.getUserChannelInterface().getChannel("#relay");
-        final RelayChannelUser user = mServer.getUserChannelInterface().getUser("otheruser");
+        final Optional<RelayChannel> optChannel = mServer.getUserChannelInterface()
+                .getChannel("#relay");
+        final Optional<RelayChannelUser> optUser = mServer.getUserChannelInterface()
+                .getUser("otheruser");
 
         // Check that the channel exists
-        assertThat(channel)
-                .isNotNull();
+        assertThat(optChannel.isPresent()).isTrue();
 
         // Check that the user exists
-        assertThat(user)
-                .isNotNull();
+        assertThat(optUser.isPresent()).isTrue();
+
+        final RelayChannel channel = optChannel.get();
+        final RelayChannelUser user = optUser.get();
 
         // Check that the user is the the global list
         assertThat(mServer.getUsers())
-                .isNotNull()
-                .containsOnly(mServer.getUser(), user);
+                .contains(user);
 
         // Check that the channel has been added to the user
         assertThat(user.getChannels())
-                .isNotNull()
-                .containsOnly(channel);
+                .contains(channel);
 
         // Check that the user has been added to the channel
         assertThat(channel.getUsers())
-                .isNotNull()
-                .containsOnly(mServer.getUser(), user);
+                .contains(mServer.getUser(), user);
 
         // Check that the channel has the correct message in buffer
-        assertThat(channel.getBuffer())
-                .isNotNull()
-                .hasSize(1);
         assertThat(Iterables.getLast(channel.getBuffer()))
-                .isNotNull()
-                .isInstanceOf(ChannelWorldJoinEvent.class);
-
-        // TODO - check events
+                .isInstanceOf(ChannelWorldJoinEvent.class)
+                .isEqualToIgnoringGivenFields(new ChannelWorldJoinEvent(channel, user),
+                        "timestamp");
     }
 
     // This method tests that when our user joins, everything is set up correctly
@@ -91,41 +90,41 @@ public class JoinParserTest {
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);
         mJoinParser.onParseCommand(list, "holoirctester!holoirctester@test");
 
-        final RelayChannel channel = mServer.getUserChannelInterface().getChannel("#relay");
-        final RelayChannelUser user = mServer.getUserChannelInterface().getUser(nick);
+        final Optional<RelayChannel> optChannel = mServer.getUserChannelInterface()
+                .getChannel("#relay");
+        final Optional<RelayChannelUser> optUser = mServer.getUserChannelInterface().getUser(nick);
 
         // Check that the channel exists
-        assertThat(channel)
-                .isNotNull();
+        assertThat(optChannel.isPresent()).isTrue();
 
         // Check that the user exists
-        assertThat(user)
-                .isNotNull();
+        assertThat(optUser.isPresent()).isTrue();
+
+        final RelayChannel channel = optChannel.get();
+        final RelayChannelUser user = optUser.get();
 
         // Check that the user is the the global list
         assertThat(mServer.getUsers())
-                .isNotNull()
-                .containsOnly(user);
+                .contains(user);
 
         // Check that the channel has been added to the user
         assertThat(user.getChannels())
-                .isNotNull()
-                .containsOnly(channel);
+                .contains(channel);
 
         // Check that the user has been added to the channel
         assertThat(channel.getUsers())
-                .isNotNull()
-                .containsOnly(user);
+                .contains(user);
 
         // Check that the channel has the correct message in buffer
-        assertThat(channel.getBuffer())
-                .isNotNull()
-                .hasSize(1);
         assertThat(Iterables.getLast(channel.getBuffer()))
-                .isNotNull()
-                .isInstanceOf(ChannelWorldJoinEvent.class);
+                .isInstanceOf(ChannelWorldJoinEvent.class)
+                .isEqualToIgnoringGivenFields(new ChannelWorldJoinEvent(channel, user),
+                        "timestamp");
 
-        // TODO - check events
+        // Check that the server has the correct message in buffer
+        assertThat(Iterables.getLast(mServer.getBuffer()))
+                .isInstanceOf(JoinEvent.class)
+                .isEqualToIgnoringGivenFields(new JoinEvent(channel), "timestamp");
     }
 
     // TODO - simulate disconnection/reconnection and test what happens then

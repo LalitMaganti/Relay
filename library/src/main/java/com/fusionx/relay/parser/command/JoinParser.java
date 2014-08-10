@@ -27,7 +27,7 @@ class JoinParser extends CommandParser {
         // Retrieve the user and channel
         final RelayChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
-        RelayChannel channel = optChannel.get();
+        RelayChannel channel = optChannel.orElse(null);
 
         // Store whether the user is the app user
         final boolean appUser = mServer.getUser().isNickEqual(user);
