@@ -6,5 +6,5 @@ public interface Conversation {
 
     public Server getServer();
 
-    public boolean isConversationValid();
+    public boolean isValid();
 }

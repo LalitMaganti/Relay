@@ -4,9 +4,9 @@ import com.fusionx.relay.Channel;
 
 public final class JoinEvent extends ServerEvent {
 
-    public final String channelName;
+    public final Channel channel;
 
     public JoinEvent(final Channel channel) {
-        channelName = channel.getName();
+        this.channel = channel;
     }
 }

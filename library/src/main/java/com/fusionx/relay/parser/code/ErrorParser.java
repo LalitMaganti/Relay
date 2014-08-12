@@ -7,6 +7,8 @@ import com.fusionx.relay.event.server.GenericServerEvent;
 
 import java.util.List;
 
+import java8.util.Optional;
+
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NOSUCHNICK;
 
@@ -41,13 +43,14 @@ class ErrorParser extends CodeParser {
     private void onNoSuchNickError(final List<String> parsedArray) {
         final String nick = parsedArray.get(0);
         final String message = parsedArray.get(1);
-        final RelayQueryUser user = mUserChannelInterface.getQueryUser(nick);
+        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
 
         // If the user is null then this no such nick event happened for another reason
-        if (user == null) {
-            mServerEventBus.postAndStoreEvent(new GenericServerEvent(message));
-        } else {
+        if (optional.isPresent()) {
+            final RelayQueryUser user = optional.get();
             mServerEventBus.postAndStoreEvent(new QueryNoSuchNickEvent(user, message), user);
+        } else {
+            mServerEventBus.postAndStoreEvent(new GenericServerEvent(message));
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.fusionx.relay.parser.command;
 
+import com.fusionx.relay.Channel;
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayQueryUser;
 import com.fusionx.relay.RelayServer;
@@ -10,6 +11,8 @@ import com.fusionx.relay.event.server.NoticeEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
+
+import java8.util.Optional;
 
 class NoticeParser extends CommandParser {
 
@@ -35,7 +38,7 @@ class NoticeParser extends CommandParser {
 
             if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelNotice(recipient, notice, sendingNick);
-            } else if (recipient.equals(getServer().getUser().getNick().getNickAsString())) {
+            } else if (recipient.equals(mServer.getUser().getNick().getNickAsString())) {
                 onParseUserNotice(sendingNick, notice);
             }
         }
@@ -43,23 +46,26 @@ class NoticeParser extends CommandParser {
 
     private void onParseChannelNotice(final String channelName, final String sendingNick,
             final String notice) {
-        final RelayChannel channel = getUserChannelInterface().getChannel(channelName);
-        if (channel == null) {
+        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
+        if (optChannel.isPresent()) {
+            final RelayChannel channel = optChannel.get();
+
+            final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
+            mServerEventBus.postAndStoreEvent(event, channel);
+        } else {
             // If we're not in this channel then send the notice to the server instead
             // TODO - maybe figure out why this is happening
-            getServerEventBus().postAndStoreEvent(new NoticeEvent(notice, sendingNick));
-            return;
+            mServerEventBus.postAndStoreEvent(new NoticeEvent(notice, sendingNick));
         }
-        final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
-        getServerEventBus().postAndStoreEvent(event, channel);
     }
 
     private void onParseUserNotice(final String sendingNick, final String notice) {
-        final RelayQueryUser user = getUserChannelInterface().getQueryUser(sendingNick);
-        if (user == null) {
-            getServerEventBus().postAndStoreEvent(new NoticeEvent(notice, sendingNick));
+        final Optional<RelayQueryUser> optUser = mUserChannelInterface.getQueryUser(sendingNick);
+        if (optUser.isPresent()) {
+            final RelayQueryUser user = optUser.get();
+            mServerEventBus.postAndStoreEvent(new QueryMessageWorldEvent(user, notice), user);
         } else {
-            getServerEventBus().postAndStoreEvent(new QueryMessageWorldEvent(user, notice), user);
+            mServerEventBus.postAndStoreEvent(new NoticeEvent(notice, sendingNick));
         }
     }
 }

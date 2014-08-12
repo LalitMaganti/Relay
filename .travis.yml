@@ -5,14 +5,10 @@ branches:
   only:
     - develop
 language: android
+android:
+  components:
+    - build-tools-20.0.0
 before_install:
-  # workaround for travis-ci/travis-ci#2279
-  - 'sudo mv /usr/local/android-sdk/tools/android-* /usr/local/bin'
-  # Accept all licenses (workaround for travis-ci/travis-ci#2466)
-  # Upgrade 'platform-tools' before 'tools' (workaround for travis-ci/travis-ci#2470)
-  # Run dinstinct 'android update sdk' commands
-  - "android-update-sdk --components='platform-tools,tools' --accept-licenses='.+'"
-  - "android-update-sdk --components='build-tools-20.0.0' --accept-licenses='.+'"
-  - "android-update-sdk --components='android-19' --accept-licenses='.+'"
-  - "android-update-sdk --components='extra-android-m2repository,extra-google-m2repository' --accept-licenses='.+'"
+  - export JAVA_HOME=/usr/lib/jvm/java-7-oracle
+  - export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
 script: ./gradlew test

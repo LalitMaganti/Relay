@@ -1,7 +1,7 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayQueryUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.RelayUserChannelInterface;
@@ -20,8 +20,11 @@ import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.VersionEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.LogUtils;
 
 import java.util.List;
+
+import java8.util.Optional;
 
 class CtcpParser {
 
@@ -29,8 +32,11 @@ class CtcpParser {
 
     private final ServerEventBus mEventBus;
 
+    private final RelayUserChannelInterface mUserChannelInterface;
+
     public CtcpParser(RelayServer server) {
         mServer = server;
+        mUserChannelInterface = server.getUserChannelInterface();
         mEventBus = server.getServerEventBus();
     }
 
@@ -66,7 +72,7 @@ class CtcpParser {
 
     private void onAction(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        if (getUserChannelInterface().shouldIgnoreUser(nick)) {
+        if (mUserChannelInterface.shouldIgnoreUser(nick)) {
             return;
         }
         final String action = parsedArray.get(3).replace("ACTION ", "");
@@ -79,28 +85,35 @@ class CtcpParser {
     }
 
     private void onParseUserAction(final String nick, final String action) {
-        final RelayQueryUser user = getUserChannelInterface().getQueryUser(nick);
-        if (user == null) {
-            getUserChannelInterface().addQueryUser(nick, action, true, false);
-            getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
-        } else {
+        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
+        if (optional.isPresent()) {
+            final RelayQueryUser user = optional.get();
             getServerEventBus().postAndStoreEvent(new QueryActionWorldEvent(user, action), user);
+        } else {
+            final RelayQueryUser user = mUserChannelInterface
+                    .addQueryUser(nick, action, true, false);
+            getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(user));
         }
     }
 
     private void onParseChannelAction(final String channelName, final String sendingNick,
             final String action) {
-        final RelayChannel channel = getUserChannelInterface().getChannel(channelName);
-        final ChannelUser sendingUser = getUserChannelInterface().getUser(sendingNick);
-        final boolean mention = MentionParser.onMentionableCommand(action,
-                getServer().getUser().getNick().getNickAsString());
-        final ChannelEvent event;
-        if (sendingUser == null) {
-            event = new ChannelWorldMessageEvent(channel, action, sendingNick, mention);
-        } else {
-            event = new ChannelWorldActionEvent(channel, action, sendingUser, mention);
-        }
-        getServerEventBus().postAndStoreEvent(event, channel);
+        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
+
+        LogUtils.logOptionalBug(optChannel);
+        optChannel.ifPresent(channel -> {
+            final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
+            final boolean mention = MentionParser.onMentionableCommand(action,
+                    getServer().getUser().getNick().getNickAsString());
+
+            final ChannelEvent event;
+            if (optUser.isPresent()) {
+                event = new ChannelWorldActionEvent(channel, action, optUser.get(), mention);
+            } else {
+                event = new ChannelWorldMessageEvent(channel, action, sendingNick, mention);
+            }
+            getServerEventBus().postAndStoreEvent(event, channel);
+        });
     }
     // Commands End Here
 
@@ -133,9 +146,5 @@ class CtcpParser {
 
     private Server getServer() {
         return mServer;
-    }
-
-    private RelayUserChannelInterface getUserChannelInterface() {
-        return mServer.getUserChannelInterface();
     }
 }

@@ -13,6 +13,8 @@ import com.fusionx.relay.util.IRCUtils;
 import java.util.Collection;
 import java.util.List;
 
+import java8.util.Optional;
+
 public class PartParser extends RemoveUserParser {
 
     public PartParser(final RelayServer server) {
@@ -20,9 +22,10 @@ public class PartParser extends RemoveUserParser {
     }
 
     @Override
-    public RelayChannelUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
+    public Optional<RelayChannelUser> getRemovedUser(final List<String> parsedArray,
+            final String rawSource) {
         final String userNick = IRCUtils.getNickFromRaw(rawSource);
-        return getUserChannelInterface().getUser(userNick);
+        return mUserChannelInterface.getUser(userNick);
     }
 
     @Override
@@ -41,14 +44,14 @@ public class PartParser extends RemoveUserParser {
             return;
         }
         final ChannelPartEvent partEvent = new ChannelPartEvent(channel);
-        getServerEventBus().postAndStoreEvent(partEvent, channel);
+        mServerEventBus.postAndStoreEvent(partEvent, channel);
 
-        final Collection<RelayChannelUser> users = getUserChannelInterface().removeChannel(channel);
+        final Collection<RelayChannelUser> users = mUserChannelInterface.removeChannel(channel);
         for (final RelayChannelUser user : users) {
-            getUserChannelInterface().removeChannelFromUser(channel, user);
+            mUserChannelInterface.removeChannelFromUser(channel, user);
         }
 
         final PartEvent event = new PartEvent(channel);
-        getServerEventBus().postAndStoreEvent(event);
+        mServerEventBus.postAndStoreEvent(event);
     }
 }

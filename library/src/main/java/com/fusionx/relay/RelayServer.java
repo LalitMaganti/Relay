@@ -32,7 +32,7 @@ public class RelayServer implements Server {
 
     private boolean mValid;
 
-    private AppUser mUser;
+    private RelayMainUser mUser;
 
     public RelayServer(final ServerConfiguration configuration, final ServerConnection connection,
             final Collection<String> ignoreList) {
@@ -46,7 +46,7 @@ public class RelayServer implements Server {
         mServerCallBus = new ServerCallBus(this, connection.getServerCallHandler());
 
         // Set the nick name to the first choice nick
-        mUser = new AppUser(configuration.getNickStorage().getFirstChoiceNick());
+        mUser = new RelayMainUser(configuration.getNickStorage().getFirstChoiceNick());
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);
@@ -124,7 +124,7 @@ public class RelayServer implements Server {
     }
 
     @Override
-    public boolean isConversationValid() {
+    public boolean isValid() {
         return mValid;
     }
 
@@ -140,7 +140,7 @@ public class RelayServer implements Server {
     }
 
     @Override
-    public AppUser getUser() {
+    public RelayMainUser getUser() {
         return mUser;
     }
 

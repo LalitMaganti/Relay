@@ -93,7 +93,11 @@ public class RelayChannelUser implements ChannelUser {
         mNick = new RelayNick(nick);
     }
 
-    public boolean isNickEqual(String oldRawNick) {
+    public boolean isNickEqual(final String oldRawNick) {
         return mNick.getNickAsString().equals(oldRawNick);
+    }
+
+    public boolean isNickEqual(final RelayChannelUser user) {
+        return mNick.getNickAsString().equals(user.getNick().getNickAsString());
     }
 }

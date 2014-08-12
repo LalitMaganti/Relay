@@ -4,6 +4,7 @@ import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayQueryUser;
 import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.RelayUserChannelInterface;
 import com.fusionx.relay.call.channel.ChannelActionCall;
 import com.fusionx.relay.call.channel.ChannelJoinCall;
 import com.fusionx.relay.call.channel.ChannelKickCall;
@@ -21,6 +22,7 @@ import com.fusionx.relay.event.channel.ChannelActionEvent;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelMessageEvent;
 import com.fusionx.relay.event.query.QueryActionSelfEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.query.QueryMessageSelfEvent;
 import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
@@ -37,6 +39,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
+import java8.util.Optional;
+import java8.util.function.Function;
 
 public class ServerCallBus {
 
@@ -48,10 +52,15 @@ public class ServerCallBus {
 
     private final Bus mBus;
 
+    private final RelayUserChannelInterface mUserChannelInterface;
+
     public ServerCallBus(final RelayServer server, final Handler callHandler) {
-        mBus = new Bus(ThreadEnforcer.ANY);
         mServer = server;
+        mUserChannelInterface = server.getUserChannelInterface();
+
         mCallHandler = callHandler;
+
+        mBus = new Bus(ThreadEnforcer.ANY);
     }
 
     public void register(final RawWriter rawWriter) {
@@ -68,12 +77,7 @@ public class ServerCallBus {
     }
 
     public void post(final Object event) {
-        mCallHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mBus.post(event);
-            }
-        });
+        mCallHandler.post(() -> mBus.post(event));
     }
 
     public void sendMode(final String channelName, final String destination, final String mode) {
@@ -93,15 +97,8 @@ public class ServerCallBus {
             post(new PrivateMessageCall(nick, message));
         }
 
-        final RelayQueryUser user = getServer().getUserChannelInterface().getQueryUser(nick);
-        if (user == null) {
-            getServer().getUserChannelInterface().addQueryUser(nick, message, false,
-                    true);
-            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
-        } else if (Utils.isNotEmpty(message)) {
-            getServer().getServerEventBus().postAndStoreEvent(new QueryMessageSelfEvent(user,
-                    getServer().getUser(), message), user);
-        }
+        sendSelfEventToQueryUser(user -> new QueryMessageSelfEvent(user, mServer.getUser(),
+                message), nick, message);
     }
 
     public void sendActionToQueryUser(final String nick, final String action) {
@@ -109,17 +106,24 @@ public class ServerCallBus {
             post(new PrivateActionCall(nick, action));
         }
 
-        final RelayQueryUser user = getServer().getUserChannelInterface().getQueryUser(nick);
-        if (user == null) {
-            getServer().getUserChannelInterface().addQueryUser(nick, action, true,
-                    true);
-            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
-        } else {
-            getServer().getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(nick));
-            if (Utils.isNotEmpty(action)) {
-                getServer().getServerEventBus().postAndStoreEvent(new QueryActionSelfEvent(user,
-                        getServer().getUser(), action), user);
+        sendSelfEventToQueryUser(user -> new QueryActionSelfEvent(user, mServer.getUser(),
+                action), nick, action);
+    }
+
+    private void sendSelfEventToQueryUser(final Function<RelayQueryUser, QueryEvent> function,
+            final String nick, final String message) {
+        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
+        if (optional.isPresent()) {
+            final RelayQueryUser user = optional.get();
+            mServer.getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(user));
+
+            if (Utils.isNotEmpty(message)) {
+                mServer.getServerEventBus().postAndStoreEvent(function.apply(user), user);
             }
+        } else {
+            final RelayQueryUser user = mUserChannelInterface
+                    .addQueryUser(nick, message, true, true);
+            mServer.getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(user));
         }
     }
 
@@ -137,12 +141,13 @@ public class ServerCallBus {
             return;
         }
         final RelayQueryUser user = (RelayQueryUser) rawUser;
-        getServer().getUserChannelInterface().removeQueryUser(user);
+        mUserChannelInterface.removeQueryUser(user);
 
-        if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final ServerEvent event = new PrivateMessageClosedEvent(user);
-            getServer().getServerEventBus().postAndStoreEvent(event);
+        if (!InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
+            return;
         }
+        final ServerEvent event = new PrivateMessageClosedEvent(user);
+        mServer.getServerEventBus().postAndStoreEvent(event);
     }
 
     public void sendJoin(final String channelName) {
@@ -152,24 +157,29 @@ public class ServerCallBus {
     public void sendMessageToChannel(final String channelName, final String message) {
         post(new ChannelMessageCall(channelName, message));
 
-        if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final RelayChannel channel = getServer().getUserChannelInterface()
-                    .getChannel(channelName);
-            final ChannelEvent event = new ChannelMessageEvent(channel, message,
-                    getServer().getUser());
-            getServer().getServerEventBus().postAndStoreEvent(event, channel);
-        }
+        sendChannelSelfMessage(channel -> new ChannelMessageEvent(channel, message,
+                mServer.getUser()), channelName);
     }
 
     public void sendActionToChannel(final String channelName, final String action) {
         post(new ChannelActionCall(channelName, action));
 
-        if (InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
-            final RelayChannel channel = getServer().getUserChannelInterface()
-                    .getChannel(channelName);
-            final ChannelEvent event = new ChannelActionEvent(channel, action,
-                    getServer().getUser());
-            getServer().getServerEventBus().postAndStoreEvent(event, channel);
+        sendChannelSelfMessage(channel -> new ChannelActionEvent(channel, action,
+                mServer.getUser()), channelName);
+    }
+
+    private void sendChannelSelfMessage(final Function<RelayChannel, ChannelEvent> function,
+            final String channelName) {
+        if (!InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
+            return;
+        }
+
+        final Optional<RelayChannel> optional = mUserChannelInterface.getChannel(channelName);
+        if (optional.isPresent()) {
+            final RelayChannel channel = optional.get();
+            mServer.getServerEventBus().postAndStoreEvent(function.apply(channel), channel);
+        } else {
+            // TODO - some sort of logging should be done here
         }
     }
 
@@ -179,10 +189,6 @@ public class ServerCallBus {
 
     public void sendTopic(final String channelName, final String newTopic) {
         post(new ChannelTopicCall(channelName, newTopic));
-    }
-
-    private RelayServer getServer() {
-        return mServer;
     }
 
     public void postImmediately(final QuitCall quitCall) {

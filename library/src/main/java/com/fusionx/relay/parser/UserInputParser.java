@@ -6,6 +6,8 @@ import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 
+import java8.util.Optional;
+
 public class UserInputParser {
 
     public static void onParseChannelMessage(final Server server, final String channelName,
@@ -69,8 +71,6 @@ public class UserInputParser {
         final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
-        final QueryUser user = server.getUserChannelInterface()
-                .getQueryUser(userNick);
 
         if (command.startsWith("/")) {
             switch (command) {
@@ -80,8 +80,7 @@ public class UserInputParser {
                     return;
                 case "/close":
                 case "/c":
-                    if (arrayLength == 0) {
-                        server.getServerCallBus().sendCloseQuery(user);
+                    if (parseUserCloseCommand(server, arrayLength, userNick)) {
                         return;
                     }
                     break;
@@ -94,6 +93,21 @@ public class UserInputParser {
             return;
         }
         onUnknownEvent(server, message);
+    }
+
+    private static boolean parseUserCloseCommand(final Server server, final int arrayLength,
+            final String userNick) {
+        if (arrayLength != 0) {
+            return false;
+        }
+        final Optional<? extends QueryUser> optional = server.getUserChannelInterface()
+                .getQueryUser(userNick);
+        if (optional.isPresent()) {
+            server.getServerCallBus().sendCloseQuery(optional.get());
+        } else {
+            // This is probably a bug we need to fix
+        }
+        return true;
     }
 
     public static void onParseServerMessage(final Server server, final String message) {
