@@ -30,5 +30,10 @@ public class TestMisc {
         public boolean isMOTDShown() {
             return false;
         }
+
+        @Override
+        public void logMissingData(final Server server) {
+
+        }
     }
 }
