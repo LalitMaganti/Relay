@@ -39,6 +39,9 @@ public class RelayServer implements Server {
         mConfiguration = configuration;
         mServerConnection = connection;
 
+        mUserChannelInterface = new RelayUserChannelInterface(this);
+        mUserChannelInterface.updateIgnoreList(ignoreList);
+
         mValid = true;
 
         mBuffer = new ArrayList<>();
@@ -50,9 +53,6 @@ public class RelayServer implements Server {
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);
-
-        mUserChannelInterface = new RelayUserChannelInterface(this);
-        mUserChannelInterface.updateIgnoreList(ignoreList);
     }
 
     public void onServerEvent(final ServerEvent event) {
