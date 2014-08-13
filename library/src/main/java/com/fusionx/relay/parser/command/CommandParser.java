@@ -2,7 +2,6 @@ package com.fusionx.relay.parser.command;
 
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.RelayUserChannelInterface;
-import com.fusionx.relay.Server;
 import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.constants.ServerCommands;
 

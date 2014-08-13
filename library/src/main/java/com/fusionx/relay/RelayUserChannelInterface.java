@@ -135,7 +135,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      * @param user      the user to add to the channel
      * @param userLevel the level to give the user in the channel
      */
-    public void addUserToChannel(final RelayChannel channel, final RelayChannelUser user,
+    void addUserToChannel(final RelayChannel channel, final RelayChannelUser user,
             final UserLevel userLevel) {
         channel.addUser(user, userLevel);
     }
@@ -147,7 +147,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      * @param user      the user to add to the channel to
      * @param userLevel the level to give the user in the channel
      */
-    public void addChannelToUser(final RelayChannel channel, final RelayChannelUser user,
+    void addChannelToUser(final RelayChannel channel, final RelayChannelUser user,
             final UserLevel userLevel) {
         user.addChannel(channel, userLevel);
 

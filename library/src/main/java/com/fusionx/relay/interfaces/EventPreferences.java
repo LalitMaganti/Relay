@@ -8,7 +8,7 @@ public interface EventPreferences {
 
     public String getQuitReason();
 
-    public boolean isSelfEventBroadcast();
+    public boolean isSelfEventHidden();
 
     public boolean isMOTDShown();
 }

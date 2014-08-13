@@ -22,8 +22,8 @@ public class TestMisc {
         }
 
         @Override
-        public boolean isSelfEventBroadcast() {
-            return false;
+        public boolean isSelfEventHidden() {
+            return true;
         }
 
         @Override

@@ -30,9 +30,9 @@ public class RelayServer implements Server {
 
     private final RelayUserChannelInterface mUserChannelInterface;
 
-    private boolean mValid;
+    private final boolean mValid;
 
-    private RelayMainUser mUser;
+    private final RelayMainUser mUser;
 
     public RelayServer(final ServerConfiguration configuration, final ServerConnection connection,
             final Collection<String> ignoreList) {

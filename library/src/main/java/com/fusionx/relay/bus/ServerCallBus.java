@@ -144,7 +144,7 @@ public class ServerCallBus {
         final RelayQueryUser user = (RelayQueryUser) rawUser;
         mUserChannelInterface.removeQueryUser(user);
 
-        if (!InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
+        if (InterfaceHolders.getPreferences().isSelfEventHidden()) {
             return;
         }
         final ServerEvent event = new PrivateMessageClosedEvent(user);
@@ -171,7 +171,7 @@ public class ServerCallBus {
 
     private void sendChannelSelfMessage(final Function<RelayChannel, ChannelEvent> function,
             final String channelName) {
-        if (!InterfaceHolders.getPreferences().isSelfEventBroadcast()) {
+        if (InterfaceHolders.getPreferences().isSelfEventHidden()) {
             return;
         }
 

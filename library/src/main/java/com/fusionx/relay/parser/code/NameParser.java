@@ -1,7 +1,5 @@
 package com.fusionx.relay.parser.code;
 
-import com.google.common.collect.FluentIterable;
-
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayServer;
