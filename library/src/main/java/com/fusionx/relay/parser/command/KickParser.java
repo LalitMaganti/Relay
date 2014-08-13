@@ -1,5 +1,7 @@
 package com.fusionx.relay.parser.command;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
@@ -11,9 +13,6 @@ import com.fusionx.relay.util.IRCUtils;
 
 import java.util.Collection;
 import java.util.List;
-
-import java8.util.Optional;
-import java8.util.stream.StreamSupport;
 
 class KickParser extends RemoveUserParser {
 
@@ -61,8 +60,9 @@ class KickParser extends RemoveUserParser {
 
         // Remove the channel only after we've finished with it
         final Collection<RelayChannelUser> users = mUserChannelInterface.removeChannel(channel);
-        StreamSupport.stream(users).forEach(user ->
-                mUserChannelInterface.removeChannelFromUser(channel, user));
+        for (final RelayChannelUser user : users) {
+            mUserChannelInterface.removeChannelFromUser(channel, user);
+        }
 
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
         final KickEvent event = new KickEvent(channel, optKickUser, kickingNick, reason);

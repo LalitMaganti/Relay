@@ -1,5 +1,7 @@
 package com.fusionx.relay.parser.command;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayQueryUser;
@@ -11,11 +13,10 @@ import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.LogUtils;
+import com.fusionx.relay.util.Optionals;
 import com.fusionx.relay.util.Utils;
 
 import java.util.List;
-
-import java8.util.Optional;
 
 public class PrivmsgParser extends CommandParser {
 
@@ -65,7 +66,7 @@ public class PrivmsgParser extends CommandParser {
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel);
-        optChannel.ifPresent(channel -> {
+        Optionals.ifPresent(optChannel, channel -> {
             // TODO - actually parse the colours
             final String message = Utils.stripColorsFromMessage(rawMessage);
             final boolean mention = MentionParser.onMentionableCommand(message,

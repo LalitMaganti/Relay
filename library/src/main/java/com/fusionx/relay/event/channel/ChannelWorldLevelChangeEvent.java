@@ -1,11 +1,10 @@
 package com.fusionx.relay.event.channel;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Nick;
 import com.fusionx.relay.constants.UserLevel;
-
-import java8.util.Optional;
 
 public class ChannelWorldLevelChangeEvent extends ChannelWorldUserEvent {
 

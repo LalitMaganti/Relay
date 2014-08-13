@@ -1,11 +1,11 @@
 package com.fusionx.relay.event.channel;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Nick;
 import com.fusionx.relay.RelayChannelUser;
-
-import java8.util.Optional;
 
 public class ChannelWorldKickEvent extends ChannelWorldUserEvent {
 
@@ -20,7 +20,7 @@ public class ChannelWorldKickEvent extends ChannelWorldUserEvent {
             final String reason) {
         super(channel, kickedUser.getNick());
 
-        this.kickingNick = optKickingUser.map(ChannelUser::getNick).orElse(null);
+        this.kickingNick = optKickingUser.transform(ChannelUser::getNick).orNull();
         this.kickingNickString = kickingNickString;
         this.reason = reason;
     }

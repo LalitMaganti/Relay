@@ -1,20 +1,21 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.RelayMainUser;
+import com.google.common.base.Optional;
+
+import com.fusionx.relay.Nick;
+import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayMainUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import com.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import com.fusionx.relay.event.server.ServerNickChangeEvent;
-import com.fusionx.relay.Nick;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.LogUtils;
+import com.fusionx.relay.util.Optionals;
 
 import java.util.List;
-
-import java8.util.Optional;
-import java8.util.stream.StreamSupport;
 
 class NickParser extends CommandParser {
 
@@ -38,7 +39,7 @@ class NickParser extends CommandParser {
         // already been given and using - simply ignore this bad nick change - Miau is a BNC
         // which displays this behaviour
         LogUtils.logOptionalBug(optUser);
-        optUser.ifPresent(user -> {
+        Optionals.ifPresent(optUser, user -> {
             final String newNick = parsedArray.get(NEW_NICK_INDEX);
             final Nick oldNick = user.getNick();
             user.setNick(newNick);
@@ -48,12 +49,12 @@ class NickParser extends CommandParser {
                 mServerEventBus.postAndStoreEvent(event);
             }
 
-            StreamSupport.stream(user.getChannels()).forEach(channel -> {
-                final ChannelEvent event  = appUser
+            for (final RelayChannel channel : user.getChannels()) {
+                final ChannelEvent event = appUser
                         ? new ChannelNickChangeEvent(channel, oldNick, (RelayMainUser) user)
                         : new ChannelWorldNickChangeEvent(channel, oldNick, user);
                 mServerEventBus.postAndStoreEvent(event, channel);
-            });
+            }
         });
     }
 }

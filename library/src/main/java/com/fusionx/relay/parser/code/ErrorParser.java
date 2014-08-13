@@ -1,13 +1,13 @@
 package com.fusionx.relay.parser.code;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.RelayQueryUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.query.QueryNoSuchNickEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
 
 import java.util.List;
-
-import java8.util.Optional;
 
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NOSUCHNICK;

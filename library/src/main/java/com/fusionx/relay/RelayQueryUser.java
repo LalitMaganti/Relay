@@ -54,6 +54,11 @@ public class RelayQueryUser implements QueryUser {
         mBuffer.add(event);
     }
 
+    public void postAndStoreEvent(final QueryEvent queryEvent) {
+        onUserEvent(queryEvent);
+        mServer.getServerEventBus().post(queryEvent);
+    }
+
     public void onUserEvent(final QueryEvent event) {
         mBuffer.add(event);
     }

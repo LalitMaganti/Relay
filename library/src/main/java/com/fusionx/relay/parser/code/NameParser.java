@@ -1,5 +1,7 @@
 package com.fusionx.relay.parser.code;
 
+import com.google.common.collect.FluentIterable;
+
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayServer;
@@ -8,8 +10,6 @@ import com.fusionx.relay.event.channel.ChannelNameEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
-
-import java8.util.stream.StreamSupport;
 
 import static com.fusionx.relay.constants.ServerReplyCodes.RPL_NAMREPLY;
 
@@ -37,12 +37,12 @@ class NameParser extends CodeParser {
         }
 
         final List<String> listOfUsers = IRCUtils.splitRawLine(parsedArray.get(2), false);
-        StreamSupport.stream(listOfUsers).forEach(rawNick -> {
+        for (final String rawNick : listOfUsers) {
             final UserLevel level = UserLevel.getLevelFromPrefix(rawNick.charAt(0));
             final String nick = level == UserLevel.NONE ? rawNick : rawNick.substring(1);
             final RelayChannelUser user = mUserChannelInterface.getNonNullUser(nick);
             mUserChannelInterface.coupleUserAndChannel(user, mChannel, level);
-        });
+        }
     }
 
     private void onParseNameFinished() {

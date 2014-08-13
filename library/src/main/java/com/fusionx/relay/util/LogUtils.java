@@ -1,8 +1,8 @@
 package com.fusionx.relay.util;
 
-import android.util.Log;
+import com.google.common.base.Optional;
 
-import java8.util.Optional;
+import android.util.Log;
 
 public class LogUtils {
 

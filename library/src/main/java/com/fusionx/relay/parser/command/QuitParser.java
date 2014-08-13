@@ -1,5 +1,7 @@
 package com.fusionx.relay.parser.command;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayQueryUser;
@@ -7,12 +9,10 @@ import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import com.fusionx.relay.event.query.QueryQuitWorldEvent;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.Optionals;
 
 import java.util.Collection;
 import java.util.List;
-
-import java8.util.Optional;
-import java8.util.stream.StreamSupport;
 
 public class QuitParser extends CommandParser {
 
@@ -38,20 +38,20 @@ public class QuitParser extends CommandParser {
 
     private void onUserQuit(final List<String> parsed, final String userNick) {
         final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(userNick);
-        optUser.ifPresent(user -> {
+        Optionals.ifPresent(optUser, user -> {
             final Collection<RelayChannel> channels = mUserChannelInterface.removeUser(user);
             final String reason = parsed.size() == 3 ? parsed.get(2).replace("\"", "") : "";
-            StreamSupport.stream(channels).forEach(channel -> {
+            for (final RelayChannel channel : channels) {
                 mUserChannelInterface.removeUserFromChannel(channel, user);
 
                 final ChannelWorldQuitEvent event = new ChannelWorldQuitEvent(channel, user,
                         reason);
                 mServerEventBus.postAndStoreEvent(event, channel);
-            });
+            }
         });
 
         final Optional<RelayQueryUser> optQuery = mUserChannelInterface.getQueryUser(userNick);
-        optQuery.ifPresent(queryUser -> {
+        Optionals.ifPresent(optQuery, queryUser -> {
             final QueryQuitWorldEvent event = new QueryQuitWorldEvent(queryUser);
             mServerEventBus.postAndStoreEvent(event, queryUser);
         });

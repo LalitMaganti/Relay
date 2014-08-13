@@ -1,5 +1,8 @@
 package com.fusionx.relay.bus;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayQueryUser;
@@ -39,8 +42,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
-import java8.util.Optional;
-import java8.util.function.Function;
 
 public class ServerCallBus {
 

@@ -1,15 +1,16 @@
 package com.fusionx.relay.parser.command;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.util.LogUtils;
+import com.fusionx.relay.util.Optionals;
 
 import java.util.List;
-
-import java8.util.Optional;
 
 public abstract class RemoveUserParser extends CommandParser {
 
@@ -23,11 +24,11 @@ public abstract class RemoveUserParser extends CommandParser {
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel);
-        optChannel.ifPresent(channel -> {
+        Optionals.ifPresent(optChannel, channel -> {
             final Optional<RelayChannelUser> optUser = getRemovedUser(parsedArray, rawSource);
             LogUtils.logOptionalBug(optUser);
 
-            optUser.ifPresent(user -> {
+            Optionals.ifPresent(optUser, user -> {
                 if (mServer.getUser().isNickEqual(user.getNick().getNickAsString())) {
                     onRemoved(parsedArray, rawSource, channel);
                 } else {

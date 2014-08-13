@@ -1,8 +1,8 @@
 package com.fusionx.relay;
 
-import java.util.Collection;
+import com.google.common.base.Optional;
 
-import java8.util.Optional;
+import java.util.Collection;
 
 public interface UserChannelInterface {
 

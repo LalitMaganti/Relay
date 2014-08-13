@@ -1,5 +1,7 @@
 package com.fusionx.relay.parser.command;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayQueryUser;
@@ -21,10 +23,9 @@ import com.fusionx.relay.event.server.VersionEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.LogUtils;
+import com.fusionx.relay.util.Optionals;
 
 import java.util.List;
-
-import java8.util.Optional;
 
 class CtcpParser {
 
@@ -101,7 +102,7 @@ class CtcpParser {
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel);
-        optChannel.ifPresent(channel -> {
+        Optionals.ifPresent(optChannel, channel -> {
             final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
             final boolean mention = MentionParser.onMentionableCommand(action,
                     getServer().getUser().getNick().getNickAsString());

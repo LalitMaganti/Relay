@@ -1,5 +1,8 @@
 package com.fusionx.relay;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
+
 import com.fusionx.relay.constants.UserLevel;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -9,8 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import gnu.trove.set.hash.THashSet;
-import java8.util.Optional;
-import java8.util.stream.StreamSupport;
 
 public class RelayUserChannelInterface implements UserChannelInterface {
 
@@ -34,9 +35,9 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     public Optional<RelayChannel> getChannel(final String name) {
         // Channel names have to unique disregarding case - not having ignore-case here leads
         // to null channels when the channel does actually exist
-        return StreamSupport.stream(mServer.getUser().getChannels())
+        return FluentIterable.from(mServer.getUser().getChannels())
                 .filter(c -> name.equalsIgnoreCase(c.getName()))
-                .findFirst();
+                .first();
     }
 
     /**
@@ -44,9 +45,9 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     @Override
     public Optional<RelayChannelUser> getUser(final String nick) {
-        return StreamSupport.stream(mServer.getUsers())
+        return FluentIterable.from(mServer.getUsers())
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
-                .findFirst();
+                .first();
     }
 
     /**
@@ -62,9 +63,9 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     @Override
     public Optional<RelayQueryUser> getQueryUser(final String nick) {
-        return StreamSupport.stream(mQueryUsers)
+        return FluentIterable.from(mQueryUsers)
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
-                .findFirst();
+                .first();
     }
 
     /**
@@ -197,7 +198,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      * {@inheritDoc}
      */
     public RelayChannelUser getNonNullUser(final String nick) {
-        return getUser(nick).orElse(new RelayChannelUser(nick));
+        return getUser(nick).or(new RelayChannelUser(nick));
     }
 
     public RelayChannel getNewChannel(final String channelName) {

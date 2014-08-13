@@ -1,5 +1,7 @@
 package com.fusionx.relay.parser.command;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.RelayMainUser;
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
@@ -11,10 +13,9 @@ import com.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
 import com.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.LogUtils;
+import com.fusionx.relay.util.Optionals;
 
 import java.util.List;
-
-import java8.util.Optional;
 
 class ModeParser extends CommandParser {
 
@@ -34,7 +35,7 @@ class ModeParser extends CommandParser {
             final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(recipient);
 
             LogUtils.logOptionalBug(optChannel);
-            optChannel.ifPresent(channel -> {
+            Optionals.ifPresent(optChannel, channel -> {
                 final int messageLength = parsedArray.size();
                 if (messageLength == 4) {
                     // User not specified - therefore channel mode is being changed

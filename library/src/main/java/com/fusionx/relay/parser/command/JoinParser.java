@@ -1,5 +1,7 @@
 package com.fusionx.relay.parser.command;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayChannelUser;
 import com.fusionx.relay.RelayServer;
@@ -9,8 +11,6 @@ import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 
 import java.util.List;
-
-import java8.util.Optional;
 
 class JoinParser extends CommandParser {
 
@@ -27,7 +27,7 @@ class JoinParser extends CommandParser {
         // Retrieve the user and channel
         final RelayChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
-        RelayChannel channel = optChannel.orElse(null);
+        RelayChannel channel = optChannel.orNull();
 
         // Store whether the user is the app user
         final boolean appUser = mServer.getUser().isNickEqual(user);
