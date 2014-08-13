@@ -8,6 +8,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ServerConfiguration implements Parcelable {
 
@@ -92,7 +93,7 @@ public class ServerConfiguration implements Parcelable {
     /**
      * The list of all the channels that will be joined when connected to the server
      */
-    private final ArrayList<String> mAutoJoinChannels;
+    private final List<String> mAutoJoinChannels;
 
     private ServerConfiguration(final Parcel in) {
         mTitle = in.readString();
@@ -240,7 +241,7 @@ public class ServerConfiguration implements Parcelable {
         return mNickservPassword;
     }
 
-    public ArrayList<String> getAutoJoinChannels() {
+    public List<String> getAutoJoinChannels() {
         return mAutoJoinChannels;
     }
 
@@ -260,7 +261,7 @@ public class ServerConfiguration implements Parcelable {
         /**
          * The list of all the channels that will be joined when connected to the server
          */
-        private final ArrayList<String> mAutoJoinChannels;
+        private final List<String> mAutoJoinChannels;
 
         /**
          * An integer identifier for this server - not used by the library but useful for storing
@@ -565,7 +566,7 @@ public class ServerConfiguration implements Parcelable {
             return this;
         }
 
-        public ArrayList<String> getAutoJoinChannels() {
+        public List<String> getAutoJoinChannels() {
             return mAutoJoinChannels;
         }
 

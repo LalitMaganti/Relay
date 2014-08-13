@@ -3,11 +3,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'me.tatarka:gradle-retrolambda:2.2.1'
     }
 }
 
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
+apply plugin: 'retrolambda'
 
 repositories {
     mavenCentral()
@@ -15,7 +17,7 @@ repositories {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    buildToolsVersion '20.0.0'
 
     defaultConfig {
         minSdkVersion 9
@@ -23,25 +25,38 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
-    compile 'org.apache.commons:commons-lang3:3.0'
-    compile 'com.squareup:otto:1.3.2'
-    compile 'de.greenrobot:eventbus:2.2.0'
-    compile 'com.google.guava:guava:16.0.+'
-    compile 'net.sf.trove4j:trove4j:3.0.3'
+    compile 'org.apache.commons:commons-lang3:3.+'
+    compile 'com.squareup:otto:1.+'
+    compile 'de.greenrobot:eventbus:2.+'
+    compile 'com.google.guava:guava:18.+'
+    compile 'net.sf.trove4j:trove4j:3.+'
+
+    retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:+'
+}
+
+retrolambda {
+    jdk System.getenv("JAVA8_HOME")
+    oldJdk System.getenv("JAVA_HOME")
+    javaVersion JavaVersion.VERSION_1_7
 }
 
 android.libraryVariants.all { variant ->
     task("generate${variant.name}Javadoc", type: Javadoc) {
+        title = "$name $version API"
         description "Generates Javadoc for $variant.name."
         source = variant.javaCompile.source
         ext.androidJar =
-                "${android.plugin.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
         classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+        options.links("http://docs.oracle.com/javase/7/docs/api/");
+        options.links("http://d.android.com/reference/");
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
     }
 }

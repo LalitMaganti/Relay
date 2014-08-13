@@ -1,8 +1,8 @@
 package com.fusionx.relay.parser.code;
 
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.server.MotdEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.misc.RelayConfigurationProvider;
 import com.fusionx.relay.util.Utils;
 
 import java.util.List;
@@ -12,13 +12,13 @@ import static com.fusionx.relay.constants.ServerReplyCodes.RPL_MOTDSTART;
 
 class MotdParser extends CodeParser {
 
-    MotdParser(final Server server) {
+    MotdParser(final RelayServer server) {
         super(server);
     }
 
     @Override
     public void onParseCode(final int code, final List<String> parsedArray) {
-        if (InterfaceHolders.getPreferences().isMOTDShown()) {
+        if (RelayConfigurationProvider.getPreferences().isMOTDShown()) {
             final String message = parsedArray.get(0);
             if (Utils.isNotEmpty(message)) {
                 final MotdEvent event;

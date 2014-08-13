@@ -1,48 +1,60 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.AppUser;
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.nick.BasicNick;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.NickChangeEvent;
-import com.fusionx.relay.event.channel.WorldNickChangeEvent;
-import com.fusionx.relay.event.server.ServerNickChangeEvent;
-import com.fusionx.relay.nick.Nick;
-import com.fusionx.relay.util.IRCUtils;
+import com.google.common.base.Optional;
 
-import java.util.Collection;
+import com.fusionx.relay.Nick;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayMainUser;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.ChannelNickChangeEvent;
+import com.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
+import com.fusionx.relay.event.server.ServerNickChangeEvent;
+import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.LogUtils;
+import com.fusionx.relay.util.Optionals;
+
 import java.util.List;
 
 class NickParser extends CommandParser {
 
-    public NickParser(final Server server) {
+    private static final int NEW_NICK_INDEX = 2;
+
+    public NickParser(final RelayServer server) {
         super(server);
     }
 
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         final String oldRawNick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser user = getUserChannelInterface().getUserIfExists(oldRawNick);
-        final Collection<Channel> channels = user.getChannels();
+        final boolean appUser = mServer.getUser().isNickEqual(oldRawNick);
+        final Optional<RelayChannelUser> optUser = appUser
+                ? Optional.of(mServer.getUser())
+                : mUserChannelInterface.getUser(oldRawNick);
 
-        final Nick oldNick = user.getNick();
-        user.setNick(parsedArray.get(2));
+        // The can happen in cases where gave a nick to the server but it ignored this nick and
+        // gave use another one instead. Then half way through the server notice phase it
+        // randomly decides to change our nick from the one we provided to the one which we have
+        // already been given and using - simply ignore this bad nick change - Miau is a BNC
+        // which displays this behaviour
+        LogUtils.logOptionalBug(optUser, mServer);
+        Optionals.ifPresent(optUser, user -> {
+            final String newNick = parsedArray.get(NEW_NICK_INDEX);
+            final Nick oldNick = user.getNick();
+            user.setNick(newNick);
 
-        if (user instanceof AppUser) {
-            final ServerNickChangeEvent event = new ServerNickChangeEvent(oldNick, user);
-            getServerEventBus().postAndStoreEvent(event);
-        }
-
-        for (final Channel channel : channels) {
-            final ChannelEvent event;
-            if (user instanceof AppUser) {
-                event = new NickChangeEvent(channel, oldNick, (AppUser) user);
-            } else {
-                event = new WorldNickChangeEvent(channel, oldNick, user);
+            if (appUser) {
+                final ServerNickChangeEvent event = new ServerNickChangeEvent(oldNick, user);
+                mServerEventBus.postAndStoreEvent(event);
             }
-            getServerEventBus().postAndStoreEvent(event, channel);
-        }
+
+            for (final RelayChannel channel : user.getChannels()) {
+                final ChannelEvent event = appUser
+                        ? new ChannelNickChangeEvent(channel, oldNick, (RelayMainUser) user)
+                        : new ChannelWorldNickChangeEvent(channel, oldNick, user);
+                mServerEventBus.postAndStoreEvent(event, channel);
+            }
+        });
     }
 }

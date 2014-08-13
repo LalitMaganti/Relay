@@ -2,8 +2,8 @@ package com.fusionx.relay.parser;
 
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.call.NickChangeCall;
-import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.bus.ServerEventBus;
+import com.fusionx.relay.call.server.NickChangeCall;
 import com.fusionx.relay.constants.ServerCommands;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.misc.CoreListener;
@@ -100,8 +100,7 @@ public class ServerConnectionParser {
                 if (!triedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
                     mWriter.sendNick(new NickChangeCall(nickStorage.getSecondChoiceNick()));
                     triedSecondNick = true;
-                } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage
-                        .getThirdChoiceNick())) {
+                } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage.getThirdChoiceNick())) {
                     mWriter.sendNick(new NickChangeCall(nickStorage.getThirdChoiceNick()));
                     triedThirdNick = true;
                 } else {

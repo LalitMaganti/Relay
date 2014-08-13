@@ -1,10 +1,14 @@
 package com.fusionx.relay.parser.code;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.Server;
+import com.google.common.base.Optional;
+
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.constants.ServerReplyCodes;
-import com.fusionx.relay.event.channel.InitialTopicEvent;
+import com.fusionx.relay.event.channel.ChannelInitialTopicEvent;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.LogUtils;
+import com.fusionx.relay.util.Optionals;
 
 import java.util.List;
 
@@ -12,7 +16,7 @@ class TopicParser extends CodeParser {
 
     private String tempTopic;
 
-    TopicParser(final Server server) {
+    TopicParser(final RelayServer server) {
         super(server);
     }
 
@@ -32,11 +36,15 @@ class TopicParser extends CodeParser {
     private void onTopicInfo(final List<String> parsedArray) {
         final String channelName = parsedArray.get(0);
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final Optional<RelayChannel> optional = mUserChannelInterface.getChannel(channelName);
 
-        final InitialTopicEvent topicEvent = new InitialTopicEvent(channel, nick, tempTopic);
-        mServerEventBus.postAndStoreEvent(topicEvent, channel);
+        LogUtils.logOptionalBug(optional, mServer);
+        Optionals.ifPresent(optional, channel -> {
+            final ChannelInitialTopicEvent topicEvent = new ChannelInitialTopicEvent(channel, nick,
+                    tempTopic);
+            mServerEventBus.postAndStoreEvent(topicEvent, channel);
 
-        tempTopic = null;
+            tempTopic = null;
+        });
     }
 }

@@ -1,32 +1,43 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.PrivateMessageUser;
+import com.google.common.base.Optional;
+
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayQueryUser;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.RelayUserChannelInterface;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.UserChannelInterface;
-import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.call.VersionCall;
-import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.bus.ServerEventBus;
+import com.fusionx.relay.call.server.ERRMSGResponseCall;
+import com.fusionx.relay.call.server.FingerResponseCall;
+import com.fusionx.relay.call.server.PingResponseCall;
+import com.fusionx.relay.call.server.TimeResponseCall;
+import com.fusionx.relay.call.server.VersionResponseCall;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.WorldActionEvent;
-import com.fusionx.relay.event.channel.WorldMessageEvent;
-import com.fusionx.relay.event.server.GenericServerEvent;
-import com.fusionx.relay.event.server.NewPrivateMessage;
+import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
+import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
+import com.fusionx.relay.event.query.QueryActionWorldEvent;
+import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.VersionEvent;
-import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.LogUtils;
+import com.fusionx.relay.util.Optionals;
 
 import java.util.List;
 
 class CtcpParser {
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final ServerEventBus mEventBus;
 
-    public CtcpParser(Server server) {
+    private final RelayUserChannelInterface mUserChannelInterface;
+
+    public CtcpParser(RelayServer server) {
         mServer = server;
+        mUserChannelInterface = server.getUserChannelInterface();
         mEventBus = server.getServerEventBus();
     }
 
@@ -39,51 +50,71 @@ class CtcpParser {
         final String normalMessage = parsedArray.get(3);
         final String message = normalMessage.substring(1, normalMessage.length() - 1);
 
+        final String nick = IRCUtils.getNickFromRaw(rawSource);
         // TODO - THIS IS INCOMPLETE
         if (message.startsWith("ACTION")) {
             onAction(parsedArray, rawSource);
+        } else if (message.startsWith("FINGER")) {
+            getServer().getServerCallBus().post(new FingerResponseCall(nick, mServer));
         } else if (message.startsWith("VERSION")) {
-            final String nick = IRCUtils.getNickFromRaw(rawSource);
-            getServer().getServerCallBus().post(new VersionCall(nick, "Relay Android Library"));
+            getServer().getServerCallBus().post(new VersionResponseCall(nick));
+        } else if (message.startsWith("SOURCE")) {
+        } else if (message.startsWith("USERINFO")) {
+        } else if (message.startsWith("ERRMSG")) {
+            final String query = message.replace("ERRMSG ", "");
+            getServer().getServerCallBus().post(new ERRMSGResponseCall(nick, query));
+        } else if (message.startsWith("PING")) {
+            final String timestamp = message.replace("PING ", "");
+            getServer().getServerCallBus().post(new PingResponseCall(nick, timestamp));
+        } else if (message.startsWith("TIME")) {
+            getServer().getServerCallBus().post(new TimeResponseCall(nick));
         }
     }
 
     private void onAction(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        if (!getUserChannelInterface().shouldIgnoreUser(nick)) {
-            final String action = parsedArray.get(3).replace("ACTION ", "");
-            final String recipient = parsedArray.get(2);
-            if (Channel.isChannelPrefix(recipient.charAt(0))) {
-                onParseChannelAction(recipient, nick, action);
-            } else {
-                onParseUserAction(nick, action);
-            }
+        if (mUserChannelInterface.shouldIgnoreUser(nick)) {
+            return;
+        }
+        final String action = parsedArray.get(3).replace("ACTION ", "");
+        final String recipient = parsedArray.get(2);
+        if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
+            onParseChannelAction(recipient, nick, action);
+        } else {
+            onParseUserAction(nick, action);
         }
     }
 
     private void onParseUserAction(final String nick, final String action) {
-        final PrivateMessageUser user = getUserChannelInterface().getPrivateMessageUser(nick);
-        if (user == null) {
-            getUserChannelInterface().addNewPrivateMessageUser(nick, action, true, false);
-            getServerEventBus().postAndStoreEvent(new NewPrivateMessage(nick));
+        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
+        if (optional.isPresent()) {
+            final RelayQueryUser user = optional.get();
+            getServerEventBus().postAndStoreEvent(new QueryActionWorldEvent(user, action), user);
         } else {
-            getServerEventBus().postAndStoreEvent(new WorldPrivateActionEvent(user, action), user);
+            final RelayQueryUser user = mUserChannelInterface
+                    .addQueryUser(nick, action, true, false);
+            getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(user));
         }
     }
 
     private void onParseChannelAction(final String channelName, final String sendingNick,
             final String action) {
-        final Channel channel = getUserChannelInterface().getChannel(channelName);
-        final WorldUser sendingUser = getUserChannelInterface().getUserIfExists(sendingNick);
-        final boolean mention = MentionParser.onMentionableCommand(action,
-                getServer().getUser().getNick().getNickAsString());
-        final ChannelEvent event;
-        if (sendingUser == null) {
-            event = new WorldMessageEvent(channel, action, sendingNick, mention);
-        } else {
-            event = new WorldActionEvent(channel, action, sendingUser, mention);
-        }
-        getServerEventBus().postAndStoreEvent(event, channel);
+        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
+
+        LogUtils.logOptionalBug(optChannel, mServer);
+        Optionals.ifPresent(optChannel, channel -> {
+            final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
+            final boolean mention = MentionParser.onMentionableCommand(action,
+                    getServer().getUser().getNick().getNickAsString());
+
+            final ChannelEvent event;
+            if (optUser.isPresent()) {
+                event = new ChannelWorldActionEvent(channel, action, optUser.get(), mention);
+            } else {
+                event = new ChannelWorldMessageEvent(channel, action, sendingNick, mention);
+            }
+            getServerEventBus().postAndStoreEvent(event, channel);
+        });
     }
     // Commands End Here
 
@@ -95,11 +126,17 @@ class CtcpParser {
         // TODO - THIS IS INCOMPLETE
         if (message.startsWith("ACTION")) {
             // Nothing should be done for an action reply - it is technically invalid
+        } else if (message.startsWith("FINGER")) {
         } else if (message.startsWith("VERSION")) {
             // Pass this on to the server
             final String nick = IRCUtils.getNickFromRaw(rawSource);
             final String version = message.replace("VERSION", "");
             getServerEventBus().postAndStoreEvent(new VersionEvent(nick, version));
+        } else if (message.startsWith("SOURCE")) {
+        } else if (message.startsWith("USERINFO")) {
+        } else if (message.startsWith("ERRMSG")) {
+        } else if (message.startsWith("PING")) {
+        } else if (message.startsWith("TIME")) {
         }
     }
     // Replies end here
@@ -110,9 +147,5 @@ class CtcpParser {
 
     private Server getServer() {
         return mServer;
-    }
-
-    private UserChannelInterface getUserChannelInterface() {
-        return mServer.getUserChannelInterface();
     }
 }

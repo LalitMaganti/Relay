@@ -1,13 +1,13 @@
 package com.fusionx.relay.event.server;
 
-import com.fusionx.relay.PrivateMessageUser;
-import com.fusionx.relay.nick.Nick;
+import com.fusionx.relay.QueryUser;
+import com.fusionx.relay.Nick;
 
 public class PrivateMessageClosedEvent extends ServerEvent {
 
     public final Nick privateMessageNick;
 
-    public PrivateMessageClosedEvent(final PrivateMessageUser user) {
+    public PrivateMessageClosedEvent(final QueryUser user) {
         privateMessageNick = user.getNick();
     }
 }

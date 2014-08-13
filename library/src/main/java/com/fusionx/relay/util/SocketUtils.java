@@ -73,7 +73,7 @@ public class SocketUtils {
         return new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
 
-    public static BufferedReader getSocketBufferedReader(Socket socket) throws IOException {
+    public static BufferedReader getSocketBufferedReader(final Socket socket) throws IOException {
         return new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 }

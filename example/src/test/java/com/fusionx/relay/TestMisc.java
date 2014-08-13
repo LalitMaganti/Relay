@@ -1,10 +1,10 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.interfaces.EventPreferences;
+import com.fusionx.relay.interfaces.RelayConfiguration;
 
 public class TestMisc {
 
-    public static class DefaultEventPreferences implements EventPreferences {
+    public static class DefaultRelayConfiguration implements RelayConfiguration {
 
         @Override
         public int getReconnectAttemptsCount() {
@@ -22,13 +22,18 @@ public class TestMisc {
         }
 
         @Override
-        public boolean isSelfEventBroadcast() {
-            return false;
+        public boolean isSelfEventHidden() {
+            return true;
         }
 
         @Override
         public boolean isMOTDShown() {
             return false;
+        }
+
+        @Override
+        public void logMissingData(final Server server) {
+
         }
     }
 }

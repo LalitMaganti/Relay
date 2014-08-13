@@ -1,16 +1,15 @@
 package com.fusionx.relay.writers;
 
-import com.fusionx.relay.call.ChannelJoinCall;
-import com.fusionx.relay.call.ModeCall;
-import com.fusionx.relay.call.NickChangeCall;
-import com.fusionx.relay.call.QuitCall;
-import com.fusionx.relay.call.RawCall;
-import com.fusionx.relay.call.UserCall;
-import com.fusionx.relay.call.VersionCall;
-import com.fusionx.relay.call.WhoisCall;
+import com.fusionx.relay.call.channel.ChannelJoinCall;
+import com.fusionx.relay.call.server.ModeCall;
+import com.fusionx.relay.call.server.NickChangeCall;
+import com.fusionx.relay.call.server.QuitCall;
+import com.fusionx.relay.call.server.RawCall;
+import com.fusionx.relay.call.server.UserCall;
+import com.fusionx.relay.call.server.VersionResponseCall;
+import com.fusionx.relay.call.server.WhoisCall;
 import com.squareup.otto.Subscribe;
 
-import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.Writer;
@@ -80,9 +79,8 @@ public class ServerWriter extends RawWriter {
     }
 
     @Subscribe
-    public void sendVersion(final VersionCall event) {
-        writeLineToServer("PRIVMSG " + event.askingUser + " :\u0001VERSION " + event.version +
-                "\u0001");
+    public void sendVersion(final VersionResponseCall event) {
+        writeLineToServer(event.getLineToSendServer());
     }
 
     public void sendSaslAuthentication(final String saslUsername, final String saslPassword) {

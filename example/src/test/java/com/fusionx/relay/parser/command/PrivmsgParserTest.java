@@ -1,9 +1,9 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerTest;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.RelayServerTest;
 import com.fusionx.relay.TestMisc;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.misc.RelayConfigurationProvider;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,15 +14,15 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 public class PrivmsgParserTest {
 
-    private Server mServer;
+    private RelayServer mServer;
 
     private PrivmsgParser mPrivmsgParser;
 
     // Setup work for the tests
     public PrivmsgParserTest() {
-        InterfaceHolders.onInterfaceReceived(new TestMisc.DefaultEventPreferences());
+        RelayConfigurationProvider.onInterfaceReceived(new TestMisc.DefaultRelayConfiguration());
 
-        mServer = ServerTest.getDefaultServer();
+        mServer = RelayServerTest.getDefaultServer();
         mPrivmsgParser = new PrivmsgParser(mServer, null);
     }
 

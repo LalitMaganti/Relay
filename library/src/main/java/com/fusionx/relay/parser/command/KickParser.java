@@ -1,18 +1,22 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.event.channel.WorldKickEvent;
-import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.google.common.base.Optional;
+
+import com.fusionx.relay.ChannelUser;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.event.channel.ChannelWorldKickEvent;
+import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.util.IRCUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 class KickParser extends RemoveUserParser {
 
-    public KickParser(Server server) {
+    public KickParser(RelayServer server) {
         super(server);
     }
 
@@ -25,19 +29,20 @@ class KickParser extends RemoveUserParser {
      * @return the WorldUser object associated with the nick
      */
     @Override
-    public WorldUser getRemovedUser(final List<String> parsedArray, final String rawSource) {
+    public Optional<RelayChannelUser> getRemovedUser(final List<String> parsedArray,
+            final String rawSource) {
         final String kickedNick = parsedArray.get(3);
-        return getUserChannelInterface().getUserIfExists(kickedNick);
+        return mUserChannelInterface.getUser(kickedNick);
     }
 
     @Override
-    public WorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
-            final Channel channel, final WorldUser kickedUser) {
+    public ChannelWorldUserEvent getEvent(final List<String> parsedArray,
+            final String rawSource, final RelayChannel channel, final ChannelUser kickedUser) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
+        final Optional<RelayChannelUser> optKickUser = mUserChannelInterface.getUser(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
 
-        return new WorldKickEvent(channel, kickedUser, kickingUser, kickingNick, reason);
+        return new ChannelWorldKickEvent(channel, kickedUser, optKickUser, kickingNick, reason);
     }
 
     /**
@@ -48,16 +53,20 @@ class KickParser extends RemoveUserParser {
      * @param channel     the channel we were kicked from
      */
     @Override
-    void onRemoved(final List<String> parsedArray, final String rawSource, final Channel channel) {
+    void onRemoved(final List<String> parsedArray, final String rawSource,
+            final RelayChannel channel) {
         final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
-        final WorldUser kickingUser = getUserChannelInterface().getUserIfExists(kickingNick);
+        final Optional<RelayChannelUser> optKickUser = mUserChannelInterface.getUser(kickingNick);
 
         // Remove the channel only after we've finished with it
-        getUserChannelInterface().removeChannel(channel);
+        final Collection<RelayChannelUser> users = mUserChannelInterface.removeChannel(channel);
+        for (final RelayChannelUser user : users) {
+            mUserChannelInterface.removeChannelFromUser(channel, user);
+        }
 
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
-        final KickEvent event = new KickEvent(channel, kickingUser, reason);
+        final KickEvent event = new KickEvent(channel, optKickUser, kickingNick, reason);
 
-        getServerEventBus().postAndStoreEvent(event);
+        mServerEventBus.postAndStoreEvent(event);
     }
 }

@@ -1,11 +1,10 @@
 package com.fusionx.relay.parser.code;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.UserChannelInterface;
-import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.RelayChannel;
+import com.fusionx.relay.RelayChannelUser;
+import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.constants.UserLevel;
-import com.fusionx.relay.event.channel.NameEvent;
+import com.fusionx.relay.event.channel.ChannelNameEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
@@ -14,14 +13,10 @@ import static com.fusionx.relay.constants.ServerReplyCodes.RPL_NAMREPLY;
 
 class NameParser extends CodeParser {
 
-    private final UserChannelInterface mUserChannelInterface;
+    private RelayChannel mChannel;
 
-    private Channel mChannel;
-
-    public NameParser(final Server server) {
+    public NameParser(final RelayServer server) {
         super(server);
-
-        mUserChannelInterface = server.getUserChannelInterface();
     }
 
     @Override
@@ -35,19 +30,21 @@ class NameParser extends CodeParser {
 
     private void onParseNameReply(final List<String> parsedArray) {
         if (mChannel == null) {
-            mChannel = mUserChannelInterface.getChannel(parsedArray.get(1));
+            // TODO - this needs to be handled properly rather than simply getting
+            mChannel = mUserChannelInterface.getChannel(parsedArray.get(1)).get();
         }
+
         final List<String> listOfUsers = IRCUtils.splitRawLine(parsedArray.get(2), false);
         for (final String rawNick : listOfUsers) {
             final UserLevel level = UserLevel.getLevelFromPrefix(rawNick.charAt(0));
             final String nick = level == UserLevel.NONE ? rawNick : rawNick.substring(1);
-            final WorldUser user = mUserChannelInterface.getUser(nick);
+            final RelayChannelUser user = mUserChannelInterface.getNonNullUser(nick);
             mUserChannelInterface.coupleUserAndChannel(user, mChannel, level);
         }
     }
 
     private void onParseNameFinished() {
-        mServer.getServerEventBus().postAndStoreEvent(new NameEvent(mChannel,
+        mServer.getServerEventBus().postAndStoreEvent(new ChannelNameEvent(mChannel,
                 mChannel.getUsers()), mChannel);
 
         mChannel = null;

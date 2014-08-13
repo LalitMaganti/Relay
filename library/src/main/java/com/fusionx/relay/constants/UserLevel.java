@@ -29,9 +29,8 @@ public enum UserLevel {
                 return UserLevel.OP;
             case '+':
                 return UserLevel.VOICE;
-            default:
-                return UserLevel.NONE;
         }
+        return UserLevel.NONE;
     }
 
     public static UserLevel getLevelFromMode(final char modeCharacter) {
@@ -46,9 +45,8 @@ public enum UserLevel {
                 return UserLevel.OP;
             case 'v':
                 return UserLevel.VOICE;
-            default:
-                return UserLevel.NONE;
         }
+        return UserLevel.NONE;
     }
 
     public char getPrefix() {

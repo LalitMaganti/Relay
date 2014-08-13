@@ -1,6 +1,8 @@
 package com.fusionx.relay.parser;
 
-import com.fusionx.relay.PrivateMessageUser;
+import com.google.common.base.Optional;
+
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.util.IRCUtils;
 
@@ -69,19 +71,16 @@ public class UserInputParser {
         final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
-        final PrivateMessageUser user = server.getUserChannelInterface()
-                .getPrivateMessageUser(userNick);
 
         if (command.startsWith("/")) {
             switch (command) {
                 case "/me":
                     final String action = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallBus().sendActionToUser(userNick, action);
+                    server.getServerCallBus().sendActionToQueryUser(userNick, action);
                     return;
                 case "/close":
                 case "/c":
-                    if (arrayLength == 0) {
-                        server.getServerCallBus().sendClosePrivateMessage(user);
+                    if (parseUserCloseCommand(server, arrayLength, userNick)) {
                         return;
                     }
                     break;
@@ -90,10 +89,25 @@ public class UserInputParser {
                     return;
             }
         } else {
-            server.getServerCallBus().sendMessageToUser(userNick, message);
+            server.getServerCallBus().sendMessageToQueryUser(userNick, message);
             return;
         }
         onUnknownEvent(server, message);
+    }
+
+    private static boolean parseUserCloseCommand(final Server server, final int arrayLength,
+            final String userNick) {
+        if (arrayLength != 0) {
+            return false;
+        }
+        final Optional<? extends QueryUser> optional = server.getUserChannelInterface()
+                .getQueryUser(userNick);
+        if (optional.isPresent()) {
+            server.getServerCallBus().sendCloseQuery(optional.get());
+        } else {
+            // This is probably a bug we need to fix
+        }
+        return true;
     }
 
     public static void onParseServerMessage(final Server server, final String message) {
@@ -104,8 +118,7 @@ public class UserInputParser {
         onUnknownEvent(server, message);
     }
 
-    private static void onParseServerCommand(final Server server,
-            final String rawLine) {
+    private static void onParseServerCommand(final Server server, final String rawLine) {
         final List<String> parsedArray = IRCUtils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
@@ -124,7 +137,7 @@ public class UserInputParser {
                     final String nick = parsedArray.remove(0);
                     final String message = parsedArray.size() >= 1 ? IRCUtils.concatenateStringList
                             (parsedArray) : "";
-                    server.getServerCallBus().sendMessageToUser(nick, message);
+                    server.getServerCallBus().sendMessageToQueryUser(nick, message);
                     return;
                 }
                 break;
@@ -144,7 +157,7 @@ public class UserInputParser {
             case "/ns":
                 if (arrayLength > 1) {
                     final String message = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallBus().sendMessageToUser("NickServ", message);
+                    server.getServerCallBus().sendMessageToQueryUser("NickServ", message);
                     return;
                 }
                 break;
@@ -165,6 +178,6 @@ public class UserInputParser {
     }
 
     private static void onUnknownEvent(final Server server, final String rawLine) {
-        //server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
+        // server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
     }
 }

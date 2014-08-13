@@ -1,24 +1,28 @@
 package com.fusionx.relay.parser.command;
 
-import com.fusionx.relay.Server;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.event.server.InviteEvent;
+import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.util.IRCUtils;
 
 import java.util.List;
 
 class InviteParser extends CommandParser {
 
-    public InviteParser(Server server) {
+    public InviteParser(final RelayServer server) {
         super(server);
     }
 
     @Override
     public void onParseCommand(List<String> parsedArray, String rawSource) {
         final String invitingNick = IRCUtils.getNickFromRaw(rawSource);
-        if (parsedArray.get(2).equals(getServer().getUser().getNick())) {
+        final String invitedNick = parsedArray.get(2);
+        if (mServer.getUser().isNickEqual(invitedNick)) {
             final String channelName = parsedArray.get(3);
-            //mServerEventBus.sendInviteEvent(mServer, channelName);
+            final ServerEvent event = new InviteEvent(channelName, invitingNick);
+            mServerEventBus.postAndStoreEvent(event);
         } else {
-            // TODO - fix up what should happen here
+            // This is impossible - breaks RFC if it occurs - just ignore it
         }
     }
 }

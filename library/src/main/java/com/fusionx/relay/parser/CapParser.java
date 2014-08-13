@@ -1,7 +1,7 @@
 package com.fusionx.relay.parser;
 
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.constants.ServerReplyCodes;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.ServerEvent;

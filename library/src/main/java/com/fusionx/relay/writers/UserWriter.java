@@ -1,7 +1,7 @@
 package com.fusionx.relay.writers;
 
-import com.fusionx.relay.call.PrivateActionCall;
-import com.fusionx.relay.call.PrivateMessageCall;
+import com.fusionx.relay.call.user.PrivateActionCall;
+import com.fusionx.relay.call.user.PrivateMessageCall;
 import com.squareup.otto.Subscribe;
 
 import java.io.Writer;

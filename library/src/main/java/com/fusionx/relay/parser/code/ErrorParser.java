@@ -1,8 +1,11 @@
 package com.fusionx.relay.parser.code;
 
-import com.fusionx.relay.PrivateMessageUser;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.event.user.NoSuchNickEvent;
+import com.google.common.base.Optional;
+
+import com.fusionx.relay.RelayQueryUser;
+import com.fusionx.relay.RelayServer;
+import com.fusionx.relay.event.query.QueryNoSuchNickEvent;
+import com.fusionx.relay.event.server.GenericServerEvent;
 
 import java.util.List;
 
@@ -11,7 +14,7 @@ import static com.fusionx.relay.constants.ServerReplyCodes.ERR_NOSUCHNICK;
 
 class ErrorParser extends CodeParser {
 
-    ErrorParser(Server server) {
+    ErrorParser(RelayServer server) {
         super(server);
     }
 
@@ -33,20 +36,21 @@ class ErrorParser extends CodeParser {
 
     /**
      * Example line:
-     * :some.server.url 401 holoirc holoirctester :No such nick/channel
+     * :some.server.url 401 relay relaytester :No such nick/channel
      *
      * @param parsedArray - the array of the line (split by spaces)
      */
     private void onNoSuchNickError(final List<String> parsedArray) {
         final String nick = parsedArray.get(0);
         final String message = parsedArray.get(1);
-        final PrivateMessageUser user = mUserChannelInterface.getPrivateMessageUser(nick);
+        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
 
         // If the user is null then this no such nick event happened for another reason
-        if (user != null) {
-            mServerEventBus.postAndStoreEvent(new NoSuchNickEvent(user, message), user);
+        if (optional.isPresent()) {
+            final RelayQueryUser user = optional.get();
+            mServerEventBus.postAndStoreEvent(new QueryNoSuchNickEvent(user, message), user);
         } else {
-            // TODO - fix this
+            mServerEventBus.postAndStoreEvent(new GenericServerEvent(message));
         }
     }
 }
