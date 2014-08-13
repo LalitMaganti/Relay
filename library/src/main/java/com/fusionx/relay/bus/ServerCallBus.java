@@ -30,7 +30,7 @@ import com.fusionx.relay.event.query.QueryMessageSelfEvent;
 import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.misc.RelayConfigurationProvider;
 import com.fusionx.relay.util.Utils;
 import com.fusionx.relay.writers.RawWriter;
 import com.squareup.otto.Bus;
@@ -133,7 +133,7 @@ public class ServerCallBus {
     }
 
     public void sendPart(final String channelName) {
-        post(new ChannelPartCall(channelName, InterfaceHolders.getPreferences().getPartReason()));
+        post(new ChannelPartCall(channelName, RelayConfigurationProvider.getPreferences().getPartReason()));
     }
 
     public void sendCloseQuery(final QueryUser rawUser) {
@@ -144,7 +144,7 @@ public class ServerCallBus {
         final RelayQueryUser user = (RelayQueryUser) rawUser;
         mUserChannelInterface.removeQueryUser(user);
 
-        if (InterfaceHolders.getPreferences().isSelfEventHidden()) {
+        if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
             return;
         }
         final ServerEvent event = new PrivateMessageClosedEvent(user);
@@ -171,7 +171,7 @@ public class ServerCallBus {
 
     private void sendChannelSelfMessage(final Function<RelayChannel, ChannelEvent> function,
             final String channelName) {
-        if (InterfaceHolders.getPreferences().isSelfEventHidden()) {
+        if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
             return;
         }
 

@@ -38,7 +38,7 @@ class TopicParser extends CodeParser {
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
         final Optional<RelayChannel> optional = mUserChannelInterface.getChannel(channelName);
 
-        LogUtils.logOptionalBug(optional);
+        LogUtils.logOptionalBug(optional, mServer);
         Optionals.ifPresent(optional, channel -> {
             final ChannelInitialTopicEvent topicEvent = new ChannelInitialTopicEvent(channel, nick,
                     tempTopic);

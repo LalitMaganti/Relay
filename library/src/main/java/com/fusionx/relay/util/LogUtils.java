@@ -2,16 +2,16 @@ package com.fusionx.relay.util;
 
 import com.google.common.base.Optional;
 
-import android.util.Log;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class LogUtils {
 
     private static final String TAG = "Relay";
 
-    public static void logOptionalBug(final Optional<?> optional) {
+    public static void logOptionalBug(final Optional<?> optional, final Server server) {
         if (!optional.isPresent()) {
-            Log.e(TAG, "Missing an optional which is required - indicates the possible presence "
-                    + "of a bug");
+            RelayConfigurationProvider.getPreferences().logMissingData(server);
         }
     }
 }

@@ -23,10 +23,10 @@ public abstract class RemoveUserParser extends CommandParser {
         final String channelName = parsedArray.get(2);
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
-        LogUtils.logOptionalBug(optChannel);
+        LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
             final Optional<RelayChannelUser> optUser = getRemovedUser(parsedArray, rawSource);
-            LogUtils.logOptionalBug(optUser);
+            LogUtils.logOptionalBug(optUser, mServer);
 
             Optionals.ifPresent(optUser, user -> {
                 if (mServer.getUser().isNickEqual(user.getNick().getNickAsString())) {

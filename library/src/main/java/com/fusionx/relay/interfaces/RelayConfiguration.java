@@ -1,6 +1,8 @@
 package com.fusionx.relay.interfaces;
 
-public interface EventPreferences {
+import com.fusionx.relay.Server;
+
+public interface RelayConfiguration {
 
     public int getReconnectAttemptsCount();
 
@@ -11,4 +13,6 @@ public interface EventPreferences {
     public boolean isSelfEventHidden();
 
     public boolean isMOTDShown();
+
+    public void logMissingData(final Server server);
 }

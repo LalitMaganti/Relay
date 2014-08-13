@@ -30,7 +30,7 @@ import java.io.Writer;
 import java.net.Socket;
 import java.util.Collection;
 
-import static com.fusionx.relay.misc.InterfaceHolders.getPreferences;
+import static com.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 /**
  * Class which carries out all the interesting connection stuff including the initial setting up

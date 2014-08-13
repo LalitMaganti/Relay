@@ -1,7 +1,7 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.interfaces.EventPreferences;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.interfaces.RelayConfiguration;
+import com.fusionx.relay.misc.RelayConfigurationProvider;
 
 import android.os.Handler;
 import android.util.Pair;
@@ -23,14 +23,14 @@ public class ConnectionManager {
     /**
      * Returns a singleton connection manager which is lazily created
      *
-     * @param preferences a concrete implementation of the {@link com.fusionx.relay.interfaces.EventPreferences}
+     * @param preferences a concrete implementation of the {@link com.fusionx.relay.interfaces.RelayConfiguration}
      *                    interface
      * @return the connection manager which was created
      */
-    public static ConnectionManager getConnectionManager(final EventPreferences preferences) {
+    public static ConnectionManager getConnectionManager(final RelayConfiguration preferences) {
         if (sConnectionManager == null) {
             sConnectionManager = new ConnectionManager();
-            InterfaceHolders.onInterfaceReceived(preferences);
+            RelayConfigurationProvider.onInterfaceReceived(preferences);
         }
         return sConnectionManager;
     }

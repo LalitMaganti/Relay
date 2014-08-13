@@ -2,7 +2,7 @@ package com.fusionx.relay.parser.code;
 
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.server.MotdEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.misc.RelayConfigurationProvider;
 import com.fusionx.relay.util.Utils;
 
 import java.util.List;
@@ -18,7 +18,7 @@ class MotdParser extends CodeParser {
 
     @Override
     public void onParseCode(final int code, final List<String> parsedArray) {
-        if (InterfaceHolders.getPreferences().isMOTDShown()) {
+        if (RelayConfigurationProvider.getPreferences().isMOTDShown()) {
             final String message = parsedArray.get(0);
             if (Utils.isNotEmpty(message)) {
                 final MotdEvent event;

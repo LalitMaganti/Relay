@@ -38,7 +38,7 @@ class NickParser extends CommandParser {
         // randomly decides to change our nick from the one we provided to the one which we have
         // already been given and using - simply ignore this bad nick change - Miau is a BNC
         // which displays this behaviour
-        LogUtils.logOptionalBug(optUser);
+        LogUtils.logOptionalBug(optUser, mServer);
         Optionals.ifPresent(optUser, user -> {
             final String newNick = parsedArray.get(NEW_NICK_INDEX);
             final Nick oldNick = user.getNick();

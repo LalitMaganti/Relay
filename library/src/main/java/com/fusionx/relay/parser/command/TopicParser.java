@@ -23,7 +23,7 @@ public class TopicParser extends CommandParser {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Optional<RelayChannel> optChan = mUserChannelInterface.getChannel(parsedArray.get(2));
 
-        LogUtils.logOptionalBug(optChan);
+        LogUtils.logOptionalBug(optChan, mServer);
         Optionals.ifPresent(optChan, channel -> {
             final String newTopic = parsedArray.get(3);
 

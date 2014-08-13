@@ -65,7 +65,7 @@ public class PrivmsgParser extends CommandParser {
             final String rawMessage) {
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
-        LogUtils.logOptionalBug(optChannel);
+        LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
             // TODO - actually parse the colours
             final String message = Utils.stripColorsFromMessage(rawMessage);

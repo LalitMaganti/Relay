@@ -101,7 +101,7 @@ class CtcpParser {
             final String action) {
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
-        LogUtils.logOptionalBug(optChannel);
+        LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
             final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
             final boolean mention = MentionParser.onMentionableCommand(action,

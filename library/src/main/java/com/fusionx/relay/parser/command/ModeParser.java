@@ -34,7 +34,7 @@ class ModeParser extends CommandParser {
             // or possibly the mode of the channel itself)
             final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(recipient);
 
-            LogUtils.logOptionalBug(optChannel);
+            LogUtils.logOptionalBug(optChannel, mServer);
             Optionals.ifPresent(optChannel, channel -> {
                 final int messageLength = parsedArray.size();
                 if (messageLength == 4) {

@@ -11,7 +11,7 @@ import com.fusionx.relay.RelayServerTest;
 import com.fusionx.relay.TestMisc;
 import com.fusionx.relay.event.channel.ChannelWorldJoinEvent;
 import com.fusionx.relay.event.server.JoinEvent;
-import com.fusionx.relay.misc.InterfaceHolders;
+import com.fusionx.relay.misc.RelayConfigurationProvider;
 import com.fusionx.relay.util.IRCUtils;
 
 import org.junit.Test;
@@ -129,7 +129,7 @@ public class JoinParserTest {
     // TODO - simulate disconnection/reconnection and test what happens then
 
     private void resetFields() {
-        InterfaceHolders.onInterfaceReceived(new TestMisc.DefaultEventPreferences());
+        RelayConfigurationProvider.onInterfaceReceived(new TestMisc.DefaultRelayConfiguration());
 
         mServer = RelayServerTest.getDefaultServer();
         mJoinParser = new JoinParser(mServer);

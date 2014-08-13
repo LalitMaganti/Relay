@@ -1,10 +1,10 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.interfaces.EventPreferences;
+import com.fusionx.relay.interfaces.RelayConfiguration;
 
 public class TestMisc {
 
-    public static class DefaultEventPreferences implements EventPreferences {
+    public static class DefaultRelayConfiguration implements RelayConfiguration {
 
         @Override
         public int getReconnectAttemptsCount() {
