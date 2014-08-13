@@ -1,5 +1,6 @@
 package com.fusionx.relay.parser.command;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 import com.fusionx.relay.RelayChannel;
@@ -19,8 +20,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
-
-import java8.util.Optional;
 
 import static com.fusionx.relay.ServerConfigurationTest.getFreenodeConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;
