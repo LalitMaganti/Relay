@@ -4,6 +4,8 @@ import com.fusionx.relay.bus.ServerCallHandler;
 import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.event.server.ServerEvent;
 
+import android.os.Handler;
+
 import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +34,7 @@ public class RelayServer implements Server {
     private final RelayMainUser mUser;
 
     public RelayServer(final ServerConfiguration configuration, final ServerConnection connection,
-            final Collection<String> ignoreList) {
+            final Handler callHandler, final Collection<String> ignoreList) {
         mConfiguration = configuration;
         mServerConnection = connection;
 
@@ -43,7 +45,7 @@ public class RelayServer implements Server {
 
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus(this);
-        mServerCallHandler = new ServerCallHandler(this, connection.getServerCallHandler());
+        mServerCallHandler = new ServerCallHandler(this, callHandler);
 
         // Set the nick name to the first choice nick
         mUser = new RelayMainUser(configuration.getNickStorage().getFirstChoiceNick());

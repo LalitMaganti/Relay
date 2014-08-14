@@ -44,9 +44,11 @@ public class ServerConnection {
 
     private final Handler mUiThreadHandler;
 
-    private final Handler mServerCallHandler;
+    private final Handler mCallHandler;
 
     private final ServerConfiguration mServerConfiguration;
+
+    private final ServerCallHandler mServerCallHandler;
 
     private final RelayServer mServer;
 
@@ -65,20 +67,14 @@ public class ServerConnection {
     ServerConnection(final ServerConfiguration serverConfiguration, final Handler handler,
             final Collection<String> ignoreList) {
         mServerConfiguration = serverConfiguration;
+        mUiThreadHandler = handler;
+
         final HandlerThread handlerThread = new HandlerThread("ServerCalls");
         handlerThread.start();
-        mServerCallHandler = new Handler(handlerThread.getLooper());
+        mCallHandler = new Handler(handlerThread.getLooper());
 
-        mServer = new RelayServer(serverConfiguration, this, ignoreList);
-        mUiThreadHandler = handler;
-    }
-
-    public Handler getServerCallHandler() {
-        return mServerCallHandler;
-    }
-
-    public ConnectionStatus getStatus() {
-        return mStatus;
+        mServer = new RelayServer(serverConfiguration, this, mCallHandler, ignoreList);
+        mServerCallHandler = mServer.getServerCallHandler();
     }
 
     void startConnection() {
@@ -95,11 +91,10 @@ public class ServerConnection {
     }
 
     void stopConnection() {
-        mServerCallHandler.post(() -> {
+        mCallHandler.post(() -> {
             if (mStatus == ConnectionStatus.CONNECTED) {
                 mStopped = true;
-                mServer.getServerCallHandler().postImmediately(new QuitCall(getPreferences()
-                        .getQuitReason()));
+                mServerCallHandler.postImmediately(new QuitCall(getPreferences().getQuitReason()));
             } else if (mMainThread.isAlive()) {
                 mMainThread.interrupt();
             }
@@ -113,8 +108,8 @@ public class ServerConnection {
         return mServer;
     }
 
-    void updateStatus(final ConnectionStatus newStatus) {
-        mStatus = newStatus;
+    ConnectionStatus getStatus() {
+        return mStatus;
     }
 
     public String getCurrentLine() {
@@ -128,7 +123,7 @@ public class ServerConnection {
      * Method which keeps trying to reconnect to the server the number of times specified and if
      * the user has not explicitly tried to disconnect
      */
-    void connectToServer() {
+    private void connectToServer() {
         connect();
 
         for (mReconnectAttempts = 0; !mStopped && isReconnectNeeded(); mReconnectAttempts++) {
@@ -143,20 +138,27 @@ public class ServerConnection {
             }
             connect();
         }
+        if (mStopped) {
+            return;
+        }
         onDisconnected("Disconnected from server (no reconnect pending).", false);
     }
 
     /**
      * Closes the socket if it is not already closed
      */
-    void closeSocket() {
-        if (mSocket != null) {
-            try {
-                mSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private void closeSocket() {
+        if (mSocket == null || mSocket.isClosed()) {
+            mSocket = null;
+            return;
         }
+
+        try {
+            mSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mSocket = null;
     }
 
     private void connect() {
@@ -170,15 +172,14 @@ public class ServerConnection {
             // We are now in the phase where we can say we are connecting to the server
             onConnecting();
 
-            final ServerCallHandler callHandler = mServer.getServerCallHandler();
             if (mServerConfiguration.isSaslAvailable()) {
                 // By sending this line, the server *should* wait until we end the CAP stuff with
                 // CAP END
-                callHandler.sendSupportedCAP();
+                mServerCallHandler.sendSupportedCAP();
             }
 
             if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
-                callHandler.sendServerPassword(mServerConfiguration.getServerPassword());
+                mServerCallHandler.sendServerPassword(mServerConfiguration.getServerPassword());
             }
 
             // Send NICK and USER lines to the server
@@ -190,14 +191,14 @@ public class ServerConnection {
 
             final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
-                    mServerConfiguration, reader, callHandler);
+                    mServerConfiguration, reader, mServerCallHandler);
             final String nick = parser.parseConnect();
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
             // If the nick is null then we have no hope of progressing
             if (!TextUtils.isEmpty(nick)) {
-                onStartParsing(nick, callHandler, reader);
+                onStartParsing(nick, mServerCallHandler, reader);
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
@@ -218,9 +219,7 @@ public class ServerConnection {
             final BufferedReader reader) throws IOException {
         // Since we are now connected, reset the reconnect attempts
         mReconnectAttempts = 0;
-
         mServer.getUser().setNick(nick);
-
         onConnected();
 
         // Identifies with NickServ if the password exists
@@ -248,14 +247,13 @@ public class ServerConnection {
     }
 
     private void onConnecting() {
-        updateStatus(ConnectionStatus.CONNECTING);
+        mStatus = ConnectionStatus.CONNECTING;
 
         mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent());
     }
 
     private void onReconnecting() {
-        // Set status to reconnecting
-        updateStatus(ConnectionStatus.RECONNECTING);
+        mStatus = ConnectionStatus.RECONNECTING;
 
         mServer.getServerEventBus().postAndStoreEvent(new ReconnectEvent());
     }
@@ -274,7 +272,7 @@ public class ServerConnection {
                 server -> new DisconnectEvent(serverMessage, retryPending));
     }
 
-    void onStopped() {
+    private void onStopped() {
         onStatusChanged(ConnectionStatus.STOPPED,
                 ChannelStopEvent::new,
                 QueryStopEvent::new,
@@ -285,7 +283,7 @@ public class ServerConnection {
             final Function<RelayChannel, ChannelEvent> channelFunction,
             final Function<RelayQueryUser, QueryEvent> queryFunction,
             final Function<Server, ServerEvent> serverFunction) {
-        updateStatus(status);
+        mStatus = status;
 
         for (final RelayChannel channel : mServer.getUser().getChannels()) {
             channel.postAndStoreEvent(channelFunction.apply(channel));
