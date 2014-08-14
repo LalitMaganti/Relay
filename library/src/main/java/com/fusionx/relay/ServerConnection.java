@@ -74,4 +74,8 @@ public class ServerConnection {
     void updateStatus(final ConnectionStatus newStatus) {
         mStatus = newStatus;
     }
+
+    public String getCurrentLine() {
+        return mBaseConnection.getCurrentLine();
+    }
 }

@@ -15,4 +15,6 @@ public interface RelayConfiguration {
     public boolean isMOTDShown();
 
     public void logMissingData(final Server server);
+
+    public void logServerLine(final String line);
 }

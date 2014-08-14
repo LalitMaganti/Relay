@@ -99,6 +99,10 @@ public class RelayServer implements Server {
         mUserChannelInterface.updateIgnoreList(list);
     }
 
+    public ServerConnection getServerConnection() {
+        return mServerConnection;
+    }
+
     void addUser(final RelayChannelUser user) {
         mUsers.add(user);
     }

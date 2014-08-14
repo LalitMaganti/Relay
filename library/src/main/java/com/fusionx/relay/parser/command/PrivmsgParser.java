@@ -18,6 +18,8 @@ import com.fusionx.relay.util.Utils;
 
 import java.util.List;
 
+import static com.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
+
 public class PrivmsgParser extends CommandParser {
 
     private final CtcpParser mCtcpParser;
@@ -30,6 +32,10 @@ public class PrivmsgParser extends CommandParser {
 
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
+        if (parsedArray.size() < 4) {
+            getPreferences().logServerLine(mServer.getServerConnection().getCurrentLine());
+            return;
+        }
         final String message = parsedArray.get(3);
 
         // PRIVMSGs can be CTCP commands

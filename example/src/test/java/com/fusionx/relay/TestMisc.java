@@ -35,5 +35,10 @@ public class TestMisc {
         public void logMissingData(final Server server) {
 
         }
+
+        @Override
+        public void logServerLine(final String line) {
+
+        }
     }
 }
