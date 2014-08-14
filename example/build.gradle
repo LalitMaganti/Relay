@@ -33,7 +33,7 @@ android {
 apply plugin: 'android-unit-test'
 
 dependencies {
-    compile project(':relay')
+    compile project(':relay-library')
 
     testCompile 'junit:junit:4.10'
     testCompile 'org.robolectric:robolectric:+'

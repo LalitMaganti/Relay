@@ -35,7 +35,7 @@ dependencies {
     compile 'com.google.guava:guava:18.+'
     compile 'net.sf.trove4j:trove4j:3.+'
 
-    compile project(':Bus')
+    compile project(':bus-library')
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:+'
 }

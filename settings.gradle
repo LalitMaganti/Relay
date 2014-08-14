@@ -1,5 +1,5 @@
-include ':relay', ':relayexample', ':Bus'
+include ':bus-library', ':relay-library', ':relay-example'
 
-project(':relay').projectDir = new File('library')
-project(':relayexample').projectDir = new File('example')
-project(':Bus').projectDir = new File('libraries/Bus/library')
+project(':bus-library').projectDir = new File('libraries/bus/library')
+project(':relay-library').projectDir = new File('library')
+project(':relay-example').projectDir = new File('example')
