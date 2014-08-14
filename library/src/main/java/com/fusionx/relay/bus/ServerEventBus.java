@@ -1,5 +1,6 @@
 package com.fusionx.relay.bus;
 
+import com.fusionx.bus.Bus;
 import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayQueryUser;
 import com.fusionx.relay.RelayServer;
@@ -7,16 +8,14 @@ import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 
-import de.greenrobot.event.EventBus;
-
 public class ServerEventBus {
 
     private final RelayServer mServer;
 
-    private final EventBus mBus;
+    private final Bus mBus;
 
     public ServerEventBus(final RelayServer server) {
-        mBus = new EventBus();
+        mBus = new Bus();
         mServer = server;
     }
 

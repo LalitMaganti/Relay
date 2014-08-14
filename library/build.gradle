@@ -32,10 +32,10 @@ android {
 
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.+'
-    compile 'com.squareup:otto:1.+'
-    compile 'de.greenrobot:eventbus:2.+'
     compile 'com.google.guava:guava:18.+'
     compile 'net.sf.trove4j:trove4j:3.+'
+
+    compile project(':Bus')
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:+'
 }
