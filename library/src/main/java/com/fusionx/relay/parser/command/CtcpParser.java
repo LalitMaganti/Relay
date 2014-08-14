@@ -23,7 +23,7 @@ import com.fusionx.relay.event.server.VersionEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.LogUtils;
-import com.fusionx.relay.util.Optionals;
+import com.fusionx.relay.function.Optionals;
 
 import java.util.List;
 
@@ -55,19 +55,19 @@ class CtcpParser {
         if (message.startsWith("ACTION")) {
             onAction(parsedArray, rawSource);
         } else if (message.startsWith("FINGER")) {
-            getServer().getServerCallBus().post(new FingerResponseCall(nick, mServer));
+            getServer().getServerCallHandler().post(new FingerResponseCall(nick, mServer));
         } else if (message.startsWith("VERSION")) {
-            getServer().getServerCallBus().post(new VersionResponseCall(nick));
+            getServer().getServerCallHandler().post(new VersionResponseCall(nick));
         } else if (message.startsWith("SOURCE")) {
         } else if (message.startsWith("USERINFO")) {
         } else if (message.startsWith("ERRMSG")) {
             final String query = message.replace("ERRMSG ", "");
-            getServer().getServerCallBus().post(new ERRMSGResponseCall(nick, query));
+            getServer().getServerCallHandler().post(new ERRMSGResponseCall(nick, query));
         } else if (message.startsWith("PING")) {
             final String timestamp = message.replace("PING ", "");
-            getServer().getServerCallBus().post(new PingResponseCall(nick, timestamp));
+            getServer().getServerCallHandler().post(new PingResponseCall(nick, timestamp));
         } else if (message.startsWith("TIME")) {
-            getServer().getServerCallBus().post(new TimeResponseCall(nick));
+            getServer().getServerCallHandler().post(new TimeResponseCall(nick));
         }
     }
 

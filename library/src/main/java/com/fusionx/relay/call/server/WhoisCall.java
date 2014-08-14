@@ -12,6 +12,6 @@ public class WhoisCall extends Call {
 
     @Override
     public String getLineToSendServer() {
-        return null;
+        return "WHOIS " + nick;
     }
 }

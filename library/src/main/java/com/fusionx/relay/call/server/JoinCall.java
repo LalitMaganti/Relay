@@ -1,12 +1,12 @@
-package com.fusionx.relay.call.channel;
+package com.fusionx.relay.call.server;
 
 import com.fusionx.relay.call.Call;
 
-public class ChannelJoinCall extends Call {
+public class JoinCall extends Call {
 
     private final String channelName;
 
-    public ChannelJoinCall(String channelName) {
+    public JoinCall(String channelName) {
         this.channelName = channelName;
     }
 

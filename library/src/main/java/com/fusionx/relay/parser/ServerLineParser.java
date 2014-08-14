@@ -2,6 +2,7 @@ package com.fusionx.relay.parser;
 
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.bus.ServerCallHandler;
 import com.fusionx.relay.constants.ServerCommands;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.ServerEvent;
@@ -11,7 +12,6 @@ import com.fusionx.relay.parser.code.CodeParser;
 import com.fusionx.relay.parser.command.CommandParser;
 import com.fusionx.relay.parser.command.QuitParser;
 import com.fusionx.relay.util.IRCUtils;
-import com.fusionx.relay.writers.ServerWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,7 +41,7 @@ public class ServerLineParser {
 
     private final SparseArray<CodeParser> mCodeParser;
 
-    private ServerWriter mWriter;
+    private ServerCallHandler mCallHandler;
 
     private String mLine;
 
@@ -54,12 +54,12 @@ public class ServerLineParser {
     /**
      * A loop which reads each line from the server as it is received and passes it on to parse
      *
-     * @param reader the reader associated with the server stream
-     * @param writer the writer to write to the server
+     * @param reader      the reader associated with the server stream
+     * @param callHandler the writer to write to the server
      */
-    public void parseMain(final BufferedReader reader, final ServerWriter writer) throws
+    public void parseMain(final BufferedReader reader, final ServerCallHandler callHandler) throws
             IOException {
-        mWriter = writer;
+        mCallHandler = callHandler;
 
         while ((mLine = reader.readLine()) != null) {
             final boolean quit = parseLine();
@@ -90,7 +90,7 @@ public class ServerLineParser {
             case ServerCommands.PING:
                 // Immediately respond & return
                 final String source = parsedArray.get(1);
-                CoreListener.respondToPing(mWriter, source);
+                CoreListener.respondToPing(mCallHandler, source);
                 return false;
             case ServerCommands.ERROR:
                 // We are finished - the server has kicked us

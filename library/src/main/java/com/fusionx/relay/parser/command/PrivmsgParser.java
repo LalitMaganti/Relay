@@ -13,7 +13,7 @@ import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.parser.MentionParser;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.LogUtils;
-import com.fusionx.relay.util.Optionals;
+import com.fusionx.relay.function.Optionals;
 import com.fusionx.relay.util.Utils;
 
 import java.util.List;

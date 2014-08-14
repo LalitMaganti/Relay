@@ -18,7 +18,7 @@ public class ChannelPartCall extends Call {
 
     @Override
     public String getLineToSendServer() {
-        return TextUtils.isEmpty(channelName) ? String.format(WriterCommands.Part, channelName)
-                : String.format(WriterCommands.PartWithReason, channelName, reason).trim();
+        return TextUtils.isEmpty(channelName) ? String.format(WriterCommands.PART, channelName)
+                : String.format(WriterCommands.PART_WITH_REASON, channelName, reason).trim();
     }
 }

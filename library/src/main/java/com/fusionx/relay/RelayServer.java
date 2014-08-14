@@ -1,13 +1,10 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.bus.ServerCallBus;
+import com.fusionx.relay.bus.ServerCallHandler;
 import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.writers.ChannelWriter;
-import com.fusionx.relay.writers.ServerWriter;
-import com.fusionx.relay.writers.UserWriter;
 
-import java.io.Writer;
+import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,7 +21,7 @@ public class RelayServer implements Server {
 
     private final ServerEventBus mServerEventBus;
 
-    private final ServerCallBus mServerCallBus;
+    private final ServerCallHandler mServerCallHandler;
 
     private final Set<RelayChannelUser> mUsers;
 
@@ -46,7 +43,7 @@ public class RelayServer implements Server {
 
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus(this);
-        mServerCallBus = new ServerCallBus(this, connection.getServerCallHandler());
+        mServerCallHandler = new ServerCallHandler(this, connection.getServerCallHandler());
 
         // Set the nick name to the first choice nick
         mUser = new RelayMainUser(configuration.getNickStorage().getFirstChoiceNick());
@@ -66,9 +63,8 @@ public class RelayServer implements Server {
         // Keep our own user inside though
         mUsers.add(mUser);
 
-        // Need to remove old writers as they would be using the old socket OutputStream if a
-        // reconnection occurs
-        mServerCallBus.onConnectionTerminated();
+        // Need to remove anything using the old socket OutputStream in-case a reconnection occurs
+        mServerCallHandler.onConnectionTerminated();
     }
 
     @Override
@@ -84,14 +80,9 @@ public class RelayServer implements Server {
      * Sets up the writers based on the output stream passed into the method
      *
      * @param writer the which the writers will use
-     * @return the server writer created from the OutputStreamWriter
      */
-    public ServerWriter onOutputStreamCreated(final Writer writer) {
-        final ServerWriter serverWriter = new ServerWriter(writer);
-        mServerCallBus.register(serverWriter);
-        mServerCallBus.register(new ChannelWriter(writer));
-        mServerCallBus.register(new UserWriter(writer));
-        return serverWriter;
+    public void onOutputStreamCreated(final BufferedWriter writer) {
+        mServerCallHandler.onOutputStreamCreated(writer);
     }
 
     @Override
@@ -159,8 +150,8 @@ public class RelayServer implements Server {
     }
 
     @Override
-    public ServerCallBus getServerCallBus() {
-        return mServerCallBus;
+    public ServerCallHandler getServerCallHandler() {
+        return mServerCallHandler;
     }
 
     @Override

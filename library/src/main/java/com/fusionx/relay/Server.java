@@ -1,6 +1,6 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.bus.ServerCallBus;
+import com.fusionx.relay.bus.ServerCallHandler;
 import com.fusionx.relay.bus.ServerEventBus;
 import com.fusionx.relay.event.server.ServerEvent;
 
@@ -24,7 +24,7 @@ public interface Server extends Conversation {
 
     public ConnectionStatus getStatus();
 
-    public ServerCallBus getServerCallBus();
+    public ServerCallHandler getServerCallHandler();
 
     public ServerEventBus getServerEventBus();
 

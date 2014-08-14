@@ -23,7 +23,7 @@ public class ChannelKickCall extends Call {
     public String getLineToSendServer() {
         return TextUtils.isEmpty(channelName)
                 ? String.format(WriterCommands.Kick, channelName, userNick)
-                : String.format(WriterCommands.KickWithReason, channelName, userNick,
+                : String.format(WriterCommands.KICK_WITH_REASON, channelName, userNick,
                         reason).trim();
     }
 }

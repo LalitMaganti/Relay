@@ -1,6 +1,7 @@
 package com.fusionx.relay.call.user;
 
 import com.fusionx.relay.call.Call;
+import com.fusionx.relay.writers.WriterCommands;
 
 public class PrivateActionCall extends Call {
 
@@ -15,6 +16,6 @@ public class PrivateActionCall extends Call {
 
     @Override
     public String getLineToSendServer() {
-        return null;
+        return String.format(WriterCommands.ACTION, userNick, message);
     }
 }

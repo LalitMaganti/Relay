@@ -13,7 +13,7 @@ import com.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
 import com.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.LogUtils;
-import com.fusionx.relay.util.Optionals;
+import com.fusionx.relay.function.Optionals;
 
 import java.util.List;
 

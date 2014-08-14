@@ -8,7 +8,7 @@ import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelTopicEvent;
 import com.fusionx.relay.util.LogUtils;
-import com.fusionx.relay.util.Optionals;
+import com.fusionx.relay.function.Optionals;
 
 import java.util.List;
 

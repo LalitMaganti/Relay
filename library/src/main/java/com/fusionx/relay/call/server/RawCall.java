@@ -12,6 +12,6 @@ public class RawCall extends Call {
 
     @Override
     public String getLineToSendServer() {
-        return null;
+        return rawLine;
     }
 }

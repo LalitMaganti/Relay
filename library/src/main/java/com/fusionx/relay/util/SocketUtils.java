@@ -69,7 +69,7 @@ public class SocketUtils {
         return (SSLSocketFactory) SSLSocketFactory.getDefault();
     }
 
-    public static Writer getSocketWriter(final Socket socket) throws IOException {
+    public static BufferedWriter getSocketWriter(final Socket socket) throws IOException {
         return new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
 

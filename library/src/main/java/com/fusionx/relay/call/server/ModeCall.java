@@ -18,6 +18,6 @@ public class ModeCall extends Call {
 
     @Override
     public String getLineToSendServer() {
-        return null;
+        return "MODE " + channelName + " " + mode + " " + nick;
     }
 }

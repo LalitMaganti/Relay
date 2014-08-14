@@ -8,15 +8,15 @@ import com.fusionx.relay.RelayChannel;
 import com.fusionx.relay.RelayQueryUser;
 import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.RelayUserChannelInterface;
+import com.fusionx.relay.call.Call;
 import com.fusionx.relay.call.channel.ChannelActionCall;
-import com.fusionx.relay.call.channel.ChannelJoinCall;
 import com.fusionx.relay.call.channel.ChannelKickCall;
 import com.fusionx.relay.call.channel.ChannelMessageCall;
 import com.fusionx.relay.call.channel.ChannelPartCall;
 import com.fusionx.relay.call.channel.ChannelTopicCall;
+import com.fusionx.relay.call.server.JoinCall;
 import com.fusionx.relay.call.server.ModeCall;
 import com.fusionx.relay.call.server.NickChangeCall;
-import com.fusionx.relay.call.server.QuitCall;
 import com.fusionx.relay.call.server.RawCall;
 import com.fusionx.relay.call.server.WhoisCall;
 import com.fusionx.relay.call.user.PrivateActionCall;
@@ -32,53 +32,87 @@ import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.misc.RelayConfigurationProvider;
 import com.fusionx.relay.util.Utils;
-import com.fusionx.relay.writers.RawWriter;
-import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
 
 import android.os.Handler;
+import android.util.Base64;
 
-import java.util.Iterator;
-import java.util.Set;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
-import gnu.trove.set.hash.THashSet;
-
-public class ServerCallBus {
-
-    private final Set<RawWriter> mRawWriterSet = new THashSet<>();
+public class ServerCallHandler {
 
     private final RelayServer mServer;
 
     private final Handler mCallHandler;
 
-    private final Bus mBus;
-
     private final RelayUserChannelInterface mUserChannelInterface;
 
-    public ServerCallBus(final RelayServer server, final Handler callHandler) {
-        mServer = server;
-        mUserChannelInterface = server.getUserChannelInterface();
+    private BufferedWriter mBufferedWriter;
 
+    public ServerCallHandler(final RelayServer server, final Handler callHandler) {
+        mServer = server;
         mCallHandler = callHandler;
 
-        mBus = new Bus(ThreadEnforcer.ANY);
+        mUserChannelInterface = server.getUserChannelInterface();
     }
 
-    public void register(final RawWriter rawWriter) {
-        mBus.register(rawWriter);
-        mRawWriterSet.add(rawWriter);
-    }
-
-    public void onConnectionTerminated() {
-        for (final Iterator<RawWriter> iterator = mRawWriterSet.iterator(); iterator.hasNext(); ) {
-            final RawWriter writer = iterator.next();
-            iterator.remove();
-            mBus.unregister(writer);
+    void writeLineToServer(final String line) {
+        try {
+            mBufferedWriter.write(line + "\r\n");
+            mBufferedWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void post(final Object event) {
-        mCallHandler.post(() -> mBus.post(event));
+    public void post(final Call call) {
+        mCallHandler.post(() -> postImmediately(call));
+    }
+
+    public void postImmediately(final Call call) {
+        writeLineToServer(call.getLineToSendServer());
+    }
+
+    public void onOutputStreamCreated(final BufferedWriter writer) {
+        mBufferedWriter = writer;
+    }
+
+    public void onConnectionTerminated() {
+        mBufferedWriter = null;
+    }
+
+    public void pongServer(final String absoluteURL) {
+        writeLineToServer("PONG " + absoluteURL);
+    }
+
+    public void sendServerPassword(final String password) {
+        writeLineToServer("PASS " + password);
+    }
+
+    public void sendNickServPassword(final String password) {
+        writeLineToServer("NICKSERV IDENTIFY " + password);
+    }
+
+    public void sendSupportedCAP() {
+        writeLineToServer("CAP LS");
+    }
+
+    public void sendEndCap() {
+        writeLineToServer("CAP END");
+    }
+
+    public void requestSasl() {
+        writeLineToServer("CAP REQ : sasl multi-prefix");
+    }
+
+    public void sendPlainSaslAuthentication() {
+        writeLineToServer("AUTHENTICATE PLAIN");
+    }
+
+    public void sendSaslAuthentication(final String saslUsername, final String saslPassword) {
+        final String authentication = saslUsername + "\0" + saslUsername + "\0" + saslPassword;
+        final String encoded = Base64.encodeToString(authentication.getBytes(), Base64.DEFAULT);
+        writeLineToServer("AUTHENTICATE " + encoded);
     }
 
     public void sendMode(final String channelName, final String destination, final String mode) {
@@ -133,7 +167,8 @@ public class ServerCallBus {
     }
 
     public void sendPart(final String channelName) {
-        post(new ChannelPartCall(channelName, RelayConfigurationProvider.getPreferences().getPartReason()));
+        post(new ChannelPartCall(channelName,
+                RelayConfigurationProvider.getPreferences().getPartReason()));
     }
 
     public void sendCloseQuery(final QueryUser rawUser) {
@@ -152,7 +187,7 @@ public class ServerCallBus {
     }
 
     public void sendJoin(final String channelName) {
-        post(new ChannelJoinCall(channelName));
+        post(new JoinCall(channelName));
     }
 
     public void sendMessageToChannel(final String channelName, final String message) {
@@ -190,9 +225,5 @@ public class ServerCallBus {
 
     public void sendTopic(final String channelName, final String newTopic) {
         post(new ChannelTopicCall(channelName, newTopic));
-    }
-
-    public void postImmediately(final QuitCall quitCall) {
-        mBus.post(quitCall);
     }
 }

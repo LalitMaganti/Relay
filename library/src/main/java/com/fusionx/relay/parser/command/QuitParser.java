@@ -9,7 +9,7 @@ import com.fusionx.relay.RelayServer;
 import com.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import com.fusionx.relay.event.query.QueryQuitWorldEvent;
 import com.fusionx.relay.util.IRCUtils;
-import com.fusionx.relay.util.Optionals;
+import com.fusionx.relay.function.Optionals;
 
 import java.util.Collection;
 import java.util.List;

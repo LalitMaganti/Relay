@@ -21,20 +21,20 @@ public class UserInputParser {
                 case "/me":
                     if (arrayLength >= 1) {
                         final String action = IRCUtils.concatenateStringList(parsedArray);
-                        server.getServerCallBus().sendActionToChannel(channelName, action);
+                        server.getServerCallHandler().sendActionToChannel(channelName, action);
                         return;
                     }
                     break;
                 case "/part":
                 case "/p":
                     if (arrayLength == 0) {
-                        server.getServerCallBus().sendPart(channelName);
+                        server.getServerCallHandler().sendPart(channelName);
                         return;
                     }
                     break;
                 case "/mode":
                     if (arrayLength == 2) {
-                        server.getServerCallBus().sendMode(channelName, parsedArray.get(0),
+                        server.getServerCallHandler().sendMode(channelName, parsedArray.get(0),
                                 parsedArray.get(1));
                         return;
                     }
@@ -44,14 +44,14 @@ public class UserInputParser {
                         final String nick = parsedArray.remove(0);
                         final String reason = arrayLength >= 1 ? IRCUtils
                                 .concatenateStringList(parsedArray) : "";
-                        server.getServerCallBus().sendKick(channelName, nick, reason);
+                        server.getServerCallHandler().sendKick(channelName, nick, reason);
                         return;
                     }
                     break;
                 case "/topic":
                     if (arrayLength >= 1) {
                         final String topic = IRCUtils.concatenateStringList(parsedArray);
-                        server.getServerCallBus().sendTopic(channelName, topic);
+                        server.getServerCallHandler().sendTopic(channelName, topic);
                         return;
                     }
                     break;
@@ -60,7 +60,7 @@ public class UserInputParser {
                     return;
             }
         } else {
-            server.getServerCallBus().sendMessageToChannel(channelName, message);
+            server.getServerCallHandler().sendMessageToChannel(channelName, message);
             return;
         }
         onUnknownEvent(server, message);
@@ -76,7 +76,7 @@ public class UserInputParser {
             switch (command) {
                 case "/me":
                     final String action = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallBus().sendActionToQueryUser(userNick, action);
+                    server.getServerCallHandler().sendActionToQueryUser(userNick, action);
                     return;
                 case "/close":
                 case "/c":
@@ -89,7 +89,7 @@ public class UserInputParser {
                     return;
             }
         } else {
-            server.getServerCallBus().sendMessageToQueryUser(userNick, message);
+            server.getServerCallHandler().sendMessageToQueryUser(userNick, message);
             return;
         }
         onUnknownEvent(server, message);
@@ -103,7 +103,7 @@ public class UserInputParser {
         final Optional<? extends QueryUser> optional = server.getUserChannelInterface()
                 .getQueryUser(userNick);
         if (optional.isPresent()) {
-            server.getServerCallBus().sendCloseQuery(optional.get());
+            server.getServerCallHandler().sendCloseQuery(optional.get());
         } else {
             // This is probably a bug we need to fix
         }
@@ -128,7 +128,7 @@ public class UserInputParser {
             case "/j":
                 if (arrayLength == 1) {
                     final String channelName = parsedArray.get(0);
-                    server.getServerCallBus().sendJoin(channelName);
+                    server.getServerCallHandler().sendJoin(channelName);
                     return;
                 }
                 break;
@@ -137,38 +137,38 @@ public class UserInputParser {
                     final String nick = parsedArray.remove(0);
                     final String message = parsedArray.size() >= 1 ? IRCUtils.concatenateStringList
                             (parsedArray) : "";
-                    server.getServerCallBus().sendMessageToQueryUser(nick, message);
+                    server.getServerCallHandler().sendMessageToQueryUser(nick, message);
                     return;
                 }
                 break;
             case "/nick":
                 if (arrayLength == 1) {
                     final String newNick = parsedArray.get(0);
-                    server.getServerCallBus().sendNickChange(newNick);
+                    server.getServerCallHandler().sendNickChange(newNick);
                     return;
                 }
                 break;
             case "/whois":
                 if (arrayLength == 1) {
-                    server.getServerCallBus().sendUserWhois(parsedArray.get(0));
+                    server.getServerCallHandler().sendUserWhois(parsedArray.get(0));
                     return;
                 }
                 break;
             case "/ns":
                 if (arrayLength > 1) {
                     final String message = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallBus().sendMessageToQueryUser("NickServ", message);
+                    server.getServerCallHandler().sendMessageToQueryUser("NickServ", message);
                     return;
                 }
                 break;
             case "/raw":
             case "/quote":
-                server.getServerCallBus().sendRawLine(IRCUtils.concatenateStringList
+                server.getServerCallHandler().sendRawLine(IRCUtils.concatenateStringList
                         (parsedArray));
                 return;
             default:
                 if (command.startsWith("/")) {
-                    server.getServerCallBus().sendRawLine(command.substring(1) + " " + IRCUtils
+                    server.getServerCallHandler().sendRawLine(command.substring(1) + " " + IRCUtils
                             .concatenateStringList(parsedArray));
                     return;
                 }

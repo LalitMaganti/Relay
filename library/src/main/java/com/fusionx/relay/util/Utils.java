@@ -92,4 +92,8 @@ public class Utils {
     private static int digitValue(final char character) {
         return Character.isDigit(character) ? Character.getNumericValue(character) : -1;
     }
+
+    public static String returnNonEmpty(final String first, final String second) {
+        return Utils.isNotEmpty(first) ? first : second;
+    }
 }

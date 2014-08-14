@@ -1,14 +1,20 @@
 package com.fusionx.relay;
 
-import com.fusionx.relay.call.channel.ChannelJoinCall;
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
+
+import com.fusionx.relay.bus.ServerCallHandler;
+import com.fusionx.relay.call.server.JoinCall;
 import com.fusionx.relay.call.server.NickChangeCall;
 import com.fusionx.relay.call.server.QuitCall;
 import com.fusionx.relay.call.server.UserCall;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
+import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelStopEvent;
 import com.fusionx.relay.event.query.QueryConnectEvent;
 import com.fusionx.relay.event.query.QueryDisconnectEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.query.QueryStopEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.ConnectingEvent;
@@ -16,17 +22,17 @@ import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.ReconnectEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.server.StopEvent;
+import com.fusionx.relay.function.FluentIterables;
 import com.fusionx.relay.parser.ServerConnectionParser;
 import com.fusionx.relay.parser.ServerLineParser;
 import com.fusionx.relay.util.SocketUtils;
 import com.fusionx.relay.util.Utils;
-import com.fusionx.relay.writers.ServerWriter;
 
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.net.Socket;
 import java.util.Collection;
 
@@ -112,20 +118,20 @@ class BaseConnection {
      */
     void stopConnection() {
         mStopped = true;
-        mServer.getServerCallBus().postImmediately(new QuitCall(getPreferences().getQuitReason()));
+        mServer.getServerCallHandler().postImmediately(new QuitCall(getPreferences()
+                .getQuitReason()));
     }
 
     /**
      * Closes the socket if it is not already closed
      */
     void closeSocket() {
-        try {
-            if (mSocket != null) {
+        if (mSocket != null) {
+            try {
                 mSocket.close();
-                mSocket = null;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -134,39 +140,40 @@ class BaseConnection {
         try {
             mSocket = SocketUtils.openSocketConnection(mServerConfiguration);
 
-            final Writer writer = SocketUtils.getSocketWriter(mSocket);
-            final ServerWriter serverWriter = mServer.onOutputStreamCreated(writer);
+            final BufferedWriter socketWriter = SocketUtils.getSocketWriter(mSocket);
+            mServer.onOutputStreamCreated(socketWriter);
 
+            // We are now in the phase where we can say we are connecting to the server
             onConnecting();
 
+            final ServerCallHandler callHandler = mServer.getServerCallHandler();
             if (mServerConfiguration.isSaslAvailable()) {
                 // By sending this line, the server *should* wait until we end the CAP stuff with
                 // CAP END
-                serverWriter.sendSupportedCAP();
+                callHandler.sendSupportedCAP();
             }
 
             if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
-                serverWriter.sendServerPassword(mServerConfiguration.getServerPassword());
+                callHandler.sendServerPassword(mServerConfiguration.getServerPassword());
             }
 
-            serverWriter.sendNick(new NickChangeCall(mServerConfiguration.getNickStorage()
-                    .getFirstChoiceNick()));
-            mServer.getServerCallBus().post(new UserCall(mServerConfiguration.getServerUserName(),
-                    Utils.isNotEmpty(mServerConfiguration.getRealName())
-                            ? mServerConfiguration.getRealName()
-                            : "RelayUser"
-            ));
+            // Send NICK and USER lines to the server
+            mServer.getServerCallHandler().post(new NickChangeCall(mServerConfiguration
+                    .getNickStorage().getFirstChoiceNick()));
+            mServer.getServerCallHandler().post(new UserCall(mServerConfiguration
+                    .getServerUserName(), Utils.returnNonEmpty(mServerConfiguration.getRealName(),
+                    "RelayUser")));
 
             final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
-                    mServerConfiguration, reader, serverWriter);
+                    mServerConfiguration, reader, callHandler);
             final String nick = parser.parseConnect();
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
             // If the nick is null then we have no hope of progressing
             if (!TextUtils.isEmpty(nick)) {
-                onStartParsing(nick, serverWriter, reader);
+                onStartParsing(nick, callHandler, reader);
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
@@ -175,14 +182,15 @@ class BaseConnection {
         }
 
         // If it was stopped then this cleanup would have already been performed
-        if (!mStopped) {
-            onDisconnected(disconnectMessage, isReconnectNeeded());
-            closeSocket();
-            mServer.onConnectionTerminated();
+        if (mStopped) {
+            return;
         }
+        onDisconnected(disconnectMessage, isReconnectNeeded());
+        closeSocket();
+        mServer.onConnectionTerminated();
     }
 
-    private void onStartParsing(final String nick, final ServerWriter serverWriter,
+    private void onStartParsing(final String nick, final ServerCallHandler callHandler,
             final BufferedReader reader) throws IOException {
         // Since we are now connected, reset the reconnect attempts
         mReconnectAttempts = 0;
@@ -193,26 +201,26 @@ class BaseConnection {
 
         // Identifies with NickServ if the password exists
         if (Utils.isNotEmpty(mServerConfiguration.getNickservPassword())) {
-            serverWriter.sendNickServPassword(mServerConfiguration.getNickservPassword());
+            callHandler.sendNickServPassword(mServerConfiguration.getNickservPassword());
         }
 
         final Collection<RelayChannel> channels = mServer.getUser().getChannels();
         if (channels.isEmpty()) {
             // Automatically join the channels specified in the configuration
-            for (final String channelName : mServerConfiguration.getAutoJoinChannels()) {
-                mServer.getServerCallBus().post(new ChannelJoinCall(channelName));
-            }
+            FluentIterables.forEach(FluentIterable.from(mServerConfiguration.getAutoJoinChannels())
+                            .transform(JoinCall::new),
+                    mServer.getServerCallHandler()::post);
         } else {
-            // Automatically join the channels specified in the configuration
-            for (final RelayChannel channel : channels) {
-                mServer.getServerCallBus().post(new ChannelJoinCall(channel.getName()));
-            }
+            FluentIterables.forEach(FluentIterable.from(channels)
+                            .transform(Channel::getName)
+                            .transform(JoinCall::new),
+                    mServer.getServerCallHandler()::post);
         }
 
         // Initialise the parser used to parse any lines from the server
         mLineParser = new ServerLineParser(mServer);
         // Loops forever until broken
-        mLineParser.parseMain(reader, serverWriter);
+        mLineParser.parseMain(reader, callHandler);
     }
 
     private void onConnecting() {
@@ -222,48 +230,41 @@ class BaseConnection {
     }
 
     private void onConnected() {
-        mServerConnection.updateStatus(ConnectionStatus.CONNECTED);
-
-        for (final RelayChannel channel : mServer.getUser().getChannels()) {
-            channel.postAndStoreEvent(new ChannelConnectEvent(channel));
-        }
-
-        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
-            user.postAndStoreEvent(new QueryConnectEvent(user));
-        }
-
-        final ServerEvent event = new ConnectEvent(mServerConfiguration.getUrl());
-        mServer.getServerEventBus().postAndStoreEvent(event);
+        onStatusChanged(ConnectionStatus.CONNECTED,
+                ChannelConnectEvent::new,
+                QueryConnectEvent::new,
+                server -> new ConnectEvent(mServerConfiguration.getUrl()));
     }
 
     private void onDisconnected(final String serverMessage, final boolean retryPending) {
-        mServerConnection.updateStatus(ConnectionStatus.DISCONNECTED);
-
-        for (final RelayChannel channel : mServer.getUser().getChannels()) {
-            channel.postAndStoreEvent(new ChannelDisconnectEvent(channel, serverMessage));
-        }
-
-        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
-            user.postAndStoreEvent(new QueryDisconnectEvent(user, serverMessage));
-        }
-
-        final ServerEvent event = new DisconnectEvent(serverMessage, retryPending);
-        mServer.getServerEventBus().postAndStoreEvent(event);
+        onStatusChanged(ConnectionStatus.DISCONNECTED,
+                channel -> new ChannelDisconnectEvent(channel, serverMessage),
+                user -> new QueryDisconnectEvent(user, serverMessage),
+                server -> new DisconnectEvent(serverMessage, retryPending));
     }
 
     void onStopped() {
-        mServerConnection.updateStatus(ConnectionStatus.STOPPED);
+        onStatusChanged(ConnectionStatus.STOPPED,
+                ChannelStopEvent::new,
+                QueryStopEvent::new,
+                server -> new StopEvent());
+    }
+
+    private void onStatusChanged(final ConnectionStatus status,
+            final Function<RelayChannel, ChannelEvent> channelFunction,
+            final Function<RelayQueryUser, QueryEvent> queryFunction,
+            final Function<Server, ServerEvent> serverFunction) {
+        mServerConnection.updateStatus(status);
 
         for (final RelayChannel channel : mServer.getUser().getChannels()) {
-            channel.postAndStoreEvent(new ChannelStopEvent(channel));
+            channel.postAndStoreEvent(channelFunction.apply(channel));
         }
 
         for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
-            user.postAndStoreEvent(new QueryStopEvent(user));
+            user.postAndStoreEvent(queryFunction.apply(user));
         }
 
-        final ServerEvent event = new StopEvent();
-        mServer.getServerEventBus().postAndStoreEvent(event);
+        mServer.getServerEventBus().postAndStoreEvent(serverFunction.apply(mServer));
     }
 
     private boolean isReconnectNeeded() {
