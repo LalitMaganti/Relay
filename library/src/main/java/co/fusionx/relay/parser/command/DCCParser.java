@@ -43,7 +43,7 @@ public class DCCParser {
             case "CHAT":
                 parseChatCommand(nick, ipAddress, port);
                 break;
-            case "FILE":
+            case "SEND":
                 parseFileCommand(nick, argument, ipAddress, port, parsedArray);
                 break;
         }

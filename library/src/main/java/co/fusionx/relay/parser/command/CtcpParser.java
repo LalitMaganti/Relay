@@ -73,7 +73,7 @@ class CtcpParser {
         } else if (message.startsWith("TIME")) {
             getServer().getServerCallHandler().post(new TimeResponseCall(nick));
         } else if (message.startsWith("DCC")) {
-            final List<String> parsedDcc = IRCUtils.splitRawLine(message, false);
+            final List<String> parsedDcc = IRCUtils.splitRawLineWithQuote(message);
             mDCCParser.onParseCommand(parsedDcc, rawSource);
         }
     }
