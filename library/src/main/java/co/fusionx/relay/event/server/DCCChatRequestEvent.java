@@ -1,17 +1,15 @@
 package co.fusionx.relay.event.server;
 
 import co.fusionx.relay.Server;
+import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 
 public class DCCChatRequestEvent extends ServerEvent {
 
-    public final String ipAddress;
+    public final DCCPendingConnection pendingConnection;
 
-    public final int port;
-
-    public DCCChatRequestEvent(final Server server, final String ipAddress, final int port) {
+    public DCCChatRequestEvent(final Server server, final DCCPendingConnection pendingConnection) {
         super(server);
 
-        this.ipAddress = ipAddress;
-        this.port = port;
+        this.pendingConnection = pendingConnection;
     }
 }

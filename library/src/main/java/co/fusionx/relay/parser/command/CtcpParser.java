@@ -74,7 +74,7 @@ class CtcpParser {
             getServer().getServerCallHandler().post(new TimeResponseCall(nick));
         } else if (message.startsWith("DCC")) {
             final List<String> parsedDcc = IRCUtils.splitRawLine(message, false);
-            mDCCParser.onParseCommand(parsedDcc);
+            mDCCParser.onParseCommand(parsedDcc, rawSource);
         }
     }
 

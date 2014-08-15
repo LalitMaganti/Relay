@@ -166,7 +166,7 @@ public class ServerConnection {
         try {
             mSocket = SocketUtils.openSocketConnection(mServerConfiguration);
 
-            final BufferedWriter socketWriter = SocketUtils.getSocketWriter(mSocket);
+            final BufferedWriter socketWriter = SocketUtils.getSocketBufferedWriter(mSocket);
             mServer.onOutputStreamCreated(socketWriter);
 
             // We are now in the phase where we can say we are connecting to the server

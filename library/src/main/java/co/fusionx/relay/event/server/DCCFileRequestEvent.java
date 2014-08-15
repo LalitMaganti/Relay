@@ -1,24 +1,15 @@
 package co.fusionx.relay.event.server;
 
 import co.fusionx.relay.Server;
+import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 
 public class DCCFileRequestEvent extends ServerEvent {
 
-    public final String fileName;
+    public final DCCPendingConnection pendingConnection;
 
-    public final String ipAddress;
-
-    public final int port;
-
-    public final long size;
-
-    public DCCFileRequestEvent(final Server server, final String fileName, final String ipAddress,
-            final int port, final long size) {
+    public DCCFileRequestEvent(final Server server, final DCCPendingConnection pendingConnection) {
         super(server);
 
-        this.fileName = fileName;
-        this.ipAddress = ipAddress;
-        this.port = port;
-        this.size = size;
+        this.pendingConnection = pendingConnection;
     }
 }
