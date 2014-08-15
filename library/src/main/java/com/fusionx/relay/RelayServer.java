@@ -71,11 +71,11 @@ public class RelayServer implements Server {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Server)) {
+        if (!(o instanceof RelayServer)) {
             return false;
         }
-        final Server server = (Server) o;
-        return server.getTitle().equals(getTitle());
+        final RelayServer server = (RelayServer) o;
+        return getTitle().equals(server.getTitle());
     }
 
     /**
