@@ -1,14 +1,13 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.ServerConfiguration;
-import co.fusionx.relay.misc.NickStorage;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import android.os.Parcel;
+
+import co.fusionx.relay.misc.NickStorage;
 
 import static co.fusionx.relay.ServerConfiguration.Builder.CREATOR;
 import static org.assertj.core.api.Assertions.assertThat;

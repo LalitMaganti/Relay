@@ -1,5 +1,7 @@
 package co.fusionx.relay.parser;
 
+import java.util.List;
+
 import co.fusionx.relay.ServerConfiguration;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
@@ -7,8 +9,6 @@ import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.util.IRCUtils;
-
-import java.util.List;
 
 class CapParser {
 

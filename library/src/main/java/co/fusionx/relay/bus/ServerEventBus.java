@@ -1,6 +1,7 @@
 package co.fusionx.relay.bus;
 
 import com.fusionx.bus.Bus;
+
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;

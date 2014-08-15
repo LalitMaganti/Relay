@@ -1,13 +1,13 @@
 package co.fusionx.relay.parser.code;
 
+import android.util.SparseArray;
+
+import java.util.List;
+
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.RelayUserChannelInterface;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.constants.ServerReplyCodes;
-
-import android.util.SparseArray;
-
-import java.util.List;
 
 public abstract class CodeParser {
 

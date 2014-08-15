@@ -1,13 +1,13 @@
 package co.fusionx.relay.parser.code;
 
+import java.util.List;
+
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayChannelUser;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.util.IRCUtils;
-
-import java.util.List;
 
 import static co.fusionx.relay.constants.ServerReplyCodes.RPL_NAMREPLY;
 

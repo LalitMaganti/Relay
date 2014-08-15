@@ -1,13 +1,12 @@
 package co.fusionx.relay.parser.command;
 
+import java.util.List;
+import java.util.Map;
+
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.RelayUserChannelInterface;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.constants.ServerCommands;
-
-import java.util.List;
-import java.util.Map;
-
 import gnu.trove.map.hash.THashMap;
 
 public abstract class CommandParser {
@@ -25,7 +24,8 @@ public abstract class CommandParser {
     }
 
     public static Map<String, CommandParser> getParserMap(final RelayServer server) {
-        final CtcpParser ctcpParser = new CtcpParser(server);
+        final DCCParser dccParser = new DCCParser(server);
+        final CtcpParser ctcpParser = new CtcpParser(server, dccParser);
 
         final Map<String, CommandParser> parserMap = new THashMap<>();
         parserMap.put(ServerCommands.JOIN, new JoinParser(server));

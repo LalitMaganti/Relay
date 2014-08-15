@@ -2,11 +2,11 @@ package co.fusionx.relay.event.channel;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.List;
+
 import co.fusionx.relay.Channel;
 import co.fusionx.relay.ChannelUser;
 import co.fusionx.relay.Nick;
-
-import java.util.List;
 
 public abstract class ChannelWorldUserEvent extends ChannelEvent {
 

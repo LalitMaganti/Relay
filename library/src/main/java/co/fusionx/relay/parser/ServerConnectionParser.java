@@ -1,24 +1,23 @@
 package co.fusionx.relay.parser;
 
-import co.fusionx.relay.Server;
-import co.fusionx.relay.ServerConfiguration;
-import co.fusionx.relay.bus.ServerCallHandler;
-import co.fusionx.relay.bus.ServerEventBus;
-import co.fusionx.relay.call.server.NickChangeCall;
-import co.fusionx.relay.constants.ServerCommands;
-import co.fusionx.relay.event.server.GenericServerEvent;
-import co.fusionx.relay.misc.CoreListener;
-import co.fusionx.relay.misc.NickStorage;
-import co.fusionx.relay.util.IRCUtils;
-import co.fusionx.relay.util.Utils;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 
+import co.fusionx.relay.Server;
+import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.bus.ServerCallHandler;
+import co.fusionx.relay.bus.ServerEventBus;
+import co.fusionx.relay.call.server.NickChangeCall;
+import co.fusionx.relay.constants.ServerCommands;
 import co.fusionx.relay.constants.ServerReplyCodes;
+import co.fusionx.relay.event.server.GenericServerEvent;
+import co.fusionx.relay.misc.CoreListener;
+import co.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.Utils;
 
 public class ServerConnectionParser {
 

@@ -1,12 +1,12 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.event.server.GenericServerEvent;
-import co.fusionx.relay.event.server.ServerEvent;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import co.fusionx.relay.event.server.GenericServerEvent;
+import co.fusionx.relay.event.server.ServerEvent;
 
 import static co.fusionx.relay.ServerConfigurationTest.getFreenodeConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;

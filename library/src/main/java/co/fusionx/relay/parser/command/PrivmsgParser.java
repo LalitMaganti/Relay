@@ -2,6 +2,8 @@ package co.fusionx.relay.parser.command;
 
 import com.google.common.base.Optional;
 
+import java.util.List;
+
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayChannelUser;
 import co.fusionx.relay.RelayQueryUser;
@@ -10,15 +12,12 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
+import co.fusionx.relay.function.Optionals;
+import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.parser.MentionParser;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
-import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.util.Utils;
-
-import java.util.List;
-
-import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class PrivmsgParser extends CommandParser {
 
@@ -33,7 +32,8 @@ public class PrivmsgParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         if (parsedArray.size() < 4) {
-            RelayConfigurationProvider.getPreferences().logServerLine(mServer.getServerConnection().getCurrentLine());
+            RelayConfigurationProvider.getPreferences()
+                    .logServerLine(mServer.getServerConnection().getCurrentLine());
             return;
         }
         final String message = parsedArray.get(3);

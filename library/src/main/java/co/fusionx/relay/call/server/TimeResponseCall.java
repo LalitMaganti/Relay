@@ -1,10 +1,10 @@
 package co.fusionx.relay.call.server;
 
-import co.fusionx.relay.call.Call;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import co.fusionx.relay.call.Call;
 
 public class TimeResponseCall extends Call {
 

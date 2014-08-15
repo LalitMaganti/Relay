@@ -1,18 +1,5 @@
 package co.fusionx.relay.parser;
 
-import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.bus.ServerCallHandler;
-import co.fusionx.relay.constants.ServerCommands;
-import co.fusionx.relay.event.server.GenericServerEvent;
-import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.event.server.WhoisEvent;
-import co.fusionx.relay.misc.CoreListener;
-import co.fusionx.relay.parser.code.CodeParser;
-import co.fusionx.relay.parser.command.CommandParser;
-import co.fusionx.relay.parser.command.QuitParser;
-import co.fusionx.relay.util.IRCUtils;
-
 import org.apache.commons.lang3.StringUtils;
 
 import android.util.Log;
@@ -23,7 +10,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.bus.ServerCallHandler;
+import co.fusionx.relay.constants.ServerCommands;
 import co.fusionx.relay.constants.ServerReplyCodes;
+import co.fusionx.relay.event.server.GenericServerEvent;
+import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.event.server.WhoisEvent;
+import co.fusionx.relay.misc.CoreListener;
+import co.fusionx.relay.parser.code.CodeParser;
+import co.fusionx.relay.parser.command.CommandParser;
+import co.fusionx.relay.parser.command.QuitParser;
+import co.fusionx.relay.util.IRCUtils;
 
 public class ServerLineParser {
 

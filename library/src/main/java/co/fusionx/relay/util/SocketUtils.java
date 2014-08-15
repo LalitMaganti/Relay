@@ -1,7 +1,5 @@
 package co.fusionx.relay.util;
 
-import co.fusionx.relay.ServerConfiguration;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -19,6 +17,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import co.fusionx.relay.ServerConfiguration;
 
 public class SocketUtils {
 

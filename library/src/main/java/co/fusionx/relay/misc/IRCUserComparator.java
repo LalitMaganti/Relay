@@ -1,10 +1,10 @@
 package co.fusionx.relay.misc;
 
+import java.util.Comparator;
+
 import co.fusionx.relay.Channel;
 import co.fusionx.relay.ChannelUser;
 import co.fusionx.relay.constants.UserLevel;
-
-import java.util.Comparator;
 
 public class IRCUserComparator implements Comparator<ChannelUser> {
 

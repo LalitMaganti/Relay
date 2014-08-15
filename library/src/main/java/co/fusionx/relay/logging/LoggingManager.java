@@ -1,11 +1,5 @@
 package co.fusionx.relay.logging;
 
-import co.fusionx.relay.Server;
-import co.fusionx.relay.event.Event;
-import co.fusionx.relay.event.channel.ChannelEvent;
-import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.event.server.ServerEvent;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,6 +9,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import co.fusionx.relay.Server;
+import co.fusionx.relay.event.Event;
+import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.event.query.QueryEvent;
+import co.fusionx.relay.event.server.ServerEvent;
 import gnu.trove.map.hash.THashMap;
 
 /**

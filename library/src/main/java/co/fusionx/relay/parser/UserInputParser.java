@@ -2,11 +2,11 @@ package co.fusionx.relay.parser;
 
 import com.google.common.base.Optional;
 
+import java.util.List;
+
 import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
 import co.fusionx.relay.util.IRCUtils;
-
-import java.util.List;
 
 public class UserInputParser {
 

@@ -2,15 +2,15 @@ package co.fusionx.relay.parser.code;
 
 import com.google.common.base.Optional;
 
+import java.util.List;
+
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.channel.ChannelInitialTopicEvent;
+import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
-import co.fusionx.relay.function.Optionals;
-
-import java.util.List;
 
 class TopicParser extends CodeParser {
 

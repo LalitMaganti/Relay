@@ -2,17 +2,17 @@ package co.fusionx.relay.parser.command;
 
 import com.google.common.base.Optional;
 
+import java.util.Collection;
+import java.util.List;
+
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayChannelUser;
 import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.query.QueryQuitWorldEvent;
-import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.function.Optionals;
-
-import java.util.Collection;
-import java.util.List;
+import co.fusionx.relay.util.IRCUtils;
 
 public class QuitParser extends CommandParser {
 

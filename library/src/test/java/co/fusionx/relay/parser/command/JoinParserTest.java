@@ -3,24 +3,24 @@ package co.fusionx.relay.parser.command;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
-import co.fusionx.relay.RelayChannel;
-import co.fusionx.relay.RelayChannelTest;
-import co.fusionx.relay.RelayChannelUser;
-import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.RelayServerTest;
-import co.fusionx.relay.TestMisc;
-import co.fusionx.relay.ServerConfigurationTest;
-import co.fusionx.relay.event.channel.ChannelWorldJoinEvent;
-import co.fusionx.relay.event.server.JoinEvent;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
-import co.fusionx.relay.util.IRCUtils;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
+
+import co.fusionx.relay.RelayChannel;
+import co.fusionx.relay.RelayChannelTest;
+import co.fusionx.relay.RelayChannelUser;
+import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.RelayServerTest;
+import co.fusionx.relay.ServerConfigurationTest;
+import co.fusionx.relay.TestMisc;
+import co.fusionx.relay.event.channel.ChannelWorldJoinEvent;
+import co.fusionx.relay.event.server.JoinEvent;
+import co.fusionx.relay.misc.RelayConfigurationProvider;
+import co.fusionx.relay.util.IRCUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -83,7 +83,8 @@ public class JoinParserTest {
     public void testOnJoin() {
         resetFields();
 
-        final String nick = ServerConfigurationTest.getFreenodeConfiguration().getNickStorage().getFirstChoiceNick();
+        final String nick = ServerConfigurationTest.getFreenodeConfiguration().getNickStorage()
+                .getFirstChoiceNick();
 
         final String joinLine = ":holoirctester!holoirctester@test JOIN #relay";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);

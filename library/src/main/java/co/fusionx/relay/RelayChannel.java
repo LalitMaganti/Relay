@@ -2,15 +2,15 @@ package co.fusionx.relay;
 
 import com.google.common.collect.ImmutableList;
 
-import co.fusionx.relay.constants.UserLevel;
-import co.fusionx.relay.event.channel.ChannelEvent;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.event.channel.ChannelEvent;
 
 public class RelayChannel implements Channel {
 

@@ -2,6 +2,9 @@ package co.fusionx.relay.parser.command;
 
 import com.google.common.base.Optional;
 
+import java.util.Collection;
+import java.util.List;
+
 import co.fusionx.relay.ChannelUser;
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayChannelUser;
@@ -11,9 +14,6 @@ import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.server.PartEvent;
 import co.fusionx.relay.util.IRCUtils;
-
-import java.util.Collection;
-import java.util.List;
 
 public class PartParser extends RemoveUserParser {
 

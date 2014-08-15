@@ -1,10 +1,10 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.constants.UserLevel;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import co.fusionx.relay.constants.UserLevel;
 
 public class RelayChannelUser implements ChannelUser {
 

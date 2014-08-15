@@ -1,14 +1,14 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.misc.NickStorage;
-import co.fusionx.relay.util.Utils;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import co.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.util.Utils;
 
 public class ServerConfiguration implements Parcelable {
 

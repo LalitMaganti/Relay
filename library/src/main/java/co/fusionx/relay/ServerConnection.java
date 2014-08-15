@@ -3,6 +3,16 @@ package co.fusionx.relay;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.text.TextUtils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Collection;
+
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.call.server.JoinCall;
 import co.fusionx.relay.call.server.NickChangeCall;
@@ -23,22 +33,11 @@ import co.fusionx.relay.event.server.ReconnectEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.StopEvent;
 import co.fusionx.relay.function.FluentIterables;
+import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.parser.ServerConnectionParser;
 import co.fusionx.relay.parser.ServerLineParser;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
-
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.text.TextUtils;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.Collection;
-
-import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class ServerConnection {
 
@@ -298,6 +297,7 @@ public class ServerConnection {
     }
 
     private boolean isReconnectNeeded() {
-        return mReconnectAttempts < RelayConfigurationProvider.getPreferences().getReconnectAttemptsCount();
+        return mReconnectAttempts < RelayConfigurationProvider.getPreferences()
+                .getReconnectAttemptsCount();
     }
 }

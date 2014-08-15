@@ -1,9 +1,5 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.bus.ServerCallHandler;
-import co.fusionx.relay.bus.ServerEventBus;
-import co.fusionx.relay.event.server.ServerEvent;
-
 import android.os.Handler;
 
 import java.io.BufferedWriter;
@@ -12,6 +8,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import co.fusionx.relay.bus.ServerCallHandler;
+import co.fusionx.relay.bus.ServerEventBus;
+import co.fusionx.relay.event.server.ServerEvent;
 
 public class RelayServer implements Server {
 

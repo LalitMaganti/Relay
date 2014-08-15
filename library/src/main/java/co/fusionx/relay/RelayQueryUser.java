@@ -1,5 +1,8 @@
 package co.fusionx.relay;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.query.QueryEvent;
@@ -7,9 +10,6 @@ import co.fusionx.relay.event.query.QueryMessageSelfEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.query.QueryOpenedEvent;
 import co.fusionx.relay.util.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RelayQueryUser implements QueryUser {
 

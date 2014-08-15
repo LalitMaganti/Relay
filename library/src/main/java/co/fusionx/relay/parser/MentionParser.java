@@ -1,8 +1,8 @@
 package co.fusionx.relay.parser;
 
-import co.fusionx.relay.util.IRCUtils;
-
 import java.util.List;
+
+import co.fusionx.relay.util.IRCUtils;
 
 public class MentionParser {
 

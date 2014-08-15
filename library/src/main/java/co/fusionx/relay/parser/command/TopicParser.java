@@ -2,15 +2,15 @@ package co.fusionx.relay.parser.command;
 
 import com.google.common.base.Optional;
 
+import java.util.List;
+
 import co.fusionx.relay.ChannelUser;
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelTopicEvent;
-import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.function.Optionals;
-
-import java.util.List;
+import co.fusionx.relay.util.LogUtils;
 
 public class TopicParser extends CommandParser {
 

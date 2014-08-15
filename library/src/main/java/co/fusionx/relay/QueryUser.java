@@ -1,8 +1,8 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.event.query.QueryEvent;
-
 import java.util.List;
+
+import co.fusionx.relay.event.query.QueryEvent;
 
 public interface QueryUser extends Conversation {
 

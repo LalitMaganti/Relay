@@ -1,8 +1,8 @@
 package co.fusionx.relay.call.server;
 
-import co.fusionx.relay.call.Call;
-
 import android.text.TextUtils;
+
+import co.fusionx.relay.call.Call;
 
 public class QuitCall extends Call {
 

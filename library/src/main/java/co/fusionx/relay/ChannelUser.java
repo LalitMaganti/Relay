@@ -1,8 +1,8 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.constants.UserLevel;
-
 import java.util.Set;
+
+import co.fusionx.relay.constants.UserLevel;
 
 public interface ChannelUser {
 

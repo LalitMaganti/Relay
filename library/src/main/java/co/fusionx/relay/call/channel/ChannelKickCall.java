@@ -1,9 +1,9 @@
 package co.fusionx.relay.call.channel;
 
+import android.text.TextUtils;
+
 import co.fusionx.relay.call.Call;
 import co.fusionx.relay.writers.WriterCommands;
-
-import android.text.TextUtils;
 
 public class ChannelKickCall extends Call {
 

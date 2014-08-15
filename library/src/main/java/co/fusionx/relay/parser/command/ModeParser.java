@@ -2,20 +2,20 @@ package co.fusionx.relay.parser.command;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.RelayMainUser;
+import java.util.List;
+
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayChannelUser;
+import co.fusionx.relay.RelayMainUser;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelModeEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
+import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
-import co.fusionx.relay.function.Optionals;
-
-import java.util.List;
 
 class ModeParser extends CommandParser {
 
@@ -67,7 +67,8 @@ class ModeParser extends CommandParser {
             final UserLevel levelEnum = user.onModeChange(channel, mode);
 
             final ChannelEvent event = appUser
-                    ? new ChannelUserLevelChangeEvent(channel, mode, (RelayMainUser) user, levelEnum,
+                    ? new ChannelUserLevelChangeEvent(channel, mode, (RelayMainUser) user,
+                    levelEnum,
                     optSending, sendingNick)
                     : new ChannelWorldLevelChangeEvent(channel, mode, user, levelEnum,
                             optSending, sendingNick);

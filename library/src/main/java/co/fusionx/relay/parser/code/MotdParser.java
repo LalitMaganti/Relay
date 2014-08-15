@@ -1,11 +1,11 @@
 package co.fusionx.relay.parser.code;
 
+import java.util.List;
+
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.event.server.MotdEvent;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.util.Utils;
-
-import java.util.List;
 
 import static co.fusionx.relay.constants.ServerReplyCodes.RPL_MOTD;
 import static co.fusionx.relay.constants.ServerReplyCodes.RPL_MOTDSTART;

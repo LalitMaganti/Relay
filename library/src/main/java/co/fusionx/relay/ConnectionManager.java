@@ -1,14 +1,13 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.interfaces.RelayConfiguration;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
-
 import android.os.Handler;
 import android.util.Pair;
 
 import java.util.Collection;
 import java.util.Map;
 
+import co.fusionx.relay.interfaces.RelayConfiguration;
+import co.fusionx.relay.misc.RelayConfigurationProvider;
 import gnu.trove.map.hash.THashMap;
 
 public class ConnectionManager {

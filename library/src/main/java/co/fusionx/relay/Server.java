@@ -1,11 +1,11 @@
 package co.fusionx.relay;
 
+import java.util.Collection;
+import java.util.List;
+
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.event.server.ServerEvent;
-
-import java.util.Collection;
-import java.util.List;
 
 public interface Server extends Conversation {
 

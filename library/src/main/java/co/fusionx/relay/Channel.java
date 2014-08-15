@@ -1,10 +1,10 @@
 package co.fusionx.relay;
 
-import co.fusionx.relay.constants.UserLevel;
-import co.fusionx.relay.event.channel.ChannelEvent;
-
 import java.util.Collection;
 import java.util.List;
+
+import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.event.channel.ChannelEvent;
 
 public interface Channel extends Conversation {
 

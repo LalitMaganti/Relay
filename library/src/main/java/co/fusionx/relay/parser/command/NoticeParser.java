@@ -2,6 +2,8 @@ package co.fusionx.relay.parser.command;
 
 import com.google.common.base.Optional;
 
+import java.util.List;
+
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;
@@ -10,8 +12,6 @@ import co.fusionx.relay.event.channel.ChannelNoticeEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.util.IRCUtils;
-
-import java.util.List;
 
 class NoticeParser extends CommandParser {
 

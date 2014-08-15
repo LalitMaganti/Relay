@@ -3,14 +3,13 @@ package co.fusionx.relay;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 
-import co.fusionx.relay.constants.UserLevel;
-import co.fusionx.relay.util.IRCUtils;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.util.IRCUtils;
 import gnu.trove.set.hash.THashSet;
 
 public class RelayUserChannelInterface implements UserChannelInterface {
@@ -70,7 +69,8 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
     /**
      * Add the channel to the user and user to the channel. Also add the user to the global list
-     * of users. The user is given a default user level in the channel of {@link co.fusionx.relay.constants.UserLevel#NONE}
+     * of users. The user is given a default user level in the channel of {@link
+     * co.fusionx.relay.constants.UserLevel#NONE}
      *
      * @param user    the user to add to the channel
      * @param channel the channel to add to the user

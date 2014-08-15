@@ -3,6 +3,12 @@ package co.fusionx.relay.bus;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
+import android.os.Handler;
+import android.util.Base64;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayQueryUser;
@@ -32,12 +38,6 @@ import co.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.util.Utils;
-
-import android.os.Handler;
-import android.util.Base64;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 public class ServerCallHandler {
 

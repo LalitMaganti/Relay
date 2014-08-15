@@ -1,11 +1,11 @@
 package co.fusionx.relay.parser.command;
 
+import java.util.List;
+
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.util.IRCUtils;
-
-import java.util.List;
 
 class InviteParser extends CommandParser {
 

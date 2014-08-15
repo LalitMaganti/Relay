@@ -2,6 +2,8 @@ package co.fusionx.relay.parser.command;
 
 import com.google.common.base.Optional;
 
+import java.util.List;
+
 import co.fusionx.relay.Nick;
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayChannelUser;
@@ -11,11 +13,9 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.server.ServerNickChangeEvent;
+import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
-import co.fusionx.relay.function.Optionals;
-
-import java.util.List;
 
 class NickParser extends CommandParser {
 
