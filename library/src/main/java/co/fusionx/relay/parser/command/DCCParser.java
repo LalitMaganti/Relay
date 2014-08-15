@@ -26,6 +26,9 @@ public class DCCParser {
         // Remove the DCC prefix
         parsedArray.remove(0);
 
+        // Now get the type of DCC
+        final String type = parsedArray.remove(0);
+
         // Remove the argument
         final String argument = parsedArray.remove(0);
 
@@ -36,8 +39,6 @@ public class DCCParser {
         // Convert the address to a normal representation
         final String ipAddress = IRCUtils.ipDecimalToString(ipDecimal);
 
-        // Now get the type of DCC
-        final String type = parsedArray.remove(0);
         switch (type) {
             case "CHAT":
                 parseChatCommand(nick, ipAddress, port);
@@ -57,8 +58,8 @@ public class DCCParser {
 
     private void parseFileCommand(final String nick, final String fileName, final String ipAddress,
             final int port, final List<String> parsedArray) {
-        // Retrieve the file size
-        final long size = Long.parseLong(parsedArray.remove(0));
+        // Retrieve the file size - file size is optional from the spec
+        final long size = parsedArray.size() > 0 ? Long.parseLong(parsedArray.remove(0)) : 0;
 
         // Send the event
         final DCCPendingConnection connection = new DCCPendingConnection(nick,
