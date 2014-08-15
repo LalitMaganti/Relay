@@ -8,6 +8,8 @@ public class PrivateMessageClosedEvent extends ServerEvent {
     public final Nick privateMessageNick;
 
     public PrivateMessageClosedEvent(final QueryUser user) {
+        super(user.getServer());
+
         privateMessageNick = user.getNick();
     }
 }

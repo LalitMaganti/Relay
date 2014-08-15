@@ -249,34 +249,34 @@ public class ServerConnection {
     private void onConnecting() {
         mStatus = ConnectionStatus.CONNECTING;
 
-        mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent());
+        mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent(mServer));
     }
 
     private void onReconnecting() {
         mStatus = ConnectionStatus.RECONNECTING;
 
-        mServer.getServerEventBus().postAndStoreEvent(new ReconnectEvent());
+        mServer.getServerEventBus().postAndStoreEvent(new ReconnectEvent(mServer));
     }
 
     private void onConnected() {
         onStatusChanged(ConnectionStatus.CONNECTED,
                 ChannelConnectEvent::new,
                 QueryConnectEvent::new,
-                server -> new ConnectEvent(mServerConfiguration.getUrl()));
+                server -> new ConnectEvent(server, mServerConfiguration.getUrl()));
     }
 
     private void onDisconnected(final String serverMessage, final boolean retryPending) {
         onStatusChanged(ConnectionStatus.DISCONNECTED,
                 channel -> new ChannelDisconnectEvent(channel, serverMessage),
                 user -> new QueryDisconnectEvent(user, serverMessage),
-                server -> new DisconnectEvent(serverMessage, retryPending));
+                server -> new DisconnectEvent(server, serverMessage, retryPending));
     }
 
     private void onStopped() {
         onStatusChanged(ConnectionStatus.STOPPED,
                 ChannelStopEvent::new,
                 QueryStopEvent::new,
-                server -> new StopEvent());
+                StopEvent::new);
     }
 
     private void onStatusChanged(final ConnectionStatus status,

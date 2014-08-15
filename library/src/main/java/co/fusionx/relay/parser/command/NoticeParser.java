@@ -54,7 +54,7 @@ class NoticeParser extends CommandParser {
         } else {
             // If we're not in this channel then send the notice to the server instead
             // TODO - maybe figure out why this is happening
-            mServerEventBus.postAndStoreEvent(new NoticeEvent(notice, sendingNick));
+            mServerEventBus.postAndStoreEvent(new NoticeEvent(mServer, notice, sendingNick));
         }
     }
 
@@ -64,7 +64,7 @@ class NoticeParser extends CommandParser {
             final RelayQueryUser user = optUser.get();
             mServerEventBus.postAndStoreEvent(new QueryMessageWorldEvent(user, notice), user);
         } else {
-            mServerEventBus.postAndStoreEvent(new NoticeEvent(notice, sendingNick));
+            mServerEventBus.postAndStoreEvent(new NoticeEvent(mServer, notice, sendingNick));
         }
     }
 }

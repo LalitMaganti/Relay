@@ -45,7 +45,8 @@ class NickParser extends CommandParser {
             user.setNick(newNick);
 
             if (appUser) {
-                final ServerNickChangeEvent event = new ServerNickChangeEvent(oldNick, user);
+                final ServerNickChangeEvent event = new ServerNickChangeEvent(mServer, oldNick,
+                        user);
                 mServerEventBus.postAndStoreEvent(event);
             }
 

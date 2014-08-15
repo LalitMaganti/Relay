@@ -46,7 +46,7 @@ public class DCCParser {
 
     private void parseChatCommand(final String ipAddress, final int port) {
         // Send the event
-        mServer.getServerEventBus().post(new DCCChatRequestEvent(ipAddress, port));
+        mServer.getServerEventBus().post(new DCCChatRequestEvent(mServer, ipAddress, port));
     }
 
     private void parseFileCommand(final String fileName, final String ipAddress,
@@ -55,6 +55,7 @@ public class DCCParser {
         final long size = Long.parseLong(parsedArray.remove(0));
 
         // Send the event
-        mServer.getServerEventBus().post(new DCCFileRequestEvent(fileName, ipAddress, port, size));
+        mServer.getServerEventBus().post(new DCCFileRequestEvent(mServer, fileName, ipAddress,
+                port, size));
     }
 }

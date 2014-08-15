@@ -19,7 +19,7 @@ class InviteParser extends CommandParser {
         final String invitedNick = parsedArray.get(2);
         if (mServer.getUser().isNickEqual(invitedNick)) {
             final String channelName = parsedArray.get(3);
-            final ServerEvent event = new InviteEvent(channelName, invitingNick);
+            final ServerEvent event = new InviteEvent(mServer, channelName, invitingNick);
             mServerEventBus.postAndStoreEvent(event);
         } else {
             // This is impossible - breaks RFC if it occurs - just ignore it

@@ -138,7 +138,7 @@ class CtcpParser {
             // Pass this on to the server
             final String nick = IRCUtils.getNickFromRaw(rawSource);
             final String version = message.replace("VERSION", "");
-            getServerEventBus().postAndStoreEvent(new VersionEvent(nick, version));
+            getServerEventBus().postAndStoreEvent(new VersionEvent(mServer, nick, version));
         } else if (message.startsWith("SOURCE")) {
         } else if (message.startsWith("USERINFO")) {
         } else if (message.startsWith("ERRMSG")) {

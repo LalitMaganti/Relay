@@ -24,9 +24,9 @@ class MotdParser extends CodeParser {
                 final MotdEvent event;
                 if (code == RPL_MOTDSTART || code == RPL_MOTD) {
                     final String motdline = message.substring(1).trim();
-                    event = new MotdEvent(motdline);
+                    event = new MotdEvent(mServer, motdline);
                 } else {
-                    event = new MotdEvent(message);
+                    event = new MotdEvent(mServer, message);
                 }
                 mServerEventBus.postAndStoreEvent(event);
             }

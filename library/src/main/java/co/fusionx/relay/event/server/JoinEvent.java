@@ -7,6 +7,8 @@ public final class JoinEvent extends ServerEvent {
     public final Channel channel;
 
     public JoinEvent(final Channel channel) {
+        super(channel.getServer());
+
         this.channel = channel;
     }
 }

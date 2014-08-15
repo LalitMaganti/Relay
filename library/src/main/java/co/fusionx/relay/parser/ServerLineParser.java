@@ -132,11 +132,11 @@ public class ServerLineParser {
         final String message = parsedArray.get(0);
 
         if (ServerReplyCodes.genericCodes.contains(code)) {
-            final ServerEvent event = new GenericServerEvent(message);
+            final ServerEvent event = new GenericServerEvent(mServer, message);
             mServer.getServerEventBus().postAndStoreEvent(event);
         } else if (ServerReplyCodes.whoisCodes.contains(code)) {
             final String response = IRCUtils.concatenateStringList(parsedArray);
-            final WhoisEvent event = new WhoisEvent(response);
+            final WhoisEvent event = new WhoisEvent(mServer, response);
             mServer.getServerEventBus().postAndStoreEvent(event);
         } else if (ServerReplyCodes.doNothingCodes.contains(code)) {
             // Do nothing

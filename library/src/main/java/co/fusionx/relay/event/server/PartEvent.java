@@ -7,6 +7,8 @@ public class PartEvent extends ServerEvent {
     public final String channelName;
 
     public PartEvent(final Channel channel) {
+        super(channel.getServer());
+
         this.channelName = channel.getName();
     }
 }

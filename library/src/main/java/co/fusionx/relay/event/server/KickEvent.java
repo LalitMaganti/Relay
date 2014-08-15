@@ -19,6 +19,7 @@ public class KickEvent extends ServerEvent {
 
     public KickEvent(final Channel channel, final Optional<RelayChannelUser> optKickingUser,
             final String kickingNickString, final String reason) {
+        super(channel.getServer());
         this.channelName = channel.getName();
         this.kickingNick = optKickingUser.transform(ChannelUser::getNick).orNull();
         this.kickingNickString = kickingNickString;

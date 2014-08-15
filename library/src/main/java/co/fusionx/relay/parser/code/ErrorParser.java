@@ -48,7 +48,7 @@ class ErrorParser extends CodeParser {
             final RelayQueryUser user = optional.get();
             mServerEventBus.postAndStoreEvent(new QueryNoSuchNickEvent(user, message), user);
         } else {
-            mServerEventBus.postAndStoreEvent(new GenericServerEvent(message));
+            mServerEventBus.postAndStoreEvent(new GenericServerEvent(mServer, message));
         }
     }
 }

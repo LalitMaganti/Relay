@@ -1,6 +1,8 @@
 package co.fusionx.relay.event.server;
 
-public class DCCFileRequestEvent {
+import co.fusionx.relay.Server;
+
+public class DCCFileRequestEvent extends ServerEvent {
 
     public final String fileName;
 
@@ -10,8 +12,10 @@ public class DCCFileRequestEvent {
 
     public final long size;
 
-    public DCCFileRequestEvent(final String fileName, final String ipAddress, final int port,
-            final long size) {
+    public DCCFileRequestEvent(final Server server, final String fileName, final String ipAddress,
+            final int port, final long size) {
+        super(server);
+
         this.fileName = fileName;
         this.ipAddress = ipAddress;
         this.port = port;

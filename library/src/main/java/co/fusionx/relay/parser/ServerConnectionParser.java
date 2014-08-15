@@ -64,7 +64,7 @@ public class ServerConnectionParser {
                     // We are finished - the server has kicked us out for some reason
                     return null;
                 case ServerCommands.AUTHENTICATE:
-                    CapParser.parseCommand(parsedArray, mConfiguration, eventBus,
+                    CapParser.parseCommand(parsedArray, mConfiguration, mServer,
                             mServerCallHandler);
                     break;
                 default:
@@ -102,7 +102,7 @@ public class ServerConnectionParser {
                 break;
             default:
                 if (ServerReplyCodes.saslCodes.contains(code)) {
-                    CapParser.parseCode(code, parsedArray, sender, mServerCallHandler);
+                    CapParser.parseCode(code, parsedArray, mServer, mServerCallHandler);
                 }
                 break;
         }
@@ -135,11 +135,12 @@ public class ServerConnectionParser {
 
         switch (command) {
             case ServerCommands.NOTICE:
-                final GenericServerEvent event = new GenericServerEvent(parsedArray.get(0));
+                final GenericServerEvent event = new GenericServerEvent(mServer,
+                        parsedArray.get(0));
                 sender.postAndStoreEvent(event);
                 break;
             case ServerCommands.CAP:
-                CapParser.parseCommand(parsedArray, mConfiguration, sender, mServerCallHandler);
+                CapParser.parseCommand(parsedArray, mConfiguration, mServer, mServerCallHandler);
                 break;
         }
     }

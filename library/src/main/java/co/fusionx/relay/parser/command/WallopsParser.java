@@ -19,6 +19,6 @@ public class WallopsParser extends CommandParser {
         final String sendingNick = IRCUtils.getNickFromRaw(rawSource);
         final String message = parsedArray.get(2);
 
-        mServerEventBus.postAndStoreEvent(new WallopsEvent(message, sendingNick));
+        mServerEventBus.postAndStoreEvent(new WallopsEvent(mServer, message, sendingNick));
     }
 }
