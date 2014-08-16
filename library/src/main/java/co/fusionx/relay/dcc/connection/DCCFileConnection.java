@@ -49,6 +49,11 @@ public class DCCFileConnection extends DCCConnection {
     }
 
     @Override
+    public String getId() {
+        return "[DCC GET] " + mPendingConnection.getDccRequestNick();
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;

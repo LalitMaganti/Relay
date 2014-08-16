@@ -31,23 +31,20 @@ public class RelayQueryUser implements QueryUser {
 
     public RelayQueryUser(final String nick, final RelayServer server) {
         mNick = new RelayNick(nick);
-        mBuffer = new ArrayList<>();
         mServer = server;
+
+        mBuffer = new ArrayList<>();
+        mBuffer.add(new QueryOpenedEvent(this));
 
         mQuerySender = new RelayQuerySender(this, server.getServerCallHandler());
 
-        mBuffer.add(new QueryOpenedEvent(this));
-
+        // This QueryUser is valud until closed
         mValid = true;
     }
 
     public void postAndStoreEvent(final QueryEvent queryEvent) {
-        onUserEvent(queryEvent);
+        mBuffer.add(queryEvent);
         mServer.getServerEventBus().post(queryEvent);
-    }
-
-    public void onUserEvent(final QueryEvent event) {
-        mBuffer.add(event);
     }
 
     @Override
@@ -59,7 +56,6 @@ public class RelayQueryUser implements QueryUser {
         mValid = false;
     }
 
-    // Getters and Setters
     @Override
     public List<QueryEvent> getBuffer() {
         return mBuffer;
@@ -83,6 +79,25 @@ public class RelayQueryUser implements QueryUser {
 
     public void setNick(final String nick) {
         mNick = new RelayNick(nick);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        } else if (!(o instanceof RelayQueryUser)) {
+            return false;
+        }
+
+        final RelayQueryUser user = (RelayQueryUser) o;
+        return mNick.equals(user.mNick) && mServer.equals(user.mServer);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mServer.hashCode();
+        result = 31 * result + mNick.hashCode();
+        return result;
     }
 
     // QuerySender interface
