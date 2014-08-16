@@ -133,7 +133,7 @@ public class ServerCallHandler {
         }
 
         sendSelfEventToQueryUser(user -> new QueryMessageSelfEvent(user, mServer.getUser(),
-                message), nick, message);
+                message), nick, message, false);
     }
 
     public void sendActionToQueryUser(final String nick, final String action) {
@@ -142,11 +142,11 @@ public class ServerCallHandler {
         }
 
         sendSelfEventToQueryUser(user -> new QueryActionSelfEvent(user, mServer.getUser(),
-                action), nick, action);
+                action), nick, action, true);
     }
 
     private void sendSelfEventToQueryUser(final Function<RelayQueryUser, QueryEvent> function,
-            final String nick, final String message) {
+            final String nick, final String message, final boolean action) {
         final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
         if (optional.isPresent()) {
             final RelayQueryUser user = optional.get();
@@ -157,7 +157,7 @@ public class ServerCallHandler {
             }
         } else {
             final RelayQueryUser user = mUserChannelInterface
-                    .addQueryUser(nick, message, true, true);
+                    .addQueryUser(nick, message, action, true);
             mServer.getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(user));
         }
     }
