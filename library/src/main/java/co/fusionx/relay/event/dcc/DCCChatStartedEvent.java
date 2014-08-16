@@ -7,4 +7,8 @@ public class DCCChatStartedEvent extends DCCEvent {
     public DCCChatStartedEvent(final DCCChatConnection dccConnection) {
         super(dccConnection);
     }
+
+    public DCCChatConnection getConnection() {
+        return (DCCChatConnection) dccConnection;
+    }
 }
