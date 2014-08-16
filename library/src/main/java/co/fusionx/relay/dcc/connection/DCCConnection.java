@@ -40,6 +40,11 @@ public abstract class DCCConnection implements Conversation {
     protected abstract void connect();
 
     @Override
+    public String getId() {
+        return mPendingConnection.getDccRequestNick();
+    }
+
+    @Override
     public Server getServer() {
         return mServer;
     }

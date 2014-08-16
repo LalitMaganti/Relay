@@ -6,7 +6,7 @@ import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingFileConnection;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
-import co.fusionx.relay.event.server.DCCFileRequestEvent;
+import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.util.IRCUtils;
 
 public class DCCParser {
@@ -65,6 +65,6 @@ public class DCCParser {
         // Send the event
         final DCCPendingFileConnection connection = new DCCPendingFileConnection(nick,
                 mServer.getDCCManager(), ipAddress, port, fileName, size);
-        mServer.postAndStoreEvent(new DCCFileRequestEvent(mServer, connection));
+        mServer.postAndStoreEvent(new DCCSendRequestEvent(mServer, connection));
     }
 }

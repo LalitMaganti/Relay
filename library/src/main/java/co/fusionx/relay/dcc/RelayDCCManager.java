@@ -10,7 +10,7 @@ import java.util.Set;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.dcc.connection.DCCChatConnection;
 import co.fusionx.relay.dcc.connection.DCCConnection;
-import co.fusionx.relay.dcc.connection.DCCFileConnection;
+import co.fusionx.relay.dcc.connection.DCCGetConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingFileConnection;
@@ -49,7 +49,7 @@ public class RelayDCCManager implements DCCManager {
     public void acceptDCCConnection(final DCCPendingFileConnection pendingConnection,
             final File file) {
         acceptDCCConnection(pendingConnection,
-                () -> new DCCFileConnection(mRelayServer, pendingConnection, file));
+                () -> new DCCGetConnection(mRelayServer, pendingConnection, file));
     }
 
     public void acceptDCCConnection(final DCCPendingChatConnection pendingConnection) {

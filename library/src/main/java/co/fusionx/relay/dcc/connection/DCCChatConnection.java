@@ -103,9 +103,4 @@ public class DCCChatConnection extends DCCConnection {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public String getId() {
-        return "[DCC CHAT] " + mPendingConnection.getDccRequestNick();
-    }
 }

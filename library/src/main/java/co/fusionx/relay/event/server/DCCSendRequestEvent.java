@@ -3,9 +3,9 @@ package co.fusionx.relay.event.server;
 import co.fusionx.relay.Server;
 import co.fusionx.relay.dcc.pending.DCCPendingFileConnection;
 
-public class DCCFileRequestEvent extends DCCRequestEvent {
+public class DCCSendRequestEvent extends DCCRequestEvent {
 
-    public DCCFileRequestEvent(final Server server,
+    public DCCSendRequestEvent(final Server server,
             final DCCPendingFileConnection pendingConnection) {
         super(server, pendingConnection);
     }
