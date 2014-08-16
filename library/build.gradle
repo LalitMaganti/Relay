@@ -5,6 +5,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
         classpath 'me.tatarka:gradle-retrolambda:2.2.1'
+        classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.+'
     }
 }
 
@@ -20,6 +21,7 @@ android {
     buildToolsVersion '20.0.0'
 
     defaultConfig {
+        applicationId "co.fusionx.relay"
         minSdkVersion 9
         targetSdkVersion 19
     }
@@ -29,13 +31,18 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+apply plugin: 'android-unit-test'
 
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.+'
-    compile 'com.squareup:otto:1.+'
-    compile 'de.greenrobot:eventbus:2.+'
     compile 'com.google.guava:guava:18.+'
     compile 'net.sf.trove4j:trove4j:3.+'
+
+    compile project(':bus-library')
+
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.robolectric:robolectric:+'
+    testCompile 'org.assertj:assertj-core:1.+'
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:+'
 }
