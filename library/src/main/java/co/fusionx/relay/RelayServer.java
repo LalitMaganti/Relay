@@ -61,6 +61,11 @@ public class RelayServer implements Server {
         mUsers.add(mUser);
     }
 
+    public void postAndStoreEvent(final ServerEvent event) {
+        mBuffer.add(event);
+        mServerEventBus.post(event);
+    }
+
     public void onServerEvent(final ServerEvent event) {
         mBuffer.add(event);
     }

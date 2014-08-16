@@ -1,5 +1,8 @@
 package co.fusionx.relay.dcc.connection;
 
+import android.os.Handler;
+import android.os.HandlerThread;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -7,13 +10,16 @@ import java.util.List;
 
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
-import co.fusionx.relay.event.dcc.DCCChatEvent;
+import co.fusionx.relay.event.dcc.DCCChatSelfMessageEvent;
 import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
+import co.fusionx.relay.event.dcc.DCCChatWorldMessageEvent;
 import co.fusionx.relay.event.dcc.DCCEvent;
-import co.fusionx.relay.event.dcc.DCCWorldChatEvent;
+import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.util.SocketUtils;
 
 public class DCCChatConnection extends DCCConnection {
+
+    private final Handler mCallHandler;
 
     private List<DCCEvent> mBuffer;
 
@@ -22,6 +28,10 @@ public class DCCChatConnection extends DCCConnection {
         super(server, pendingConnection);
 
         mBuffer = new ArrayList<>();
+
+        final HandlerThread handlerThread = new HandlerThread("dccConnection");
+        handlerThread.start();
+        mCallHandler = new Handler(handlerThread.getLooper());
     }
 
     @Override
@@ -44,7 +54,7 @@ public class DCCChatConnection extends DCCConnection {
         String line;
         while ((line = mBufferedReader.readLine()) != null) {
             // For DCC there is no parsing required - the chat is simply the message
-            postAndStoreEvent(new DCCWorldChatEvent(this, line));
+            postAndStoreEvent(new DCCChatWorldMessageEvent(this, line));
         }
     }
 
@@ -74,5 +84,23 @@ public class DCCChatConnection extends DCCConnection {
 
     public List<DCCEvent> getBuffer() {
         return mBuffer;
+    }
+
+    public void sendMessage(final String message) {
+        mCallHandler.post(() -> writeLine(message));
+
+        if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
+            return;
+        }
+        postAndStoreEvent(new DCCChatSelfMessageEvent(this, message));
+    }
+
+    private void writeLine(final String line) {
+        try {
+            mBufferedWriter.write(line + "\r\n");
+            mBufferedWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

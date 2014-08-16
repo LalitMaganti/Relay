@@ -38,6 +38,11 @@ public class RelayDCCManager implements DCCManager {
     }
 
     @Override
+    public Collection<DCCConnection> getActiveConnections() {
+        return ImmutableSet.copyOf(mConnections);
+    }
+
+    @Override
     public Collection<DCCPendingConnection> getPendingConnections() {
         return ImmutableSet.copyOf(mPendingConnections);
     }
