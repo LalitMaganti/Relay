@@ -24,7 +24,7 @@ public class RelayServerTest {
     @Test
     public void testOnServerEvent() {
         final RelayServer server = getDefaultServer();
-        final ServerEvent event = new GenericServerEvent("This is a test message");
+        final ServerEvent event = new GenericServerEvent(server, "This is a test message");
         server.onServerEvent(event);
         assertThat(server.getBuffer())
                 .isNotNull()
