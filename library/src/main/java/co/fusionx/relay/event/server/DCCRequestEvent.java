@@ -1,10 +1,16 @@
 package co.fusionx.relay.event.server;
 
 import co.fusionx.relay.Server;
+import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 
-public class DCCRequestEvent extends ServerEvent {
+public abstract class DCCRequestEvent extends ServerEvent {
 
-    public DCCRequestEvent(final Server server) {
+    public final DCCPendingConnection pendingConnection;
+
+    public DCCRequestEvent(final Server server, final DCCPendingConnection pendingConnection) {
         super(server);
+        this.pendingConnection = pendingConnection;
     }
+
+    public abstract DCCPendingConnection getPendingConnection();
 }

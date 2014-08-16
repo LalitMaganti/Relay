@@ -3,7 +3,9 @@ package co.fusionx.relay.parser.command;
 import java.util.List;
 
 import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
+import co.fusionx.relay.dcc.pending.DCCPendingFileConnection;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCFileRequestEvent;
 import co.fusionx.relay.util.IRCUtils;
@@ -51,7 +53,7 @@ public class DCCParser {
 
     private void parseChatCommand(final String nick, final String ipAddress, final int port) {
         // Send the event
-        final DCCPendingConnection connection = new DCCPendingConnection(nick,
+        final DCCPendingChatConnection connection = new DCCPendingChatConnection(nick,
                 mServer.getDCCManager(), ipAddress, port, "chat", 0);
         mServer.getServerEventBus().post(new DCCChatRequestEvent(mServer, connection));
     }
@@ -62,7 +64,7 @@ public class DCCParser {
         final long size = parsedArray.size() > 0 ? Long.parseLong(parsedArray.remove(0)) : 0;
 
         // Send the event
-        final DCCPendingConnection connection = new DCCPendingConnection(nick,
+        final DCCPendingFileConnection connection = new DCCPendingFileConnection(nick,
                 mServer.getDCCManager(), ipAddress, port, fileName, size);
         mServer.getServerEventBus().post(new DCCFileRequestEvent(mServer, connection));
     }

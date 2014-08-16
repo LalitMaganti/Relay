@@ -20,14 +20,13 @@ public class DCCPendingConnection {
     public DCCPendingConnection(final String dccRequestNick, final RelayDCCManager manager,
             final String ip, final int port, final String argument, final long size) {
         mDccRequestNick = dccRequestNick;
-
         mManager = manager;
-        mManager.addPendingConnection(this);
-
         mIP = ip;
         mPort = port;
         mArgument = argument;
         mSize = size;
+
+        mManager.addPendingConnection(this);
     }
 
     public void declineConnection() {
@@ -56,5 +55,27 @@ public class DCCPendingConnection {
 
     public DCCManager getManager() {
         return mManager;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        } else if (!(o instanceof DCCPendingConnection)) {
+            return false;
+        }
+
+        final DCCPendingConnection that = (DCCPendingConnection) o;
+        return mPort == that.mPort && mDccRequestNick.equals(that.mDccRequestNick)
+                && mIP.equals(that.mIP) && mManager.equals(that.mManager);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mDccRequestNick.hashCode();
+        result = 31 * result + mManager.hashCode();
+        result = 31 * result + mIP.hashCode();
+        result = 31 * result + mPort;
+        return result;
     }
 }

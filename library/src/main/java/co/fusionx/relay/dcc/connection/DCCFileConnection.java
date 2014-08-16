@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.dcc.pending.DCCPendingFileConnection;
+import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
+import co.fusionx.relay.event.dcc.DCCFileStartedEvent;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
@@ -22,6 +24,8 @@ public class DCCFileConnection extends DCCConnection {
 
     @Override
     protected void connect() {
+        mServer.getServerEventBus().post(new DCCFileStartedEvent(this));
+
         try {
             final BufferedSource source = Okio.buffer(Okio.source(mSocket));
             final BufferedSink sink = Okio.buffer(Okio.sink(mFile));
@@ -43,5 +47,24 @@ public class DCCFileConnection extends DCCConnection {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        } else if (!(o instanceof DCCFileConnection)) {
+            return false;
+        }
+
+        final DCCFileConnection that = (DCCFileConnection) o;
+        return mPendingConnection.equals(that.mPendingConnection) && mServer.equals(that.mServer);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mServer.hashCode();
+        result = 31 * result + mPendingConnection.hashCode();
+        return result;
     }
 }

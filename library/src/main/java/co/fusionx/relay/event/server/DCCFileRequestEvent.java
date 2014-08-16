@@ -1,15 +1,17 @@
 package co.fusionx.relay.event.server;
 
 import co.fusionx.relay.Server;
-import co.fusionx.relay.dcc.pending.DCCPendingConnection;
+import co.fusionx.relay.dcc.pending.DCCPendingFileConnection;
 
 public class DCCFileRequestEvent extends DCCRequestEvent {
 
-    public final DCCPendingConnection pendingConnection;
+    public DCCFileRequestEvent(final Server server,
+            final DCCPendingFileConnection pendingConnection) {
+        super(server, pendingConnection);
+    }
 
-    public DCCFileRequestEvent(final Server server, final DCCPendingConnection pendingConnection) {
-        super(server);
-
-        this.pendingConnection = pendingConnection;
+    @Override
+    public DCCPendingFileConnection getPendingConnection() {
+        return (DCCPendingFileConnection) pendingConnection;
     }
 }
