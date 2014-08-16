@@ -29,9 +29,9 @@ public class RelayServer implements Server {
 
     private final RelayUserChannelInterface mUserChannelInterface;
 
-    private final boolean mValid;
-
     private final RelayMainUser mUser;
+
+    private boolean mValid;
 
     public RelayServer(final ServerConfiguration configuration, final ServerConnection connection,
             final Handler callHandler, final Collection<String> ignoreList) {
@@ -164,5 +164,9 @@ public class RelayServer implements Server {
     @Override
     public ServerConfiguration getConfiguration() {
         return mConfiguration;
+    }
+
+    public void markInvalid() {
+        mValid = false;
     }
 }
