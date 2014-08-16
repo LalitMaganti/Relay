@@ -9,7 +9,6 @@ import co.fusionx.relay.RelayChannelUser;
 import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.RelayUserChannelInterface;
-import co.fusionx.relay.Server;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.call.server.ERRMSGResponseCall;
 import co.fusionx.relay.call.server.FingerResponseCall;
@@ -94,14 +93,11 @@ class CtcpParser {
 
     private void onParseUserAction(final String nick, final String action) {
         final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
-        if (optional.isPresent()) {
-            final RelayQueryUser user = optional.get();
-            getServerEventBus().postAndStoreEvent(new QueryActionWorldEvent(user, action), user);
-        } else {
-            final RelayQueryUser user = mUserChannelInterface
-                    .addQueryUser(nick, action, true, false);
-            getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(user));
+        final RelayQueryUser user = optional.or(mUserChannelInterface.addQueryUser(nick));
+        if (!optional.isPresent()) {
+            mServer.postAndStoreEvent(new NewPrivateMessageEvent(user));
         }
+        user.postAndStoreEvent(new QueryActionWorldEvent(user, action));
     }
 
     private void onParseChannelAction(final String channelName, final String sendingNick,
@@ -120,7 +116,7 @@ class CtcpParser {
             } else {
                 event = new ChannelWorldMessageEvent(channel, action, sendingNick, mention);
             }
-            getServerEventBus().postAndStoreEvent(event, channel);
+            channel.postAndStoreEvent(event);
         });
     }
     // Commands End Here
@@ -138,7 +134,7 @@ class CtcpParser {
             // Pass this on to the server
             final String nick = IRCUtils.getNickFromRaw(rawSource);
             final String version = message.replace("VERSION", "");
-            getServerEventBus().postAndStoreEvent(new VersionEvent(mServer, nick, version));
+            mServer.postAndStoreEvent(new VersionEvent(mServer, nick, version));
         } else if (message.startsWith("SOURCE")) {
         } else if (message.startsWith("USERINFO")) {
         } else if (message.startsWith("ERRMSG")) {
@@ -148,11 +144,7 @@ class CtcpParser {
     }
     // Replies end here
 
-    private ServerEventBus getServerEventBus() {
-        return mEventBus;
-    }
-
-    private Server getServer() {
+    private RelayServer getServer() {
         return mServer;
     }
 }

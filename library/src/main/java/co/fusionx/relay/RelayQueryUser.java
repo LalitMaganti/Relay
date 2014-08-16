@@ -4,16 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
-import co.fusionx.relay.event.query.QueryActionWorldEvent;
+import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.query.QueryMessageSelfEvent;
-import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.query.QueryOpenedEvent;
+import co.fusionx.relay.sender.QuerySender;
+import co.fusionx.relay.sender.RelayQuerySender;
 import co.fusionx.relay.util.Utils;
+
+import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayQueryUser implements QueryUser {
 
     private final RelayServer mServer;
+
+    private final QuerySender mQuerySender;
 
     /**
      * Contains a copy of the messages when the conversation
@@ -24,34 +29,16 @@ public class RelayQueryUser implements QueryUser {
 
     private boolean mValid;
 
-    public RelayQueryUser(final String nick, final RelayServer server, final String message,
-            final boolean action, boolean userSent) {
+    public RelayQueryUser(final String nick, final RelayServer server) {
         mNick = new RelayNick(nick);
         mBuffer = new ArrayList<>();
         mServer = server;
 
+        mQuerySender = new RelayQuerySender(this, server.getServerCallHandler());
+
         mBuffer.add(new QueryOpenedEvent(this));
 
         mValid = true;
-
-        if (!Utils.isNotEmpty(message)) {
-            return;
-        }
-        final QueryEvent event;
-        if (userSent) {
-            if (action) {
-                event = new QueryActionSelfEvent(this, server.getUser(), message);
-            } else {
-                event = new QueryMessageSelfEvent(this, server.getUser(), message);
-            }
-        } else {
-            if (action) {
-                event = new QueryActionWorldEvent(this, message);
-            } else {
-                event = new QueryMessageWorldEvent(this, message);
-            }
-        }
-        mBuffer.add(event);
     }
 
     public void postAndStoreEvent(final QueryEvent queryEvent) {
@@ -96,5 +83,33 @@ public class RelayQueryUser implements QueryUser {
 
     public void setNick(final String nick) {
         mNick = new RelayNick(nick);
+    }
+
+    // QuerySender interface
+    @Override
+    public void sendAction(final String action) {
+        mQuerySender.sendAction(action);
+
+        if (!Utils.isNotEmpty(action) || getPreferences().isSelfEventHidden()) {
+            return;
+        }
+        postAndStoreEvent(new QueryActionSelfEvent(this, mServer.getUser(), action));
+    }
+
+    @Override
+    public void sendMessage(final String message) {
+        mQuerySender.sendMessage(message);
+
+        if (!Utils.isNotEmpty(message) || getPreferences().isSelfEventHidden()) {
+            return;
+        }
+        postAndStoreEvent(new QueryMessageSelfEvent(this, mServer.getUser(), message));
+    }
+
+    @Override
+    public void close() {
+        mServer.getUserChannelInterface().removeQueryUser(this);
+
+        postAndStoreEvent(new QueryClosedEvent(this));
     }
 }

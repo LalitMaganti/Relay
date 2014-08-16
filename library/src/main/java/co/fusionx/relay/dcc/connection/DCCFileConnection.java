@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.dcc.pending.DCCPendingFileConnection;
-import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
 import co.fusionx.relay.event.dcc.DCCFileStartedEvent;
 import okio.BufferedSink;
 import okio.BufferedSource;

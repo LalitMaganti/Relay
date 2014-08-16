@@ -12,12 +12,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.Server;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.constants.ServerCommands;
 import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.server.GenericServerEvent;
-import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
 import co.fusionx.relay.misc.CoreListener;
 import co.fusionx.relay.parser.code.CodeParser;
@@ -31,7 +29,7 @@ public class ServerLineParser {
 
     private static final int SERVER_COMMAND_OR_CODE = 1;
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final Map<String, CommandParser> mCommandParserMap;
 
@@ -132,12 +130,10 @@ public class ServerLineParser {
         final String message = parsedArray.get(0);
 
         if (ServerReplyCodes.genericCodes.contains(code)) {
-            final ServerEvent event = new GenericServerEvent(mServer, message);
-            mServer.getServerEventBus().postAndStoreEvent(event);
+            mServer.postAndStoreEvent(new GenericServerEvent(mServer, message));
         } else if (ServerReplyCodes.whoisCodes.contains(code)) {
             final String response = IRCUtils.concatenateStringList(parsedArray);
-            final WhoisEvent event = new WhoisEvent(mServer, response);
-            mServer.getServerEventBus().postAndStoreEvent(event);
+            mServer.postAndStoreEvent(new WhoisEvent(mServer, response));
         } else if (ServerReplyCodes.doNothingCodes.contains(code)) {
             // Do nothing
         } else {

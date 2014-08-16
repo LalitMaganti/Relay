@@ -44,9 +44,7 @@ class NameParser extends CodeParser {
     }
 
     private void onParseNameFinished() {
-        mServer.getServerEventBus().postAndStoreEvent(new ChannelNameEvent(mChannel,
-                mChannel.getUsers()), mChannel);
-
+        mChannel.postAndStoreEvent(new ChannelNameEvent(mChannel, mChannel.getUsers()));
         mChannel = null;
     }
 }

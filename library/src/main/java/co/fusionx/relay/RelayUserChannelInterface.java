@@ -68,6 +68,17 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateIgnoreList(final Collection<String> userIgnoreList) {
+        if (userIgnoreList == null) {
+            return;
+        }
+        mUserIgnoreList = new THashSet<>(userIgnoreList);
+    }
+
+    /**
      * Add the channel to the user and user to the channel. Also add the user to the global list
      * of users. The user is given a default user level in the channel of {@link
      * co.fusionx.relay.constants.UserLevel#NONE}
@@ -205,9 +216,8 @@ public class RelayUserChannelInterface implements UserChannelInterface {
         return new RelayChannel(mServer, channelName);
     }
 
-    public RelayQueryUser addQueryUser(final String nick, final String message,
-            final boolean action, final boolean userSent) {
-        final RelayQueryUser user = new RelayQueryUser(nick, mServer, message, action, userSent);
+    public RelayQueryUser addQueryUser(final String nick) {
+        final RelayQueryUser user = new RelayQueryUser(nick, mServer);
         mQueryUsers.add(user);
         return user;
     }
@@ -219,13 +229,5 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
     public boolean shouldIgnoreUser(final String userNick) {
         return mUserIgnoreList.contains(userNick);
-    }
-
-    // Getters and setters
-    void updateIgnoreList(final Collection<String> userIgnoreList) {
-        if (userIgnoreList == null) {
-            return;
-        }
-        mUserIgnoreList = new THashSet<>(userIgnoreList);
     }
 }

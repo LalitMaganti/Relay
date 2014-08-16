@@ -5,8 +5,6 @@ import co.fusionx.relay.dcc.RelayDCCManager;
 
 public class DCCPendingConnection {
 
-    private final String mDccRequestNick;
-
     protected final RelayDCCManager mManager;
 
     protected final String mIP;
@@ -16,6 +14,8 @@ public class DCCPendingConnection {
     protected final String mArgument;
 
     protected final long mSize;
+
+    private final String mDccRequestNick;
 
     public DCCPendingConnection(final String dccRequestNick, final RelayDCCManager manager,
             final String ip, final int port, final String argument, final long size) {

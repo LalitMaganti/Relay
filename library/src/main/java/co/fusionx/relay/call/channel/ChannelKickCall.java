@@ -1,29 +1,35 @@
 package co.fusionx.relay.call.channel;
 
-import android.text.TextUtils;
+import com.google.common.base.Optional;
 
 import co.fusionx.relay.call.Call;
-import co.fusionx.relay.writers.WriterCommands;
 
 public class ChannelKickCall extends Call {
 
-    public final String channelName;
+    public final static String KICK = "KICK %1$s %2$s";
 
-    public final String userNick;
+    public final static String KICK_WITH_REASON = "KICK %1$s %2$s :%3$s";
 
-    public final String reason;
+    private final String mChannelName;
 
-    public ChannelKickCall(final String channelName, final String userNick, final String reason) {
-        this.channelName = channelName;
-        this.userNick = userNick;
-        this.reason = reason;
+    private final String mUserNick;
+
+    private final Optional<String> mOptReason;
+
+    public ChannelKickCall(final String channelName, final String userNick,
+            final Optional<String> reason) {
+        mChannelName = channelName;
+        mUserNick = userNick;
+        mOptReason = reason;
     }
 
     @Override
     public String getLineToSendServer() {
-        return TextUtils.isEmpty(channelName)
-                ? String.format(WriterCommands.Kick, channelName, userNick)
-                : String.format(WriterCommands.KICK_WITH_REASON, channelName, userNick,
-                        reason).trim();
+        return mOptReason.transform(this::kickWithReason)
+                .or(String.format(KICK, mUserNick, mChannelName));
+    }
+
+    private String kickWithReason(final String reason) {
+        return String.format(KICK_WITH_REASON, mChannelName, mUserNick, reason).trim();
     }
 }

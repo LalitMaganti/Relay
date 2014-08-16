@@ -249,13 +249,13 @@ public class ServerConnection {
     private void onConnecting() {
         mStatus = ConnectionStatus.CONNECTING;
 
-        mServer.getServerEventBus().postAndStoreEvent(new ConnectingEvent(mServer));
+        mServer.postAndStoreEvent(new ConnectingEvent(mServer));
     }
 
     private void onReconnecting() {
         mStatus = ConnectionStatus.RECONNECTING;
 
-        mServer.getServerEventBus().postAndStoreEvent(new ReconnectEvent(mServer));
+        mServer.postAndStoreEvent(new ReconnectEvent(mServer));
     }
 
     private void onConnected() {
@@ -285,7 +285,7 @@ public class ServerConnection {
             user.markInvalid();
         }
 
-        mServer.getServerEventBus().postAndStoreEvent(new StopEvent(mServer));
+        mServer.postAndStoreEvent(new StopEvent(mServer));
         mServer.markInvalid();
     }
 
@@ -303,7 +303,7 @@ public class ServerConnection {
             user.postAndStoreEvent(queryFunction.apply(user));
         }
 
-        mServer.getServerEventBus().postAndStoreEvent(serverFunction.apply(mServer));
+        mServer.postAndStoreEvent(serverFunction.apply(mServer));
     }
 
     private boolean isReconnectNeeded() {

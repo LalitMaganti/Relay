@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.Server;
 import co.fusionx.relay.dcc.connection.DCCChatConnection;
 import co.fusionx.relay.dcc.connection.DCCConnection;
 import co.fusionx.relay.dcc.connection.DCCFileConnection;

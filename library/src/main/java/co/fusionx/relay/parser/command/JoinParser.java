@@ -44,13 +44,13 @@ class JoinParser extends CommandParser {
 
         // Post the event to the channel
         final ChannelEvent event = new ChannelWorldJoinEvent(channel, user);
-        mServerEventBus.postAndStoreEvent(event, channel);
+        channel.postAndStoreEvent(event);
 
         if (!appUser) {
             return;
         }
         // Also post a server event if the user who joined was the app user
         final ServerEvent joinEvent = new JoinEvent(channel);
-        mServerEventBus.postAndStoreEvent(joinEvent);
+        mServer.postAndStoreEvent(joinEvent);
     }
 }

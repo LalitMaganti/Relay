@@ -3,22 +3,20 @@ package co.fusionx.relay;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.dcc.DCCManager;
-import co.fusionx.relay.dcc.RelayDCCManager;
 import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.sender.ServerSender;
 
-public interface Server extends Conversation {
-
-    public void updateIgnoreList(Collection<String> list);
+public interface Server extends Conversation, ServerSender {
 
     public Collection<? extends ChannelUser> getUsers();
 
-    // Getters and Setters
     public List<? extends ServerEvent> getBuffer();
 
     public UserChannelInterface getUserChannelInterface();
+
+    public DCCManager getDCCManager();
 
     public ChannelUser getUser();
 
@@ -26,11 +24,7 @@ public interface Server extends Conversation {
 
     public ConnectionStatus getStatus();
 
-    public ServerCallHandler getServerCallHandler();
-
     public ServerEventBus getServerEventBus();
 
     public ServerConfiguration getConfiguration();
-
-    public DCCManager getDCCManager();
 }

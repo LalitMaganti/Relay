@@ -9,10 +9,9 @@ import co.fusionx.relay.ChannelUser;
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayChannelUser;
 import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.event.channel.ChannelPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
-import co.fusionx.relay.event.server.PartEvent;
+import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.util.IRCUtils;
 
 public class PartParser extends RemoveUserParser {
@@ -43,15 +42,11 @@ public class PartParser extends RemoveUserParser {
         if (channel == null) {
             return;
         }
-        final ChannelPartEvent partEvent = new ChannelPartEvent(channel);
-        mServerEventBus.postAndStoreEvent(partEvent, channel);
 
         final Collection<RelayChannelUser> users = mUserChannelInterface.removeChannel(channel);
         for (final RelayChannelUser user : users) {
             mUserChannelInterface.removeChannelFromUser(channel, user);
         }
-
-        final PartEvent event = new PartEvent(channel);
-        mServerEventBus.postAndStoreEvent(event);
+        channel.postAndStoreEvent(new PartEvent(channel));
     }
 }

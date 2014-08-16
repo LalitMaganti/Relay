@@ -1,5 +1,7 @@
 package co.fusionx.relay;
 
+import com.google.common.base.Optional;
+
 import android.os.Handler;
 
 import java.io.BufferedWriter;
@@ -12,7 +14,10 @@ import java.util.Set;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.dcc.RelayDCCManager;
+import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.sender.RelayServerSender;
+import co.fusionx.relay.sender.ServerSender;
 
 public class RelayServer implements Server {
 
@@ -29,6 +34,8 @@ public class RelayServer implements Server {
     private final Set<RelayChannelUser> mUsers;
 
     private final RelayUserChannelInterface mUserChannelInterface;
+
+    private final ServerSender mServerSender;
 
     private final RelayMainUser mUser;
 
@@ -51,8 +58,11 @@ public class RelayServer implements Server {
         mValid = true;
 
         mBuffer = new ArrayList<>();
-        mServerEventBus = new ServerEventBus(this);
-        mServerCallHandler = new ServerCallHandler(this, callHandler);
+        mServerEventBus = new ServerEventBus();
+        mServerCallHandler = new ServerCallHandler(callHandler);
+
+        // Create the server sender
+        mServerSender = new RelayServerSender(this, mServerCallHandler);
 
         // Set the nick name to the first choice nick
         mUser = new RelayMainUser(configuration.getNickStorage().getFirstChoiceNick());
@@ -99,11 +109,6 @@ public class RelayServer implements Server {
         mServerCallHandler.onOutputStreamCreated(writer);
     }
 
-    @Override
-    public void updateIgnoreList(final Collection<String> list) {
-        mUserChannelInterface.updateIgnoreList(list);
-    }
-
     public ServerConnection getServerConnection() {
         return mServerConnection;
     }
@@ -116,12 +121,20 @@ public class RelayServer implements Server {
         mUsers.remove(user);
     }
 
+    public void markInvalid() {
+        mValid = false;
+    }
+
+    public ServerCallHandler getServerCallHandler() {
+        return mServerCallHandler;
+    }
+
+    // Server Interface
     @Override
     public Collection<RelayChannelUser> getUsers() {
         return mUsers;
     }
 
-    // Conversation Interface
     @Override
     public String getId() {
         return getTitle();
@@ -137,7 +150,6 @@ public class RelayServer implements Server {
         return mValid;
     }
 
-    // Getters and Setters
     @Override
     public List<ServerEvent> getBuffer() {
         return mBuffer;
@@ -164,11 +176,6 @@ public class RelayServer implements Server {
     }
 
     @Override
-    public ServerCallHandler getServerCallHandler() {
-        return mServerCallHandler;
-    }
-
-    @Override
     public ServerEventBus getServerEventBus() {
         return mServerEventBus;
     }
@@ -183,7 +190,34 @@ public class RelayServer implements Server {
         return mRelayDCCManager;
     }
 
-    public void markInvalid() {
-        mValid = false;
+    // ServerSender interface
+    @Override
+    public void sendQuery(final String nick, final String message) {
+        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
+        final RelayQueryUser user = optional.or(mUserChannelInterface.addQueryUser(nick));
+        if (!optional.isPresent()) {
+            postAndStoreEvent(new NewPrivateMessageEvent(user));
+        }
+        user.sendMessage(message);
+    }
+
+    @Override
+    public void sendJoin(final String channelName) {
+        mServerSender.sendJoin(channelName);
+    }
+
+    @Override
+    public void sendNick(final String newNick) {
+        mServerSender.sendNick(newNick);
+    }
+
+    @Override
+    public void sendWhois(final String nick) {
+        mServerSender.sendWhois(nick);
+    }
+
+    @Override
+    public void sendRawLine(final String rawLine) {
+        mServerSender.sendRawLine(rawLine);
     }
 }

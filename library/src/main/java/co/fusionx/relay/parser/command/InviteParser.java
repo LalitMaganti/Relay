@@ -4,7 +4,6 @@ import java.util.List;
 
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.event.server.InviteEvent;
-import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.util.IRCUtils;
 
 class InviteParser extends CommandParser {
@@ -19,8 +18,7 @@ class InviteParser extends CommandParser {
         final String invitedNick = parsedArray.get(2);
         if (mServer.getUser().isNickEqual(invitedNick)) {
             final String channelName = parsedArray.get(3);
-            final ServerEvent event = new InviteEvent(mServer, channelName, invitingNick);
-            mServerEventBus.postAndStoreEvent(event);
+            mServer.postAndStoreEvent(new InviteEvent(mServer, channelName, invitingNick));
         } else {
             // This is impossible - breaks RFC if it occurs - just ignore it
         }
