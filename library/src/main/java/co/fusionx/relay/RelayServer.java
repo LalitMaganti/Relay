@@ -30,11 +30,11 @@ public class RelayServer implements Server {
 
     private final RelayUserChannelInterface mUserChannelInterface;
 
-    private final boolean mValid;
-
     private final RelayMainUser mUser;
 
-    private RelayDCCManager mRelayDCCManager;
+    private final RelayDCCManager mRelayDCCManager;
+
+    private boolean mValid;
 
     public RelayServer(final ServerConfiguration configuration, final ServerConnection connection,
             final Handler callHandler, final Collection<String> ignoreList) {
@@ -176,5 +176,9 @@ public class RelayServer implements Server {
     @Override
     public RelayDCCManager getDCCManager() {
         return mRelayDCCManager;
+    }
+
+    public void markInvalid() {
+        mValid = false;
     }
 }

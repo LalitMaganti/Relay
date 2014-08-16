@@ -273,10 +273,20 @@ public class ServerConnection {
     }
 
     private void onStopped() {
-        onStatusChanged(ConnectionStatus.STOPPED,
-                ChannelStopEvent::new,
-                QueryStopEvent::new,
-                StopEvent::new);
+        mStatus = ConnectionStatus.STOPPED;
+
+        for (final RelayChannel channel : mServer.getUser().getChannels()) {
+            channel.postAndStoreEvent(new ChannelStopEvent(channel));
+            channel.markInvalid();
+        }
+
+        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+            user.postAndStoreEvent(new QueryStopEvent(user));
+            user.markInvalid();
+        }
+
+        mServer.getServerEventBus().postAndStoreEvent(new StopEvent(mServer));
+        mServer.markInvalid();
     }
 
     private void onStatusChanged(final ConnectionStatus status,
