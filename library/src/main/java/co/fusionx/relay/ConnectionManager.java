@@ -1,10 +1,13 @@
 package co.fusionx.relay;
 
+import com.google.common.collect.FluentIterable;
+
 import android.os.Handler;
 import android.util.Pair;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import co.fusionx.relay.interfaces.RelayConfiguration;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
@@ -132,5 +135,16 @@ public class ConnectionManager {
      */
     public int getServerCount() {
         return mConnectionMap.size();
+    }
+
+    /**
+     * Returns an immutable set of the servers which are currently managed by this manager
+     *
+     * @return an immutable set of the servers which are managed by this manager
+     */
+    public Set<? extends Server> getImmutableServerSet() {
+        return FluentIterable.from(mConnectionMap.values())
+                .transform(ServerConnection::getServer)
+                .toSet();
     }
 }
