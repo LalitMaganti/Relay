@@ -11,6 +11,7 @@ import java.util.Set;
 
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
+import co.fusionx.relay.dcc.RelayDCCManager;
 import co.fusionx.relay.event.server.ServerEvent;
 
 public class RelayServer implements Server {
@@ -31,6 +32,8 @@ public class RelayServer implements Server {
 
     private final RelayMainUser mUser;
 
+    private final RelayDCCManager mRelayDCCManager;
+
     private boolean mValid;
 
     public RelayServer(final ServerConfiguration configuration, final ServerConnection connection,
@@ -41,6 +44,10 @@ public class RelayServer implements Server {
         mUserChannelInterface = new RelayUserChannelInterface(this);
         mUserChannelInterface.updateIgnoreList(ignoreList);
 
+        // Create the DCCManager
+        mRelayDCCManager = new RelayDCCManager(this);
+
+        // The server is valid :)
         mValid = true;
 
         mBuffer = new ArrayList<>();
@@ -52,6 +59,11 @@ public class RelayServer implements Server {
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);
+    }
+
+    public void postAndStoreEvent(final ServerEvent event) {
+        mBuffer.add(event);
+        mServerEventBus.post(event);
     }
 
     public void onServerEvent(final ServerEvent event) {
@@ -164,6 +176,11 @@ public class RelayServer implements Server {
     @Override
     public ServerConfiguration getConfiguration() {
         return mConfiguration;
+    }
+
+    @Override
+    public RelayDCCManager getDCCManager() {
+        return mRelayDCCManager;
     }
 
     public void markInvalid() {

@@ -68,7 +68,7 @@ public class SocketUtils {
         return (SSLSocketFactory) SSLSocketFactory.getDefault();
     }
 
-    public static BufferedWriter getSocketWriter(final Socket socket) throws IOException {
+    public static BufferedWriter getSocketBufferedWriter(final Socket socket) throws IOException {
         return new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
 

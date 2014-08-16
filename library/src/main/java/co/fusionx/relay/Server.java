@@ -5,6 +5,8 @@ import java.util.List;
 
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
+import co.fusionx.relay.dcc.DCCManager;
+import co.fusionx.relay.dcc.RelayDCCManager;
 import co.fusionx.relay.event.server.ServerEvent;
 
 public interface Server extends Conversation {
@@ -29,4 +31,6 @@ public interface Server extends Conversation {
     public ServerEventBus getServerEventBus();
 
     public ServerConfiguration getConfiguration();
+
+    public DCCManager getDCCManager();
 }
