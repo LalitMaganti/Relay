@@ -7,9 +7,10 @@ import org.robolectric.annotation.Config;
 
 import android.os.Parcel;
 
+import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 
-import static co.fusionx.relay.ServerConfiguration.Builder.CREATOR;
+import static co.fusionx.relay.base.ServerConfiguration.Builder.CREATOR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 

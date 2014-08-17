@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.QueryUser;
+import co.fusionx.relay.base.QueryUser;
 
 public class NewPrivateMessageEvent extends ServerEvent {
 

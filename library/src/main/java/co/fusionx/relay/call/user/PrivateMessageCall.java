@@ -1,7 +1,7 @@
 package co.fusionx.relay.call.user;
 
 import co.fusionx.relay.call.Call;
-import co.fusionx.relay.writers.WriterCommands;
+import co.fusionx.relay.misc.WriterCommands;
 
 public class PrivateMessageCall extends Call {
 

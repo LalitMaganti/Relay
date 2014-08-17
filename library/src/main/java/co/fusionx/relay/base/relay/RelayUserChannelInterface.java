@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import co.fusionx.relay.base.UserChannelInterface;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.util.IRCUtils;
 import gnu.trove.set.hash.THashSet;

@@ -1,11 +1,13 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.constants.UserLevel;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 

@@ -6,8 +6,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 
-import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.constants.ServerCommands;

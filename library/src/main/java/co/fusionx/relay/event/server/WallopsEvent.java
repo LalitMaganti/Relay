@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Server;
 
 public class WallopsEvent extends ServerEvent {
 

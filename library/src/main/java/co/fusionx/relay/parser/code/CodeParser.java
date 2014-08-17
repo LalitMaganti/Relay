@@ -4,8 +4,8 @@ import android.util.SparseArray;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.RelayUserChannelInterface;
+import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayUserChannelInterface;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.constants.ServerReplyCodes;
 

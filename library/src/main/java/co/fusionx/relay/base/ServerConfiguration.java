@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base;
 
 import android.os.Parcel;
 import android.os.Parcelable;

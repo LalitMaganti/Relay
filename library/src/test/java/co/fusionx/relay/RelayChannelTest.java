@@ -5,6 +5,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.relay.RelayChannel;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Config(emulateSdk = 18)

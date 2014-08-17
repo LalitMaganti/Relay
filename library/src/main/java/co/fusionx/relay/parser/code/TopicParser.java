@@ -4,8 +4,8 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayChannel;
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayChannel;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.channel.ChannelInitialTopicEvent;
 import co.fusionx.relay.function.Optionals;

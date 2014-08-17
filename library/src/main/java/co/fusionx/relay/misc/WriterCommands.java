@@ -1,4 +1,4 @@
-package co.fusionx.relay.writers;
+package co.fusionx.relay.misc;
 
 public final class WriterCommands {
 

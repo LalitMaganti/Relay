@@ -3,8 +3,8 @@ package co.fusionx.relay.parser.command;
 import java.util.List;
 import java.util.Map;
 
-import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.RelayUserChannelInterface;
+import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayUserChannelInterface;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.constants.ServerCommands;
 import co.fusionx.relay.dcc.DCCParser;

@@ -4,8 +4,8 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayQueryUser;
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayQueryUser;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.query.QueryNoSuchNickEvent;
 import co.fusionx.relay.event.server.GenericServerEvent;

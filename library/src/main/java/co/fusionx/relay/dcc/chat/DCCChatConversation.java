@@ -6,7 +6,7 @@ import android.os.HandlerThread;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.dcc.DCCConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;

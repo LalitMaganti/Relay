@@ -2,7 +2,7 @@ package co.fusionx.relay.parser.command;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.util.IRCUtils;
 

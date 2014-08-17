@@ -5,6 +5,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.relay.RelayChannelUser;
+
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class RelayChannelUserTest {

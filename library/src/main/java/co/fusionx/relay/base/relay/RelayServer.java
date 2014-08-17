@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import com.google.common.base.Optional;
 
@@ -11,6 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.dcc.RelayDCCManager;
@@ -23,7 +26,7 @@ public class RelayServer implements Server {
 
     private final ServerConfiguration mConfiguration;
 
-    private final IRCConnection mIRCConnection;
+    private final RelayIRCConnection mRelayIRCConnection;
 
     private final List<ServerEvent> mBuffer;
 
@@ -43,10 +46,10 @@ public class RelayServer implements Server {
 
     private boolean mValid;
 
-    public RelayServer(final ServerConfiguration configuration, final IRCConnection connection,
+    public RelayServer(final ServerConfiguration configuration, final RelayIRCConnection connection,
             final Handler callHandler, final Collection<String> ignoreList) {
         mConfiguration = configuration;
-        mIRCConnection = connection;
+        mRelayIRCConnection = connection;
 
         mUserChannelInterface = new RelayUserChannelInterface(this);
         mUserChannelInterface.updateIgnoreList(ignoreList);
@@ -109,8 +112,8 @@ public class RelayServer implements Server {
         mServerCallHandler.onOutputStreamCreated(writer);
     }
 
-    public IRCConnection getIRCConnection() {
-        return mIRCConnection;
+    public RelayIRCConnection getRelayIRCConnection() {
+        return mRelayIRCConnection;
     }
 
     void addUser(final RelayChannelUser user) {
@@ -172,7 +175,7 @@ public class RelayServer implements Server {
 
     @Override
     public ConnectionStatus getStatus() {
-        return mIRCConnection.getStatus();
+        return mRelayIRCConnection.getStatus();
     }
 
     @Override

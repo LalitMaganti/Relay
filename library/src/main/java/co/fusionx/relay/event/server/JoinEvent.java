@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.Channel;
+import co.fusionx.relay.base.Channel;
 
 public final class JoinEvent extends ServerEvent {
 

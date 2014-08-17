@@ -5,7 +5,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.RelayServerTest;
 import co.fusionx.relay.TestMisc;
 import co.fusionx.relay.misc.RelayConfigurationProvider;

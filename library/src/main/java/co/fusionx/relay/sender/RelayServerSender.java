@@ -1,6 +1,6 @@
 package co.fusionx.relay.sender;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.call.server.JoinCall;
 import co.fusionx.relay.call.server.NickChangeCall;

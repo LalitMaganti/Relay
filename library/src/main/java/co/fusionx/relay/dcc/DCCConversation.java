@@ -1,8 +1,8 @@
 package co.fusionx.relay.dcc;
 
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.relay.RelayServer;
 
 public abstract class DCCConversation implements Conversation {
 

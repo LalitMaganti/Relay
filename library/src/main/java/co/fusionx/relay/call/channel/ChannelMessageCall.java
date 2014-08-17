@@ -1,7 +1,7 @@
 package co.fusionx.relay.call.channel;
 
 import co.fusionx.relay.call.Call;
-import co.fusionx.relay.writers.WriterCommands;
+import co.fusionx.relay.misc.WriterCommands;
 
 public class ChannelMessageCall extends Call {
 

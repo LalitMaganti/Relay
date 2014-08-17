@@ -1,5 +1,6 @@
 package co.fusionx.relay;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.interfaces.RelayConfiguration;
 
 public class TestMisc {

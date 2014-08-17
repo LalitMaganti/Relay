@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 public class RelayMainUser extends RelayChannelUser {
 

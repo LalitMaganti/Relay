@@ -2,7 +2,7 @@ package co.fusionx.relay.parser.code;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.event.server.MotdEvent;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.util.Utils;

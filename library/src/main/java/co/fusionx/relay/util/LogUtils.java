@@ -2,7 +2,7 @@ package co.fusionx.relay.util;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class LogUtils {

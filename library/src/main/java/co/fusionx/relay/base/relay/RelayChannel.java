@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;

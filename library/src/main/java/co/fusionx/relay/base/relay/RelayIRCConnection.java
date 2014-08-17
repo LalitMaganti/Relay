@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import com.google.common.base.Function;
 
@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Collection;
 
+import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.call.server.QuitCall;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
@@ -34,7 +37,7 @@ import co.fusionx.relay.parser.ServerLineParser;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
-public class IRCConnection {
+public class RelayIRCConnection {
 
     private final Handler mUiThreadHandler;
 
@@ -58,7 +61,7 @@ public class IRCConnection {
 
     private boolean mStopped;
 
-    IRCConnection(final ServerConfiguration serverConfiguration, final Handler handler,
+    RelayIRCConnection(final ServerConfiguration serverConfiguration, final Handler handler,
             final Collection<String> ignoreList) {
         mServerConfiguration = serverConfiguration;
         mUiThreadHandler = handler;

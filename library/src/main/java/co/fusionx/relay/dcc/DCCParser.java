@@ -2,7 +2,7 @@ package co.fusionx.relay.dcc;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;

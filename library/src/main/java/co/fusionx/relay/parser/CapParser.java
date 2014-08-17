@@ -2,8 +2,8 @@ package co.fusionx.relay.parser;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.server.GenericServerEvent;

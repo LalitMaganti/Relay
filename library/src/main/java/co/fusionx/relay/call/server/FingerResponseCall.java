@@ -1,6 +1,6 @@
 package co.fusionx.relay.call.server;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.call.Call;
 
 public class FingerResponseCall extends Call {

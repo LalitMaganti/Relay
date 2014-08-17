@@ -4,10 +4,10 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayChannel;
-import co.fusionx.relay.RelayChannelUser;
-import co.fusionx.relay.RelayMainUser;
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayChannel;
+import co.fusionx.relay.base.relay.RelayChannelUser;
+import co.fusionx.relay.base.relay.RelayMainUser;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelModeEvent;

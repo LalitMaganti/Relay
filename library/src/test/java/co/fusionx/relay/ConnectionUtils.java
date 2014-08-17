@@ -3,14 +3,18 @@ package co.fusionx.relay;
 import android.os.Handler;
 import android.os.Looper;
 
+import co.fusionx.relay.base.relay.RelayIRCConnection;
+import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.base.ServerConfiguration;
+
 public class ConnectionUtils {
 
-    public static IRCConnection getConnection(final ServerConfiguration configuration) {
+    public static RelayIRCConnection getConnection(final ServerConfiguration configuration) {
         final Handler handler = new Handler(Looper.getMainLooper());
-        return new IRCConnection(configuration, handler, null);
+        return new RelayIRCConnection(configuration, handler, null);
     }
 
-    public static RelayServer getServerFromConnection(final IRCConnection connection) {
+    public static RelayServer getServerFromConnection(final RelayIRCConnection connection) {
         return connection.getServer();
     }
 }

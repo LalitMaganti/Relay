@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;

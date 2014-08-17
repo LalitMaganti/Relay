@@ -1,8 +1,11 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;

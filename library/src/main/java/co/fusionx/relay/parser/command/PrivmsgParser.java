@@ -4,10 +4,10 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayChannel;
-import co.fusionx.relay.RelayChannelUser;
-import co.fusionx.relay.RelayQueryUser;
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayChannel;
+import co.fusionx.relay.base.relay.RelayChannelUser;
+import co.fusionx.relay.base.relay.RelayQueryUser;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
@@ -33,7 +33,7 @@ public class PrivmsgParser extends CommandParser {
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         if (parsedArray.size() < 4) {
             RelayConfigurationProvider.getPreferences()
-                    .logServerLine(mServer.getIRCConnection().getCurrentLine());
+                    .logServerLine(mServer.getRelayIRCConnection().getCurrentLine());
             return;
         }
         final String message = parsedArray.get(3);

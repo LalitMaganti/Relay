@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.dcc.DCCConnection;
 import co.fusionx.relay.dcc.DCCConversation;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;

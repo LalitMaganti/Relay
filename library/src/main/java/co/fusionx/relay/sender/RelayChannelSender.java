@@ -2,7 +2,7 @@ package co.fusionx.relay.sender;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.RelayChannel;
+import co.fusionx.relay.base.relay.RelayChannel;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.call.channel.ChannelActionCall;
 import co.fusionx.relay.call.channel.ChannelKickCall;

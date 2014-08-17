@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.query.QueryEvent;

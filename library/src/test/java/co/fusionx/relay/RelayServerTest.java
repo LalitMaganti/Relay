@@ -5,6 +5,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import co.fusionx.relay.base.relay.RelayIRCConnection;
+import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 
@@ -17,7 +20,7 @@ public class RelayServerTest {
 
     public static RelayServer getDefaultServer() {
         final ServerConfiguration freenode = getFreenodeConfiguration();
-        final IRCConnection connection = ConnectionUtils.getConnection(freenode);
+        final RelayIRCConnection connection = ConnectionUtils.getConnection(freenode);
         return ConnectionUtils.getServerFromConnection(connection);
     }
 

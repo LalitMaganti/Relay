@@ -1,6 +1,6 @@
 package co.fusionx.relay.interfaces;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Server;
 
 public interface RelayConfiguration {
 

@@ -10,10 +10,10 @@ import org.robolectric.annotation.Config;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayChannel;
+import co.fusionx.relay.base.relay.RelayChannel;
 import co.fusionx.relay.RelayChannelTest;
-import co.fusionx.relay.RelayChannelUser;
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayChannelUser;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.RelayServerTest;
 import co.fusionx.relay.ServerConfigurationTest;
 import co.fusionx.relay.TestMisc;

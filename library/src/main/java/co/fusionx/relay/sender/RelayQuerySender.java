@@ -1,6 +1,6 @@
 package co.fusionx.relay.sender;
 
-import co.fusionx.relay.RelayQueryUser;
+import co.fusionx.relay.base.relay.RelayQueryUser;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.call.user.PrivateActionCall;
 import co.fusionx.relay.call.user.PrivateMessageCall;

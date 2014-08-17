@@ -1,4 +1,6 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
+
+import co.fusionx.relay.base.Nick;
 
 public final class RelayNick implements Nick {
 

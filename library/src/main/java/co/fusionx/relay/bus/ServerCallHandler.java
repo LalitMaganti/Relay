@@ -6,7 +6,7 @@ import android.util.Base64;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.call.Call;
 import co.fusionx.relay.call.server.ERRMSGResponseCall;
 import co.fusionx.relay.call.server.FingerResponseCall;

@@ -2,9 +2,9 @@ package co.fusionx.relay.parser.code;
 
 import java.util.List;
 
-import co.fusionx.relay.RelayChannel;
-import co.fusionx.relay.RelayChannelUser;
-import co.fusionx.relay.RelayServer;
+import co.fusionx.relay.base.relay.RelayChannel;
+import co.fusionx.relay.base.relay.RelayChannelUser;
+import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.util.IRCUtils;
