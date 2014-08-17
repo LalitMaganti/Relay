@@ -6,8 +6,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import co.fusionx.relay.base.relay.RelayServer;
-import co.fusionx.relay.RelayServerTest;
-import co.fusionx.relay.TestMisc;
+import co.fusionx.relay.base.relay.RelayServerTest;
+import co.fusionx.relay.base.relay.TestMisc;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 @Config(emulateSdk = 18)

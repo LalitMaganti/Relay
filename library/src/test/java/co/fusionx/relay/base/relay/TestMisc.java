@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.interfaces.RelayConfiguration;

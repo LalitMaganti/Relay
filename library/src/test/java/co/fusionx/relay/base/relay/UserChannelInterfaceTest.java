@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

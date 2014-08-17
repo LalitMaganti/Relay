@@ -1,4 +1,4 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -6,7 +6,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.relay.RelayChannel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

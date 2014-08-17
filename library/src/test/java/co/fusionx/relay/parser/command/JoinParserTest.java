@@ -11,12 +11,12 @@ import org.robolectric.annotation.Config;
 import java.util.List;
 
 import co.fusionx.relay.base.relay.RelayChannel;
-import co.fusionx.relay.RelayChannelTest;
+import co.fusionx.relay.base.relay.RelayChannelTest;
 import co.fusionx.relay.base.relay.RelayChannelUser;
 import co.fusionx.relay.base.relay.RelayServer;
-import co.fusionx.relay.RelayServerTest;
-import co.fusionx.relay.ServerConfigurationTest;
-import co.fusionx.relay.TestMisc;
+import co.fusionx.relay.base.relay.RelayServerTest;
+import co.fusionx.relay.base.relay.ServerConfigurationTest;
+import co.fusionx.relay.base.relay.TestMisc;
 import co.fusionx.relay.event.channel.ChannelWorldJoinEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.misc.RelayConfigurationProvider;

@@ -1,17 +1,14 @@
-package co.fusionx.relay;
+package co.fusionx.relay.base.relay;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import co.fusionx.relay.base.relay.RelayIRCConnection;
-import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 
-import static co.fusionx.relay.ServerConfigurationTest.getFreenodeConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Config(emulateSdk = 18)
@@ -19,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RelayServerTest {
 
     public static RelayServer getDefaultServer() {
-        final ServerConfiguration freenode = getFreenodeConfiguration();
+        final ServerConfiguration freenode = ServerConfigurationTest.getFreenodeConfiguration();
         final RelayIRCConnection connection = ConnectionUtils.getConnection(freenode);
         return ConnectionUtils.getServerFromConnection(connection);
     }
