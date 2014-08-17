@@ -10,6 +10,7 @@ import java.util.Set;
 
 import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
+import co.fusionx.relay.dcc.event.file.DCCFileConversationStartedEvent;
 import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
@@ -77,6 +78,9 @@ public class RelayDCCManager implements DCCManager {
         }
         // A pending send becomes a get here
         conversation.getFile(connection, file);
+
+        // The conversation has been started
+        mServer.getServerEventBus().post(new DCCFileConversationStartedEvent(conversation));
     }
 
     public void acceptDCCConnection(final DCCPendingChatConnection connection) {

@@ -1,7 +1,10 @@
 package co.fusionx.relay.dcc.file;
 
+import com.google.common.collect.ImmutableList;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.base.relay.RelayServer;
@@ -13,7 +16,7 @@ public class DCCFileConversation extends DCCConversation {
 
     private final String mNick;
 
-    private final List<DCCConnection> mConnectionList;
+    private final List<DCCFileConnection> mConnectionList;
 
     public DCCFileConversation(final RelayServer server, final String nick) {
         super(server);
@@ -26,6 +29,12 @@ public class DCCFileConversation extends DCCConversation {
         final DCCGetConnection getConnection = new DCCGetConnection(connection, this, file);
         mConnectionList.add(getConnection);
         getConnection.startConnection();
+
+        mServer.getServerEventBus().post(new DCCGetStartedEvent(getConnection));
+    }
+
+    public Collection<DCCFileConnection> getFileConnections() {
+        return ImmutableList.copyOf(mConnectionList);
     }
 
     // Conversation interface

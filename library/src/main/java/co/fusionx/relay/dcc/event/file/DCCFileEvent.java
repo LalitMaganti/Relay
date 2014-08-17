@@ -5,9 +5,9 @@ import co.fusionx.relay.dcc.file.DCCFileConversation;
 
 public class DCCFileEvent extends DCCEvent {
 
-    public final DCCFileConversation dccFileConversation;
+    public final DCCFileConversation fileConversation;
 
-    public DCCFileEvent(final DCCFileConversation dccFileConversation) {
-        this.dccFileConversation = dccFileConversation;
+    public DCCFileEvent(final DCCFileConversation fileConversation) {
+        this.fileConversation = fileConversation;
     }
 }
