@@ -8,8 +8,9 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.base.relay.RelayServer;
-import co.fusionx.relay.dcc.DCCConnection;
 import co.fusionx.relay.dcc.DCCConversation;
+import co.fusionx.relay.dcc.event.file.DCCFileEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 
 public class DCCFileConversation extends DCCConversation {
@@ -18,11 +19,14 @@ public class DCCFileConversation extends DCCConversation {
 
     private final List<DCCFileConnection> mConnectionList;
 
+    private List<DCCFileEvent> mBuffer;
+
     public DCCFileConversation(final RelayServer server, final String nick) {
         super(server);
 
         mNick = nick;
         mConnectionList = new ArrayList<>();
+        mBuffer = new ArrayList<>();
     }
 
     public void getFile(final DCCPendingSendConnection connection, final File file) {
@@ -30,11 +34,20 @@ public class DCCFileConversation extends DCCConversation {
         mConnectionList.add(getConnection);
         getConnection.startConnection();
 
-        mServer.getServerEventBus().post(new DCCGetStartedEvent(getConnection));
+        postAndStoreEvent(new DCCFileGetStartedEvent(this, getConnection));
     }
 
     public Collection<DCCFileConnection> getFileConnections() {
         return ImmutableList.copyOf(mConnectionList);
+    }
+
+    public void postAndStoreEvent(final DCCFileEvent event) {
+        mBuffer.add(event);
+        mServer.getServerEventBus().post(event);
+    }
+
+    public List<DCCFileEvent> getBuffer() {
+        return mBuffer;
     }
 
     // Conversation interface

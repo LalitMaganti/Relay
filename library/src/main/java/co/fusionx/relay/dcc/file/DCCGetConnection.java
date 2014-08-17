@@ -45,7 +45,7 @@ public class DCCGetConnection extends DCCFileConnection {
             final byte[] inBuffer = new byte[1024];
             final byte[] outBuffer = new byte[4];
 
-            int bytesTransferred = 0;
+            long bytesTransferred = 0;
             int bytesRead;
             while ((bytesRead = socketInput.read(inBuffer)) != -1) {
                 // Write the retrieved data to the file
@@ -53,7 +53,7 @@ public class DCCGetConnection extends DCCFileConnection {
                 // Increment the transferred bytes
                 bytesTransferred += bytesRead;
                 // Set the progress
-                setProgress(bytesTransferred / mPendingConnection.getSize());
+                setBytesTransferred(bytesTransferred);
 
                 // Tell our peer how much data we have transferred
                 DCCUtils.bytesTransferredToOutputBuffer(bytesTransferred, outBuffer);
