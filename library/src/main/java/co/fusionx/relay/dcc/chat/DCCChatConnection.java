@@ -9,29 +9,30 @@ import co.fusionx.relay.dcc.DCCConnection;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
+import co.fusionx.relay.parser.command.CtcpParser;
 import co.fusionx.relay.util.SocketUtils;
 
 class DCCChatConnection extends DCCConnection {
 
     private final DCCPendingConnection mPendingConversation;
 
-    private final DCCChatConversation mDccChatConversation;
+    private final DCCChatConversation mConversation;
 
     protected BufferedReader mBufferedReader;
 
     protected BufferedWriter mBufferedWriter;
 
     public DCCChatConnection(final DCCPendingConnection pendingConversation,
-            final DCCChatConversation dccChatConversation) {
+            final DCCChatConversation conversation) {
         super(pendingConversation);
 
-        mDccChatConversation = dccChatConversation;
+        mConversation = conversation;
         mPendingConversation = pendingConversation;
     }
 
     @Override
     protected void connect() {
-        mDccChatConversation.postAndStoreEvent(new DCCChatStartedEvent(mDccChatConversation));
+        mConversation.postAndStoreEvent(new DCCChatStartedEvent(mConversation));
 
         try {
             mSocket = new Socket(mPendingConversation.getIP(), mPendingConversation.getPort());
@@ -60,10 +61,22 @@ class DCCChatConnection extends DCCConnection {
     private void startParsing() throws IOException {
         String line;
         while ((line = mBufferedReader.readLine()) != null) {
-            // For DCC there is no parsing required - the chat is simply the message
-            mDccChatConversation.postAndStoreEvent
-                    (new DCCChatWorldMessageEvent(mDccChatConversation, line));
+            parseLine(line);
         }
+    }
+
+    private void parseLine(final String line) {
+        if (CtcpParser.isCtcp(line)) {
+            parseCtcp(line);
+        } else {
+            mConversation.postAndStoreEvent(new DCCChatWorldMessageEvent(mConversation, line));
+        }
+    }
+
+    private void parseCtcp(final String line) {
+        final String message = line.substring(1, line.length() - 1);
+        final String action = message.replace("ACTION ", "");
+        mConversation.postAndStoreEvent(new DCCChatWorldActionEvent(mConversation, action));
     }
 
     void writeLine(final String line) {

@@ -9,6 +9,7 @@ import java.util.List;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.dcc.DCCConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
@@ -37,13 +38,12 @@ public class DCCChatConversation extends DCCConversation {
         mCallHandler = new Handler(handlerThread.getLooper());
     }
 
-    public List<DCCChatEvent> getBuffer() {
-        return mBuffer;
+    public void startChat() {
+        mDCCChatConnection.startConnection();
     }
 
-    void postAndStoreEvent(final DCCChatEvent event) {
-        mBuffer.add(event);
-        mServer.getServerEventBus().post(event);
+    public List<DCCChatEvent> getBuffer() {
+        return mBuffer;
     }
 
     public void sendMessage(final String message) {
@@ -55,8 +55,23 @@ public class DCCChatConversation extends DCCConversation {
         postAndStoreEvent(new DCCChatSelfMessageEvent(this, message));
     }
 
-    public void startChat() {
-        mDCCChatConnection.startConnection();
+    public void sendAction(final String action) {
+        final String line = String.format("\u0001ACTION %1$s\u0001", action);
+        mCallHandler.post(() -> mDCCChatConnection.writeLine(line));
+
+        if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
+            return;
+        }
+        postAndStoreEvent(new DCCChatSelfActionEvent(this, action));
+    }
+
+    public void closeChat() {
+
+    }
+
+    void postAndStoreEvent(final DCCChatEvent event) {
+        mBuffer.add(event);
+        mServer.getServerEventBus().post(event);
     }
 
     // Conversation interface

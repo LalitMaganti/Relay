@@ -21,7 +21,7 @@ import co.fusionx.relay.parser.MentionParser;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
 
-class CtcpParser {
+public class CtcpParser {
 
     private final RelayServer mServer;
 

@@ -177,6 +177,30 @@ public class UserInputParser {
 
     public static void onParseDCCChatEvent(final DCCChatConversation chatConnection,
             final String message) {
-        chatConnection.sendMessage(message);
+        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final String command = parsedArray.remove(0);
+        final int arrayLength = parsedArray.size();
+
+        if (!command.startsWith("/")) {
+            chatConnection.sendMessage(message);
+            return;
+        }
+        switch (command) {
+            case "/me":
+                final String action = IRCUtils.concatenateStringList(parsedArray);
+                chatConnection.sendAction(action);
+                return;
+            case "/close":
+            case "/c":
+                if (arrayLength == 0) {
+                    chatConnection.closeChat();
+                    return;
+                }
+                break;
+            default:
+                onParseServerCommand(chatConnection.getServer(), message);
+                return;
+        }
+        onUnknownEvent(chatConnection.getServer(), message);
     }
 }
