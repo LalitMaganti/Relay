@@ -65,8 +65,6 @@ class KickParser extends RemoveUserParser {
         }
 
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
-        final KickEvent event = new KickEvent(channel, optKickUser, kickingNick, reason);
-
-        mServerEventBus.postAndStoreEvent(event);
+        mServer.postAndStoreEvent(new KickEvent(channel, optKickUser, kickingNick, reason));
     }
 }

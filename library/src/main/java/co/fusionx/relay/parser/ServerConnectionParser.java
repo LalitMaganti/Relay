@@ -6,11 +6,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.ServerConfiguration;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.bus.ServerEventBus;
-import co.fusionx.relay.call.server.NickChangeCall;
 import co.fusionx.relay.constants.ServerCommands;
 import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.server.GenericServerEvent;
@@ -21,7 +20,7 @@ import co.fusionx.relay.util.Utils;
 
 public class ServerConnectionParser {
 
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final ServerConfiguration mConfiguration;
 
@@ -35,7 +34,7 @@ public class ServerConnectionParser {
 
     private int suffix;
 
-    public ServerConnectionParser(final Server server, final ServerConfiguration configuration,
+    public ServerConnectionParser(final RelayServer server, final ServerConfiguration configuration,
             final BufferedReader bufferedReader, final ServerCallHandler callHandler) {
         suffix = 0;
         triedSecondNick = false;
@@ -70,12 +69,12 @@ public class ServerConnectionParser {
                 default:
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
                         final String nick = parseConnectionCode(mConfiguration.isNickChangeable(),
-                                parsedArray, eventBus, mConfiguration.getNickStorage());
+                                parsedArray, mConfiguration.getNickStorage());
                         if (nick != null) {
                             return nick;
                         }
                     } else {
-                        parseConnectionCommand(parsedArray, eventBus);
+                        parseConnectionCommand(parsedArray);
                     }
                     break;
             }
@@ -84,8 +83,7 @@ public class ServerConnectionParser {
     }
 
     private String parseConnectionCode(final boolean canChangeNick,
-            final List<String> parsedArray, final ServerEventBus sender,
-            final NickStorage nickStorage) {
+            final List<String> parsedArray, final NickStorage nickStorage) {
         final int code = Integer.parseInt(parsedArray.get(1));
         switch (code) {
             case ServerReplyCodes.RPL_WELCOME:
@@ -97,8 +95,7 @@ public class ServerConnectionParser {
                 onNicknameInUser(canChangeNick, nickStorage);
                 break;
             case ServerReplyCodes.ERR_NONICKNAMEGIVEN:
-                mServer.getServerCallHandler().post(new NickChangeCall(nickStorage
-                        .getFirstChoiceNick()));
+                mServer.sendNick(nickStorage.getFirstChoiceNick());
                 break;
             default:
                 if (ServerReplyCodes.saslCodes.contains(code)) {
@@ -111,33 +108,27 @@ public class ServerConnectionParser {
 
     private void onNicknameInUser(final boolean canChangeNick, final NickStorage nickStorage) {
         if (!triedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
-            mServer.getServerCallHandler().post(new NickChangeCall(nickStorage
-                    .getSecondChoiceNick()));
+            mServer.sendNick(nickStorage.getSecondChoiceNick());
             triedSecondNick = true;
         } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage.getThirdChoiceNick())) {
-            mServer.getServerCallHandler().post(new NickChangeCall(nickStorage
-                    .getThirdChoiceNick()));
+            mServer.sendNick(nickStorage.getThirdChoiceNick());
             triedThirdNick = true;
         } else if (canChangeNick) {
             ++suffix;
-            mServer.getServerCallHandler().post(new NickChangeCall(nickStorage
-                    .getFirstChoiceNick() + suffix));
+            mServer.sendNick(nickStorage.getFirstChoiceNick() + suffix);
         } else {
             // TODO - fix this
             //sender.sendNickInUseMessage();
         }
     }
 
-    private void parseConnectionCommand(final List<String> parsedArray,
-            final ServerEventBus sender) {
+    private void parseConnectionCommand(final List<String> parsedArray) {
         final String command = parsedArray.get(1).toUpperCase();
         IRCUtils.removeFirstElementFromList(parsedArray, 3);
 
         switch (command) {
             case ServerCommands.NOTICE:
-                final GenericServerEvent event = new GenericServerEvent(mServer,
-                        parsedArray.get(0));
-                sender.postAndStoreEvent(event);
+                mServer.postAndStoreEvent(new GenericServerEvent(mServer, parsedArray.get(0)));
                 break;
             case ServerCommands.CAP:
                 CapParser.parseCommand(parsedArray, mConfiguration, mServer, mServerCallHandler);

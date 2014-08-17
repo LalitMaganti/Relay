@@ -1,24 +1,30 @@
 package co.fusionx.relay.call.channel;
 
-import android.text.TextUtils;
+import com.google.common.base.Optional;
 
 import co.fusionx.relay.call.Call;
-import co.fusionx.relay.writers.WriterCommands;
 
 public class ChannelPartCall extends Call {
 
-    private final String channelName;
+    public final static String PART = "PART %1$s";
 
-    private final String reason;
+    public final static String PART_WITH_REASON = "PART %1$s :%2$s";
 
-    public ChannelPartCall(final String channelName, final String reason) {
-        this.channelName = channelName;
-        this.reason = reason;
+    private final String mChannelName;
+
+    private final Optional<String> mOptReason;
+
+    public ChannelPartCall(final String channelName, final Optional<String> optReason) {
+        mChannelName = channelName;
+        mOptReason = optReason;
     }
 
     @Override
     public String getLineToSendServer() {
-        return TextUtils.isEmpty(channelName) ? String.format(WriterCommands.PART, channelName)
-                : String.format(WriterCommands.PART_WITH_REASON, channelName, reason).trim();
+        return mOptReason.transform(this::partWithReason).or(String.format(PART, mChannelName));
+    }
+
+    private String partWithReason(final String reason) {
+        return String.format(PART_WITH_REASON, mChannelName, reason).trim();
     }
 }

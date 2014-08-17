@@ -51,7 +51,6 @@ public abstract class RemoveUserParser extends CommandParser {
             final RelayChannel channel, final RelayChannelUser removedUser) {
         mUserChannelInterface.decoupleUserAndChannel(removedUser, channel);
 
-        final ChannelWorldUserEvent event = getEvent(parsedArray, rawSource, channel, removedUser);
-        mServerEventBus.postAndStoreEvent(event, channel);
+        channel.postAndStoreEvent(getEvent(parsedArray, rawSource, channel, removedUser));
     }
 }

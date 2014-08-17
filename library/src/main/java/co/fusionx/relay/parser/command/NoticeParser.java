@@ -7,7 +7,6 @@ import java.util.List;
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelNoticeEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NoticeEvent;
@@ -48,13 +47,11 @@ class NoticeParser extends CommandParser {
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
         if (optChannel.isPresent()) {
             final RelayChannel channel = optChannel.get();
-
-            final ChannelEvent event = new ChannelNoticeEvent(channel, sendingNick, notice);
-            mServerEventBus.postAndStoreEvent(event, channel);
+            channel.postAndStoreEvent(new ChannelNoticeEvent(channel, sendingNick, notice));
         } else {
             // If we're not in this channel then send the notice to the server instead
             // TODO - maybe figure out why this is happening
-            mServerEventBus.postAndStoreEvent(new NoticeEvent(mServer, notice, sendingNick));
+            mServer.postAndStoreEvent(new NoticeEvent(mServer, notice, sendingNick));
         }
     }
 
@@ -62,9 +59,9 @@ class NoticeParser extends CommandParser {
         final Optional<RelayQueryUser> optUser = mUserChannelInterface.getQueryUser(sendingNick);
         if (optUser.isPresent()) {
             final RelayQueryUser user = optUser.get();
-            mServerEventBus.postAndStoreEvent(new QueryMessageWorldEvent(user, notice), user);
+            user.postAndStoreEvent(new QueryMessageWorldEvent(user, notice));
         } else {
-            mServerEventBus.postAndStoreEvent(new NoticeEvent(mServer, notice, sendingNick));
+            mServer.postAndStoreEvent(new NoticeEvent(mServer, notice, sendingNick));
         }
     }
 }

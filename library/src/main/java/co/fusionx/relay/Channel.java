@@ -5,8 +5,9 @@ import java.util.List;
 
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.sender.ChannelSender;
 
-public interface Channel extends Conversation {
+public interface Channel extends Conversation, ChannelSender {
 
     public String getName();
 

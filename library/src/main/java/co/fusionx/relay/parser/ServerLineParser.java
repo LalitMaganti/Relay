@@ -8,15 +8,14 @@ import android.util.SparseArray;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.Server;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.constants.ServerCommands;
 import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.server.GenericServerEvent;
-import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
 import co.fusionx.relay.misc.CoreListener;
 import co.fusionx.relay.parser.code.CodeParser;
@@ -28,11 +27,9 @@ public class ServerLineParser {
 
     private static final int SERVER_COMMAND_SOURCE = 0;
 
-    private static final int SERVER_COMMAND_COMMAND = 1;
+    private static final int SERVER_COMMAND_OR_CODE = 1;
 
-    private static final int SERVER_CODE_CODE = 1;
-
-    private final Server mServer;
+    private final RelayServer mServer;
 
     private final Map<String, CommandParser> mCommandParserMap;
 
@@ -82,7 +79,7 @@ public class ServerLineParser {
             return false;
         }
 
-        final String command = parsedArray.get(SERVER_COMMAND_COMMAND);
+        final String command = parsedArray.get(0).toUpperCase(Locale.getDefault());
         switch (command) {
             case ServerCommands.PING:
                 // Immediately respond & return
@@ -95,7 +92,7 @@ public class ServerLineParser {
                 return true;
             default:
                 // Check if the second thing is a code or a command
-                if (StringUtils.isNumeric(parsedArray.get(SERVER_CODE_CODE))) {
+                if (StringUtils.isNumeric(parsedArray.get(SERVER_COMMAND_OR_CODE))) {
                     onParseServerCode(mLine, parsedArray);
                 } else {
                     return onParseServerCommand(parsedArray);
@@ -107,7 +104,8 @@ public class ServerLineParser {
     // The server is sending a command to us - parse what it is
     private boolean onParseServerCommand(final List<String> parsedArray) {
         final String rawSource = parsedArray.get(SERVER_COMMAND_SOURCE);
-        final String command = parsedArray.get(SERVER_COMMAND_COMMAND).toUpperCase();
+        final String command = parsedArray.get(SERVER_COMMAND_OR_CODE)
+                .toUpperCase(Locale.getDefault());
 
         // Parse the command
         final CommandParser parser = mCommandParserMap.get(command);
@@ -125,19 +123,17 @@ public class ServerLineParser {
     }
 
     private void onParseServerCode(final String rawLine, final List<String> parsedArray) {
-        final int code = Integer.parseInt(parsedArray.get(SERVER_CODE_CODE));
+        final int code = Integer.parseInt(parsedArray.get(SERVER_COMMAND_OR_CODE));
 
         // Pretty common across all the codes
         IRCUtils.removeFirstElementFromList(parsedArray, 3);
         final String message = parsedArray.get(0);
 
         if (ServerReplyCodes.genericCodes.contains(code)) {
-            final ServerEvent event = new GenericServerEvent(mServer, message);
-            mServer.getServerEventBus().postAndStoreEvent(event);
+            mServer.postAndStoreEvent(new GenericServerEvent(mServer, message));
         } else if (ServerReplyCodes.whoisCodes.contains(code)) {
             final String response = IRCUtils.concatenateStringList(parsedArray);
-            final WhoisEvent event = new WhoisEvent(mServer, response);
-            mServer.getServerEventBus().postAndStoreEvent(event);
+            mServer.postAndStoreEvent(new WhoisEvent(mServer, response));
         } else if (ServerReplyCodes.doNothingCodes.contains(code)) {
             // Do nothing
         } else {

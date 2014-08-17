@@ -56,15 +56,12 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final Optional<RelayQueryUser> optUser = mUserChannelInterface.getQueryUser(nick);
-        if (optUser.isPresent()) {
-            final RelayQueryUser user = optUser.get();
-            mServerEventBus.postAndStoreEvent(new QueryMessageWorldEvent(user, message), user);
-        } else {
-            final RelayQueryUser user = mUserChannelInterface
-                    .addQueryUser(nick, message, false, false);
-            mServerEventBus.postAndStoreEvent(new NewPrivateMessageEvent(user));
+        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
+        final RelayQueryUser user = optional.or(mUserChannelInterface.addQueryUser(nick));
+        if (!optional.isPresent()) {
+            mServer.postAndStoreEvent(new NewPrivateMessageEvent(user));
         }
+        user.postAndStoreEvent(new QueryMessageWorldEvent(user, message));
     }
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
@@ -85,7 +82,7 @@ public class PrivmsgParser extends CommandParser {
             } else {
                 event = new ChannelWorldMessageEvent(channel, message, sendingNick, mention);
             }
-            mServerEventBus.postAndStoreEvent(event, channel);
+            channel.postAndStoreEvent(event);
         });
     }
 }

@@ -34,4 +34,11 @@ public interface UserChannelInterface {
      * @return an optional possibly containing the query user matching the specified nick
      */
     public Optional<? extends QueryUser> getQueryUser(final String nick);
+
+    /**
+     * Sets the list of nicks who the user wishes to ignore
+     *
+     * @param ignoreList the list of user nicks to ignore
+     */
+    public void updateIgnoreList(final Collection<String> ignoreList);
 }

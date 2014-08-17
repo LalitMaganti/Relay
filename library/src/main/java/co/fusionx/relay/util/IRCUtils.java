@@ -9,8 +9,12 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IRCUtils {
+
+    private static final Pattern QUOTE_SPLIT_PATTERN = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
 
     public static String getNickFromRaw(final String rawSource) {
         String nick;
@@ -90,5 +94,14 @@ public class IRCUtils {
             }
         }
         return ipAddress.toString();
+    }
+
+    public static List<String> splitRawLineWithQuote(final String input) {
+        final List<String> list = new ArrayList<>();
+        final Matcher m = QUOTE_SPLIT_PATTERN.matcher(input);
+        while (m.find()) {
+            list.add(m.group(1).replace("\"", ""));
+        }
+        return list;
     }
 }

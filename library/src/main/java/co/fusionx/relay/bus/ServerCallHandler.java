@@ -1,62 +1,37 @@
 package co.fusionx.relay.bus;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-
 import android.os.Handler;
 import android.util.Base64;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import co.fusionx.relay.QueryUser;
-import co.fusionx.relay.RelayChannel;
-import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.RelayUserChannelInterface;
 import co.fusionx.relay.call.Call;
-import co.fusionx.relay.call.channel.ChannelActionCall;
-import co.fusionx.relay.call.channel.ChannelKickCall;
-import co.fusionx.relay.call.channel.ChannelMessageCall;
-import co.fusionx.relay.call.channel.ChannelPartCall;
-import co.fusionx.relay.call.channel.ChannelTopicCall;
-import co.fusionx.relay.call.server.JoinCall;
-import co.fusionx.relay.call.server.ModeCall;
-import co.fusionx.relay.call.server.NickChangeCall;
-import co.fusionx.relay.call.server.RawCall;
-import co.fusionx.relay.call.server.WhoisCall;
-import co.fusionx.relay.call.user.PrivateActionCall;
-import co.fusionx.relay.call.user.PrivateMessageCall;
-import co.fusionx.relay.event.channel.ChannelActionEvent;
-import co.fusionx.relay.event.channel.ChannelEvent;
-import co.fusionx.relay.event.channel.ChannelMessageEvent;
-import co.fusionx.relay.event.query.QueryActionSelfEvent;
-import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.event.query.QueryMessageSelfEvent;
-import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-import co.fusionx.relay.event.server.PrivateMessageClosedEvent;
-import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.call.server.ERRMSGResponseCall;
+import co.fusionx.relay.call.server.FingerResponseCall;
+import co.fusionx.relay.call.server.PingResponseCall;
+import co.fusionx.relay.call.server.TimeResponseCall;
+import co.fusionx.relay.call.server.UserCall;
+import co.fusionx.relay.call.server.VersionResponseCall;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
-import co.fusionx.relay.util.Utils;
 
 public class ServerCallHandler {
 
-    private final RelayServer mServer;
-
     private final Handler mCallHandler;
-
-    private final RelayUserChannelInterface mUserChannelInterface;
 
     private BufferedWriter mBufferedWriter;
 
-    public ServerCallHandler(final RelayServer server, final Handler callHandler) {
-        mServer = server;
+    public ServerCallHandler(final Handler callHandler) {
         mCallHandler = callHandler;
-
-        mUserChannelInterface = server.getUserChannelInterface();
     }
 
     void writeLineToServer(final String line) {
+        if (mBufferedWriter == null) {
+            RelayConfigurationProvider.getPreferences().logServerLine(line);
+            return;
+        }
+
         try {
             mBufferedWriter.write(line + "\r\n");
             mBufferedWriter.flush();
@@ -115,115 +90,27 @@ public class ServerCallHandler {
         writeLineToServer("AUTHENTICATE " + encoded);
     }
 
-    public void sendMode(final String channelName, final String destination, final String mode) {
-        post(new ModeCall(channelName, destination, mode));
+    public void sendUser(final String serverUserName, final String realName) {
+        post(new UserCall(serverUserName, realName));
     }
 
-    public void sendUserWhois(final String nick) {
-        post(new WhoisCall(nick));
+    public void sendFingerResponse(final String nick, final RelayServer server) {
+        post(new FingerResponseCall(nick, server));
     }
 
-    public void sendRawLine(final String rawLine) {
-        post(new RawCall(rawLine));
+    public void sendVersionResponse(final String nick) {
+        post(new VersionResponseCall(nick));
     }
 
-    public void sendMessageToQueryUser(final String nick, final String message) {
-        if (Utils.isNotEmpty(message)) {
-            post(new PrivateMessageCall(nick, message));
-        }
-
-        sendSelfEventToQueryUser(user -> new QueryMessageSelfEvent(user, mServer.getUser(),
-                message), nick, message);
+    public void sendErrMsgResponse(final String nick, final String query) {
+        post(new ERRMSGResponseCall(nick, query));
     }
 
-    public void sendActionToQueryUser(final String nick, final String action) {
-        if (Utils.isNotEmpty(action)) {
-            post(new PrivateActionCall(nick, action));
-        }
-
-        sendSelfEventToQueryUser(user -> new QueryActionSelfEvent(user, mServer.getUser(),
-                action), nick, action);
+    public void sendPingResponse(final String nick, final String timestamp) {
+        post(new PingResponseCall(nick, timestamp));
     }
 
-    private void sendSelfEventToQueryUser(final Function<RelayQueryUser, QueryEvent> function,
-            final String nick, final String message) {
-        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
-        if (optional.isPresent()) {
-            final RelayQueryUser user = optional.get();
-            mServer.getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(user));
-
-            if (Utils.isNotEmpty(message)) {
-                mServer.getServerEventBus().postAndStoreEvent(function.apply(user), user);
-            }
-        } else {
-            final RelayQueryUser user = mUserChannelInterface
-                    .addQueryUser(nick, message, true, true);
-            mServer.getServerEventBus().postAndStoreEvent(new NewPrivateMessageEvent(user));
-        }
-    }
-
-    public void sendNickChange(final String newNick) {
-        post(new NickChangeCall(newNick));
-    }
-
-    public void sendPart(final String channelName) {
-        post(new ChannelPartCall(channelName,
-                RelayConfigurationProvider.getPreferences().getPartReason()));
-    }
-
-    public void sendCloseQuery(final QueryUser rawUser) {
-        if (!(rawUser instanceof RelayQueryUser)) {
-            // TODO - this is invalid and unexpected. What should be done here?
-            return;
-        }
-        final RelayQueryUser user = (RelayQueryUser) rawUser;
-        mUserChannelInterface.removeQueryUser(user);
-
-        if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
-            return;
-        }
-        final ServerEvent event = new PrivateMessageClosedEvent(user);
-        mServer.getServerEventBus().postAndStoreEvent(event);
-    }
-
-    public void sendJoin(final String channelName) {
-        post(new JoinCall(channelName));
-    }
-
-    public void sendMessageToChannel(final String channelName, final String message) {
-        post(new ChannelMessageCall(channelName, message));
-
-        sendChannelSelfMessage(channel -> new ChannelMessageEvent(channel, message,
-                mServer.getUser()), channelName);
-    }
-
-    public void sendActionToChannel(final String channelName, final String action) {
-        post(new ChannelActionCall(channelName, action));
-
-        sendChannelSelfMessage(channel -> new ChannelActionEvent(channel, action,
-                mServer.getUser()), channelName);
-    }
-
-    private void sendChannelSelfMessage(final Function<RelayChannel, ChannelEvent> function,
-            final String channelName) {
-        if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
-            return;
-        }
-
-        final Optional<RelayChannel> optional = mUserChannelInterface.getChannel(channelName);
-        if (optional.isPresent()) {
-            final RelayChannel channel = optional.get();
-            mServer.getServerEventBus().postAndStoreEvent(function.apply(channel), channel);
-        } else {
-            // TODO - some sort of logging should be done here
-        }
-    }
-
-    public void sendKick(final String channelName, final String nick, final String reason) {
-        post(new ChannelKickCall(channelName, nick, reason));
-    }
-
-    public void sendTopic(final String channelName, final String newTopic) {
-        post(new ChannelTopicCall(channelName, newTopic));
+    public void sendTimeResponse(final String nick) {
+        post(new TimeResponseCall(nick));
     }
 }

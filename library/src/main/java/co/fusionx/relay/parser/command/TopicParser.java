@@ -7,7 +7,6 @@ import java.util.List;
 import co.fusionx.relay.ChannelUser;
 import co.fusionx.relay.RelayChannel;
 import co.fusionx.relay.RelayServer;
-import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelTopicEvent;
 import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
@@ -26,9 +25,7 @@ public class TopicParser extends CommandParser {
         LogUtils.logOptionalBug(optChan, mServer);
         Optionals.ifPresent(optChan, channel -> {
             final String newTopic = parsedArray.get(3);
-
-            final ChannelEvent event = new ChannelTopicEvent(channel, user, newTopic);
-            mServerEventBus.postAndStoreEvent(event, channel);
+            channel.postAndStoreEvent(new ChannelTopicEvent(channel, user, newTopic));
         });
     }
 }

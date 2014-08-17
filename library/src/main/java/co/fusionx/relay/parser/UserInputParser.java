@@ -4,110 +4,104 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
+import co.fusionx.relay.Channel;
 import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
+import co.fusionx.relay.dcc.connection.DCCChatConnection;
 import co.fusionx.relay.util.IRCUtils;
+
+import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class UserInputParser {
 
-    public static void onParseChannelMessage(final Server server, final String channelName,
-            final String message) {
+    public static void onParseChannelMessage(final Channel channel, final String message) {
         final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 
-        if (command.startsWith("/")) {
-            switch (command) {
-                case "/me":
-                    if (arrayLength >= 1) {
-                        final String action = IRCUtils.concatenateStringList(parsedArray);
-                        server.getServerCallHandler().sendActionToChannel(channelName, action);
-                        return;
-                    }
-                    break;
-                case "/part":
-                case "/p":
-                    if (arrayLength == 0) {
-                        server.getServerCallHandler().sendPart(channelName);
-                        return;
-                    }
-                    break;
-                case "/mode":
-                    if (arrayLength == 2) {
-                        server.getServerCallHandler().sendMode(channelName, parsedArray.get(0),
-                                parsedArray.get(1));
-                        return;
-                    }
-                    break;
-                case "/kick":
-                    if (arrayLength >= 1) {
-                        final String nick = parsedArray.remove(0);
-                        final String reason = arrayLength >= 1 ? IRCUtils
-                                .concatenateStringList(parsedArray) : "";
-                        server.getServerCallHandler().sendKick(channelName, nick, reason);
-                        return;
-                    }
-                    break;
-                case "/topic":
-                    if (arrayLength >= 1) {
-                        final String topic = IRCUtils.concatenateStringList(parsedArray);
-                        server.getServerCallHandler().sendTopic(channelName, topic);
-                        return;
-                    }
-                    break;
-                default:
-                    onParseServerCommand(server, message);
-                    return;
-            }
-        } else {
-            server.getServerCallHandler().sendMessageToChannel(channelName, message);
+        if (!command.startsWith("/")) {
+            channel.sendMessage(message);
             return;
         }
-        onUnknownEvent(server, message);
-    }
-
-    public static void onParseUserMessage(final Server server, final String userNick,
-            final String message) {
-        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
-        final String command = parsedArray.remove(0);
-        final int arrayLength = parsedArray.size();
-
-        if (command.startsWith("/")) {
-            switch (command) {
-                case "/me":
+        switch (command) {
+            case "/me":
+                if (arrayLength >= 1) {
                     final String action = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallHandler().sendActionToQueryUser(userNick, action);
+                    channel.sendAction(action);
                     return;
-                case "/close":
-                case "/c":
-                    if (parseUserCloseCommand(server, arrayLength, userNick)) {
-                        return;
-                    }
-                    break;
-                default:
-                    onParseServerCommand(server, message);
+                }
+                break;
+            case "/part":
+            case "/p":
+                if (arrayLength == 0) {
+                    channel.sendPart(Optional.fromNullable(getPreferences().getPartReason()));
                     return;
-            }
-        } else {
-            server.getServerCallHandler().sendMessageToQueryUser(userNick, message);
-            return;
+                }
+                break;
+            case "/mode":
+                if (arrayLength == 2) {
+                    channel.sendUserMode(parsedArray.get(0), parsedArray.get(1));
+                    return;
+                }
+                break;
+            case "/kick":
+                if (arrayLength >= 1) {
+                    final String nick = parsedArray.remove(0);
+                    final Optional<String> reason = arrayLength >= 1
+                            ? Optional.of(IRCUtils.concatenateStringList(parsedArray))
+                            : Optional.absent();
+                    channel.sendKick(nick, reason);
+                    return;
+                }
+                break;
+            case "/topic":
+                if (arrayLength >= 1) {
+                    final String topic = IRCUtils.concatenateStringList(parsedArray);
+                    channel.sendTopic(topic);
+                    return;
+                }
+                break;
+            default:
+                onParseServerCommand(channel.getServer(), message);
+                return;
         }
-        onUnknownEvent(server, message);
+
+        onUnknownEvent(channel.getServer(), message);
     }
 
-    private static boolean parseUserCloseCommand(final Server server, final int arrayLength,
-            final String userNick) {
-        if (arrayLength != 0) {
-            return false;
+    public static void onParseUserMessage(final QueryUser queryUser, final String message) {
+        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final String command = parsedArray.remove(0);
+        final int arrayLength = parsedArray.size();
+
+        if (!command.startsWith("/")) {
+            queryUser.sendMessage(message);
+            return;
         }
-        final Optional<? extends QueryUser> optional = server.getUserChannelInterface()
-                .getQueryUser(userNick);
-        if (optional.isPresent()) {
-            server.getServerCallHandler().sendCloseQuery(optional.get());
-        } else {
-            // This is probably a bug we need to fix
+        switch (command) {
+            case "/me":
+                final String action = IRCUtils.concatenateStringList(parsedArray);
+                queryUser.sendAction(action);
+                return;
+            case "/close":
+            case "/c":
+                if (parseUserCloseCommand(arrayLength, queryUser)) {
+                    return;
+                }
+                break;
+            default:
+                onParseServerCommand(queryUser.getServer(), message);
+                return;
         }
-        return true;
+        onUnknownEvent(queryUser.getServer(), message);
+    }
+
+    private static boolean parseUserCloseCommand(final int arrayLength, final QueryUser queryUser) {
+        if (arrayLength == 0) {
+            queryUser.close();
+            return true;
+        }
+        return false;
     }
 
     public static void onParseServerMessage(final Server server, final String message) {
@@ -128,7 +122,7 @@ public class UserInputParser {
             case "/j":
                 if (arrayLength == 1) {
                     final String channelName = parsedArray.get(0);
-                    server.getServerCallHandler().sendJoin(channelName);
+                    server.sendJoin(channelName);
                     return;
                 }
                 break;
@@ -137,39 +131,39 @@ public class UserInputParser {
                     final String nick = parsedArray.remove(0);
                     final String message = parsedArray.size() >= 1 ? IRCUtils.concatenateStringList
                             (parsedArray) : "";
-                    server.getServerCallHandler().sendMessageToQueryUser(nick, message);
+                    server.sendQuery(nick, message);
                     return;
                 }
                 break;
             case "/nick":
                 if (arrayLength == 1) {
                     final String newNick = parsedArray.get(0);
-                    server.getServerCallHandler().sendNickChange(newNick);
+                    server.sendNick(newNick);
                     return;
                 }
                 break;
             case "/whois":
                 if (arrayLength == 1) {
-                    server.getServerCallHandler().sendUserWhois(parsedArray.get(0));
+                    final String nick = parsedArray.get(0);
+                    server.sendWhois(nick);
                     return;
                 }
                 break;
             case "/ns":
                 if (arrayLength > 1) {
                     final String message = IRCUtils.concatenateStringList(parsedArray);
-                    server.getServerCallHandler().sendMessageToQueryUser("NickServ", message);
+                    server.sendQuery("NickServ", message);
                     return;
                 }
                 break;
             case "/raw":
             case "/quote":
-                server.getServerCallHandler().sendRawLine(IRCUtils.concatenateStringList
-                        (parsedArray));
+                server.sendRawLine(IRCUtils.concatenateStringList(parsedArray));
                 return;
             default:
                 if (command.startsWith("/")) {
-                    server.getServerCallHandler().sendRawLine(command.substring(1) + " " + IRCUtils
-                            .concatenateStringList(parsedArray));
+                    server.sendRawLine(command.substring(1) + " "
+                            + IRCUtils.concatenateStringList(parsedArray));
                     return;
                 }
                 break;
@@ -179,5 +173,10 @@ public class UserInputParser {
 
     private static void onUnknownEvent(final Server server, final String rawLine) {
         // server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
+    }
+
+    public static void onParseDCCChatEvent(final DCCChatConnection chatConnection,
+            final String message) {
+        chatConnection.sendMessage(message);
     }
 }

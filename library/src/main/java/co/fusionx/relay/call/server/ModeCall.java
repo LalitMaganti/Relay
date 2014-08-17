@@ -10,7 +10,7 @@ public class ModeCall extends Call {
 
     public final String nick;
 
-    public ModeCall(String channelName, String mode, String nick) {
+    public ModeCall(final String channelName, final String mode, final String nick) {
         this.channelName = channelName;
         this.mode = mode;
         this.nick = nick;

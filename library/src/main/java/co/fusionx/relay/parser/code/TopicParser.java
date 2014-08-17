@@ -40,10 +40,7 @@ class TopicParser extends CodeParser {
 
         LogUtils.logOptionalBug(optional, mServer);
         Optionals.ifPresent(optional, channel -> {
-            final ChannelInitialTopicEvent topicEvent = new ChannelInitialTopicEvent(channel, nick,
-                    tempTopic);
-            mServerEventBus.postAndStoreEvent(topicEvent, channel);
-
+            channel.postAndStoreEvent(new ChannelInitialTopicEvent(channel, nick, tempTopic));
             tempTopic = null;
         });
     }

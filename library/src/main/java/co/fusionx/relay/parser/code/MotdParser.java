@@ -18,18 +18,20 @@ class MotdParser extends CodeParser {
 
     @Override
     public void onParseCode(final int code, final List<String> parsedArray) {
-        if (RelayConfigurationProvider.getPreferences().isMOTDShown()) {
-            final String message = parsedArray.get(0);
-            if (Utils.isNotEmpty(message)) {
-                final MotdEvent event;
-                if (code == RPL_MOTDSTART || code == RPL_MOTD) {
-                    final String motdline = message.substring(1).trim();
-                    event = new MotdEvent(mServer, motdline);
-                } else {
-                    event = new MotdEvent(mServer, message);
-                }
-                mServerEventBus.postAndStoreEvent(event);
-            }
+        if (!RelayConfigurationProvider.getPreferences().isMOTDShown()) {
+            return;
         }
+        final String message = parsedArray.get(0);
+        if (!Utils.isNotEmpty(message)) {
+            return;
+        }
+        final MotdEvent event;
+        if (code == RPL_MOTDSTART || code == RPL_MOTD) {
+            final String motdline = message.substring(1).trim();
+            event = new MotdEvent(mServer, motdline);
+        } else {
+            event = new MotdEvent(mServer, message);
+        }
+        mServer.postAndStoreEvent(event);
     }
 }

@@ -72,11 +72,11 @@ class ModeParser extends CommandParser {
                     optSending, sendingNick)
                     : new ChannelWorldLevelChangeEvent(channel, mode, user, levelEnum,
                             optSending, sendingNick);
-            mServerEventBus.postAndStoreEvent(event, channel);
+            channel.postAndStoreEvent(event);
         } else {
             final ChannelEvent event = new ChannelModeEvent(channel, optSending, sendingNick,
                     source, mode);
-            mServerEventBus.postAndStoreEvent(event, channel);
+            channel.postAndStoreEvent(event);
         }
     }
 }

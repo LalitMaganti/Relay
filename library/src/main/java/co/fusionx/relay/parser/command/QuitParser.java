@@ -43,18 +43,13 @@ public class QuitParser extends CommandParser {
             final String reason = parsed.size() == 3 ? parsed.get(2).replace("\"", "") : "";
             for (final RelayChannel channel : channels) {
                 mUserChannelInterface.removeUserFromChannel(channel, user);
-
-                final ChannelWorldQuitEvent event = new ChannelWorldQuitEvent(channel, user,
-                        reason);
-                mServerEventBus.postAndStoreEvent(event, channel);
+                channel.postAndStoreEvent(new ChannelWorldQuitEvent(channel, user, reason));
             }
         });
 
         final Optional<RelayQueryUser> optQuery = mUserChannelInterface.getQueryUser(userNick);
-        Optionals.ifPresent(optQuery, queryUser -> {
-            final QueryQuitWorldEvent event = new QueryQuitWorldEvent(queryUser);
-            mServerEventBus.postAndStoreEvent(event, queryUser);
-        });
+        Optionals.ifPresent(optQuery,
+                queryUser -> queryUser.postAndStoreEvent(new QueryQuitWorldEvent(queryUser)));
     }
 
     private void onQuit() {
