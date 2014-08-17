@@ -1,4 +1,4 @@
-package co.fusionx.relay.parser.command;
+package co.fusionx.relay.dcc;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public class DCCParser {
 
     private final RelayServer mServer;
 
-    DCCParser(final RelayServer server) {
+    public DCCParser(final RelayServer server) {
         mServer = server;
     }
 

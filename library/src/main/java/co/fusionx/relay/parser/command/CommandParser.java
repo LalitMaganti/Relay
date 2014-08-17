@@ -7,6 +7,7 @@ import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.RelayUserChannelInterface;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.constants.ServerCommands;
+import co.fusionx.relay.dcc.DCCParser;
 import gnu.trove.map.hash.THashMap;
 
 public abstract class CommandParser {

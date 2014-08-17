@@ -10,7 +10,7 @@ import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.RelayUserChannelInterface;
 import co.fusionx.relay.bus.ServerEventBus;
-import co.fusionx.relay.call.server.TimeResponseCall;
+import co.fusionx.relay.dcc.DCCParser;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
@@ -28,8 +28,6 @@ class CtcpParser {
 
     private final DCCParser mDCCParser;
 
-    private final ServerEventBus mEventBus;
-
     private final RelayUserChannelInterface mUserChannelInterface;
 
     public CtcpParser(final RelayServer server, final DCCParser dccParser) {
@@ -37,7 +35,6 @@ class CtcpParser {
         mDCCParser = dccParser;
 
         mUserChannelInterface = server.getUserChannelInterface();
-        mEventBus = server.getServerEventBus();
     }
 
     public static boolean isCtcp(final String message) {
@@ -69,7 +66,7 @@ class CtcpParser {
             mServer.getServerCallHandler().sendTimeResponse(nick);
         } else if (message.startsWith("DCC")) {
             final List<String> parsedDcc = IRCUtils.splitRawLineWithQuote(message);
-            mDCCParser.onParseCommand(parsedDcc, rawSource);
+            // mDCCParser.onParseCommand(parsedDcc, rawSource);
         }
     }
 
