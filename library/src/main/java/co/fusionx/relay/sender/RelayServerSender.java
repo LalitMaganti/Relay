@@ -3,6 +3,9 @@ package co.fusionx.relay.sender;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.bus.ServerCallHandler;
 import co.fusionx.relay.call.server.JoinCall;
+import co.fusionx.relay.call.server.NickChangeCall;
+import co.fusionx.relay.call.server.RawCall;
+import co.fusionx.relay.call.server.WhoisCall;
 
 public class RelayServerSender implements ServerSender {
 
@@ -27,16 +30,16 @@ public class RelayServerSender implements ServerSender {
 
     @Override
     public void sendNick(final String newNick) {
-
+        mCallHandler.post(new NickChangeCall(newNick));
     }
 
     @Override
     public void sendWhois(final String nick) {
-
+        mCallHandler.post(new WhoisCall(nick));
     }
 
     @Override
     public void sendRawLine(final String rawLine) {
-
+        mCallHandler.post(new RawCall(rawLine));
     }
 }

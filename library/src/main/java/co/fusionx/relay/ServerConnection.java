@@ -1,7 +1,6 @@
 package co.fusionx.relay;
 
 import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -14,10 +13,7 @@ import java.net.Socket;
 import java.util.Collection;
 
 import co.fusionx.relay.bus.ServerCallHandler;
-import co.fusionx.relay.call.server.JoinCall;
-import co.fusionx.relay.call.server.NickChangeCall;
 import co.fusionx.relay.call.server.QuitCall;
-import co.fusionx.relay.call.server.UserCall;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
 import co.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
@@ -32,7 +28,6 @@ import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.ReconnectEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.StopEvent;
-import co.fusionx.relay.function.FluentIterables;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.parser.ServerConnectionParser;
 import co.fusionx.relay.parser.ServerLineParser;
@@ -183,11 +178,9 @@ public class ServerConnection {
             }
 
             // Send NICK and USER lines to the server
-            mServer.getServerCallHandler().post(new NickChangeCall(mServerConfiguration
-                    .getNickStorage().getFirstChoiceNick()));
-            mServer.getServerCallHandler().post(new UserCall(mServerConfiguration
-                    .getServerUserName(), Utils.returnNonEmpty(mServerConfiguration.getRealName(),
-                    "RelayUser")));
+            mServer.sendNick(mServerConfiguration.getNickStorage().getFirstChoiceNick());
+            mServer.getServerCallHandler().sendUser(mServerConfiguration.getServerUserName(),
+                    Utils.returnNonEmpty(mServerConfiguration.getRealName(), "RelayUser"));
 
             final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
@@ -230,14 +223,13 @@ public class ServerConnection {
         final Collection<RelayChannel> channels = mServer.getUser().getChannels();
         if (channels.isEmpty()) {
             // Automatically join the channels specified in the configuration
-            FluentIterables.forEach(FluentIterable.from(mServerConfiguration.getAutoJoinChannels())
-                            .transform(JoinCall::new),
-                    mServer.getServerCallHandler()::post);
+            for (final String channelName : mServerConfiguration.getAutoJoinChannels()) {
+                mServer.sendJoin(channelName);
+            }
         } else {
-            FluentIterables.forEach(FluentIterable.from(channels)
-                            .transform(Channel::getName)
-                            .transform(JoinCall::new),
-                    mServer.getServerCallHandler()::post);
+            for (final RelayChannel channel : channels) {
+                mServer.sendJoin(channel.getName());
+            }
         }
 
         // Initialise the parser used to parse any lines from the server

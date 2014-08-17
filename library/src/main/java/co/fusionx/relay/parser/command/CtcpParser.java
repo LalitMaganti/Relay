@@ -10,11 +10,7 @@ import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.RelayUserChannelInterface;
 import co.fusionx.relay.bus.ServerEventBus;
-import co.fusionx.relay.call.server.ERRMSGResponseCall;
-import co.fusionx.relay.call.server.FingerResponseCall;
-import co.fusionx.relay.call.server.PingResponseCall;
 import co.fusionx.relay.call.server.TimeResponseCall;
-import co.fusionx.relay.call.server.VersionResponseCall;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
@@ -58,19 +54,19 @@ class CtcpParser {
         if (message.startsWith("ACTION")) {
             onAction(parsedArray, rawSource);
         } else if (message.startsWith("FINGER")) {
-            getServer().getServerCallHandler().post(new FingerResponseCall(nick, mServer));
+            mServer.getServerCallHandler().sendFingerResponse(nick, mServer);
         } else if (message.startsWith("VERSION")) {
-            getServer().getServerCallHandler().post(new VersionResponseCall(nick));
+            mServer.getServerCallHandler().sendVersionResponse(nick);
         } else if (message.startsWith("SOURCE")) {
         } else if (message.startsWith("USERINFO")) {
         } else if (message.startsWith("ERRMSG")) {
             final String query = message.replace("ERRMSG ", "");
-            getServer().getServerCallHandler().post(new ERRMSGResponseCall(nick, query));
+            mServer.getServerCallHandler().sendErrMsgResponse(nick, query);
         } else if (message.startsWith("PING")) {
             final String timestamp = message.replace("PING ", "");
-            getServer().getServerCallHandler().post(new PingResponseCall(nick, timestamp));
+            mServer.getServerCallHandler().sendPingResponse(nick, timestamp);
         } else if (message.startsWith("TIME")) {
-            getServer().getServerCallHandler().post(new TimeResponseCall(nick));
+            mServer.getServerCallHandler().sendTimeResponse(nick);
         } else if (message.startsWith("DCC")) {
             final List<String> parsedDcc = IRCUtils.splitRawLineWithQuote(message);
             mDCCParser.onParseCommand(parsedDcc, rawSource);

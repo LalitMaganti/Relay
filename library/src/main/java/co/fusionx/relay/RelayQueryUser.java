@@ -123,8 +123,8 @@ public class RelayQueryUser implements QueryUser {
 
     @Override
     public void close() {
+        mQuerySender.close();
         mServer.getUserChannelInterface().removeQueryUser(this);
-
         postAndStoreEvent(new QueryClosedEvent(this));
     }
 }

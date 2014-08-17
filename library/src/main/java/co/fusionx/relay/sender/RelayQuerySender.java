@@ -35,6 +35,6 @@ public class RelayQuerySender implements QuerySender {
 
     @Override
     public void close() {
-
+        // We don't need to send anything to the server to close a query
     }
 }

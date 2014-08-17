@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.misc.RelayConfigurationProvider;
+
+import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayChannelUser implements ChannelUser {
 
@@ -43,9 +46,13 @@ public class RelayChannelUser implements ChannelUser {
     public UserLevel getChannelPrivileges(final Channel rawChannel) {
         if (rawChannel instanceof RelayChannel) {
             final RelayChannel channel = (RelayChannel) rawChannel;
-            return mUserLevelMap.get(channel);
+            final UserLevel level = mUserLevelMap.get(channel);
+            if (level == null) {
+                getPreferences().logMissingData(rawChannel.getServer());
+            }
+            return level == null ? UserLevel.NONE : level;
         }
-        return null;
+        return UserLevel.NONE;
     }
 
     public UserLevel onModeChange(final RelayChannel channel, final String mode) {

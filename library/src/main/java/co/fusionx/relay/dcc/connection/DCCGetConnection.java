@@ -14,7 +14,7 @@ import co.fusionx.relay.event.dcc.DCCFileStartedEvent;
 import okio.BufferedSource;
 import okio.Okio;
 
-public class DCCGetConnection extends DCCConnection {
+public class DCCGetConnection extends DCCFileConnection {
 
     private final File mFile;
 
