@@ -40,7 +40,11 @@ public class DCCGetConnection extends DCCFileConnection {
             fileOutput = new RandomAccessFile(mFile, "rw");
 
             final long length = fileOutput.length();
-            if (length != 0) {
+            if (length == mPendingConnection.getSize()) {
+                // The file is already fully downloaded - don't download it again
+                setBytesTransferred(length);
+                return;
+            } else if (length != 0) {
                 final boolean success = tryResume(length);
                 fileOutput.seek(success ? length : 0);
             }
