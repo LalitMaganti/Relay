@@ -9,7 +9,6 @@ import co.fusionx.relay.RelayChannelUser;
 import co.fusionx.relay.RelayQueryUser;
 import co.fusionx.relay.RelayServer;
 import co.fusionx.relay.RelayUserChannelInterface;
-import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.dcc.DCCParser;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
@@ -66,7 +65,7 @@ class CtcpParser {
             mServer.getServerCallHandler().sendTimeResponse(nick);
         } else if (message.startsWith("DCC")) {
             final List<String> parsedDcc = IRCUtils.splitRawLineWithQuote(message);
-            // mDCCParser.onParseCommand(parsedDcc, rawSource);
+            gmDCCParser.onParseCommand(parsedDcc, rawSource);
         }
     }
 
