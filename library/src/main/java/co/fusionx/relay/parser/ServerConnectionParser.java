@@ -28,17 +28,17 @@ public class ServerConnectionParser {
 
     private final ServerCallHandler mServerCallHandler;
 
-    private boolean triedSecondNick;
+    private boolean mTriedSecondNick;
 
-    private boolean triedThirdNick;
+    private boolean mTriedThirdNick;
 
-    private int suffix;
+    private int mSuffix;
 
     public ServerConnectionParser(final RelayServer server, final ServerConfiguration configuration,
             final BufferedReader bufferedReader, final ServerCallHandler callHandler) {
-        suffix = 0;
-        triedSecondNick = false;
-        triedThirdNick = false;
+        mSuffix = 0;
+        mTriedSecondNick = false;
+        mTriedThirdNick = false;
 
         mServer = server;
         mConfiguration = configuration;
@@ -47,8 +47,6 @@ public class ServerConnectionParser {
     }
 
     public String parseConnect() throws IOException {
-        final ServerEventBus eventBus = mServer.getServerEventBus();
-
         String line;
         while ((line = mBufferedReader.readLine()) != null) {
             final List<String> parsedArray = IRCUtils.splitRawLine(line, true);
@@ -107,15 +105,15 @@ public class ServerConnectionParser {
     }
 
     private void onNicknameInUser(final boolean canChangeNick, final NickStorage nickStorage) {
-        if (!triedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
+        if (!mTriedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
             mServer.sendNick(nickStorage.getSecondChoiceNick());
-            triedSecondNick = true;
-        } else if (!triedThirdNick && Utils.isNotEmpty(nickStorage.getThirdChoiceNick())) {
+            mTriedSecondNick = true;
+        } else if (!mTriedThirdNick && Utils.isNotEmpty(nickStorage.getThirdChoiceNick())) {
             mServer.sendNick(nickStorage.getThirdChoiceNick());
-            triedThirdNick = true;
+            mTriedThirdNick = true;
         } else if (canChangeNick) {
-            ++suffix;
-            mServer.sendNick(nickStorage.getFirstChoiceNick() + suffix);
+            ++mSuffix;
+            mServer.sendNick(nickStorage.getFirstChoiceNick() + mSuffix);
         } else {
             // TODO - fix this
             //sender.sendNickInUseMessage();

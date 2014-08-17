@@ -1,8 +1,8 @@
 package co.fusionx.relay.dcc;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.dcc.file.DCCFileConnection;
 
 public abstract class DCCConversation implements Conversation {
 
@@ -13,7 +13,7 @@ public abstract class DCCConversation implements Conversation {
     }
 
     @Override
-    public Server getServer() {
+    public RelayServer getServer() {
         return mServer;
     }
 

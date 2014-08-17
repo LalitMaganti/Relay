@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.base.relay.RelayServer;
@@ -15,15 +16,16 @@ import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayDCCManager implements DCCManager {
 
-    private final Set<DCCChatConversation> mChatConversations;
+    private final Map<String, DCCChatConversation> mChatConversations;
 
-    private final Set<DCCFileConversation> mFileConversations;
+    private final Map<String, DCCFileConversation> mFileConversations;
 
     private final Set<DCCPendingConnection> mPendingConnections;
 
@@ -31,8 +33,8 @@ public class RelayDCCManager implements DCCManager {
 
     public RelayDCCManager(final RelayServer relayServer) {
         mServer = relayServer;
-        mChatConversations = new THashSet<>();
-        mFileConversations = new THashSet<>();
+        mChatConversations = new THashMap<>();
+        mFileConversations = new THashMap<>();
         mPendingConnections = new THashSet<>();
     }
 
@@ -42,12 +44,12 @@ public class RelayDCCManager implements DCCManager {
 
     @Override
     public Collection<DCCChatConversation> getChatConversations() {
-        return ImmutableSet.copyOf(mChatConversations);
+        return ImmutableSet.copyOf(mChatConversations.values());
     }
 
     @Override
     public Collection<DCCFileConversation> getFileConversations() {
-        return ImmutableSet.copyOf(mFileConversations);
+        return ImmutableSet.copyOf(mFileConversations.values());
     }
 
     @Override
@@ -66,7 +68,7 @@ public class RelayDCCManager implements DCCManager {
 
         // Check if we have an existing conversation
         final Optional<DCCFileConversation> optConversation = FluentIterable
-                .from(mFileConversations)
+                .from(mFileConversations.values())
                 .filter(f -> f.getId().equals(connection.getDccRequestNick()))
                 .first();
         // Get the conversation or a new one if it does not exist
@@ -74,7 +76,7 @@ public class RelayDCCManager implements DCCManager {
                 .or(new DCCFileConversation(mServer, connection.getDccRequestNick()));
         // If the conversation was not present add it
         if (!optConversation.isPresent()) {
-            mFileConversations.add(conversation);
+            mFileConversations.put(connection.getDccRequestNick(), conversation);
         }
         // A pending send becomes a get here
         conversation.getFile(connection, file);
@@ -93,11 +95,15 @@ public class RelayDCCManager implements DCCManager {
         mPendingConnections.remove(connection);
 
         final DCCChatConversation conversation = new DCCChatConversation(mServer, connection);
-        mChatConversations.add(conversation);
+        mChatConversations.put(connection.getDccRequestNick(), conversation);
         conversation.startChat();
     }
 
     public void declineDCCConnection(final DCCPendingConnection connection) {
         mPendingConnections.remove(connection);
+    }
+
+    public DCCFileConversation getFileConversation(final String nick) {
+        return mFileConversations.get(nick);
     }
 }

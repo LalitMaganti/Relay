@@ -32,6 +32,8 @@ public class ServerCallHandler {
             return;
         }
 
+        System.out.println("<<<" + line);
+
         try {
             mBufferedWriter.write(line + "\r\n");
             mBufferedWriter.flush();

@@ -6,9 +6,9 @@ import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 
 public abstract class DCCFileConnection extends DCCConnection {
 
-    private final DCCFileConversation mFileConversation;
+    protected final DCCFileConversation mFileConversation;
 
-    private long mBytesTransferred;
+    protected long mBytesTransferred;
 
     public DCCFileConnection(final DCCPendingConnection pendingConnection,
             final DCCFileConversation fileConversation) {

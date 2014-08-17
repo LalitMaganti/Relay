@@ -3,6 +3,9 @@ package co.fusionx.relay.dcc;
 import java.util.List;
 
 import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.dcc.file.DCCFileConnection;
+import co.fusionx.relay.dcc.file.DCCFileConversation;
+import co.fusionx.relay.dcc.file.DCCGetConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
@@ -33,6 +36,32 @@ public class DCCParser {
         // Remove the argument
         final String argument = parsedArray.remove(0);
 
+        switch (type) {
+            case "CHAT":
+                parseChatCommand(nick, parsedArray);
+                break;
+            case "SEND":
+                parseSendCommand(nick, argument, parsedArray);
+                break;
+            case "ACCEPT":
+                parseAcceptCommand(nick, argument, parsedArray);
+                break;
+        }
+    }
+
+    private void parseAcceptCommand(final String nick, final String fileName,
+            final List<String> parsedArray) {
+        final int port = Integer.parseInt(parsedArray.remove(0));
+        final long position = Long.parseLong(parsedArray.remove(0));
+
+        final DCCFileConversation conversation = mServer.getDCCManager().getFileConversation(nick);
+        final DCCFileConnection connection = conversation.getFileConnection(fileName);
+        final DCCGetConnection getConnection = (DCCGetConnection) connection;
+
+        getConnection.onResumeAccepted();
+    }
+
+    private void parseChatCommand(final String nick, final List<String> parsedArray) {
         // Retrieve the ip address as an integer and the port
         final long ipDecimal = Long.parseLong(parsedArray.remove(0));
         final int port = Integer.parseInt(parsedArray.remove(0));
@@ -40,25 +69,21 @@ public class DCCParser {
         // Convert the address to a normal representation
         final String ipAddress = IRCUtils.ipDecimalToString(ipDecimal);
 
-        switch (type) {
-            case "CHAT":
-                parseChatCommand(nick, ipAddress, port);
-                break;
-            case "SEND":
-                parseFileCommand(nick, argument, ipAddress, port, parsedArray);
-                break;
-        }
-    }
-
-    private void parseChatCommand(final String nick, final String ipAddress, final int port) {
         // Send the event
         final DCCPendingChatConnection connection = new DCCPendingChatConnection(nick,
                 mServer.getDCCManager(), ipAddress, port, "chat", 0);
         mServer.postAndStoreEvent(new DCCChatRequestEvent(mServer, connection));
     }
 
-    private void parseFileCommand(final String nick, final String fileName, final String ipAddress,
-            final int port, final List<String> parsedArray) {
+    private void parseSendCommand(final String nick, final String fileName,
+            final List<String> parsedArray) {
+        // Retrieve the ip address as an integer and the port
+        final long ipDecimal = Long.parseLong(parsedArray.remove(0));
+        final int port = Integer.parseInt(parsedArray.remove(0));
+
+        // Convert the address to a normal representation
+        final String ipAddress = IRCUtils.ipDecimalToString(ipDecimal);
+
         // Retrieve the file size - file size is optional from the spec
         final long size = parsedArray.size() > 0 ? Long.parseLong(parsedArray.remove(0)) : 0;
 

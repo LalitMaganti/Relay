@@ -78,6 +78,7 @@ public class ServerLineParser {
         if (parsedArray.isEmpty()) {
             return false;
         }
+        System.out.println(">>>" + mLine);
 
         final String command = parsedArray.get(0).toUpperCase(Locale.getDefault());
         switch (command) {

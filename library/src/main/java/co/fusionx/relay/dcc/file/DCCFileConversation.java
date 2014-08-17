@@ -6,18 +6,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.dcc.DCCConversation;
 import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
+import gnu.trove.map.hash.THashMap;
 
 public class DCCFileConversation extends DCCConversation {
 
     private final String mNick;
 
-    private final List<DCCFileConnection> mConnectionList;
+    private final Map<String, DCCFileConnection> mConnectionList;
 
     private List<DCCFileEvent> mBuffer;
 
@@ -25,20 +27,24 @@ public class DCCFileConversation extends DCCConversation {
         super(server);
 
         mNick = nick;
-        mConnectionList = new ArrayList<>();
+        mConnectionList = new THashMap<>();
         mBuffer = new ArrayList<>();
+    }
+
+    public DCCFileConnection getFileConnection(final String fileName) {
+        return mConnectionList.get(fileName);
     }
 
     public void getFile(final DCCPendingSendConnection connection, final File file) {
         final DCCGetConnection getConnection = new DCCGetConnection(connection, this, file);
-        mConnectionList.add(getConnection);
+        mConnectionList.put(connection.getArgument(), getConnection);
         getConnection.startConnection();
 
         postAndStoreEvent(new DCCFileGetStartedEvent(this, getConnection));
     }
 
     public Collection<DCCFileConnection> getFileConnections() {
-        return ImmutableList.copyOf(mConnectionList);
+        return ImmutableList.copyOf(mConnectionList.values());
     }
 
     public void postAndStoreEvent(final DCCFileEvent event) {

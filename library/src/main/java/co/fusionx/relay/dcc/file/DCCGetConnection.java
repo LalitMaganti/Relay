@@ -5,9 +5,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import co.fusionx.relay.dcc.DCCUtils;
+import co.fusionx.relay.dcc.call.DCCResumeCall;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
+import co.fusionx.relay.util.IOUtils;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
@@ -15,6 +19,8 @@ import okio.Okio;
 public class DCCGetConnection extends DCCFileConnection {
 
     private final File mFile;
+
+    private CountDownLatch mCountDownLatch;
 
     public DCCGetConnection(final DCCPendingConnection pendingConnection,
             final DCCFileConversation fileConversation, final File file) {
@@ -25,7 +31,20 @@ public class DCCGetConnection extends DCCFileConnection {
 
     @Override
     protected void connect() {
+        RandomAccessFile fileOutput = null;
+        BufferedSource socketInput = null;
+        BufferedSink socketOutput = null;
+
         try {
+            // Create the random access file
+            fileOutput = new RandomAccessFile(mFile, "rw");
+
+            final long length = fileOutput.length();
+            if (length != 0) {
+                final boolean success = tryResume(length);
+                fileOutput.seek(success ? length : 0);
+            }
+
             // Create and connect to the socket
             final InetSocketAddress address = new InetSocketAddress(mPendingConnection.getIP(),
                     mPendingConnection.getPort());
@@ -34,18 +53,14 @@ public class DCCGetConnection extends DCCFileConnection {
             mSocket.connect(address, 5000);
 
             // Create the socket source and sink
-            final BufferedSource socketInput = Okio.buffer(Okio.source(mSocket));
-            final BufferedSink socketOutput = Okio.buffer(Okio.sink(mSocket));
-
-            // Create the file - TODO - seek to the correct amount
-            final RandomAccessFile fileOutput = new RandomAccessFile(mFile, "rw");
-            fileOutput.seek(0);
+            socketInput = Okio.buffer(Okio.source(mSocket));
+            socketOutput = Okio.buffer(Okio.sink(mSocket));
 
             // Create the input and output buffers
             final byte[] inBuffer = new byte[1024];
             final byte[] outBuffer = new byte[4];
 
-            long bytesTransferred = 0;
+            long bytesTransferred = fileOutput.getFilePointer();
             int bytesRead;
             while ((bytesRead = socketInput.read(inBuffer)) != -1) {
                 // Write the retrieved data to the file
@@ -60,15 +75,31 @@ public class DCCGetConnection extends DCCFileConnection {
                 socketOutput.write(outBuffer);
                 socketOutput.flush();
             }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        } finally {
             // Close the socket streams
-            socketInput.close();
-            socketOutput.close();
+            IOUtils.closeQuietly(socketInput);
+            IOUtils.closeQuietly(socketOutput);
 
             // Close the file and socket
-            fileOutput.close();
-            mSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            IOUtils.closeQuietly(fileOutput);
+            IOUtils.closeQuietly(mSocket);
         }
+    }
+
+    private boolean tryResume(final long position) throws InterruptedException {
+        mFileConversation.getServer().getServerCallHandler()
+                .post(new DCCResumeCall(mPendingConnection.getDccRequestNick(),
+                        getFileName(), mPendingConnection.getPort(), position));
+
+        mCountDownLatch = new CountDownLatch(1);
+        return mCountDownLatch.await(10000, TimeUnit.MILLISECONDS);
+    }
+
+    // TODO - the position sent by peer should be used as an ultra check but simply ignore it for
+    // now
+    public void onResumeAccepted() {
+        mCountDownLatch.countDown();
     }
 }
