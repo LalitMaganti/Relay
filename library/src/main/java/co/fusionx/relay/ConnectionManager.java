@@ -17,7 +17,7 @@ public class ConnectionManager {
 
     private static ConnectionManager sConnectionManager;
 
-    private final Map<String, ServerConnection> mConnectionMap = new THashMap<>();
+    private final Map<String, IRCConnection> mConnectionMap = new THashMap<>();
 
     private ConnectionManager() {
     }
@@ -50,11 +50,11 @@ public class ConnectionManager {
      */
     public Pair<Boolean, ? extends Server> requestConnection(final ServerConfiguration
             configuration, final Collection<String> ignoreList, final Handler errorHandler) {
-        ServerConnection connection = mConnectionMap.get(configuration.getTitle());
+        IRCConnection connection = mConnectionMap.get(configuration.getTitle());
 
         final boolean exists = connection != null;
         if (!exists) {
-            connection = new ServerConnection(configuration, errorHandler, ignoreList);
+            connection = new IRCConnection(configuration, errorHandler, ignoreList);
             connection.startConnection();
             mConnectionMap.put(configuration.getTitle(), connection);
         }
@@ -69,7 +69,7 @@ public class ConnectionManager {
      *                                  not in the ConnectionStatus.Disconnected state
      */
     public void requestReconnection(final Server server) {
-        final ServerConnection connection = mConnectionMap.get(server.getTitle());
+        final IRCConnection connection = mConnectionMap.get(server.getTitle());
 
         if (connection == null) {
             throw new IllegalArgumentException("Server not managed by this manager");
@@ -92,7 +92,7 @@ public class ConnectionManager {
      * @return whether the list of connected servers is empty
      */
     public boolean requestStoppageAndRemoval(final String serverName) {
-        final ServerConnection connection = mConnectionMap.get(serverName);
+        final IRCConnection connection = mConnectionMap.get(serverName);
         if (connection != null) {
             connection.stopConnection();
             mConnectionMap.remove(serverName);
@@ -104,7 +104,7 @@ public class ConnectionManager {
      * Disconnect and remove all the servers in the manager
      */
     public void requestDisconnectAll() {
-        for (final ServerConnection connection : mConnectionMap.values()) {
+        for (final IRCConnection connection : mConnectionMap.values()) {
             connection.stopConnection();
         }
         mConnectionMap.clear();
@@ -144,7 +144,7 @@ public class ConnectionManager {
      */
     public Set<? extends Server> getImmutableServerSet() {
         return FluentIterable.from(mConnectionMap.values())
-                .transform(ServerConnection::getServer)
+                .transform(IRCConnection::getServer)
                 .toSet();
     }
 }

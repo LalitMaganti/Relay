@@ -23,7 +23,7 @@ public class RelayServer implements Server {
 
     private final ServerConfiguration mConfiguration;
 
-    private final ServerConnection mServerConnection;
+    private final IRCConnection mIRCConnection;
 
     private final List<ServerEvent> mBuffer;
 
@@ -43,10 +43,10 @@ public class RelayServer implements Server {
 
     private boolean mValid;
 
-    public RelayServer(final ServerConfiguration configuration, final ServerConnection connection,
+    public RelayServer(final ServerConfiguration configuration, final IRCConnection connection,
             final Handler callHandler, final Collection<String> ignoreList) {
         mConfiguration = configuration;
-        mServerConnection = connection;
+        mIRCConnection = connection;
 
         mUserChannelInterface = new RelayUserChannelInterface(this);
         mUserChannelInterface.updateIgnoreList(ignoreList);
@@ -109,8 +109,8 @@ public class RelayServer implements Server {
         mServerCallHandler.onOutputStreamCreated(writer);
     }
 
-    public ServerConnection getServerConnection() {
-        return mServerConnection;
+    public IRCConnection getIRCConnection() {
+        return mIRCConnection;
     }
 
     void addUser(final RelayChannelUser user) {
@@ -172,7 +172,7 @@ public class RelayServer implements Server {
 
     @Override
     public ConnectionStatus getStatus() {
-        return mServerConnection.getStatus();
+        return mIRCConnection.getStatus();
     }
 
     @Override

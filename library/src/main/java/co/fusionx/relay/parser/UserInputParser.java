@@ -7,7 +7,7 @@ import java.util.List;
 import co.fusionx.relay.Channel;
 import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
-import co.fusionx.relay.dcc.connection.DCCChatConnection;
+import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.util.IRCUtils;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
@@ -175,7 +175,7 @@ public class UserInputParser {
         // server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
     }
 
-    public static void onParseDCCChatEvent(final DCCChatConnection chatConnection,
+    public static void onParseDCCChatEvent(final DCCChatConversation chatConnection,
             final String message) {
         chatConnection.sendMessage(message);
     }

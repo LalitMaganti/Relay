@@ -4,9 +4,9 @@ import java.io.File;
 
 import co.fusionx.relay.dcc.RelayDCCManager;
 
-public class DCCPendingFileConnection extends DCCPendingConnection {
+public class DCCPendingSendConnection extends DCCPendingConnection {
 
-    public DCCPendingFileConnection(final String dccRequestNick, final RelayDCCManager manager,
+    public DCCPendingSendConnection(final String dccRequestNick, final RelayDCCManager manager,
             final String ip, final int port, final String argument, final long size) {
         super(dccRequestNick, manager, ip, port, argument, size);
     }

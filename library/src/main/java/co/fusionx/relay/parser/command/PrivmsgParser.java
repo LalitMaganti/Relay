@@ -33,7 +33,7 @@ public class PrivmsgParser extends CommandParser {
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         if (parsedArray.size() < 4) {
             RelayConfigurationProvider.getPreferences()
-                    .logServerLine(mServer.getServerConnection().getCurrentLine());
+                    .logServerLine(mServer.getIRCConnection().getCurrentLine());
             return;
         }
         final String message = parsedArray.get(3);

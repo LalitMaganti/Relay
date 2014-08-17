@@ -17,7 +17,7 @@ public class RelayServerTest {
 
     public static RelayServer getDefaultServer() {
         final ServerConfiguration freenode = getFreenodeConfiguration();
-        final ServerConnection connection = ConnectionUtils.getConnection(freenode);
+        final IRCConnection connection = ConnectionUtils.getConnection(freenode);
         return ConnectionUtils.getServerFromConnection(connection);
     }
 

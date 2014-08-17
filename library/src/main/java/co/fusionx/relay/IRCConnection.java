@@ -34,7 +34,7 @@ import co.fusionx.relay.parser.ServerLineParser;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
-public class ServerConnection {
+public class IRCConnection {
 
     private final Handler mUiThreadHandler;
 
@@ -58,7 +58,7 @@ public class ServerConnection {
 
     private boolean mStopped;
 
-    ServerConnection(final ServerConfiguration serverConfiguration, final Handler handler,
+    IRCConnection(final ServerConfiguration serverConfiguration, final Handler handler,
             final Collection<String> ignoreList) {
         mServerConfiguration = serverConfiguration;
         mUiThreadHandler = handler;

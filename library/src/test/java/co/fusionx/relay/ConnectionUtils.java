@@ -5,12 +5,12 @@ import android.os.Looper;
 
 public class ConnectionUtils {
 
-    public static ServerConnection getConnection(final ServerConfiguration configuration) {
+    public static IRCConnection getConnection(final ServerConfiguration configuration) {
         final Handler handler = new Handler(Looper.getMainLooper());
-        return new ServerConnection(configuration, handler, null);
+        return new IRCConnection(configuration, handler, null);
     }
 
-    public static RelayServer getServerFromConnection(final ServerConnection connection) {
+    public static RelayServer getServerFromConnection(final IRCConnection connection) {
         return connection.getServer();
     }
 }
