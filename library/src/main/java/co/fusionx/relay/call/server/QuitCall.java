@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import co.fusionx.relay.call.Call;
 
-public class QuitCall extends Call {
+public class QuitCall implements Call {
 
     private final String quitReason;
 

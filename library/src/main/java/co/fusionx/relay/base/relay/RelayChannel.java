@@ -18,7 +18,7 @@ import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;
 import co.fusionx.relay.sender.ChannelSender;
-import co.fusionx.relay.sender.RelayChannelSender;
+import co.fusionx.relay.sender.relay.RelayChannelSender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
@@ -46,7 +46,7 @@ public class RelayChannel implements Channel {
         mServer = server;
         mChannelName = channelName;
 
-        mChannelSender = new RelayChannelSender(this, mServer.getServerCallHandler());
+        mChannelSender = new RelayChannelSender(this, mServer.getRelayServerLineSender());
 
         mBuffer = new ArrayList<>();
         mNumberOfUsers = new EnumMap<>(UserLevel.class);

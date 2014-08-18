@@ -2,7 +2,7 @@ package co.fusionx.relay.call.channel;
 
 import co.fusionx.relay.call.Call;
 
-public class ChannelTopicCall extends Call {
+public class ChannelTopicCall implements Call {
 
     private final String mTopic;
 

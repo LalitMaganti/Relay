@@ -12,7 +12,7 @@ import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.query.QueryMessageSelfEvent;
 import co.fusionx.relay.event.query.QueryOpenedEvent;
 import co.fusionx.relay.sender.QuerySender;
-import co.fusionx.relay.sender.RelayQuerySender;
+import co.fusionx.relay.sender.relay.RelayQuerySender;
 import co.fusionx.relay.util.Utils;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
@@ -39,7 +39,7 @@ public class RelayQueryUser implements QueryUser {
         mBuffer = new ArrayList<>();
         mBuffer.add(new QueryOpenedEvent(this));
 
-        mQuerySender = new RelayQuerySender(this, server.getServerCallHandler());
+        mQuerySender = new RelayQuerySender(this, server.getRelayServerLineSender());
 
         // This QueryUser is valud until closed
         mValid = true;

@@ -2,7 +2,7 @@ package co.fusionx.relay.call.server;
 
 import co.fusionx.relay.call.Call;
 
-public class RawCall extends Call {
+public class RawCall implements Call {
 
     public final String rawLine;
 

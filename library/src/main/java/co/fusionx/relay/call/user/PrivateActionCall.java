@@ -3,7 +3,7 @@ package co.fusionx.relay.call.user;
 import co.fusionx.relay.call.Call;
 import co.fusionx.relay.misc.WriterCommands;
 
-public class PrivateActionCall extends Call {
+public class PrivateActionCall implements Call {
 
     public final String userNick;
 

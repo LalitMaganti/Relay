@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 
 import co.fusionx.relay.call.Call;
 
-public class ChannelPartCall extends Call {
+public class ChannelPartCall implements Call {
 
     public final static String PART = "PART %1$s";
 

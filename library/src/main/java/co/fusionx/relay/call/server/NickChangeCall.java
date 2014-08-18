@@ -2,7 +2,7 @@ package co.fusionx.relay.call.server;
 
 import co.fusionx.relay.call.Call;
 
-public class NickChangeCall extends Call {
+public class NickChangeCall implements Call {
 
     private final String newNick;
 

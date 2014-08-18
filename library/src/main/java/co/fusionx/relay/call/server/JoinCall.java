@@ -2,7 +2,7 @@ package co.fusionx.relay.call.server;
 
 import co.fusionx.relay.call.Call;
 
-public class JoinCall extends Call {
+public class JoinCall implements Call {
 
     private final String channelName;
 

@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 
 import co.fusionx.relay.call.Call;
 
-public class ChannelKickCall extends Call {
+public class ChannelKickCall implements Call {
 
     public final static String KICK = "KICK %1$s %2$s";
 

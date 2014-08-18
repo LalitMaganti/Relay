@@ -9,7 +9,7 @@ import co.fusionx.relay.dcc.DCCConnection;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
-import co.fusionx.relay.parser.command.CtcpParser;
+import co.fusionx.relay.parser.main.command.CtcpParser;
 import co.fusionx.relay.util.SocketUtils;
 
 class DCCChatConnection extends DCCConnection {

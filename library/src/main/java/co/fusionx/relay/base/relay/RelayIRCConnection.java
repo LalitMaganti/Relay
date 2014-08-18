@@ -15,8 +15,6 @@ import java.util.Collection;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.bus.ServerCallHandler;
-import co.fusionx.relay.call.server.QuitCall;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
 import co.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
@@ -31,11 +29,15 @@ import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.ReconnectEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.StopEvent;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
-import co.fusionx.relay.parser.ServerConnectionParser;
-import co.fusionx.relay.parser.ServerLineParser;
+import co.fusionx.relay.parser.connection.ServerConnectionParser;
+import co.fusionx.relay.parser.main.ServerLineParser;
+import co.fusionx.relay.sender.relay.RelayCapSender;
+import co.fusionx.relay.sender.relay.RelayInternalSender;
+import co.fusionx.relay.sender.relay.RelayServerLineSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
+
+import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayIRCConnection {
 
@@ -45,9 +47,13 @@ public class RelayIRCConnection {
 
     private final ServerConfiguration mServerConfiguration;
 
-    private final ServerCallHandler mServerCallHandler;
+    private final RelayServerLineSender mRelayServerLineSender;
 
     private final RelayServer mServer;
+
+    private final RelayCapSender mCapSender;
+
+    private final RelayInternalSender mInternalSender;
 
     private Thread mMainThread;
 
@@ -71,7 +77,9 @@ public class RelayIRCConnection {
         mCallHandler = new Handler(handlerThread.getLooper());
 
         mServer = new RelayServer(serverConfiguration, this, mCallHandler, ignoreList);
-        mServerCallHandler = mServer.getServerCallHandler();
+        mRelayServerLineSender = mServer.getRelayServerLineSender();
+        mCapSender = new RelayCapSender(mRelayServerLineSender);
+        mInternalSender = new RelayInternalSender(mRelayServerLineSender);
     }
 
     void startConnection() {
@@ -95,8 +103,7 @@ public class RelayIRCConnection {
 
             if (mStatus == ConnectionStatus.CONNECTED) {
                 mStopped = true;
-                mServerCallHandler.postImmediately(new QuitCall(
-                        RelayConfigurationProvider.getPreferences().getQuitReason()));
+                mInternalSender.quitServer(getPreferences().getQuitReason());
             } else if (mMainThread.isAlive()) {
                 mMainThread.interrupt();
             }
@@ -176,28 +183,28 @@ public class RelayIRCConnection {
             if (mServerConfiguration.isSaslAvailable()) {
                 // By sending this line, the server *should* wait until we end the CAP stuff with
                 // CAP END
-                mServerCallHandler.sendSupportedCAP();
+                mCapSender.sendSupportedCAP();
             }
 
             if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
-                mServerCallHandler.sendServerPassword(mServerConfiguration.getServerPassword());
+                mInternalSender.sendServerPassword(mServerConfiguration.getServerPassword());
             }
 
             // Send NICK and USER lines to the server
             mServer.sendNick(mServerConfiguration.getNickStorage().getFirstChoiceNick());
-            mServer.getServerCallHandler().sendUser(mServerConfiguration.getServerUserName(),
+            mInternalSender.sendUser(mServerConfiguration.getServerUserName(),
                     Utils.returnNonEmpty(mServerConfiguration.getRealName(), "RelayUser"));
 
             final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
-                    mServerConfiguration, reader, mServerCallHandler);
+                    mServerConfiguration, reader, mRelayServerLineSender);
             final String nick = parser.parseConnect();
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
             // If the nick is null then we have no hope of progressing
             if (!TextUtils.isEmpty(nick)) {
-                onStartParsing(nick, mServerCallHandler, reader);
+                onStartParsing(nick, reader);
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
@@ -214,8 +221,7 @@ public class RelayIRCConnection {
         mServer.onConnectionTerminated();
     }
 
-    private void onStartParsing(final String nick, final ServerCallHandler callHandler,
-            final BufferedReader reader) throws IOException {
+    private void onStartParsing(final String nick, final BufferedReader reader) throws IOException {
         // Since we are now connected, reset the reconnect attempts
         mReconnectAttempts = 0;
         mServer.getUser().setNick(nick);
@@ -223,7 +229,7 @@ public class RelayIRCConnection {
 
         // Identifies with NickServ if the password exists
         if (Utils.isNotEmpty(mServerConfiguration.getNickservPassword())) {
-            callHandler.sendNickServPassword(mServerConfiguration.getNickservPassword());
+            mInternalSender.sendNickServPassword(mServerConfiguration.getNickservPassword());
         }
 
         final Collection<RelayChannel> channels = mServer.getUser().getChannels();
@@ -241,7 +247,7 @@ public class RelayIRCConnection {
         // Initialise the parser used to parse any lines from the server
         mLineParser = new ServerLineParser(mServer);
         // Loops forever until broken
-        mLineParser.parseMain(reader, callHandler);
+        mLineParser.parseMain(reader, mRelayServerLineSender);
     }
 
     private void onConnecting() {
@@ -305,7 +311,6 @@ public class RelayIRCConnection {
     }
 
     private boolean isReconnectNeeded() {
-        return mReconnectAttempts < RelayConfigurationProvider.getPreferences()
-                .getReconnectAttemptsCount();
+        return mReconnectAttempts < getPreferences().getReconnectAttemptsCount();
     }
 }

@@ -14,12 +14,12 @@ import java.util.Set;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.bus.ServerCallHandler;
+import co.fusionx.relay.sender.relay.RelayServerLineSender;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.dcc.RelayDCCManager;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.sender.RelayServerSender;
+import co.fusionx.relay.sender.relay.RelayServerSender;
 import co.fusionx.relay.sender.ServerSender;
 
 public class RelayServer implements Server {
@@ -32,7 +32,7 @@ public class RelayServer implements Server {
 
     private final ServerEventBus mServerEventBus;
 
-    private final ServerCallHandler mServerCallHandler;
+    private final RelayServerLineSender mRelayServerLineSender;
 
     private final Set<RelayChannelUser> mUsers;
 
@@ -62,10 +62,10 @@ public class RelayServer implements Server {
 
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus();
-        mServerCallHandler = new ServerCallHandler(callHandler);
+        mRelayServerLineSender = new RelayServerLineSender(callHandler);
 
         // Create the server sender
-        mServerSender = new RelayServerSender(this, mServerCallHandler);
+        mServerSender = new RelayServerSender(this, mRelayServerLineSender);
 
         // Set the nick name to the first choice nick
         mUser = new RelayMainUser(configuration.getNickStorage().getFirstChoiceNick());
@@ -91,7 +91,7 @@ public class RelayServer implements Server {
         mUsers.add(mUser);
 
         // Need to remove anything using the old socket OutputStream in-case a reconnection occurs
-        mServerCallHandler.onConnectionTerminated();
+        mRelayServerLineSender.onConnectionTerminated();
     }
 
     @Override
@@ -109,7 +109,7 @@ public class RelayServer implements Server {
      * @param writer the which the writers will use
      */
     public void onOutputStreamCreated(final BufferedWriter writer) {
-        mServerCallHandler.onOutputStreamCreated(writer);
+        mRelayServerLineSender.onOutputStreamCreated(writer);
     }
 
     public RelayIRCConnection getRelayIRCConnection() {
@@ -128,8 +128,8 @@ public class RelayServer implements Server {
         mValid = false;
     }
 
-    public ServerCallHandler getServerCallHandler() {
-        return mServerCallHandler;
+    public RelayServerLineSender getRelayServerLineSender() {
+        return mRelayServerLineSender;
     }
 
     // Server Interface

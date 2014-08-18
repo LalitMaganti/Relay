@@ -2,7 +2,7 @@ package co.fusionx.relay.call.server;
 
 import co.fusionx.relay.call.Call;
 
-public class ModeCall extends Call {
+public class ModeCall implements Call {
 
     public final String channelName;
 

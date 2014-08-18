@@ -3,19 +3,19 @@ package co.fusionx.relay.call.channel;
 import co.fusionx.relay.call.Call;
 import co.fusionx.relay.misc.WriterCommands;
 
-public class ChannelActionCall extends Call {
+public class ChannelActionCall implements Call {
 
-    private final String action;
+    private final String mChannelName;
 
-    private final String channelName;
+    private final String mAction;
 
     public ChannelActionCall(final String channelName, final String action) {
-        this.action = action;
-        this.channelName = channelName;
+        mChannelName = channelName;
+        mAction = action;
     }
 
     @Override
     public String getLineToSendServer() {
-        return String.format(WriterCommands.ACTION, channelName, action);
+        return String.format(WriterCommands.ACTION, mChannelName, mAction);
     }
 }

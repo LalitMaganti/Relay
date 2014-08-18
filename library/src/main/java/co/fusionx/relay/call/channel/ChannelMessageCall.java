@@ -3,7 +3,7 @@ package co.fusionx.relay.call.channel;
 import co.fusionx.relay.call.Call;
 import co.fusionx.relay.misc.WriterCommands;
 
-public class ChannelMessageCall extends Call {
+public class ChannelMessageCall implements Call {
 
     private final String channelName;
 

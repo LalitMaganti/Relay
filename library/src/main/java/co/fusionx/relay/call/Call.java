@@ -1,6 +1,6 @@
 package co.fusionx.relay.call;
 
-public abstract class Call {
+public interface Call {
 
-    public abstract String getLineToSendServer();
+    public String getLineToSendServer();
 }
