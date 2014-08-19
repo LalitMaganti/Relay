@@ -11,7 +11,6 @@ import java.util.Set;
 import co.fusionx.relay.base.UserChannelInterface;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.util.IRCUtils;
-import gnu.trove.set.hash.THashSet;
 
 public class RelayUserChannelInterface implements UserChannelInterface {
 
@@ -76,7 +75,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
         if (userIgnoreList == null) {
             return;
         }
-        mUserIgnoreList = new THashSet<>(userIgnoreList);
+        mUserIgnoreList = new HashSet<>(userIgnoreList);
     }
 
     /**

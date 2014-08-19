@@ -6,6 +6,8 @@ import com.google.common.collect.ImmutableSet;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,8 +18,6 @@ import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
@@ -33,9 +33,9 @@ public class RelayDCCManager implements DCCManager {
 
     public RelayDCCManager(final RelayServer relayServer) {
         mServer = relayServer;
-        mChatConversations = new THashMap<>();
-        mFileConversations = new THashMap<>();
-        mPendingConnections = new THashSet<>();
+        mChatConversations = new HashMap<>();
+        mFileConversations = new HashMap<>();
+        mPendingConnections = new HashSet<>();
     }
 
     public void addPendingConnection(final DCCPendingConnection pendingConnection) {

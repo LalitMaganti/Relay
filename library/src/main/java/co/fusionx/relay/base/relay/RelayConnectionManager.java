@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.util.Pair;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,13 +16,12 @@ import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.interfaces.RelayConfiguration;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
-import gnu.trove.map.hash.THashMap;
 
 public class RelayConnectionManager implements ConnectionManager {
 
     private static ConnectionManager sConnectionManager;
 
-    private final Map<String, RelayIRCConnection> mConnectionMap = new THashMap<>();
+    private final Map<String, RelayIRCConnection> mConnectionMap = new HashMap<>();
 
     private RelayConnectionManager() {
     }

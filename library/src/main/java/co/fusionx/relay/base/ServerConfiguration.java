@@ -76,6 +76,11 @@ public class ServerConfiguration implements Parcelable {
     private final String mServerPassword;
 
     /**
+     * The path to the PEM file which contains the certificate and private key
+     */
+    private final String mClientAuthenticationKeyPath;
+
+    /**
      * The username for SASL authentication
      */
     private final String mSaslUsername;
@@ -109,6 +114,7 @@ public class ServerConfiguration implements Parcelable {
 
         mServerUserName = in.readString();
         mServerPassword = in.readString();
+        mClientAuthenticationKeyPath = in.readString();
 
         mSaslUsername = in.readString();
         mSaslPassword = in.readString();
@@ -133,6 +139,7 @@ public class ServerConfiguration implements Parcelable {
 
         mServerUserName = builder.getServerUserName();
         mServerPassword = builder.getServerPassword();
+        mClientAuthenticationKeyPath = builder.getClientAuthenticationKeyPath();
 
         mSaslUsername = builder.getSaslUsername();
         mSaslPassword = builder.getSaslPassword();
@@ -165,6 +172,7 @@ public class ServerConfiguration implements Parcelable {
 
         out.writeString(mServerUserName);
         out.writeString(mServerPassword);
+        out.writeString(mClientAuthenticationKeyPath);
 
         out.writeString(mSaslUsername);
         out.writeString(mSaslPassword);
@@ -227,6 +235,10 @@ public class ServerConfiguration implements Parcelable {
 
     public String getServerPassword() {
         return mServerPassword;
+    }
+
+    public String getClientAuthenticationKeyPath() {
+        return mClientAuthenticationKeyPath;
     }
 
     public String getSaslUsername() {
@@ -323,6 +335,11 @@ public class ServerConfiguration implements Parcelable {
         private String mServerPassword;
 
         /**
+         * The path to the PEM file which contains the certificate and private key
+         */
+        private String mClientAuthenticationKeyPath;
+
+        /**
          * The username for SASL authentication
          */
         private String mSaslUsername;
@@ -353,6 +370,7 @@ public class ServerConfiguration implements Parcelable {
 
             mServerUserName = "relay";
             mServerPassword = "";
+            mClientAuthenticationKeyPath = "";
 
             mSaslUsername = "";
             mSaslPassword = "";
@@ -378,6 +396,7 @@ public class ServerConfiguration implements Parcelable {
 
             mServerUserName = in.readString();
             mServerPassword = in.readString();
+            mClientAuthenticationKeyPath = in.readString();
 
             mSaslUsername = in.readString();
             mSaslPassword = in.readString();
@@ -426,6 +445,7 @@ public class ServerConfiguration implements Parcelable {
 
             out.writeString(mServerUserName);
             out.writeString(mServerPassword);
+            out.writeString(mClientAuthenticationKeyPath);
 
             out.writeString(mSaslUsername);
             out.writeString(mSaslPassword);
@@ -536,6 +556,15 @@ public class ServerConfiguration implements Parcelable {
 
         public Builder setServerPassword(String serverPassword) {
             mServerPassword = serverPassword;
+            return this;
+        }
+
+        public String getClientAuthenticationKeyPath() {
+            return mClientAuthenticationKeyPath;
+        }
+
+        public Builder setClientAuthenticationKeyPath(final String clientAuthenticationKeyPath) {
+            mClientAuthenticationKeyPath = clientAuthenticationKeyPath;
             return this;
         }
 

@@ -26,6 +26,10 @@ android {
         targetSdkVersion 19
     }
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -36,8 +40,9 @@ apply plugin: 'android-unit-test'
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.+'
     compile 'com.google.guava:guava:18.+'
-    compile 'net.sf.trove4j:trove4j:3.+'
     compile 'com.squareup.okio:okio:1.0.1'
+    compile 'com.madgag.spongycastle:core:1.51.0.0'
+    compile 'com.madgag.spongycastle:pkix:1.51.0.0'
 
     compile project(':bus-library')
 
