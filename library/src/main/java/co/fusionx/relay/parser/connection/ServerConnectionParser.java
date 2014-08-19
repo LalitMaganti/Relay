@@ -15,7 +15,6 @@ import co.fusionx.relay.misc.NickStorage;
 import co.fusionx.relay.sender.relay.RelayInternalSender;
 import co.fusionx.relay.sender.relay.RelayServerLineSender;
 import co.fusionx.relay.util.IRCUtils;
-import co.fusionx.relay.util.Utils;
 
 public class ServerConnectionParser {
 
@@ -29,17 +28,13 @@ public class ServerConnectionParser {
 
     private final CapParser mCapParser;
 
-    private boolean mTriedSecondNick;
+    private int mIndex = 1;
 
-    private boolean mTriedThirdNick;
-
-    private int mSuffix;
+    private int mSuffix = 1;
 
     public ServerConnectionParser(final RelayServer server, final ServerConfiguration configuration,
             final BufferedReader bufferedReader, final RelayServerLineSender serverLineSender) {
         mSuffix = 0;
-        mTriedSecondNick = false;
-        mTriedThirdNick = false;
 
         mServer = server;
         mConfiguration = configuration;
@@ -92,7 +87,7 @@ public class ServerConnectionParser {
                 IRCUtils.removeFirstElementFromList(parsedArray, 3);
                 return nick;
             case ServerReplyCodes.ERR_NICKNAMEINUSE:
-                onNicknameInUser(canChangeNick, nickStorage);
+                onNicknameInUse(canChangeNick, nickStorage);
                 break;
             case ServerReplyCodes.ERR_NONICKNAMEGIVEN:
                 mServer.sendNick(nickStorage.getFirstChoiceNick());
@@ -106,16 +101,13 @@ public class ServerConnectionParser {
         return null;
     }
 
-    private void onNicknameInUser(final boolean canChangeNick, final NickStorage nickStorage) {
-        if (!mTriedSecondNick && Utils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
-            mServer.sendNick(nickStorage.getSecondChoiceNick());
-            mTriedSecondNick = true;
-        } else if (!mTriedThirdNick && Utils.isNotEmpty(nickStorage.getThirdChoiceNick())) {
-            mServer.sendNick(nickStorage.getThirdChoiceNick());
-            mTriedThirdNick = true;
+    private void onNicknameInUse(final boolean canChangeNick, final NickStorage nickStorage) {
+        if (mIndex < nickStorage.getNickCount()) {
+            mServer.sendNick(nickStorage.getNickAtPosition(mIndex));
+            mIndex++;
         } else if (canChangeNick) {
-            ++mSuffix;
             mServer.sendNick(nickStorage.getFirstChoiceNick() + mSuffix);
+            mSuffix++;
         } else {
             // TODO - fix this
             //sender.sendNickInUseMessage();

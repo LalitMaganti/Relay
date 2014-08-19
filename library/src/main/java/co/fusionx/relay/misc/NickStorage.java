@@ -3,12 +3,18 @@ package co.fusionx.relay.misc;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class NickStorage implements Parcelable {
 
     public static final Parcelable.Creator<NickStorage> CREATOR = new Parcelable
             .Creator<NickStorage>() {
         public NickStorage createFromParcel(Parcel in) {
-            return new NickStorage(in.readString(), in.readString(), in.readString());
+            final List<String> nicks = new ArrayList<>();
+            in.readStringList(nicks);
+            return new NickStorage(nicks);
         }
 
         public NickStorage[] newArray(int size) {
@@ -16,17 +22,14 @@ public class NickStorage implements Parcelable {
         }
     };
 
-    private final String mFirstChoiceNick;
+    private final List<String> mNicks = new ArrayList<>();
 
-    private final String mSecondChoiceNick;
+    public NickStorage(final List<String> choices) {
+        mNicks.addAll(choices);
+    }
 
-    private final String mThirdChoiceNick;
-
-    public NickStorage(final String firstChoice, final String secondChoice,
-            final String thirdChoice) {
-        mFirstChoiceNick = firstChoice;
-        mSecondChoiceNick = secondChoice;
-        mThirdChoiceNick = thirdChoice;
+    public NickStorage(final String... choices) {
+        mNicks.addAll(Arrays.asList(choices));
     }
 
     @Override
@@ -36,38 +39,32 @@ public class NickStorage implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(mFirstChoiceNick);
-        parcel.writeString(mSecondChoiceNick);
-        parcel.writeString(mThirdChoiceNick);
+        parcel.writeStringList(mNicks);
     }
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof NickStorage) {
             final NickStorage nickStorage = (NickStorage) o;
-            return mFirstChoiceNick.equals(nickStorage.getFirstChoiceNick()) &&
-                    mSecondChoiceNick.equals(nickStorage.getSecondChoiceNick()) &&
-                    mThirdChoiceNick.equals(nickStorage.getThirdChoiceNick());
+            return mNicks.equals(nickStorage.mNicks);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return mFirstChoiceNick.hashCode() * 41 + mSecondChoiceNick.hashCode() * 43 +
-                mThirdChoiceNick.hashCode() * 31;
+        return mNicks.hashCode();
     }
 
-    // Getters and setters
     public String getFirstChoiceNick() {
-        return mFirstChoiceNick;
+        return mNicks.get(0);
     }
 
-    public String getSecondChoiceNick() {
-        return mSecondChoiceNick;
+    public String getNickAtPosition(final int position) {
+        return position < getNickCount() ? mNicks.get(position) : "";
     }
 
-    public String getThirdChoiceNick() {
-        return mThirdChoiceNick;
+    public int getNickCount() {
+        return mNicks.size();
     }
 }
