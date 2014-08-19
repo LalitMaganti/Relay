@@ -1,17 +1,17 @@
 package co.fusionx.relay.sender.relay;
 
-import co.fusionx.relay.call.dcc.DCCResumeCall;
+import co.fusionx.relay.packet.dcc.DCCResumePacket;
 
 public class RelayDCCSender {
 
-    private final RelayServerLineSender mServerLineSender;
+    private final RelayPacketSender mServerLineSender;
 
-    public RelayDCCSender(final RelayServerLineSender serverLineSender) {
+    public RelayDCCSender(final RelayPacketSender serverLineSender) {
         mServerLineSender = serverLineSender;
     }
 
     public void requestResume(final String dccRequestNick, final String fileName, final int port,
             final long position) {
-        mServerLineSender.post(new DCCResumeCall(dccRequestNick, fileName, port, position));
+        mServerLineSender.post(new DCCResumePacket(dccRequestNick, fileName, port, position));
     }
 }

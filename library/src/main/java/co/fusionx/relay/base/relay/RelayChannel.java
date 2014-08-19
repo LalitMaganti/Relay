@@ -46,7 +46,7 @@ public class RelayChannel implements Channel {
         mServer = server;
         mChannelName = channelName;
 
-        mChannelSender = new RelayChannelSender(this, mServer.getRelayServerLineSender());
+        mChannelSender = new RelayChannelSender(this, mServer.getRelayPacketSender());
 
         mBuffer = new ArrayList<>();
         mNumberOfUsers = new EnumMap<>(UserLevel.class);

@@ -1,36 +1,36 @@
 package co.fusionx.relay.sender.relay;
 
-import co.fusionx.relay.call.server.NickServPasswordCall;
-import co.fusionx.relay.call.server.QuitCall;
-import co.fusionx.relay.call.server.UserCall;
-import co.fusionx.relay.call.server.internal.PongCall;
-import co.fusionx.relay.call.server.internal.ServerPasswordCall;
+import co.fusionx.relay.packet.server.NickServPasswordPacket;
+import co.fusionx.relay.packet.server.QuitPacket;
+import co.fusionx.relay.packet.server.UserPacket;
+import co.fusionx.relay.packet.server.internal.PongPacket;
+import co.fusionx.relay.packet.server.internal.ServerPasswordPacket;
 
 public class RelayInternalSender {
 
-    private final RelayServerLineSender mRelayServerLineSender;
+    private final RelayPacketSender mRelayPacketSender;
 
-    public RelayInternalSender(final RelayServerLineSender relayServerLineSender) {
-        mRelayServerLineSender = relayServerLineSender;
+    public RelayInternalSender(final RelayPacketSender relayPacketSender) {
+        mRelayPacketSender = relayPacketSender;
     }
 
     public void pongServer(final String source) {
-        mRelayServerLineSender.post(new PongCall(source));
+        mRelayPacketSender.post(new PongPacket(source));
     }
 
     public void sendServerPassword(final String password) {
-        mRelayServerLineSender.post(new ServerPasswordCall(password));
+        mRelayPacketSender.post(new ServerPasswordPacket(password));
     }
 
     public void sendNickServPassword(final String password) {
-        mRelayServerLineSender.post(new NickServPasswordCall(password));
+        mRelayPacketSender.post(new NickServPasswordPacket(password));
     }
 
     public void sendUser(final String serverUserName, final String realName) {
-        mRelayServerLineSender.post(new UserCall(serverUserName, realName));
+        mRelayPacketSender.post(new UserPacket(serverUserName, realName));
     }
 
     public void quitServer(final String quitReason) {
-        mRelayServerLineSender.post(new QuitCall(quitReason));
+        mRelayPacketSender.post(new QuitPacket(quitReason));
     }
 }

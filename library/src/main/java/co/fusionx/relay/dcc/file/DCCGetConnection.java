@@ -29,7 +29,7 @@ public class DCCGetConnection extends DCCFileConnection {
         super(pendingConnection, conversation);
 
         mFile = file;
-        mRelayDCCSender = new RelayDCCSender(conversation.getServer().getRelayServerLineSender());
+        mRelayDCCSender = new RelayDCCSender(conversation.getServer().getRelayPacketSender());
     }
 
     @Override

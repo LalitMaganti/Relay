@@ -20,7 +20,7 @@ import co.fusionx.relay.parser.main.code.CodeParser;
 import co.fusionx.relay.parser.main.command.CommandParser;
 import co.fusionx.relay.parser.main.command.QuitParser;
 import co.fusionx.relay.sender.relay.RelayInternalSender;
-import co.fusionx.relay.sender.relay.RelayServerLineSender;
+import co.fusionx.relay.sender.relay.RelayPacketSender;
 import co.fusionx.relay.util.IRCUtils;
 
 public class ServerLineParser {
@@ -35,7 +35,7 @@ public class ServerLineParser {
 
     private final SparseArray<CodeParser> mCodeParser;
 
-    private RelayServerLineSender mServerLineSender;
+    private RelayPacketSender mServerLineSender;
 
     private RelayInternalSender mInternalSender;
 
@@ -53,7 +53,7 @@ public class ServerLineParser {
      * @param reader     the reader associated with the server stream
      * @param lineSender the writer to write to the server
      */
-    public void parseMain(final BufferedReader reader, final RelayServerLineSender lineSender)
+    public void parseMain(final BufferedReader reader, final RelayPacketSender lineSender)
             throws IOException {
         mServerLineSender = lineSender;
         mInternalSender = new RelayInternalSender(lineSender);

@@ -21,7 +21,7 @@ class CapParser {
         mServer = server;
         mServerConfiguration = serverConfiguration;
 
-        mCapSender = new RelayCapSender(mServer.getRelayServerLineSender());
+        mCapSender = new RelayCapSender(mServer.getRelayPacketSender());
     }
 
     void parseCode(final int code, final List<String> parsedArray) {

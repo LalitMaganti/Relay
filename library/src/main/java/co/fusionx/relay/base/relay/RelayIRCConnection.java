@@ -33,7 +33,7 @@ import co.fusionx.relay.parser.connection.ServerConnectionParser;
 import co.fusionx.relay.parser.main.ServerLineParser;
 import co.fusionx.relay.sender.relay.RelayCapSender;
 import co.fusionx.relay.sender.relay.RelayInternalSender;
-import co.fusionx.relay.sender.relay.RelayServerLineSender;
+import co.fusionx.relay.sender.relay.RelayPacketSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
@@ -47,7 +47,7 @@ public class RelayIRCConnection {
 
     private final ServerConfiguration mServerConfiguration;
 
-    private final RelayServerLineSender mRelayServerLineSender;
+    private final RelayPacketSender mRelayPacketSender;
 
     private final RelayServer mServer;
 
@@ -77,9 +77,9 @@ public class RelayIRCConnection {
         mCallHandler = new Handler(handlerThread.getLooper());
 
         mServer = new RelayServer(serverConfiguration, this, mCallHandler, ignoreList);
-        mRelayServerLineSender = mServer.getRelayServerLineSender();
-        mCapSender = new RelayCapSender(mRelayServerLineSender);
-        mInternalSender = new RelayInternalSender(mRelayServerLineSender);
+        mRelayPacketSender = mServer.getRelayPacketSender();
+        mCapSender = new RelayCapSender(mRelayPacketSender);
+        mInternalSender = new RelayInternalSender(mRelayPacketSender);
     }
 
     void startConnection() {
@@ -197,7 +197,7 @@ public class RelayIRCConnection {
 
             final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
-                    mServerConfiguration, reader, mRelayServerLineSender);
+                    mServerConfiguration, reader, mRelayPacketSender);
             final String nick = parser.parseConnect();
 
             // This nick may well be different from any of the nicks in storage - get the
@@ -247,7 +247,7 @@ public class RelayIRCConnection {
         // Initialise the parser used to parse any lines from the server
         mLineParser = new ServerLineParser(mServer);
         // Loops forever until broken
-        mLineParser.parseMain(reader, mRelayServerLineSender);
+        mLineParser.parseMain(reader, mRelayPacketSender);
     }
 
     private void onConnecting() {

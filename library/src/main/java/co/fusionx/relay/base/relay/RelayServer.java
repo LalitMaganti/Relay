@@ -14,7 +14,7 @@ import java.util.Set;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.sender.relay.RelayServerLineSender;
+import co.fusionx.relay.sender.relay.RelayPacketSender;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.dcc.RelayDCCManager;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
@@ -32,7 +32,7 @@ public class RelayServer implements Server {
 
     private final ServerEventBus mServerEventBus;
 
-    private final RelayServerLineSender mRelayServerLineSender;
+    private final RelayPacketSender mRelayPacketSender;
 
     private final Set<RelayChannelUser> mUsers;
 
@@ -62,10 +62,10 @@ public class RelayServer implements Server {
 
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus();
-        mRelayServerLineSender = new RelayServerLineSender(callHandler);
+        mRelayPacketSender = new RelayPacketSender(callHandler);
 
         // Create the server sender
-        mServerSender = new RelayServerSender(this, mRelayServerLineSender);
+        mServerSender = new RelayServerSender(this, mRelayPacketSender);
 
         // Set the nick name to the first choice nick
         mUser = new RelayMainUser(configuration.getNickStorage().getFirst());
@@ -91,7 +91,7 @@ public class RelayServer implements Server {
         mUsers.add(mUser);
 
         // Need to remove anything using the old socket OutputStream in-case a reconnection occurs
-        mRelayServerLineSender.onConnectionTerminated();
+        mRelayPacketSender.onConnectionTerminated();
     }
 
     @Override
@@ -109,7 +109,7 @@ public class RelayServer implements Server {
      * @param writer the which the writers will use
      */
     public void onOutputStreamCreated(final BufferedWriter writer) {
-        mRelayServerLineSender.onOutputStreamCreated(writer);
+        mRelayPacketSender.onOutputStreamCreated(writer);
     }
 
     public RelayIRCConnection getRelayIRCConnection() {
@@ -128,8 +128,8 @@ public class RelayServer implements Server {
         mValid = false;
     }
 
-    public RelayServerLineSender getRelayServerLineSender() {
-        return mRelayServerLineSender;
+    public RelayPacketSender getRelayPacketSender() {
+        return mRelayPacketSender;
     }
 
     // Server Interface

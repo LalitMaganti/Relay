@@ -13,7 +13,7 @@ import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.misc.NickStorage;
 import co.fusionx.relay.sender.relay.RelayInternalSender;
-import co.fusionx.relay.sender.relay.RelayServerLineSender;
+import co.fusionx.relay.sender.relay.RelayPacketSender;
 import co.fusionx.relay.util.IRCUtils;
 
 public class ServerConnectionParser {
@@ -33,7 +33,7 @@ public class ServerConnectionParser {
     private int mSuffix;
 
     public ServerConnectionParser(final RelayServer server, final ServerConfiguration configuration,
-            final BufferedReader bufferedReader, final RelayServerLineSender serverLineSender) {
+            final BufferedReader bufferedReader, final RelayPacketSender serverLineSender) {
         mServer = server;
         mConfiguration = configuration;
         mBufferedReader = bufferedReader;

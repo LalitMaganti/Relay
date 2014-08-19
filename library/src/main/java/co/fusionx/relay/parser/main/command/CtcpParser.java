@@ -36,7 +36,7 @@ public class CtcpParser {
 
         mUserChannelInterface = server.getUserChannelInterface();
 
-        mCtcpResponseSender = new RelayCtcpResponseSender(server.getRelayServerLineSender());
+        mCtcpResponseSender = new RelayCtcpResponseSender(server.getRelayPacketSender());
     }
 
     public static boolean isCtcp(final String message) {

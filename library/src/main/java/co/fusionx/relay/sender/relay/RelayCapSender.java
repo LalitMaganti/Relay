@@ -1,36 +1,36 @@
 package co.fusionx.relay.sender.relay;
 
-import co.fusionx.relay.call.server.cap.CAPEndCall;
-import co.fusionx.relay.call.server.cap.CAPPlainSASLAuthCall;
-import co.fusionx.relay.call.server.cap.CAPRequestPlainSaslAuthCall;
-import co.fusionx.relay.call.server.cap.CAPRequestSASLCall;
-import co.fusionx.relay.call.server.cap.CAPSupportedCall;
+import co.fusionx.relay.packet.server.cap.CAPEndPacket;
+import co.fusionx.relay.packet.server.cap.CAPPlainSASLAuthPacket;
+import co.fusionx.relay.packet.server.cap.CAPRequestPlainSaslAuthPacket;
+import co.fusionx.relay.packet.server.cap.CAPRequestSASLPacket;
+import co.fusionx.relay.packet.server.cap.CAPSupportedPacket;
 
 public class RelayCapSender {
 
-    private final RelayServerLineSender mRelayServerLineSender;
+    private final RelayPacketSender mRelayPacketSender;
 
-    public RelayCapSender(final RelayServerLineSender relayServerLineSender) {
-        mRelayServerLineSender = relayServerLineSender;
+    public RelayCapSender(final RelayPacketSender relayPacketSender) {
+        mRelayPacketSender = relayPacketSender;
     }
 
     public void sendSupportedCAP() {
-        mRelayServerLineSender.post(new CAPSupportedCall());
+        mRelayPacketSender.post(new CAPSupportedPacket());
     }
 
     public void sendEndCap() {
-        mRelayServerLineSender.post(new CAPEndCall());
+        mRelayPacketSender.post(new CAPEndPacket());
     }
 
     public void requestSasl() {
-        mRelayServerLineSender.post(new CAPRequestSASLCall());
+        mRelayPacketSender.post(new CAPRequestSASLPacket());
     }
 
     public void sendPlainSaslAuthentication() {
-        mRelayServerLineSender.post(new CAPRequestPlainSaslAuthCall());
+        mRelayPacketSender.post(new CAPRequestPlainSaslAuthPacket());
     }
 
     public void sendSaslPlainAuthentication(final String saslUsername, final String saslPassword) {
-        mRelayServerLineSender.post(new CAPPlainSASLAuthCall(saslUsername, saslPassword));
+        mRelayPacketSender.post(new CAPPlainSASLAuthPacket(saslUsername, saslPassword));
     }
 }
