@@ -68,7 +68,7 @@ public class RelayServer implements Server {
         mServerSender = new RelayServerSender(this, mRelayServerLineSender);
 
         // Set the nick name to the first choice nick
-        mUser = new RelayMainUser(configuration.getNickStorage().getFirstChoiceNick());
+        mUser = new RelayMainUser(configuration.getNickStorage().getFirst());
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);

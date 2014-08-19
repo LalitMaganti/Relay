@@ -1,10 +1,13 @@
 package co.fusionx.relay.misc;
 
+import com.google.common.collect.FluentIterable;
+
+import org.apache.commons.lang3.StringUtils;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class NickStorage implements Parcelable {
@@ -25,11 +28,15 @@ public class NickStorage implements Parcelable {
     private final List<String> mNicks = new ArrayList<>();
 
     public NickStorage(final List<String> choices) {
-        mNicks.addAll(choices);
+        addAll(FluentIterable.from(choices));
     }
 
     public NickStorage(final String... choices) {
-        mNicks.addAll(Arrays.asList(choices));
+        addAll(FluentIterable.of(choices));
+    }
+
+    private void addAll(final FluentIterable<String> fluentIterable) {
+        fluentIterable.filter(StringUtils::isNotEmpty).copyInto(mNicks);
     }
 
     @Override
@@ -56,7 +63,7 @@ public class NickStorage implements Parcelable {
         return mNicks.hashCode();
     }
 
-    public String getFirstChoiceNick() {
+    public String getFirst() {
         return mNicks.get(0);
     }
 

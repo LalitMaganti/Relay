@@ -84,7 +84,7 @@ public class JoinParserTest {
         resetFields();
 
         final String nick = ServerConfigurationTest.getFreenodeConfiguration().getNickStorage()
-                .getFirstChoiceNick();
+                .getFirst();
 
         final String joinLine = ":holoirctester!holoirctester@test JOIN #relay";
         final List<String> list = IRCUtils.splitRawLine(joinLine, false);

@@ -28,20 +28,21 @@ public class ServerConnectionParser {
 
     private final CapParser mCapParser;
 
-    private int mIndex = 1;
+    private int mIndex;
 
-    private int mSuffix = 1;
+    private int mSuffix;
 
     public ServerConnectionParser(final RelayServer server, final ServerConfiguration configuration,
             final BufferedReader bufferedReader, final RelayServerLineSender serverLineSender) {
-        mSuffix = 0;
-
         mServer = server;
         mConfiguration = configuration;
         mBufferedReader = bufferedReader;
 
         mInternalSender = new RelayInternalSender(serverLineSender);
         mCapParser = new CapParser(server, configuration);
+
+        mIndex = 1;
+        mSuffix = 1;
     }
 
     public String parseConnect() throws IOException {
@@ -90,7 +91,7 @@ public class ServerConnectionParser {
                 onNicknameInUse(canChangeNick, nickStorage);
                 break;
             case ServerReplyCodes.ERR_NONICKNAMEGIVEN:
-                mServer.sendNick(nickStorage.getFirstChoiceNick());
+                mServer.sendNick(nickStorage.getFirst());
                 break;
             default:
                 if (ServerReplyCodes.saslCodes.contains(code)) {
@@ -106,7 +107,7 @@ public class ServerConnectionParser {
             mServer.sendNick(nickStorage.getNickAtPosition(mIndex));
             mIndex++;
         } else if (canChangeNick) {
-            mServer.sendNick(nickStorage.getFirstChoiceNick() + mSuffix);
+            mServer.sendNick(nickStorage.getFirst() + mSuffix);
             mSuffix++;
         } else {
             // TODO - fix this

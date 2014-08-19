@@ -191,7 +191,7 @@ public class RelayIRCConnection {
             }
 
             // Send NICK and USER lines to the server
-            mServer.sendNick(mServerConfiguration.getNickStorage().getFirstChoiceNick());
+            mServer.sendNick(mServerConfiguration.getNickStorage().getFirst());
             mInternalSender.sendUser(mServerConfiguration.getServerUserName(),
                     Utils.returnNonEmpty(mServerConfiguration.getRealName(), "RelayUser"));
 
