@@ -1,6 +1,5 @@
 package co.fusionx.relay.sender.relay;
 
-import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.packet.server.ctcp.response.ERRMSGResponsePacket;
 import co.fusionx.relay.packet.server.ctcp.response.FingerResponsePacket;
 import co.fusionx.relay.packet.server.ctcp.response.PingResponsePacket;
@@ -15,8 +14,8 @@ public class RelayCtcpResponseSender {
         mRelayPacketSender = relayPacketSender;
     }
 
-    public void sendFingerResponse(final String nick, final RelayServer server) {
-        mRelayPacketSender.post(new FingerResponsePacket(nick, server));
+    public void sendFingerResponse(final String nick, final String realName) {
+        mRelayPacketSender.post(new FingerResponsePacket(nick, realName));
     }
 
     public void sendVersionResponse(final String nick) {

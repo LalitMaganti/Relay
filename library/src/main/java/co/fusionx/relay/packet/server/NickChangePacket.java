@@ -12,6 +12,6 @@ public class NickChangePacket implements Packet {
 
     @Override
     public String getLineToSendServer() {
-        return "NICK " + newNick;
+        return String.format("NICK %s", newNick);
     }
 }

@@ -21,12 +21,12 @@ import co.fusionx.relay.util.Utils;
 
 public class PrivmsgParser extends CommandParser {
 
-    private final CtcpParser mCtcpParser;
+    private final CTCPParser mCTCPParser;
 
-    public PrivmsgParser(final RelayServer server, final CtcpParser ctcpParser) {
+    public PrivmsgParser(final RelayServer server, final CTCPParser CTCPParser) {
         super(server);
 
-        mCtcpParser = ctcpParser;
+        mCTCPParser = CTCPParser;
     }
 
     @Override
@@ -39,8 +39,8 @@ public class PrivmsgParser extends CommandParser {
         final String message = parsedArray.get(3);
 
         // PRIVMSGs can be CTCP commands
-        if (CtcpParser.isCtcp(message)) {
-            mCtcpParser.onParseCommand(parsedArray, rawSource);
+        if (CTCPParser.isCtcp(message)) {
+            mCTCPParser.onParseCommand(parsedArray, rawSource);
         } else {
             final String nick = IRCUtils.getNickFromRaw(rawSource);
             if (mUserChannelInterface.shouldIgnoreUser(nick)) {

@@ -12,6 +12,6 @@ public class JoinPacket implements Packet {
 
     @Override
     public String getLineToSendServer() {
-        return "JOIN " + channelName;
+        return String.format("JOIN %s", channelName);
     }
 }

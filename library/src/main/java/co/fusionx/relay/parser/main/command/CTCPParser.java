@@ -20,7 +20,7 @@ import co.fusionx.relay.sender.relay.RelayCtcpResponseSender;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
 
-public class CtcpParser {
+public class CTCPParser {
 
     private final RelayServer mServer;
 
@@ -30,7 +30,7 @@ public class CtcpParser {
 
     private final RelayCtcpResponseSender mCtcpResponseSender;
 
-    public CtcpParser(final RelayServer server, final DCCParser dccParser) {
+    public CTCPParser(final RelayServer server, final DCCParser dccParser) {
         mServer = server;
         mDCCParser = dccParser;
 

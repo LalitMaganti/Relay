@@ -14,12 +14,12 @@ import co.fusionx.relay.util.IRCUtils;
 
 class NoticeParser extends CommandParser {
 
-    private final CtcpParser mCtcpParser;
+    private final CTCPParser mCTCPParser;
 
-    public NoticeParser(final RelayServer server, final CtcpParser ctcpParser) {
+    public NoticeParser(final RelayServer server, final CTCPParser CTCPParser) {
         super(server);
 
-        mCtcpParser = ctcpParser;
+        mCTCPParser = CTCPParser;
     }
 
     @Override
@@ -27,8 +27,8 @@ class NoticeParser extends CommandParser {
         final String message = parsedArray.get(3);
 
         // Notices can be CTCP replies
-        if (CtcpParser.isCtcp(message)) {
-            mCtcpParser.onParseReply(parsedArray, rawSource);
+        if (CTCPParser.isCtcp(message)) {
+            mCTCPParser.onParseReply(parsedArray, rawSource);
         } else {
             final String sendingNick = IRCUtils.getNickFromRaw(rawSource);
             final String recipient = parsedArray.get(2);

@@ -12,6 +12,6 @@ public class NickServPasswordPacket implements Packet {
 
     @Override
     public String getLineToSendServer() {
-        return "NICKSERV IDENTIFY " + mPassword;
+        return String.format("NICKSERV IDENTIFY %s", mPassword);
     }
 }

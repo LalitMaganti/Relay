@@ -4,21 +4,18 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import co.fusionx.relay.packet.Packet;
+public class TimeResponsePacket extends CTCPResponsePacket {
 
-public class TimeResponsePacket implements Packet {
-
-    private final String mRecipient;
+    private static final DateFormat SIMPLE_DATE_FORMAT
+            = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     public TimeResponsePacket(String nick) {
-        mRecipient = nick;
+        super(nick);
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getResponse() {
         final Date date = new Date();
-        final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        return String.format("NOTICE %s \u0001TIME :%s\u0001", mRecipient,
-                dateFormat.format(date));
+        return String.format("TIME :%s", SIMPLE_DATE_FORMAT.format(date));
     }
 }

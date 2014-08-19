@@ -25,12 +25,12 @@ public abstract class CommandParser {
 
     public static Map<String, CommandParser> getParserMap(final RelayServer server) {
         final DCCParser dccParser = new DCCParser(server);
-        final CtcpParser ctcpParser = new CtcpParser(server, dccParser);
+        final CTCPParser CTCPParser = new CTCPParser(server, dccParser);
 
         final Map<String, CommandParser> parserMap = new HashMap<>();
         parserMap.put(ServerCommands.JOIN, new JoinParser(server));
-        parserMap.put(ServerCommands.PRIVMSG, new PrivmsgParser(server, ctcpParser));
-        parserMap.put(ServerCommands.NOTICE, new NoticeParser(server, ctcpParser));
+        parserMap.put(ServerCommands.PRIVMSG, new PrivmsgParser(server, CTCPParser));
+        parserMap.put(ServerCommands.NOTICE, new NoticeParser(server, CTCPParser));
         parserMap.put(ServerCommands.PART, new PartParser(server));
         parserMap.put(ServerCommands.MODE, new ModeParser(server));
         parserMap.put(ServerCommands.QUIT, new QuitParser(server));

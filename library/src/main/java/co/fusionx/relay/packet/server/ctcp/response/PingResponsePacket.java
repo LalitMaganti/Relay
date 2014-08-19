@@ -1,20 +1,17 @@
 package co.fusionx.relay.packet.server.ctcp.response;
 
-import co.fusionx.relay.packet.Packet;
-
-public class PingResponsePacket implements Packet {
-
-    private final String mRecipient;
+public class PingResponsePacket extends CTCPResponsePacket {
 
     private final String mTimestamp;
 
     public PingResponsePacket(final String nick, final String timestamp) {
-        mRecipient = nick;
+        super(nick);
+
         mTimestamp = timestamp;
     }
 
     @Override
-    public String getLineToSendServer() {
-        return String.format("NOTICE %s \u0001PING %s\u0001", mRecipient, mTimestamp);
+    public String getResponse() {
+        return String.format("PING %s", mTimestamp);
     }
 }

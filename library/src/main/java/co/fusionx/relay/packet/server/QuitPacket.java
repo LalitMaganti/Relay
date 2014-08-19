@@ -6,14 +6,14 @@ import co.fusionx.relay.packet.Packet;
 
 public class QuitPacket implements Packet {
 
-    private final String quitReason;
+    private final String mQuitReason;
 
     public QuitPacket(final String quitReason) {
-        this.quitReason = quitReason;
+        mQuitReason = quitReason;
     }
 
     @Override
     public String getLineToSendServer() {
-        return TextUtils.isEmpty(quitReason) ? "QUIT" : "QUIT :" + quitReason;
+        return TextUtils.isEmpty(mQuitReason) ? "QUIT" : String.format("QUIT :%s", mQuitReason);
     }
 }

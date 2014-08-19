@@ -18,6 +18,6 @@ public class ModePacket implements Packet {
 
     @Override
     public String getLineToSendServer() {
-        return "MODE " + channelName + " " + mode + " " + nick;
+        return String.format("MODE %s %s %s", channelName, mode, nick);
     }
 }
