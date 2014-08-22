@@ -12,15 +12,10 @@ public interface ConnectionManager {
      * Creates a connection with the IRC server and tries to connect to it
      *
      * @param configuration the configuration you want to connect with
-     * @param ignoreList    list of users who should be ignored - this can be changed in the
-     *                      future using the updateIgnoreList method on the returned Server object
-     * @param errorHandler  a handler object which will be used if an error occurs on the
-     *                      background thread
      * @return a pair of objects - the first item is a boolean which is true if the server already
      * exists in the manager. The second item is the server which was created.
      */
-    Pair<Boolean, ? extends Server> requestConnection(ServerConfiguration
-            configuration, Collection<String> ignoreList, Handler errorHandler);
+    Pair<Boolean, ? extends Server> requestConnection(ServerConfiguration configuration);
 
     /**
      * Reconnect to the specified server

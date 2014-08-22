@@ -15,22 +15,22 @@ public class RelayCtcpResponseSender {
     }
 
     public void sendFingerResponse(final String nick, final String realName) {
-        mRelayPacketSender.post(new FingerResponsePacket(nick, realName));
+        mRelayPacketSender.sendPacket(new FingerResponsePacket(nick, realName));
     }
 
     public void sendVersionResponse(final String nick) {
-        mRelayPacketSender.post(new VersionResponsePacket(nick));
+        mRelayPacketSender.sendPacket(new VersionResponsePacket(nick));
     }
 
     public void sendErrMsgResponse(final String nick, final String query) {
-        mRelayPacketSender.post(new ERRMSGResponsePacket(nick, query));
+        mRelayPacketSender.sendPacket(new ERRMSGResponsePacket(nick, query));
     }
 
     public void sendPingResponse(final String nick, final String timestamp) {
-        mRelayPacketSender.post(new PingResponsePacket(nick, timestamp));
+        mRelayPacketSender.sendPacket(new PingResponsePacket(nick, timestamp));
     }
 
     public void sendTimeResponse(final String nick) {
-        mRelayPacketSender.post(new TimeResponsePacket(nick));
+        mRelayPacketSender.sendPacket(new TimeResponsePacket(nick));
     }
 }

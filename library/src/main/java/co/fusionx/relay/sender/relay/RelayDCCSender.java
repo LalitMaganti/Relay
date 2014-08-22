@@ -12,6 +12,6 @@ public class RelayDCCSender {
 
     public void requestResume(final String dccRequestNick, final String fileName, final int port,
             final long position) {
-        mServerLineSender.post(new DCCResumePacket(dccRequestNick, fileName, port, position));
+        mServerLineSender.sendPacket(new DCCResumePacket(dccRequestNick, fileName, port, position));
     }
 }

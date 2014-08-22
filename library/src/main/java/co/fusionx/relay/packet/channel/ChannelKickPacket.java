@@ -24,7 +24,7 @@ public class ChannelKickPacket implements Packet {
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         return mOptReason.transform(this::kickWithReason)
                 .or(String.format(KICK, mUserNick, mChannelName));
     }

@@ -11,7 +11,7 @@ public class ServerPasswordPacket implements Packet {
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         return String.format("PASS %s", mPassword);
     }
 }

@@ -11,7 +11,7 @@ public class WhoisPacket implements Packet {
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         return String.format("WHOIS %s", nick);
     }
 }

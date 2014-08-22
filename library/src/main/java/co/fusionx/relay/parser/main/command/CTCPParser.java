@@ -53,7 +53,8 @@ public class CTCPParser {
         if (message.startsWith("ACTION")) {
             onAction(parsedArray, rawSource);
         } else if (message.startsWith("FINGER")) {
-            mCtcpResponseSender.sendFingerResponse(nick, mServer);
+            mCtcpResponseSender.sendFingerResponse(nick,
+                    getServer().getConfiguration().getRealName());
         } else if (message.startsWith("VERSION")) {
             mCtcpResponseSender.sendVersionResponse(nick);
         } else if (message.startsWith("SOURCE")) {
@@ -74,9 +75,6 @@ public class CTCPParser {
 
     private void onAction(final List<String> parsedArray, final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        if (mUserChannelInterface.shouldIgnoreUser(nick)) {
-            return;
-        }
         final String action = parsedArray.get(3).replace("ACTION ", "");
         final String recipient = parsedArray.get(2);
         if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {

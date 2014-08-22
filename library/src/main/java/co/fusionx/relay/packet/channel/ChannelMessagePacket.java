@@ -15,7 +15,7 @@ public class ChannelMessagePacket implements Packet {
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         return String.format(WriterCommands.PRIVMSG, channelName, message);
     }
 }

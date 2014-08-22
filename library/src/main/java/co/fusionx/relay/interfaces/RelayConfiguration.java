@@ -17,4 +17,6 @@ public interface RelayConfiguration {
     public void logMissingData(final Server server);
 
     public void logServerLine(final String line);
+
+    public void handleException(Exception ex);
 }

@@ -16,7 +16,7 @@ public class CAPPlainSASLAuthPacket implements Packet {
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         final String authentication = mSaslUsername + "\0" + mSaslUsername + "\0" + mSaslPassword;
         final String encoded = Base64.encodeToString(authentication.getBytes(), Base64.DEFAULT);
         return String.format("AUTHENTICATE %s", encoded);

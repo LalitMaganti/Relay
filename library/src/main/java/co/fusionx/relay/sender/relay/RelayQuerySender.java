@@ -23,7 +23,8 @@ public class RelayQuerySender implements QuerySender {
         if (!Utils.isNotEmpty(action)) {
             return;
         }
-        mCallHandler.post(new PrivateActionPacket(mQueryUser.getNick().getNickAsString(), action));
+        mCallHandler.sendPacket(
+                new PrivateActionPacket(mQueryUser.getNick().getNickAsString(), action));
     }
 
     @Override
@@ -31,7 +32,8 @@ public class RelayQuerySender implements QuerySender {
         if (!Utils.isNotEmpty(message)) {
             return;
         }
-        mCallHandler.post(new PrivateMessagePacket(mQueryUser.getNick().getNickAsString(), message));
+        mCallHandler.sendPacket(
+                new PrivateMessagePacket(mQueryUser.getNick().getNickAsString(), message));
     }
 
     @Override

@@ -14,7 +14,7 @@ public class UserPacket implements Packet {
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         return String.format("USER %s 8 * :%s", mUserName, mRealName);
     }
 }

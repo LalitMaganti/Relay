@@ -15,22 +15,22 @@ public class RelayCapSender {
     }
 
     public void sendSupportedCAP() {
-        mRelayPacketSender.post(new CAPSupportedPacket());
+        mRelayPacketSender.sendPacket(new CAPSupportedPacket());
     }
 
     public void sendEndCap() {
-        mRelayPacketSender.post(new CAPEndPacket());
+        mRelayPacketSender.sendPacket(new CAPEndPacket());
     }
 
     public void requestSasl() {
-        mRelayPacketSender.post(new CAPRequestSASLPacket());
+        mRelayPacketSender.sendPacket(new CAPRequestSASLPacket());
     }
 
     public void sendPlainSaslAuthentication() {
-        mRelayPacketSender.post(new CAPRequestPlainSaslAuthPacket());
+        mRelayPacketSender.sendPacket(new CAPRequestPlainSaslAuthPacket());
     }
 
     public void sendSaslPlainAuthentication(final String saslUsername, final String saslPassword) {
-        mRelayPacketSender.post(new CAPPlainSASLAuthPacket(saslUsername, saslPassword));
+        mRelayPacketSender.sendPacket(new CAPPlainSASLAuthPacket(saslUsername, saslPassword));
     }
 }

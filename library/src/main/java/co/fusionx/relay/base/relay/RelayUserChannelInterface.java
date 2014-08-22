@@ -18,13 +18,10 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
     private final RelayServer mServer;
 
-    private Set<String> mUserIgnoreList;
-
     RelayUserChannelInterface(final RelayServer server) {
         mServer = server;
 
         mQueryUsers = new LinkedHashSet<>();
-        mUserIgnoreList = new HashSet<>();
     }
 
     /**
@@ -65,17 +62,6 @@ public class RelayUserChannelInterface implements UserChannelInterface {
         return FluentIterable.from(mQueryUsers)
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
                 .first();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateIgnoreList(final Collection<String> userIgnoreList) {
-        if (userIgnoreList == null) {
-            return;
-        }
-        mUserIgnoreList = new HashSet<>(userIgnoreList);
     }
 
     /**
@@ -225,9 +211,5 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     public void removeQueryUser(final RelayQueryUser user) {
         mQueryUsers.remove(user);
         user.markInvalid();
-    }
-
-    public boolean shouldIgnoreUser(final String userNick) {
-        return mUserIgnoreList.contains(userNick);
     }
 }

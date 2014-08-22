@@ -23,7 +23,7 @@ public class DCCResumePacket implements Packet {
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         return String.format(DCC_RESUME, mNick, mFileName, mPort, mPosition);
     }
 }

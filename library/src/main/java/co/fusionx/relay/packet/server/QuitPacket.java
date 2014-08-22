@@ -13,7 +13,7 @@ public class QuitPacket implements Packet {
     }
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         return TextUtils.isEmpty(mQuitReason) ? "QUIT" : String.format("QUIT :%s", mQuitReason);
     }
 }

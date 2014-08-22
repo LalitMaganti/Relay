@@ -1,43 +1,29 @@
 package co.fusionx.relay.sender.relay;
 
-import android.os.Handler;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 
 import co.fusionx.relay.packet.Packet;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
+
+import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayPacketSender {
 
-    private final Handler mCallHandler;
-
     private BufferedWriter mBufferedWriter;
 
-    public RelayPacketSender(final Handler callHandler) {
-        mCallHandler = callHandler;
-    }
-
-    void writeLineToServer(final String line) {
+    void sendPacket(final Packet packet) {
+        final String line = packet.getLine();
         if (mBufferedWriter == null) {
-            RelayConfigurationProvider.getPreferences().logServerLine(line);
+            getPreferences().logServerLine(line);
             return;
         }
 
         try {
-            mBufferedWriter.write(line + "\r\n");
+            mBufferedWriter.write(String.format("%s\r\n", line));
             mBufferedWriter.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    void post(final Packet packet) {
-        mCallHandler.post(() -> postImmediately(packet));
-    }
-
-    void postImmediately(final Packet packet) {
-        writeLineToServer(packet.getLineToSendServer());
     }
 
     public void onOutputStreamCreated(final BufferedWriter writer) {

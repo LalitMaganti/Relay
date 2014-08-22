@@ -2,8 +2,6 @@ package co.fusionx.relay.base.relay;
 
 import com.google.common.base.Optional;
 
-import android.os.Handler;
-
 import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,13 +12,13 @@ import java.util.Set;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.sender.relay.RelayPacketSender;
 import co.fusionx.relay.bus.ServerEventBus;
 import co.fusionx.relay.dcc.RelayDCCManager;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.sender.relay.RelayServerSender;
 import co.fusionx.relay.sender.ServerSender;
+import co.fusionx.relay.sender.relay.RelayPacketSender;
+import co.fusionx.relay.sender.relay.RelayServerSender;
 
 public class RelayServer implements Server {
 
@@ -46,13 +44,12 @@ public class RelayServer implements Server {
 
     private boolean mValid;
 
-    public RelayServer(final ServerConfiguration configuration, final RelayIRCConnection connection,
-            final Handler callHandler, final Collection<String> ignoreList) {
+    public RelayServer(final ServerConfiguration configuration,
+            final RelayIRCConnection connection) {
         mConfiguration = configuration;
         mRelayIRCConnection = connection;
 
         mUserChannelInterface = new RelayUserChannelInterface(this);
-        mUserChannelInterface.updateIgnoreList(ignoreList);
 
         // Create the DCCManager
         mRelayDCCManager = new RelayDCCManager(this);
@@ -62,7 +59,7 @@ public class RelayServer implements Server {
 
         mBuffer = new ArrayList<>();
         mServerEventBus = new ServerEventBus();
-        mRelayPacketSender = new RelayPacketSender(callHandler);
+        mRelayPacketSender = new RelayPacketSender();
 
         // Create the server sender
         mServerSender = new RelayServerSender(this, mRelayPacketSender);

@@ -25,21 +25,21 @@ public class RelayServerSender implements ServerSender {
 
     @Override
     public void sendJoin(final String channelName) {
-        mCallHandler.post(new JoinPacket(channelName));
+        mCallHandler.sendPacket(new JoinPacket(channelName));
     }
 
     @Override
     public void sendNick(final String newNick) {
-        mCallHandler.post(new NickChangePacket(newNick));
+        mCallHandler.sendPacket(new NickChangePacket(newNick));
     }
 
     @Override
     public void sendWhois(final String nick) {
-        mCallHandler.post(new WhoisPacket(nick));
+        mCallHandler.sendPacket(new WhoisPacket(nick));
     }
 
     @Override
     public void sendRawLine(final String rawLine) {
-        mCallHandler.post(new RawPacket(rawLine));
+        mCallHandler.sendPacket(new RawPacket(rawLine));
     }
 }

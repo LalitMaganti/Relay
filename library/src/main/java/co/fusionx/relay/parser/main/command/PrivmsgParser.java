@@ -43,9 +43,6 @@ public class PrivmsgParser extends CommandParser {
             mCTCPParser.onParseCommand(parsedArray, rawSource);
         } else {
             final String nick = IRCUtils.getNickFromRaw(rawSource);
-            if (mUserChannelInterface.shouldIgnoreUser(nick)) {
-                return;
-            }
             final String recipient = parsedArray.get(2);
             if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelMessage(nick, recipient, message);

@@ -25,31 +25,31 @@ public class RelayChannelSender implements ChannelSender {
 
     @Override
     public void sendAction(final String action) {
-        mRelayPacketSender.post(new ChannelActionPacket(mChannel.getName(), action));
+        mRelayPacketSender.sendPacket(new ChannelActionPacket(mChannel.getName(), action));
     }
 
     @Override
     public void sendKick(final String userNick, final Optional<String> reason) {
-        mRelayPacketSender.post(new ChannelKickPacket(mChannel.getName(), userNick, reason));
+        mRelayPacketSender.sendPacket(new ChannelKickPacket(mChannel.getName(), userNick, reason));
     }
 
     @Override
     public void sendMessage(final String message) {
-        mRelayPacketSender.post(new ChannelMessagePacket(mChannel.getName(), message));
+        mRelayPacketSender.sendPacket(new ChannelMessagePacket(mChannel.getName(), message));
     }
 
     @Override
     public void sendPart(final Optional<String> reason) {
-        mRelayPacketSender.post(new ChannelPartPacket(mChannel.getName(), reason));
+        mRelayPacketSender.sendPacket(new ChannelPartPacket(mChannel.getName(), reason));
     }
 
     @Override
     public void sendTopic(final String newTopic) {
-        mRelayPacketSender.post(new ChannelTopicPacket(mChannel.getName(), newTopic));
+        mRelayPacketSender.sendPacket(new ChannelTopicPacket(mChannel.getName(), newTopic));
     }
 
     @Override
     public void sendUserMode(final String userNick, final String mode) {
-        mRelayPacketSender.post(new ModePacket(mChannel.getName(), userNick, mode));
+        mRelayPacketSender.sendPacket(new ModePacket(mChannel.getName(), userNick, mode));
     }
 }

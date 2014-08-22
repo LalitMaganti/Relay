@@ -5,7 +5,7 @@ import co.fusionx.relay.packet.Packet;
 public class CAPRequestSASLPacket implements Packet {
 
     @Override
-    public String getLineToSendServer() {
+    public String getLine() {
         return "CAP REQ : sasl multi-prefix";
     }
 }

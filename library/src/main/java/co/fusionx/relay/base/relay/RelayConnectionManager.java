@@ -46,12 +46,12 @@ public class RelayConnectionManager implements ConnectionManager {
      */
     @Override
     public Pair<Boolean, ? extends Server> requestConnection(final ServerConfiguration
-            configuration, final Collection<String> ignoreList, final Handler errorHandler) {
+            configuration) {
         RelayIRCConnection connection = mConnectionMap.get(configuration.getTitle());
 
         final boolean exists = connection != null;
         if (!exists) {
-            connection = new RelayIRCConnection(configuration, errorHandler, ignoreList);
+            connection = new RelayIRCConnection(configuration);
             connection.startConnection();
             mConnectionMap.put(configuration.getTitle(), connection);
         }

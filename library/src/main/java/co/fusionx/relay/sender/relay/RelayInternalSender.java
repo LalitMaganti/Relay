@@ -15,22 +15,22 @@ public class RelayInternalSender {
     }
 
     public void pongServer(final String source) {
-        mRelayPacketSender.post(new PongPacket(source));
+        mRelayPacketSender.sendPacket(new PongPacket(source));
     }
 
     public void sendServerPassword(final String password) {
-        mRelayPacketSender.post(new ServerPasswordPacket(password));
+        mRelayPacketSender.sendPacket(new ServerPasswordPacket(password));
     }
 
     public void sendNickServPassword(final String password) {
-        mRelayPacketSender.post(new NickServPasswordPacket(password));
+        mRelayPacketSender.sendPacket(new NickServPasswordPacket(password));
     }
 
     public void sendUser(final String serverUserName, final String realName) {
-        mRelayPacketSender.post(new UserPacket(serverUserName, realName));
+        mRelayPacketSender.sendPacket(new UserPacket(serverUserName, realName));
     }
 
     public void quitServer(final String quitReason) {
-        mRelayPacketSender.post(new QuitPacket(quitReason));
+        mRelayPacketSender.sendPacket(new QuitPacket(quitReason));
     }
 }

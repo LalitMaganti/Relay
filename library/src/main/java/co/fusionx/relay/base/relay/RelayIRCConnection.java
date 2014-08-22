@@ -3,7 +3,6 @@ package co.fusionx.relay.base.relay;
 import com.google.common.base.Function;
 
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -41,10 +40,6 @@ import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayIRCConnection {
 
-    private final Handler mUiThreadHandler;
-
-    private final Handler mCallHandler;
-
     private final ServerConfiguration mServerConfiguration;
 
     private final RelayPacketSender mRelayPacketSender;
@@ -67,16 +62,10 @@ public class RelayIRCConnection {
 
     private boolean mStopped;
 
-    RelayIRCConnection(final ServerConfiguration serverConfiguration, final Handler handler,
-            final Collection<String> ignoreList) {
+    RelayIRCConnection(final ServerConfiguration serverConfiguration) {
         mServerConfiguration = serverConfiguration;
-        mUiThreadHandler = handler;
 
-        final HandlerThread handlerThread = new HandlerThread("ServerCalls");
-        handlerThread.start();
-        mCallHandler = new Handler(handlerThread.getLooper());
-
-        mServer = new RelayServer(serverConfiguration, this, mCallHandler, ignoreList);
+        mServer = new RelayServer(serverConfiguration, this);
         mRelayPacketSender = mServer.getRelayPacketSender();
         mCapSender = new RelayCapSender(mRelayPacketSender);
         mInternalSender = new RelayInternalSender(mRelayPacketSender);
@@ -87,29 +76,25 @@ public class RelayIRCConnection {
             try {
                 connectToServer();
             } catch (final Exception ex) {
-                mUiThreadHandler.post(() -> {
-                    throw new RuntimeException(getCurrentLine(), ex);
-                });
+                getPreferences().handleException(ex);
             }
         });
         mMainThread.start();
     }
 
     void stopConnection() {
-        mCallHandler.post(() -> {
-            // Send the stop events and set the status before we talk to the server - ensures
-            // that we don't get concurrent modifications
-            onStopped();
+        // Send the stop events and set the status before we talk to the server - ensures
+        // that we don't get concurrent modifications
+        onStopped();
 
-            if (mStatus == ConnectionStatus.CONNECTED) {
-                mStopped = true;
-                mInternalSender.quitServer(getPreferences().getQuitReason());
-            } else if (mMainThread.isAlive()) {
-                mMainThread.interrupt();
-            }
-            closeSocket();
-            mServer.onConnectionTerminated();
-        });
+        if (mStatus == ConnectionStatus.CONNECTED) {
+            mStopped = true;
+            mInternalSender.quitServer(getPreferences().getQuitReason());
+        } else if (mMainThread.isAlive()) {
+            mMainThread.interrupt();
+        }
+        closeSocket();
+        mServer.onConnectionTerminated();
     }
 
     RelayServer getServer() {
