@@ -49,7 +49,7 @@ public class DCCFileConversation extends DCCConversation {
 
     public void postAndStoreEvent(final DCCFileEvent event) {
         mBuffer.add(event);
-        mServer.getServerEventBus().post(event);
+        mServer.getEventBus().post(event);
     }
 
     public List<DCCFileEvent> getBuffer() {

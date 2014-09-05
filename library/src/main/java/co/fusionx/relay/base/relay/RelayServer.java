@@ -12,7 +12,7 @@ import java.util.Set;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.bus.ServerEventBus;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.dcc.RelayDCCManager;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
@@ -28,7 +28,7 @@ public class RelayServer implements Server {
 
     private final List<ServerEvent> mBuffer;
 
-    private final ServerEventBus mServerEventBus;
+    private final EventBus mEventBus;
 
     private final RelayPacketSender mRelayPacketSender;
 
@@ -58,7 +58,7 @@ public class RelayServer implements Server {
         mValid = true;
 
         mBuffer = new ArrayList<>();
-        mServerEventBus = new ServerEventBus();
+        mEventBus = new EventBus();
         mRelayPacketSender = new RelayPacketSender();
 
         // Create the server sender
@@ -73,7 +73,7 @@ public class RelayServer implements Server {
 
     public void postAndStoreEvent(final ServerEvent event) {
         mBuffer.add(event);
-        mServerEventBus.post(event);
+        mEventBus.post(event);
     }
 
     public void onServerEvent(final ServerEvent event) {
@@ -176,8 +176,8 @@ public class RelayServer implements Server {
     }
 
     @Override
-    public ServerEventBus getServerEventBus() {
-        return mServerEventBus;
+    public EventBus getEventBus() {
+        return mEventBus;
     }
 
     @Override

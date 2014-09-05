@@ -10,7 +10,7 @@ public class ChannelNickChangeEvent extends ChannelEvent {
 
     public final Nick newNick;
 
-    public final RelayMainUser mRelayMainUser;
+    public final RelayMainUser relayUser;
 
     public ChannelNickChangeEvent(final Channel channel, final Nick oldNick,
             final RelayMainUser user) {
@@ -18,6 +18,6 @@ public class ChannelNickChangeEvent extends ChannelEvent {
 
         this.oldNick = oldNick;
         this.newNick = user.getNick();
-        this.mRelayMainUser = user;
+        this.relayUser = user;
     }
 }

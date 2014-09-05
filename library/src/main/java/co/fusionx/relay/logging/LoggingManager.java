@@ -112,11 +112,11 @@ public abstract class LoggingManager {
         }
 
         public void startLogging() {
-            mServer.getServerEventBus().register(this, LOG_PRIORITY);
+            mServer.getEventBus().register(this, LOG_PRIORITY);
         }
 
         public void stopLogging() {
-            mServer.getServerEventBus().unregister(this);
+            mServer.getEventBus().unregister(this);
         }
 
         public void onEvent(final ServerEvent event) {

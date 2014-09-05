@@ -9,7 +9,9 @@ import co.fusionx.relay.constants.UserLevel;
 
 public class ChannelUserLevelChangeEvent extends ChannelEvent {
 
-    public final UserLevel level;
+    public final UserLevel oldLevel;
+
+    public final UserLevel newLevel;
 
     public final String rawMode;
 
@@ -20,13 +22,14 @@ public class ChannelUserLevelChangeEvent extends ChannelEvent {
     public final String changingNick;
 
     public ChannelUserLevelChangeEvent(final Channel channel, final String rawMode,
-            final RelayMainUser user, final UserLevel level,
+            final RelayMainUser user, final UserLevel oldLevel, final UserLevel newLevel,
             final Optional<? extends ChannelUser> changingUser,
             final String changingNick) {
         super(channel);
 
         this.rawMode = rawMode;
-        this.level = level;
+        this.oldLevel = oldLevel;
+        this.newLevel = newLevel;
         this.user = user;
         this.changingUser = changingUser;
         this.changingNick = changingNick;

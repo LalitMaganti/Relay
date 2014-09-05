@@ -14,8 +14,4 @@ public interface Channel extends Conversation, ChannelSender {
     public List<? extends ChannelEvent> getBuffer();
 
     public Collection<? extends ChannelUser> getUsers();
-
-    public int getUserCount();
-
-    public int getNumberOfUsersType(final UserLevel userLevel);
 }

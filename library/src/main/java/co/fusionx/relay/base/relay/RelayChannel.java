@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.Server;
@@ -34,7 +33,7 @@ public class RelayChannel implements Channel {
 
     private final String mChannelName;
 
-    private final Set<RelayChannelUser> mUsers;
+    private final Collection<RelayChannelUser> mUsers;
 
     private final EnumMap<UserLevel, Integer> mNumberOfUsers;
 
@@ -78,7 +77,7 @@ public class RelayChannel implements Channel {
 
     public void postAndStoreEvent(final ChannelEvent event) {
         mBuffer.add(event);
-        mServer.getServerEventBus().post(event);
+        mServer.getEventBus().post(event);
     }
 
     // User stuff starts here
@@ -105,7 +104,6 @@ public class RelayChannel implements Channel {
         }
 
         mUsers.add(user);
-        incrementUserType(userLevel);
     }
 
     /**
@@ -117,68 +115,6 @@ public class RelayChannel implements Channel {
             // TODO - this is invalid - need to track it down if it does happen
         }
         mUsers.remove(user);
-        decrementUserType(user.getChannelPrivileges(this));
-    }
-
-    /**
-     * Increments the type of user in the channel by 1
-     *
-     * @param userLevel the type of user
-     */
-    void incrementUserType(final UserLevel userLevel) {
-        if (userLevel == UserLevel.NONE) {
-            return;
-        }
-        synchronized (mNumberOfUsers) {
-            Integer users = mNumberOfUsers.get(userLevel);
-            mNumberOfUsers.put(userLevel, ++users);
-        }
-    }
-
-    /**
-     * Decrements the type of user in the channel by 1
-     *
-     * @param userLevel the type of user
-     */
-    void decrementUserType(final UserLevel userLevel) {
-        if (userLevel == UserLevel.NONE) {
-            return;
-        }
-        synchronized (mNumberOfUsers) {
-            Integer users = mNumberOfUsers.get(userLevel);
-            mNumberOfUsers.put(userLevel, --users);
-        }
-    }
-
-    /**
-     * Gets the number of users in the channel
-     *
-     * @return the number of users in the channel
-     */
-    @Override
-    public int getUserCount() {
-        final Collection<RelayChannelUser> users = getUsers();
-        return users != null ? users.size() : 0;
-    }
-
-    /**
-     * Gets the number of users of a specific level in the channel
-     *
-     * @param userLevel - the level to get
-     * @return the number of users of this level
-     */
-    @Override
-    public int getNumberOfUsersType(final UserLevel userLevel) {
-        synchronized (mNumberOfUsers) {
-            if (userLevel == UserLevel.NONE) {
-                int normalUsers = getUserCount();
-                for (UserLevel levelEnum : UserLevel.values()) {
-                    normalUsers -= mNumberOfUsers.get(levelEnum);
-                }
-                return normalUsers;
-            }
-            return mNumberOfUsers.get(userLevel);
-        }
     }
 
     @Override

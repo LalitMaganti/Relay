@@ -1,12 +1,12 @@
-package co.fusionx.relay.bus;
+package co.fusionx.relay.misc;
 
 import com.fusionx.bus.Bus;
 
-public class ServerEventBus {
+public class EventBus {
 
     private final Bus mBus;
 
-    public ServerEventBus() {
+    public EventBus() {
         mBus = new Bus();
     }
 

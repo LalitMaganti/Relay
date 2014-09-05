@@ -82,7 +82,7 @@ public class RelayDCCManager implements DCCManager {
         conversation.getFile(connection, file);
 
         // The conversation has been started
-        mServer.getServerEventBus().post(new DCCFileConversationStartedEvent(conversation));
+        mServer.getEventBus().post(new DCCFileConversationStartedEvent(conversation));
     }
 
     public void acceptDCCConnection(final DCCPendingChatConnection connection) {

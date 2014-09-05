@@ -6,7 +6,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.base.relay.RelayUserChannelInterface;
-import co.fusionx.relay.bus.ServerEventBus;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.constants.ServerReplyCodes;
 
 public abstract class CodeParser {
@@ -15,12 +15,12 @@ public abstract class CodeParser {
 
     final RelayServer mServer;
 
-    final ServerEventBus mServerEventBus;
+    final EventBus mEventBus;
 
     CodeParser(final RelayServer server) {
         mServer = server;
         mUserChannelInterface = server.getUserChannelInterface();
-        mServerEventBus = server.getServerEventBus();
+        mEventBus = server.getEventBus();
     }
 
     public static SparseArray<CodeParser> getParserMap(final RelayServer server) {

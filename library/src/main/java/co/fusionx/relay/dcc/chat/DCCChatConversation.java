@@ -11,7 +11,6 @@ import co.fusionx.relay.dcc.DCCConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
-import co.fusionx.relay.dcc.file.DCCFileConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
@@ -72,7 +71,7 @@ public class DCCChatConversation extends DCCConversation {
 
     void postAndStoreEvent(final DCCChatEvent event) {
         mBuffer.add(event);
-        mServer.getServerEventBus().post(event);
+        mServer.getEventBus().post(event);
     }
 
     // Conversation interface

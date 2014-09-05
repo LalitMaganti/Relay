@@ -4,7 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
-        classpath 'me.tatarka:gradle-retrolambda:2.2.1'
+        classpath 'me.tatarka:gradle-retrolambda:2.2.3'
         classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.+'
     }
 }
@@ -49,8 +49,6 @@ dependencies {
     testCompile 'junit:junit:4.+'
     testCompile 'org.robolectric:robolectric:+'
     testCompile 'org.assertj:assertj-core:1.+'
-
-    retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:+'
 }
 
 retrolambda {

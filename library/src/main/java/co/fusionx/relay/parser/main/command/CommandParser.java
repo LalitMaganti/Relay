@@ -6,7 +6,7 @@ import java.util.Map;
 
 import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.base.relay.RelayUserChannelInterface;
-import co.fusionx.relay.bus.ServerEventBus;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.constants.ServerCommands;
 
 public abstract class CommandParser {
@@ -15,12 +15,12 @@ public abstract class CommandParser {
 
     final RelayUserChannelInterface mUserChannelInterface;
 
-    final ServerEventBus mServerEventBus;
+    final EventBus mEventBus;
 
     CommandParser(final RelayServer server) {
         mServer = server;
         mUserChannelInterface = server.getUserChannelInterface();
-        mServerEventBus = server.getServerEventBus();
+        mEventBus = server.getEventBus();
     }
 
     public static Map<String, CommandParser> getParserMap(final RelayServer server) {
