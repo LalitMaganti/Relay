@@ -10,8 +10,7 @@ import co.fusionx.relay.base.ServerConfiguration;
 public class ConnectionUtils {
 
     public static RelayIRCConnection getConnection(final ServerConfiguration configuration) {
-        final Handler handler = new Handler(Looper.getMainLooper());
-        return new RelayIRCConnection(configuration, handler, null);
+        return new RelayIRCConnection(configuration);
     }
 
     public static RelayServer getServerFromConnection(final RelayIRCConnection connection) {

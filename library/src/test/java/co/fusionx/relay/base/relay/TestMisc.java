@@ -41,5 +41,10 @@ public class TestMisc {
         public void logServerLine(final String line) {
 
         }
+
+        @Override
+        public void handleException(final Exception ex) {
+
+        }
     }
 }
