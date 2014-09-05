@@ -3,18 +3,16 @@ package co.fusionx.relay.dcc.chat;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import co.fusionx.relay.base.relay.RelayAbstractConversation;
 import co.fusionx.relay.base.relay.RelayServer;
-import co.fusionx.relay.dcc.DCCConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
-public class DCCChatConversation extends DCCConversation {
+public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent> {
 
     private final Handler mCallHandler;
 
@@ -22,16 +20,13 @@ public class DCCChatConversation extends DCCConversation {
 
     private final DCCPendingConnection mPendingConnection;
 
-    private List<DCCChatEvent> mBuffer;
-
     public DCCChatConversation(final RelayServer server,
             final DCCPendingConnection pendingConnection) {
         super(server);
+
         mPendingConnection = pendingConnection;
 
         mDCCChatConnection = new DCCChatConnection(mPendingConnection, this);
-
-        mBuffer = new ArrayList<>();
 
         final HandlerThread handlerThread = new HandlerThread("dccConnection");
         handlerThread.start();
@@ -40,10 +35,6 @@ public class DCCChatConversation extends DCCConversation {
 
     public void startChat() {
         mDCCChatConnection.startConnection();
-    }
-
-    public List<DCCChatEvent> getBuffer() {
-        return mBuffer;
     }
 
     public void sendMessage(final String message) {
@@ -67,11 +58,6 @@ public class DCCChatConversation extends DCCConversation {
 
     public void closeChat() {
 
-    }
-
-    void postAndStoreEvent(final DCCChatEvent event) {
-        mBuffer.add(event);
-        mServer.getEventBus().post(event);
     }
 
     // Conversation interface

@@ -20,7 +20,7 @@ public abstract class CommandParser {
     CommandParser(final RelayServer server) {
         mServer = server;
         mUserChannelInterface = server.getUserChannelInterface();
-        mEventBus = server.getEventBus();
+        mEventBus = server.getServerWideBus();
     }
 
     public static Map<String, CommandParser> getParserMap(final RelayServer server) {

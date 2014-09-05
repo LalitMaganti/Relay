@@ -1,18 +1,16 @@
 package co.fusionx.relay.base;
 
 import java.util.Collection;
-import java.util.List;
 
-import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.dcc.DCCManager;
+import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.sender.ServerSender;
 
-public interface Server extends Conversation, ServerSender {
+public interface Server extends Conversation<ServerEvent>, ServerSender {
 
     public Collection<? extends ChannelUser> getUsers();
-
-    public List<? extends ServerEvent> getBuffer();
 
     public UserChannelInterface getUserChannelInterface();
 
@@ -24,7 +22,7 @@ public interface Server extends Conversation, ServerSender {
 
     public ConnectionStatus getStatus();
 
-    public EventBus getEventBus();
+    public EventBus<Event> getServerWideBus();
 
     public ServerConfiguration getConfiguration();
 }

@@ -20,7 +20,7 @@ public abstract class CodeParser {
     CodeParser(final RelayServer server) {
         mServer = server;
         mUserChannelInterface = server.getUserChannelInterface();
-        mEventBus = server.getEventBus();
+        mEventBus = server.getServerWideBus();
     }
 
     public static SparseArray<CodeParser> getParserMap(final RelayServer server) {

@@ -15,40 +15,34 @@ import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.misc.IRCUserComparator;
 import co.fusionx.relay.sender.ChannelSender;
 import co.fusionx.relay.sender.relay.RelayChannelSender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
-public class RelayChannel implements Channel {
+public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implements Channel {
 
     // As set out in RFC2812
     private final static ImmutableList<Character> CHANNEL_PREFIXES = ImmutableList.of('#', '&',
             '+', '!');
 
-    private final RelayServer mServer;
-
-    private final ChannelSender mChannelSender;
-
     private final String mChannelName;
 
     private final Collection<RelayChannelUser> mUsers;
 
-    private final List<ChannelEvent> mBuffer;
-
-    private boolean mValid;
+    private final ChannelSender mChannelSender;
 
     RelayChannel(final RelayServer server, final String channelName) {
-        mServer = server;
+        super(server);
+
         mChannelName = channelName;
+
+        mUsers = new UniqueList<>(new BasicEventList<>(), new IRCUserComparator(this));
 
         mChannelSender = new RelayChannelSender(this, mServer.getRelayPacketSender());
 
-        mBuffer = new ArrayList<>();
-        mUsers = new UniqueList<>(new BasicEventList<>(), new IRCUserComparator(this));
-
-        mValid = true;
         clearInternalData();
     }
 
@@ -83,21 +77,6 @@ public class RelayChannel implements Channel {
     }
 
     /**
-     * Gets the buffer of the channel - the events which occured since this channel was created
-     *
-     * @return a list of the events
-     */
-    @Override
-    public List<ChannelEvent> getBuffer() {
-        return mBuffer;
-    }
-
-    @Override
-    public boolean isValid() {
-        return mValid;
-    }
-
-    /**
      * Returns the id of the channel which is simply its name
      *
      * @return the id (name) of the channel
@@ -105,16 +84,6 @@ public class RelayChannel implements Channel {
     @Override
     public String getId() {
         return mChannelName;
-    }
-
-    /**
-     * Returns the server this channel is attached to
-     *
-     * @return the server this channel belongs to
-     */
-    @Override
-    public Server getServer() {
-        return mServer;
     }
 
     /*
@@ -184,15 +153,6 @@ public class RelayChannel implements Channel {
     public void clearInternalData() {
         // Clear the list of users
         mUsers.clear();
-    }
-
-    public void postAndStoreEvent(final ChannelEvent event) {
-        mBuffer.add(event);
-        mServer.getEventBus().post(event);
-    }
-
-    public void markInvalid() {
-        mValid = false;
     }
 
     void addUser(final RelayChannelUser user) {

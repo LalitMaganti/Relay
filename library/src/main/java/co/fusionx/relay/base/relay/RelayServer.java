@@ -12,83 +12,58 @@ import java.util.Set;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.dcc.RelayDCCManager;
+import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.sender.ServerSender;
 import co.fusionx.relay.sender.relay.RelayPacketSender;
 import co.fusionx.relay.sender.relay.RelayServerSender;
 
-public class RelayServer implements Server {
+public class RelayServer extends RelayAbstractConversation<ServerEvent> implements Server {
 
     private final ServerConfiguration mConfiguration;
 
     private final RelayIRCConnection mRelayIRCConnection;
 
-    private final List<ServerEvent> mBuffer;
-
-    private final EventBus mEventBus;
+    private final Set<RelayChannelUser> mUsers;
 
     private final RelayPacketSender mRelayPacketSender;
 
-    private final Set<RelayChannelUser> mUsers;
+    private final ServerSender mServerSender;
+
+    private final EventBus<Event> mServerWideEventBus;
 
     private final RelayUserChannelInterface mUserChannelInterface;
-
-    private final ServerSender mServerSender;
 
     private final RelayMainUser mUser;
 
     private final RelayDCCManager mRelayDCCManager;
 
-    private boolean mValid;
-
     public RelayServer(final ServerConfiguration configuration,
             final RelayIRCConnection connection) {
+        super(null);
+
         mConfiguration = configuration;
         mRelayIRCConnection = connection;
-
-        mUserChannelInterface = new RelayUserChannelInterface(this);
-
-        // Create the DCCManager
-        mRelayDCCManager = new RelayDCCManager(this);
-
-        // The server is valid :)
-        mValid = true;
-
-        mBuffer = new ArrayList<>();
-        mEventBus = new EventBus();
-        mRelayPacketSender = new RelayPacketSender();
-
-        // Create the server sender
-        mServerSender = new RelayServerSender(this, mRelayPacketSender);
 
         // Set the nick name to the first choice nick
         mUser = new RelayMainUser(configuration.getNickStorage().getFirst());
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);
-    }
 
-    public void postAndStoreEvent(final ServerEvent event) {
-        mBuffer.add(event);
-        mEventBus.post(event);
-    }
+        mUserChannelInterface = new RelayUserChannelInterface(this);
 
-    public void onServerEvent(final ServerEvent event) {
-        mBuffer.add(event);
-    }
+        // Create the DCCManager
+        mRelayDCCManager = new RelayDCCManager(this);
 
-    public void onConnectionTerminated() {
-        // Clear the global list of users - it's now invalid
-        mUsers.clear();
+        mServerWideEventBus = new EventBus<>();
+        mRelayPacketSender = new RelayPacketSender();
 
-        // Keep our own user inside though
-        mUsers.add(mUser);
-
-        // Need to remove anything using the old socket OutputStream in-case a reconnection occurs
-        mRelayPacketSender.onConnectionTerminated();
+        // Create the server sender
+        mServerSender = new RelayServerSender(this, mRelayPacketSender);
     }
 
     @Override
@@ -98,35 +73,6 @@ public class RelayServer implements Server {
         }
         final RelayServer server = (RelayServer) o;
         return getTitle().equals(server.getTitle());
-    }
-
-    /**
-     * Sets up the writers based on the output stream passed into the method
-     *
-     * @param writer the which the writers will use
-     */
-    public void onOutputStreamCreated(final BufferedWriter writer) {
-        mRelayPacketSender.onOutputStreamCreated(writer);
-    }
-
-    public RelayIRCConnection getRelayIRCConnection() {
-        return mRelayIRCConnection;
-    }
-
-    void addUser(final RelayChannelUser user) {
-        mUsers.add(user);
-    }
-
-    void removeUser(final RelayChannelUser user) {
-        mUsers.remove(user);
-    }
-
-    public void markInvalid() {
-        mValid = false;
-    }
-
-    public RelayPacketSender getRelayPacketSender() {
-        return mRelayPacketSender;
     }
 
     // Server Interface
@@ -143,16 +89,6 @@ public class RelayServer implements Server {
     @Override
     public RelayServer getServer() {
         return this;
-    }
-
-    @Override
-    public boolean isValid() {
-        return mValid;
-    }
-
-    @Override
-    public List<ServerEvent> getBuffer() {
-        return mBuffer;
     }
 
     @Override
@@ -176,8 +112,8 @@ public class RelayServer implements Server {
     }
 
     @Override
-    public EventBus getEventBus() {
-        return mEventBus;
+    public EventBus<Event> getServerWideBus() {
+        return mServerWideEventBus;
     }
 
     @Override
@@ -219,5 +155,49 @@ public class RelayServer implements Server {
     @Override
     public void sendRawLine(final String rawLine) {
         mServerSender.sendRawLine(rawLine);
+    }
+
+    // Internal methods
+    public void postAndStoreEvent(final ServerEvent event) {
+        mBuffer.add(event);
+
+        mEventBus.post(event);
+        mServerWideEventBus.post(event);
+    }
+
+    public void onConnectionTerminated() {
+        // Clear the global list of users - it's now invalid
+        mUsers.clear();
+
+        // Keep our own user inside though
+        mUsers.add(mUser);
+
+        // Need to remove anything using the old socket OutputStream in-case a reconnection occurs
+        mRelayPacketSender.onConnectionTerminated();
+    }
+
+    /**
+     * Sets up the writers based on the output stream passed into the method
+     *
+     * @param writer the which the writers will use
+     */
+    public void onOutputStreamCreated(final BufferedWriter writer) {
+        mRelayPacketSender.onOutputStreamCreated(writer);
+    }
+
+    public RelayIRCConnection getRelayIRCConnection() {
+        return mRelayIRCConnection;
+    }
+
+    void addUser(final RelayChannelUser user) {
+        mUsers.add(user);
+    }
+
+    void removeUser(final RelayChannelUser user) {
+        mUsers.remove(user);
+    }
+
+    public RelayPacketSender getRelayPacketSender() {
+        return mRelayPacketSender;
     }
 }

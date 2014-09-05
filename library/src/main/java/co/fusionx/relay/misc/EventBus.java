@@ -2,7 +2,7 @@ package co.fusionx.relay.misc;
 
 import com.fusionx.bus.Bus;
 
-public class EventBus {
+public class EventBus<T> {
 
     private final Bus mBus;
 
@@ -22,7 +22,7 @@ public class EventBus {
         mBus.unregister(object);
     }
 
-    public void post(final Object event) {
+    public void post(final T event) {
         mBus.post(event);
     }
 }

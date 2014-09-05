@@ -3,32 +3,28 @@ package co.fusionx.relay.dcc.file;
 import com.google.common.collect.ImmutableList;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import co.fusionx.relay.base.relay.RelayAbstractConversation;
 import co.fusionx.relay.base.relay.RelayServer;
-import co.fusionx.relay.dcc.DCCConversation;
 import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 
-public class DCCFileConversation extends DCCConversation {
+public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent> {
 
     private final String mNick;
 
     private final Map<String, DCCFileConnection> mConnectionList;
 
-    private List<DCCFileEvent> mBuffer;
-
     public DCCFileConversation(final RelayServer server, final String nick) {
         super(server);
 
         mNick = nick;
+
         mConnectionList = new HashMap<>();
-        mBuffer = new ArrayList<>();
     }
 
     public DCCFileConnection getFileConnection(final String fileName) {
@@ -45,15 +41,6 @@ public class DCCFileConversation extends DCCConversation {
 
     public Collection<DCCFileConnection> getFileConnections() {
         return ImmutableList.copyOf(mConnectionList.values());
-    }
-
-    public void postAndStoreEvent(final DCCFileEvent event) {
-        mBuffer.add(event);
-        mServer.getEventBus().post(event);
-    }
-
-    public List<DCCFileEvent> getBuffer() {
-        return mBuffer;
     }
 
     // Conversation interface
