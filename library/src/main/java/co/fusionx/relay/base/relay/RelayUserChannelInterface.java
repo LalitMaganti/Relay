@@ -4,9 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import co.fusionx.relay.base.UserChannelInterface;
 import co.fusionx.relay.constants.UserLevel;
@@ -134,7 +132,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     void addUserToChannel(final RelayChannel channel, final RelayChannelUser user,
             final UserLevel userLevel) {
-        channel.addUser(user, userLevel);
+        channel.addUser(user);
     }
 
     /**

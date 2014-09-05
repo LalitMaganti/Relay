@@ -31,7 +31,7 @@ class JoinParser extends CommandParser {
 
         // Store whether the user is the app user
         final boolean appUser = mServer.getUser().isNickEqual(user);
-        if (!optChannel.isPresent()) {
+        if (channel == null) {
             // If the channel is null then we haven't joined it before (disconnection) and we should
             // create a new channel
             channel = mUserChannelInterface.getNewChannel(channelName);

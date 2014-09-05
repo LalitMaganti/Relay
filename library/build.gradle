@@ -38,17 +38,18 @@ android {
 apply plugin: 'android-unit-test'
 
 dependencies {
-    compile 'org.apache.commons:commons-lang3:3.+'
-    compile 'com.google.guava:guava:18.+'
+    compile 'org.apache.commons:commons-lang3:3.3.2'
+    compile 'com.google.guava:guava:18.0'
     compile 'com.squareup.okio:okio:1.0.1'
     compile 'com.madgag.spongycastle:core:1.51.0.0'
     compile 'com.madgag.spongycastle:pkix:1.51.0.0'
+    compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.0'
 
     compile project(':bus-library')
 
-    testCompile 'junit:junit:4.+'
-    testCompile 'org.robolectric:robolectric:+'
-    testCompile 'org.assertj:assertj-core:1.+'
+    testCompile 'junit:junit:4.12-beta-1'
+    testCompile 'org.robolectric:robolectric:2.3'
+    testCompile 'org.assertj:assertj-core:1.6.1'
 }
 
 retrolambda {

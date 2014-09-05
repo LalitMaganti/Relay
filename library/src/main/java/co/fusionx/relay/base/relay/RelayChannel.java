@@ -6,16 +6,16 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.List;
 
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.UniqueList;
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.Server;
-import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;
+import co.fusionx.relay.misc.IRCUserComparator;
 import co.fusionx.relay.sender.ChannelSender;
 import co.fusionx.relay.sender.relay.RelayChannelSender;
 
@@ -35,8 +35,6 @@ public class RelayChannel implements Channel {
 
     private final Collection<RelayChannelUser> mUsers;
 
-    private final EnumMap<UserLevel, Integer> mNumberOfUsers;
-
     private final List<ChannelEvent> mBuffer;
 
     private boolean mValid;
@@ -48,11 +46,9 @@ public class RelayChannel implements Channel {
         mChannelSender = new RelayChannelSender(this, mServer.getRelayPacketSender());
 
         mBuffer = new ArrayList<>();
-        mNumberOfUsers = new EnumMap<>(UserLevel.class);
-        mUsers = new HashSet<>();
+        mUsers = new UniqueList<>(new BasicEventList<>(), new IRCUserComparator(this));
 
         mValid = true;
-
         clearInternalData();
     }
 
@@ -66,22 +62,6 @@ public class RelayChannel implements Channel {
         return CHANNEL_PREFIXES.contains(firstCharacter);
     }
 
-    public void clearInternalData() {
-        // Clear the user count
-        for (final UserLevel level : UserLevel.values()) {
-            mNumberOfUsers.put(level, 0);
-        }
-        // Clear the list of users
-        mUsers.clear();
-    }
-
-    public void postAndStoreEvent(final ChannelEvent event) {
-        mBuffer.add(event);
-        mServer.getEventBus().post(event);
-    }
-
-    // User stuff starts here
-
     /**
      * Returns a list of all the users currently in the channel
      *
@@ -91,42 +71,6 @@ public class RelayChannel implements Channel {
     public Collection<RelayChannelUser> getUsers() {
         return mUsers;
     }
-
-    /**
-     *
-     *
-     * @param user
-     * @param userLevel
-     */
-    void addUser(final RelayChannelUser user, final UserLevel userLevel) {
-        if (mUsers.contains(user)) {
-            // TODO - this is invalid - need to track it down if it does happen
-        }
-
-        mUsers.add(user);
-    }
-
-    /**
-     *
-     * @param user
-     */
-    void removeUser(final RelayChannelUser user) {
-        if (!mUsers.contains(user)) {
-            // TODO - this is invalid - need to track it down if it does happen
-        }
-        mUsers.remove(user);
-    }
-
-    @Override
-    public boolean isValid() {
-        return mValid;
-    }
-
-    public void markInvalid() {
-        mValid = false;
-    }
-
-    // Getters and setters
 
     /**
      * Gets the name of the channel
@@ -146,6 +90,11 @@ public class RelayChannel implements Channel {
     @Override
     public List<ChannelEvent> getBuffer() {
         return mBuffer;
+    }
+
+    @Override
+    public boolean isValid() {
+        return mValid;
     }
 
     /**
@@ -232,6 +181,28 @@ public class RelayChannel implements Channel {
     }
 
     // Helpers
+    public void clearInternalData() {
+        // Clear the list of users
+        mUsers.clear();
+    }
+
+    public void postAndStoreEvent(final ChannelEvent event) {
+        mBuffer.add(event);
+        mServer.getEventBus().post(event);
+    }
+
+    public void markInvalid() {
+        mValid = false;
+    }
+
+    void addUser(final RelayChannelUser user) {
+        mUsers.add(user);
+    }
+
+    void removeUser(final RelayChannelUser user) {
+        mUsers.remove(user);
+    }
+
     private void sendChannelSelfMessage(final Supplier<ChannelEvent> function) {
         if (getPreferences().isSelfEventHidden()) {
             return;
