@@ -43,12 +43,12 @@ public class RelayChannelUser implements ChannelUser {
     }
 
     @Override
-    public UserLevel getChannelPrivileges(final Channel rawChannel) {
-        if (rawChannel instanceof RelayChannel) {
-            final RelayChannel channel = (RelayChannel) rawChannel;
-            final UserLevel level = mUserLevelMap.get(channel);
+    public UserLevel getChannelPrivileges(final Channel channel) {
+        if (channel instanceof RelayChannel) {
+            final RelayChannel relayChannel = (RelayChannel) channel;
+            final UserLevel level = mUserLevelMap.get(relayChannel);
             if (level == null) {
-                getPreferences().logMissingData(rawChannel.getServer());
+                getPreferences().logMissingData(relayChannel.getServer());
             }
             return level == null ? UserLevel.NONE : level;
         }

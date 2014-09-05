@@ -9,6 +9,7 @@ import co.fusionx.relay.base.relay.RelayChannel;
 import co.fusionx.relay.base.relay.RelayChannelUser;
 import co.fusionx.relay.base.relay.RelayQueryUser;
 import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.query.QueryQuitWorldEvent;
 import co.fusionx.relay.function.Optionals;
@@ -42,8 +43,9 @@ public class QuitParser extends CommandParser {
             final Collection<RelayChannel> channels = mUserChannelInterface.removeUser(user);
             final String reason = parsed.size() == 3 ? parsed.get(2).replace("\"", "") : "";
             for (final RelayChannel channel : channels) {
+                final UserLevel level = user.getChannelPrivileges(channel);
                 mUserChannelInterface.removeUserFromChannel(channel, user);
-                channel.postAndStoreEvent(new ChannelWorldQuitEvent(channel, user, reason));
+                channel.postAndStoreEvent(new ChannelWorldQuitEvent(channel, user, level, reason));
             }
         });
 

@@ -9,6 +9,7 @@ import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.relay.RelayChannel;
 import co.fusionx.relay.base.relay.RelayChannelUser;
 import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.channel.PartEvent;
@@ -30,8 +31,9 @@ public class PartParser extends RemoveUserParser {
     @Override
     public ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
             final RelayChannel channel, final ChannelUser user) {
+        final UserLevel level = user.getChannelPrivileges(channel);
         final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"", "") : "";
-        return new ChannelWorldPartEvent(channel, user, reason);
+        return new ChannelWorldPartEvent(channel, user, level, reason);
     }
 
     @Override

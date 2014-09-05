@@ -36,15 +36,6 @@ public abstract class ChannelWorldUserEvent extends ChannelEvent {
         this.userNickString = user.getNick().getNickAsString();
     }
 
-    ChannelWorldUserEvent(final Channel channel, final Nick nick) {
-        super(channel);
-
-        this.user = null;
-        this.userNick = nick;
-        this.userMentioned = false;
-        this.userNickString = nick.getNickAsString();
-    }
-
     ChannelWorldUserEvent(final Channel channel, final String nick, final boolean mention) {
         super(channel);
 
