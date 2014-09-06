@@ -84,7 +84,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     public void coupleUserAndChannel(final RelayChannelUser user, final RelayChannel channel,
             final UserLevel userLevel) {
-        addUserToChannel(channel, user, userLevel);
+        addUserToChannel(channel, user);
         addChannelToUser(channel, user, userLevel);
     }
 
@@ -125,13 +125,10 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
     /**
      * Add the user to the list of users of the channel
-     *
-     * @param channel   the channel to add the user to
+     *  @param channel   the channel to add the user to
      * @param user      the user to add to the channel
-     * @param userLevel the level to give the user in the channel
      */
-    void addUserToChannel(final RelayChannel channel, final RelayChannelUser user,
-            final UserLevel userLevel) {
+    void addUserToChannel(final RelayChannel channel, final RelayChannelUser user) {
         channel.addUser(user);
     }
 
@@ -169,11 +166,11 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     public void removeChannelFromUser(final RelayChannel channel, final RelayChannelUser user) {
         final Collection<RelayChannel> setOfChannels = user.getChannels();
+        user.removeChannel(channel);
+
         // The app user check is to make sure that the app user isn't removed from the list of
         // users
-        if (setOfChannels.size() > 1 || user instanceof RelayMainUser) {
-            user.removeChannel(channel);
-        } else {
+        if (setOfChannels.size() == 0 && !(user instanceof RelayMainUser)) {
             mServer.removeUser(user);
         }
     }

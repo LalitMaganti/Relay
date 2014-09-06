@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -39,7 +40,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
 
         mChannelName = channelName;
 
-        mUsers = new UniqueList<>(new BasicEventList<>(), new IRCUserComparator(this));
+        mUsers = new HashSet<>();
 
         mChannelSender = new RelayChannelSender(this, mServer.getRelayPacketSender());
 
