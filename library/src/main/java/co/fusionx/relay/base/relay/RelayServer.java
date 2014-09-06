@@ -1,17 +1,17 @@
 package co.fusionx.relay.base.relay;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.BufferedWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.dcc.RelayDCCManager;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
@@ -34,6 +34,8 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
     private final ServerSender mServerSender;
 
     private final EventBus<Event> mServerWideEventBus;
+
+    private final Set<CapCapability> mCapabilities;
 
     private final RelayUserChannelInterface mUserChannelInterface;
 
@@ -61,6 +63,8 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
 
         mServerWideEventBus = new EventBus<>();
         mRelayPacketSender = new RelayPacketSender();
+
+        mCapabilities = new HashSet<>();
 
         // Create the server sender
         mServerSender = new RelayServerSender(this, mRelayPacketSender);
@@ -178,6 +182,14 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
 
     public void onOutputStreamCreated(final BufferedWriter writer) {
         mRelayPacketSender.onOutputStreamCreated(writer);
+    }
+
+    public void addCapability(final CapCapability capability) {
+        mCapabilities.add(capability);
+    }
+
+    public ImmutableSet<CapCapability> getCapabilities() {
+        return ImmutableSet.copyOf(mCapabilities);
     }
 
     void addUser(final RelayChannelUser user) {

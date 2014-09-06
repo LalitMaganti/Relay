@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.misc.EventBus;
 

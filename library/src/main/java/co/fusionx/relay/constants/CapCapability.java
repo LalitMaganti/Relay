@@ -1,11 +1,12 @@
 package co.fusionx.relay.constants;
 
 public enum CapCapability {
+    MULTIPREFIX("multi-prefix"),
     SASL("sasl");
 
     private final String mCapability;
 
-    CapCapability(final String capability) {
+    private CapCapability(final String capability) {
         mCapability = capability;
     }
 

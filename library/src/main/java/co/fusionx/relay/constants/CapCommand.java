@@ -15,10 +15,6 @@ public enum CapCommand {
         mSubCommand = subCommand;
     }
 
-    public String getSubCommand() {
-        return mSubCommand;
-    }
-
     public static CapCommand getCommandFromString(final String string) {
         for (final CapCommand command : CapCommand.values()) {
             if (command.getSubCommand().equals(string)) {
@@ -26,5 +22,9 @@ public enum CapCommand {
             }
         }
         return null;
+    }
+
+    public String getSubCommand() {
+        return mSubCommand;
     }
 }

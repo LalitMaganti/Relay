@@ -6,8 +6,8 @@ import java.util.List;
 
 import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.base.relay.RelayUserChannelInterface;
-import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.constants.ServerReplyCodes;
+import co.fusionx.relay.misc.EventBus;
 
 public abstract class CodeParser {
 

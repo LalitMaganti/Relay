@@ -2,10 +2,10 @@ package co.fusionx.relay.parser.connection.cap;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 
 import android.util.Pair;
 
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +34,8 @@ public class CapParser {
 
     private final RelayCapSender mCapSender;
 
+    private Set<ModifiedCapability> mPossibleCapabilities;
+
     public CapParser(final RelayServer server, final ServerConfiguration serverConfiguration) {
         mServer = server;
         mServerConfiguration = serverConfiguration;
@@ -59,14 +61,13 @@ public class CapParser {
         return capabilitySet;
     }
 
-    public static ModifiedCapability collectionContainsCapability(
-            final Collection<ModifiedCapability> capabilities, final CapCapability capability) {
-        for (final ModifiedCapability modifiedCapability : capabilities) {
+    public boolean serverHasCapability(final CapCapability capability) {
+        for (final ModifiedCapability modifiedCapability : mPossibleCapabilities) {
             if (modifiedCapability.getCapability() == capability) {
-                return modifiedCapability;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     public void parseCode(final int code, final List<String> parsedArray) {
@@ -120,35 +121,52 @@ public class CapParser {
     private void parseLS(final List<String> parsedArray) {
         final String rawCapabilities = parsedArray.remove(0);
         final String colonLessCapabilities = ParseUtils.removeInitialColonIfExists(rawCapabilities);
-        final Set<ModifiedCapability> capabilities = parseCapabilities(colonLessCapabilities);
+        mPossibleCapabilities = parseCapabilities(colonLessCapabilities);
 
-        final ModifiedCapability saslCap = collectionContainsCapability(capabilities, SASL);
+        final boolean hasSasl = serverHasCapability(SASL);
 
         // We attempt to request every CAP capability we know about (with the exception of SASL)
         // before we try anything else
-        if (capabilities.size() > 1 || capabilities.size() > 0 && saslCap == null) {
-            mCapSender.sendRequestCapabilities(joinCapabilities(capabilities));
-        } else if (saslCap != null && mServerConfiguration.shouldSendSasl()) {
+        if (mPossibleCapabilities.size() > 1 || mPossibleCapabilities.size() > 0 && !hasSasl) {
+            mCapSender.sendRequestCapabilities(joinNonSaslCapabilities(mPossibleCapabilities));
+        } else if (hasSasl && mServerConfiguration.shouldSendSasl()) {
             mCapSender.sendRequestSasl();
         } else {
             mCapSender.sendEnd();
         }
     }
 
-    private String joinCapabilities(final Set<ModifiedCapability> capabilities) {
+    private String joinNonSaslCapabilities(final Set<ModifiedCapability> capabilities) {
         return FluentIterable.from(capabilities)
+                .filter(c -> c.getCapability() != SASL)
                 .transform(c -> c.getCapability().getCapabilityString())
                 .join(Joiner.on(' '));
     }
 
+    // TODO - a lot of assumptions are made by this method which are probably should not be made
+    // - fix in the future
     private void parseAck(final List<String> parsedArray) {
         final String rawCapabilities = parsedArray.remove(0);
         final String colonLessCapabilities = ParseUtils.removeInitialColonIfExists(rawCapabilities);
         final Set<ModifiedCapability> capabilities = parseCapabilities(colonLessCapabilities);
 
-        final ModifiedCapability capability = collectionContainsCapability(capabilities, SASL);
-        if (capability != null && capability.getModifier() != Modifier.DISABLE) {
-            mCapSender.sendPlainAuthenticationRequest();
+        if (capabilities.size() == 1) {
+            final ModifiedCapability modCap = Iterables.getLast(capabilities);
+            if (modCap.getCapability() == SASL && modCap.getModifier() == null) {
+                mCapSender.sendPlainAuthenticationRequest();
+                return;
+            }
+        }
+
+        for (final ModifiedCapability capability : capabilities) {
+            mServer.addCapability(capability.getCapability());
+        }
+
+        final boolean hasSasl = serverHasCapability(SASL);
+        if (hasSasl && mServerConfiguration.shouldSendSasl()) {
+            mCapSender.sendRequestSasl();
+        } else {
+            mCapSender.sendEnd();
         }
     }
 

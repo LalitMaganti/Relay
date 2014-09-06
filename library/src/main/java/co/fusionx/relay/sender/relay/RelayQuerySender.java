@@ -6,7 +6,6 @@ import co.fusionx.relay.base.relay.RelayQueryUser;
 import co.fusionx.relay.packet.user.PrivateActionPacket;
 import co.fusionx.relay.packet.user.PrivateMessagePacket;
 import co.fusionx.relay.sender.QuerySender;
-import co.fusionx.relay.util.Utils;
 
 public class RelayQuerySender implements QuerySender {
 

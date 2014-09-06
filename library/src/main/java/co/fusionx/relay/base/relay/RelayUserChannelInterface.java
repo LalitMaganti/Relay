@@ -125,8 +125,9 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
     /**
      * Add the user to the list of users of the channel
-     *  @param channel   the channel to add the user to
-     * @param user      the user to add to the channel
+     *
+     * @param channel the channel to add the user to
+     * @param user    the user to add to the channel
      */
     void addUserToChannel(final RelayChannel channel, final RelayChannelUser user) {
         channel.addUser(user);

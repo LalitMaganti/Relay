@@ -1,7 +1,7 @@
 package co.fusionx.relay.packet.channel;
 
-import co.fusionx.relay.packet.Packet;
 import co.fusionx.relay.misc.WriterCommands;
+import co.fusionx.relay.packet.Packet;
 
 public class ChannelMessagePacket implements Packet {
 

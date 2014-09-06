@@ -4,20 +4,13 @@ import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.UniqueList;
 import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;
-import co.fusionx.relay.misc.EventBus;
-import co.fusionx.relay.misc.IRCUserComparator;
 import co.fusionx.relay.sender.ChannelSender;
 import co.fusionx.relay.sender.relay.RelayChannelSender;
 

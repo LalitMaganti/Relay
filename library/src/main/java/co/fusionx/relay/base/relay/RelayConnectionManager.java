@@ -2,10 +2,8 @@ package co.fusionx.relay.base.relay;
 
 import com.google.common.collect.FluentIterable;
 
-import android.os.Handler;
 import android.util.Pair;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

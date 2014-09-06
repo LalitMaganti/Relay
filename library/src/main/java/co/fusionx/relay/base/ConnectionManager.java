@@ -1,9 +1,7 @@
 package co.fusionx.relay.base;
 
-import android.os.Handler;
 import android.util.Pair;
 
-import java.util.Collection;
 import java.util.Set;
 
 public interface ConnectionManager {
