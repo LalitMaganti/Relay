@@ -93,8 +93,6 @@ public class RelayIRCConnection {
         } else if (mMainThread.isAlive()) {
             mMainThread.interrupt();
         }
-        closeSocket();
-        mServer.onConnectionTerminated();
     }
 
     RelayServer getServer() {
@@ -103,13 +101,6 @@ public class RelayIRCConnection {
 
     ConnectionStatus getStatus() {
         return mStatus;
-    }
-
-    public String getCurrentLine() {
-        if (mLineParser != null) {
-            return mLineParser.getCurrentLine();
-        }
-        return "";
     }
 
     /**
@@ -196,9 +187,10 @@ public class RelayIRCConnection {
 
         // If it was stopped then this cleanup would have already been performed
         if (mStopped) {
-            return;
+            onStopped();
+        } else {
+            onDisconnected(disconnectMessage, isReconnectNeeded());
         }
-        onDisconnected(disconnectMessage, isReconnectNeeded());
         closeSocket();
         mServer.onConnectionTerminated();
     }
