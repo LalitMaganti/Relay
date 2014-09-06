@@ -3,34 +3,39 @@ package co.fusionx.relay.sender.relay;
 import co.fusionx.relay.packet.server.cap.CAPEndPacket;
 import co.fusionx.relay.packet.server.cap.CAPLSPacket;
 import co.fusionx.relay.packet.server.cap.CAPPlainSASLAuthPacket;
-import co.fusionx.relay.packet.server.cap.CAPRequestPlainSaslAuthPacket;
 import co.fusionx.relay.packet.server.cap.CAPRequestSASLPacket;
+import co.fusionx.relay.packet.server.cap.CapRequestCapabilitiesPacket;
+import co.fusionx.relay.packet.server.cap.SaslRequestPlainAuthPacket;
 
 public class RelayCapSender {
 
-    private final RelayPacketSender mRelayPacketSender;
+    private final RelayPacketSender mSender;
 
-    public RelayCapSender(final RelayPacketSender relayPacketSender) {
-        mRelayPacketSender = relayPacketSender;
+    public RelayCapSender(final RelayPacketSender sender) {
+        mSender = sender;
     }
 
     public void sendLs() {
-        mRelayPacketSender.sendPacket(new CAPLSPacket());
+        mSender.sendPacket(new CAPLSPacket());
     }
 
     public void sendEnd() {
-        mRelayPacketSender.sendPacket(new CAPEndPacket());
+        mSender.sendPacket(new CAPEndPacket());
     }
 
-    public void sendSaslRequest() {
-        mRelayPacketSender.sendPacket(new CAPRequestSASLPacket());
+    public void sendRequestSasl() {
+        mSender.sendPacket(new CAPRequestSASLPacket());
     }
 
     public void sendPlainAuthenticationRequest() {
-        mRelayPacketSender.sendPacket(new CAPRequestPlainSaslAuthPacket());
+        mSender.sendPacket(new SaslRequestPlainAuthPacket());
     }
 
     public void sendSaslPlainAuthentication(final String saslUsername, final String saslPassword) {
-        mRelayPacketSender.sendPacket(new CAPPlainSASLAuthPacket(saslUsername, saslPassword));
+        mSender.sendPacket(new CAPPlainSASLAuthPacket(saslUsername, saslPassword));
+    }
+
+    public void sendRequestCapabilities(final String capabilities) {
+        mSender.sendPacket(new CapRequestCapabilitiesPacket(capabilities));
     }
 }

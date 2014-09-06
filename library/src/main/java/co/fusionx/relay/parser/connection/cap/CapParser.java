@@ -1,5 +1,8 @@
 package co.fusionx.relay.parser.connection.cap;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
+
 import android.util.Pair;
 
 import java.util.Collection;
@@ -18,6 +21,8 @@ import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.sender.relay.RelayCapSender;
 import co.fusionx.relay.util.ParseUtils;
+
+import static co.fusionx.relay.constants.CapCapability.SASL;
 
 public class CapParser {
 
@@ -45,6 +50,9 @@ public class CapParser {
         for (final String capability : capabilities) {
             final Pair<String, Modifier> pair = Modifier.consumeModifier(capability);
             final CapCapability capCapability = CapCapability.getCapabilityFromString(pair.first);
+            if (capCapability == null) {
+                continue;
+            }
             capabilitySet.add(new ModifiedCapability(pair.second, capCapability));
         }
 
@@ -93,13 +101,18 @@ public class CapParser {
     }
 
     public void parseAuthenticate(final List<String> parsedArray) {
-        mCapSender.sendSaslPlainAuthentication(mServerConfiguration.getSaslUsername(),
-                mServerConfiguration.getSaslPassword());
+        final String argument = parsedArray.get(0);
+        switch (argument) {
+            case "+":
+                final String username = mServerConfiguration.getSaslUsername();
+                final String password = mServerConfiguration.getSaslPassword();
+                mCapSender.sendSaslPlainAuthentication(username, password);
+                break;
+        }
     }
 
     private void initalizeCommandMap(final Map<CapCommand, Consumer<List<String>>> map) {
         map.put(CapCommand.LS, this::parseLS);
-        map.put(CapCommand.LIST, this::parseList);
         map.put(CapCommand.ACK, this::parseAck);
         map.put(CapCommand.NAK, this::parseNak);
     }
@@ -109,25 +122,31 @@ public class CapParser {
         final String colonLessCapabilities = ParseUtils.removeInitialColonIfExists(rawCapabilities);
         final Set<ModifiedCapability> capabilities = parseCapabilities(colonLessCapabilities);
 
-        if (collectionContainsCapability(capabilities, CapCapability.SASL) != null &&
-                mServerConfiguration.shouldSendSasl()) {
-            mCapSender.sendSaslRequest();
+        final ModifiedCapability saslCap = collectionContainsCapability(capabilities, SASL);
+
+        // We attempt to request every CAP capability we know about (with the exception of SASL)
+        // before we try anything else
+        if (capabilities.size() > 1 || capabilities.size() > 0 && saslCap == null) {
+            mCapSender.sendRequestCapabilities(joinCapabilities(capabilities));
+        } else if (saslCap != null && mServerConfiguration.shouldSendSasl()) {
+            mCapSender.sendRequestSasl();
         } else {
             mCapSender.sendEnd();
         }
     }
 
-    private void parseList(final List<String> parsedArray) {
-        // TODO - this needs to be done
+    private String joinCapabilities(final Set<ModifiedCapability> capabilities) {
+        return FluentIterable.from(capabilities)
+                .transform(c -> c.getCapability().getCapabilityString())
+                .join(Joiner.on(' '));
     }
 
     private void parseAck(final List<String> parsedArray) {
         final String rawCapabilities = parsedArray.remove(0);
         final String colonLessCapabilities = ParseUtils.removeInitialColonIfExists(rawCapabilities);
         final Set<ModifiedCapability> capabilities = parseCapabilities(colonLessCapabilities);
-        final ModifiedCapability capability = collectionContainsCapability(capabilities,
-                CapCapability.SASL);
 
+        final ModifiedCapability capability = collectionContainsCapability(capabilities, SASL);
         if (capability != null && capability.getModifier() != Modifier.DISABLE) {
             mCapSender.sendPlainAuthenticationRequest();
         }
