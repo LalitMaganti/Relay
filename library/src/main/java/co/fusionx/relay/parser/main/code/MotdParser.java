@@ -17,7 +17,7 @@ class MotdParser extends CodeParser {
     }
 
     @Override
-    public void onParseCode(final int code, final List<String> parsedArray) {
+    public void onParseCode(final List<String> parsedArray, final int code) {
         if (!RelayConfigurationProvider.getPreferences().isMOTDShown()) {
             return;
         }

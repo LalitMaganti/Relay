@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 
 import co.fusionx.relay.base.UserChannelInterface;
 import co.fusionx.relay.constants.UserLevel;
-import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 public class RelayUserChannelInterface implements UserChannelInterface {
 
@@ -181,8 +181,8 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      * @param rawSource the source of the user to retrieve
      * @return the user matching the source or null of none match
      */
-    public RelayChannelUser getUserFromRaw(final String rawSource) {
-        final String nick = IRCUtils.getNickFromRaw(rawSource);
+    public RelayChannelUser getUserFromPrefix(final String rawSource) {
+        final String nick = ParseUtils.getNickFromPrefix(rawSource);
         return getNonNullUser(nick);
     }
 

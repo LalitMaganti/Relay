@@ -9,8 +9,8 @@ import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.constants.ServerReplyCodes;
 import co.fusionx.relay.event.channel.ChannelInitialTopicEvent;
 import co.fusionx.relay.function.Optionals;
-import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 class TopicParser extends CodeParser {
 
@@ -21,7 +21,7 @@ class TopicParser extends CodeParser {
     }
 
     @Override
-    public void onParseCode(final int code, final List<String> parsedArray) {
+    public void onParseCode(final List<String> parsedArray, final int code) {
         if (code == ServerReplyCodes.RPL_TOPIC) {
             onTopic(parsedArray);
         } else if (code == ServerReplyCodes.RPL_TOPICWHOTIME) {
@@ -35,7 +35,7 @@ class TopicParser extends CodeParser {
 
     private void onTopicInfo(final List<String> parsedArray) {
         final String channelName = parsedArray.get(0);
-        final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
+        final String nick = ParseUtils.getNickFromPrefix(parsedArray.get(1));
         final Optional<RelayChannel> optional = mUserChannelInterface.getChannel(channelName);
 
         LogUtils.logOptionalBug(optional, mServer);

@@ -1,6 +1,7 @@
 package co.fusionx.relay.constants;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public final class ServerReplyCodes {
 
@@ -345,12 +346,19 @@ public final class ServerReplyCodes {
 
     public static final int RPL_SASL_SUCCESSFUL = 903;
 
-    public static final int ERR_SASL_FAILED = 904;
+    public static final int ERR_SASL_FAIL = 904;
 
-    public static final int ERR_SASL_FAILED_2 = 905;
+    public static final int ERR_SASL_TOO_LONG = 905;
 
-    public static final ImmutableList<Integer> saslCodes = ImmutableList.of(RPL_SASL_LOGGED_IN,
-            RPL_SASL_SUCCESSFUL, ERR_SASL_FAILED, ERR_SASL_FAILED_2);
+    public static final int ERR_SASL_ABORTED = 906;
+
+    public static final int ERR_SASL_ALREADY = 907;
+
+    public static final int RPL_SASL_MECHS = 908;
+
+    public static final ImmutableSet<Integer> saslCodes = ImmutableSet.of(RPL_SASL_LOGGED_IN,
+            RPL_SASL_SUCCESSFUL, ERR_SASL_FAIL, ERR_SASL_TOO_LONG, ERR_SASL_ABORTED,
+            ERR_SASL_ALREADY, RPL_SASL_MECHS);
 
     private static final int RPL_YOURHOST = 2;
 

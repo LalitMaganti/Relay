@@ -1,10 +1,10 @@
 package co.fusionx.relay.sender.relay;
 
 import co.fusionx.relay.packet.server.cap.CAPEndPacket;
+import co.fusionx.relay.packet.server.cap.CAPLSPacket;
 import co.fusionx.relay.packet.server.cap.CAPPlainSASLAuthPacket;
 import co.fusionx.relay.packet.server.cap.CAPRequestPlainSaslAuthPacket;
 import co.fusionx.relay.packet.server.cap.CAPRequestSASLPacket;
-import co.fusionx.relay.packet.server.cap.CAPSupportedPacket;
 
 public class RelayCapSender {
 
@@ -14,19 +14,19 @@ public class RelayCapSender {
         mRelayPacketSender = relayPacketSender;
     }
 
-    public void sendSupportedCAP() {
-        mRelayPacketSender.sendPacket(new CAPSupportedPacket());
+    public void sendLs() {
+        mRelayPacketSender.sendPacket(new CAPLSPacket());
     }
 
-    public void sendEndCap() {
+    public void sendEnd() {
         mRelayPacketSender.sendPacket(new CAPEndPacket());
     }
 
-    public void requestSasl() {
+    public void sendSaslRequest() {
         mRelayPacketSender.sendPacket(new CAPRequestSASLPacket());
     }
 
-    public void sendPlainSaslAuthentication() {
+    public void sendPlainAuthenticationRequest() {
         mRelayPacketSender.sendPacket(new CAPRequestPlainSaslAuthPacket());
     }
 

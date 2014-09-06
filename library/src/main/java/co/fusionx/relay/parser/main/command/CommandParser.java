@@ -44,5 +44,5 @@ public abstract class CommandParser {
         return parserMap;
     }
 
-    public abstract void onParseCommand(final List<String> parsedArray, final String rawSource);
+    public abstract void onParseCommand(final List<String> parsedArray, final String prefix);
 }

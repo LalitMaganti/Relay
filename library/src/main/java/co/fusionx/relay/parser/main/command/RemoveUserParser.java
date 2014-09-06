@@ -19,20 +19,20 @@ public abstract class RemoveUserParser extends CommandParser {
     }
 
     @Override
-    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        final String channelName = parsedArray.get(2);
+    public void onParseCommand(final List<String> parsedArray, final String prefix) {
+        final String channelName = parsedArray.get(0);
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
-            final Optional<RelayChannelUser> optUser = getRemovedUser(parsedArray, rawSource);
+            final Optional<RelayChannelUser> optUser = getRemovedUser(parsedArray, prefix);
             LogUtils.logOptionalBug(optUser, mServer);
 
             Optionals.ifPresent(optUser, user -> {
                 if (mServer.getUser().isNickEqual(user.getNick().getNickAsString())) {
-                    onRemoved(parsedArray, rawSource, channel);
+                    onRemoved(parsedArray, prefix, channel);
                 } else {
-                    onUserRemoved(parsedArray, rawSource, channel, user);
+                    onUserRemoved(parsedArray, prefix, channel, user);
                 }
             });
         });

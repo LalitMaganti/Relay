@@ -46,5 +46,5 @@ public abstract class CodeParser {
         return parserMap;
     }
 
-    public abstract void onParseCode(final int code, final List<String> parsedArray);
+    public abstract void onParseCode(final List<String> parsedArray, final int code);
 }

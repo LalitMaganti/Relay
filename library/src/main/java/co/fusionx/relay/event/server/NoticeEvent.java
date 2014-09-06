@@ -6,7 +6,7 @@ public class NoticeEvent extends ImportantServerEvent {
 
     public final String sendingNick;
 
-    public NoticeEvent(final Server server, final String message, String sendingNick) {
+    public NoticeEvent(final Server server, final String sendingNick, final String message) {
         super(server, message);
 
         this.sendingNick = sendingNick;

@@ -14,18 +14,16 @@ import co.fusionx.relay.event.server.ServerEvent;
 
 class JoinParser extends CommandParser {
 
-    private static final int CHANNEL_NAME_INDEX = 2;
-
     public JoinParser(final RelayServer server) {
         super(server);
     }
 
     @Override
-    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        final String channelName = parsedArray.get(CHANNEL_NAME_INDEX);
+    public void onParseCommand(final List<String> parsedArray, final String prefix) {
+        final String channelName = parsedArray.get(0);
 
         // Retrieve the user and channel
-        final RelayChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final RelayChannelUser user = mUserChannelInterface.getUserFromPrefix(prefix);
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
         RelayChannel channel = optChannel.orNull();
 
@@ -46,11 +44,10 @@ class JoinParser extends CommandParser {
         final ChannelEvent event = new ChannelWorldJoinEvent(channel, user);
         channel.postAndStoreEvent(event);
 
-        if (!appUser) {
-            return;
+        if (appUser) {
+            // Also post a server event if the user who joined was the app user
+            final ServerEvent joinEvent = new JoinEvent(channel);
+            mServer.postAndStoreEvent(joinEvent);
         }
-        // Also post a server event if the user who joined was the app user
-        final ServerEvent joinEvent = new JoinEvent(channel);
-        mServer.postAndStoreEvent(joinEvent);
     }
 }

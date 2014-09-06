@@ -11,6 +11,7 @@ import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 public class DCCParser {
 
@@ -25,7 +26,7 @@ public class DCCParser {
     // DCC FILE <file name> <server IP int> <server port> <file size>
     public void onParseCommand(final List<String> parsedArray, final String rawSource) {
         // Get the nick of the person who requested this
-        final String nick = IRCUtils.getNickFromRaw(rawSource);
+        final String nick = ParseUtils.getNickFromPrefix(rawSource);
 
         // Remove the DCC prefix
         parsedArray.remove(0);

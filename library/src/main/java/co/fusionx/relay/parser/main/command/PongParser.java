@@ -11,7 +11,7 @@ public class PongParser extends CommandParser {
     }
 
     @Override
-    public void onParseCommand(List<String> parsedArray, String rawSource) {
+    public void onParseCommand(List<String> parsedArray, String prefix) {
         // TODO - what should be done here?
     }
 }

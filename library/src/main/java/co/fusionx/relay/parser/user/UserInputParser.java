@@ -9,13 +9,14 @@ import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class UserInputParser {
 
     public static void onParseChannelMessage(final Channel channel, final String message) {
-        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 
@@ -70,7 +71,7 @@ public class UserInputParser {
     }
 
     public static void onParseUserMessage(final QueryUser queryUser, final String message) {
-        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 
@@ -113,7 +114,7 @@ public class UserInputParser {
     }
 
     private static void onParseServerCommand(final Server server, final String rawLine) {
-        final List<String> parsedArray = IRCUtils.splitRawLine(rawLine, false);
+        final List<String> parsedArray = ParseUtils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 
@@ -177,7 +178,7 @@ public class UserInputParser {
 
     public static void onParseDCCChatEvent(final DCCChatConversation chatConnection,
             final String message) {
-        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 

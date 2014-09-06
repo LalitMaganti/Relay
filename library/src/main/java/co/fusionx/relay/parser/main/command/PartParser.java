@@ -13,7 +13,7 @@ import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.channel.PartEvent;
-import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 public class PartParser extends RemoveUserParser {
 
@@ -24,7 +24,7 @@ public class PartParser extends RemoveUserParser {
     @Override
     public Optional<RelayChannelUser> getRemovedUser(final List<String> parsedArray,
             final String rawSource) {
-        final String userNick = IRCUtils.getNickFromRaw(rawSource);
+        final String userNick = ParseUtils.getNickFromPrefix(rawSource);
         return mUserChannelInterface.getUser(userNick);
     }
 
@@ -32,7 +32,7 @@ public class PartParser extends RemoveUserParser {
     public ChannelWorldUserEvent getEvent(final List<String> parsedArray, final String rawSource,
             final RelayChannel channel, final ChannelUser user) {
         final UserLevel level = user.getChannelPrivileges(channel);
-        final String reason = parsedArray.size() == 4 ? parsedArray.get(3).replace("\"", "") : "";
+        final String reason = parsedArray.size() == 2 ? parsedArray.get(1).replace("\"", "") : "";
         return new ChannelWorldPartEvent(channel, user, level, reason);
     }
 

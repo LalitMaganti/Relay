@@ -13,7 +13,7 @@ import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelWorldKickEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.server.KickEvent;
-import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 class KickParser extends RemoveUserParser {
 
@@ -40,7 +40,7 @@ class KickParser extends RemoveUserParser {
     public ChannelWorldUserEvent getEvent(final List<String> parsedArray,
             final String rawSource, final RelayChannel channel, final ChannelUser kickedUser) {
         final UserLevel level = kickedUser.getChannelPrivileges(channel);
-        final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
+        final String kickingNick = ParseUtils.getNickFromPrefix(rawSource);
         final Optional<RelayChannelUser> optKickUser = mUserChannelInterface.getUser(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
 
@@ -58,7 +58,7 @@ class KickParser extends RemoveUserParser {
     @Override
     void onRemoved(final List<String> parsedArray, final String rawSource,
             final RelayChannel channel) {
-        final String kickingNick = IRCUtils.getNickFromRaw(rawSource);
+        final String kickingNick = ParseUtils.getNickFromPrefix(rawSource);
         final Optional<RelayChannelUser> optKickUser = mUserChannelInterface.getUser(kickingNick);
 
         // Remove the channel only after we've finished with it

@@ -12,20 +12,18 @@ import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.server.ServerNickChangeEvent;
 import co.fusionx.relay.function.Optionals;
-import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 class NickParser extends CommandParser {
-
-    private static final int NEW_NICK_INDEX = 2;
 
     public NickParser(final RelayServer server) {
         super(server);
     }
 
     @Override
-    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        final String oldRawNick = IRCUtils.getNickFromRaw(rawSource);
+    public void onParseCommand(final List<String> parsedArray, final String prefix) {
+        final String oldRawNick = ParseUtils.getNickFromPrefix(prefix);
         final boolean appUser = mServer.getUser().isNickEqual(oldRawNick);
         final Optional<RelayChannelUser> optUser = appUser
                 ? Optional.of(mServer.getUser())
@@ -38,7 +36,7 @@ class NickParser extends CommandParser {
         // which displays this behaviour
         LogUtils.logOptionalBug(optUser, mServer);
         Optionals.ifPresent(optUser, user -> {
-            final String newNick = parsedArray.get(NEW_NICK_INDEX);
+            final String newNick = parsedArray.get(0);
             final Nick oldNick = user.getNick();
             user.setNick(newNick);
 

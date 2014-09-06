@@ -17,8 +17,8 @@ import co.fusionx.relay.event.server.VersionEvent;
 import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.parser.main.MentionParser;
 import co.fusionx.relay.sender.relay.RelayCtcpResponseSender;
-import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 public class CTCPParser {
 
@@ -44,43 +44,41 @@ public class CTCPParser {
     }
 
     // Commands start here
-    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        final String normalMessage = parsedArray.get(3);
-        final String message = normalMessage.substring(1, normalMessage.length() - 1);
+    public void onParseCommand(final String prefix,
+            final String recipient, final String rawMessage) {
+        final String message = rawMessage.substring(1, rawMessage.length() - 1);
+        final String sendingNick = ParseUtils.getNickFromPrefix(prefix);
 
-        final String nick = IRCUtils.getNickFromRaw(rawSource);
         // TODO - THIS IS INCOMPLETE
         if (message.startsWith("ACTION")) {
-            onAction(parsedArray, rawSource);
+            onAction(recipient, sendingNick, message);
         } else if (message.startsWith("FINGER")) {
-            mCtcpResponseSender.sendFingerResponse(nick,
-                    getServer().getConfiguration().getRealName());
+            mCtcpResponseSender.sendFingerResponse(sendingNick,
+                    mServer.getConfiguration().getRealName());
         } else if (message.startsWith("VERSION")) {
-            mCtcpResponseSender.sendVersionResponse(nick);
+            mCtcpResponseSender.sendVersionResponse(sendingNick);
         } else if (message.startsWith("SOURCE")) {
         } else if (message.startsWith("USERINFO")) {
         } else if (message.startsWith("ERRMSG")) {
             final String query = message.replace("ERRMSG ", "");
-            mCtcpResponseSender.sendErrMsgResponse(nick, query);
+            mCtcpResponseSender.sendErrMsgResponse(sendingNick, query);
         } else if (message.startsWith("PING")) {
             final String timestamp = message.replace("PING ", "");
-            mCtcpResponseSender.sendPingResponse(nick, timestamp);
+            mCtcpResponseSender.sendPingResponse(sendingNick, timestamp);
         } else if (message.startsWith("TIME")) {
-            mCtcpResponseSender.sendTimeResponse(nick);
+            mCtcpResponseSender.sendTimeResponse(sendingNick);
         } else if (message.startsWith("DCC")) {
-            final List<String> parsedDcc = IRCUtils.splitRawLineWithQuote(message);
-            mDCCParser.onParseCommand(parsedDcc, rawSource);
+            final List<String> parsedDcc = ParseUtils.splitRawLineWithQuote(message);
+            mDCCParser.onParseCommand(parsedDcc, prefix);
         }
     }
 
-    private void onAction(final List<String> parsedArray, final String rawSource) {
-        final String nick = IRCUtils.getNickFromRaw(rawSource);
-        final String action = parsedArray.get(3).replace("ACTION ", "");
-        final String recipient = parsedArray.get(2);
+    private void onAction(final String recipient, final String sendingNick, final String message) {
+        final String action = message.replace("ACTION ", "");
         if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
-            onParseChannelAction(recipient, nick, action);
+            onParseChannelAction(recipient, sendingNick, action);
         } else {
-            onParseUserAction(nick, action);
+            onParseUserAction(recipient, action);
         }
     }
 
@@ -101,7 +99,7 @@ public class CTCPParser {
         Optionals.ifPresent(optChannel, channel -> {
             final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
             final boolean mention = MentionParser.onMentionableCommand(action,
-                    getServer().getUser().getNick().getNickAsString());
+                    mServer.getUser().getNick().getNickAsString());
 
             final ChannelEvent event;
             if (optUser.isPresent()) {
@@ -115,7 +113,7 @@ public class CTCPParser {
     // Commands End Here
 
     // Replies start here
-    public void onParseReply(final List<String> parsedArray, final String rawSource) {
+    public void onParseReply(final List<String> parsedArray, final String prefix) {
         final String normalMessage = parsedArray.get(3);
         final String message = normalMessage.substring(1, normalMessage.length() - 1);
 
@@ -124,7 +122,7 @@ public class CTCPParser {
             // Nothing should be done for an action reply - it is technically invalid
         } else if (message.startsWith("FINGER")) {
         } else if (message.startsWith("VERSION")) {
-            final String nick = IRCUtils.getNickFromRaw(rawSource);
+            final String nick = ParseUtils.getNickFromPrefix(prefix);
             final String version = message.replace("VERSION", "");
             mServer.postAndStoreEvent(new VersionEvent(mServer, nick, version));
         } else if (message.startsWith("SOURCE")) {
@@ -135,8 +133,4 @@ public class CTCPParser {
         }
     }
     // Replies end here
-
-    private RelayServer getServer() {
-        return mServer;
-    }
 }

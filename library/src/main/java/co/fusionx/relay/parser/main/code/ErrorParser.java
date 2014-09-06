@@ -17,7 +17,7 @@ class ErrorParser extends CodeParser {
     }
 
     @Override
-    public void onParseCode(final int code, final List<String> parsedArray) {
+    public void onParseCode(final List<String> parsedArray, final int code) {
         switch (code) {
             case ServerReplyCodes.ERR_NOSUCHNICK:
                 onNoSuchNickError(parsedArray);

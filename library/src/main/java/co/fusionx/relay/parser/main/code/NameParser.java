@@ -7,7 +7,7 @@ import co.fusionx.relay.base.relay.RelayChannelUser;
 import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
-import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 import static co.fusionx.relay.constants.ServerReplyCodes.RPL_NAMREPLY;
 
@@ -20,7 +20,7 @@ class NameParser extends CodeParser {
     }
 
     @Override
-    public void onParseCode(final int code, final List<String> parsedArray) {
+    public void onParseCode(final List<String> parsedArray, final int code) {
         if (code == RPL_NAMREPLY) {
             onParseNameReply(parsedArray);
         } else {
@@ -34,7 +34,7 @@ class NameParser extends CodeParser {
             mChannel = mUserChannelInterface.getChannel(parsedArray.get(1)).get();
         }
 
-        final List<String> listOfUsers = IRCUtils.splitRawLine(parsedArray.get(2), false);
+        final List<String> listOfUsers = ParseUtils.splitRawLine(parsedArray.get(2), false);
         for (final String rawNick : listOfUsers) {
             final UserLevel level = UserLevel.getLevelFromPrefix(rawNick.charAt(0));
             final String nick = level == UserLevel.NONE ? rawNick : rawNick.substring(1);

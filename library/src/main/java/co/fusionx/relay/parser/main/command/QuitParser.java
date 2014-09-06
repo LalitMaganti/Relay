@@ -13,7 +13,7 @@ import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.query.QueryQuitWorldEvent;
 import co.fusionx.relay.function.Optionals;
-import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 public class QuitParser extends CommandParser {
 
@@ -24,8 +24,8 @@ public class QuitParser extends CommandParser {
     }
 
     @Override
-    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        final String nick = IRCUtils.getNickFromRaw(rawSource);
+    public void onParseCommand(final List<String> parsedArray, final String prefix) {
+        final String nick = ParseUtils.getNickFromPrefix(prefix);
         if (mServer.getUser().isNickEqual(nick)) {
             onQuit();
         } else {
@@ -41,7 +41,7 @@ public class QuitParser extends CommandParser {
         final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(userNick);
         Optionals.ifPresent(optUser, user -> {
             final Collection<RelayChannel> channels = mUserChannelInterface.removeUser(user);
-            final String reason = parsed.size() == 3 ? parsed.get(2).replace("\"", "") : "";
+            final String reason = parsed.size() == 2 ? parsed.get(1).replace("\"", "") : "";
             for (final RelayChannel channel : channels) {
                 final UserLevel level = user.getChannelPrivileges(channel);
                 mUserChannelInterface.removeUserFromChannel(channel, user);

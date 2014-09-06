@@ -154,7 +154,7 @@ public class ServerConfiguration implements Parcelable {
     }
 
     // Helper methods
-    public boolean isSaslAvailable() {
+    public boolean shouldSendSasl() {
         return Utils.isNotEmpty(mSaslUsername) && Utils.isNotEmpty(mSaslPassword);
     }
 

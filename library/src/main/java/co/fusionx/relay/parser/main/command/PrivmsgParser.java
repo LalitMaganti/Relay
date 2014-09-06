@@ -13,10 +13,9 @@ import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.function.Optionals;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.parser.main.MentionParser;
-import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.util.ParseUtils;
 import co.fusionx.relay.util.Utils;
 
 public class PrivmsgParser extends CommandParser {
@@ -30,20 +29,15 @@ public class PrivmsgParser extends CommandParser {
     }
 
     @Override
-    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        if (parsedArray.size() < 4) {
-            RelayConfigurationProvider.getPreferences()
-                    .logServerLine(mServer.getRelayIRCConnection().getCurrentLine());
-            return;
-        }
-        final String message = parsedArray.get(3);
+    public void onParseCommand(final List<String> parsedArray, final String prefix) {
+        final String recipient = parsedArray.get(0);
+        final String message = parsedArray.get(1);
 
         // PRIVMSGs can be CTCP commands
         if (CTCPParser.isCtcp(message)) {
-            mCTCPParser.onParseCommand(parsedArray, rawSource);
+            mCTCPParser.onParseCommand(prefix, recipient, message);
         } else {
-            final String nick = IRCUtils.getNickFromRaw(rawSource);
-            final String recipient = parsedArray.get(2);
+            final String nick = ParseUtils.getNickFromPrefix(prefix);
             if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelMessage(nick, recipient, message);
             } else {

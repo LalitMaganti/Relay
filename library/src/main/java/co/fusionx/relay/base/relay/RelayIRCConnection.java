@@ -2,7 +2,6 @@ package co.fusionx.relay.base.relay;
 
 import com.google.common.base.Function;
 
-import android.os.Handler;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -37,6 +36,7 @@ import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
+import static co.fusionx.relay.parser.connection.ServerConnectionParser.ParseStatus;
 
 public class RelayIRCConnection {
 
@@ -165,17 +165,14 @@ public class RelayIRCConnection {
             // We are now in the phase where we can say we are connecting to the server
             onConnecting();
 
-            if (mServerConfiguration.isSaslAvailable()) {
-                // By sending this line, the server *should* wait until we end the CAP stuff with
-                // CAP END
-                mCapSender.sendSupportedCAP();
-            }
+            // By sending this line, the server *should* wait until we end the CAP negotiation
+            // That is if the server supports IRCv3
+            mCapSender.sendLs();
 
+            // Follow RFC2812's recommended order of sending - PASS -> NICK -> USER
             if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
                 mInternalSender.sendServerPassword(mServerConfiguration.getServerPassword());
             }
-
-            // Send NICK and USER lines to the server
             mServer.sendNick(mServerConfiguration.getNickStorage().getFirst());
             mInternalSender.sendUser(mServerConfiguration.getServerUserName(),
                     Utils.returnNonEmpty(mServerConfiguration.getRealName(), "RelayUser"));
@@ -183,13 +180,13 @@ public class RelayIRCConnection {
             final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
             final ServerConnectionParser parser = new ServerConnectionParser(mServer,
                     mServerConfiguration, reader, mRelayPacketSender);
-            final String nick = parser.parseConnect();
+            final ServerConnectionParser.ConnectionLineParseStatus status = parser.parseConnect();
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
             // If the nick is null then we have no hope of progressing
-            if (!TextUtils.isEmpty(nick)) {
-                onStartParsing(nick, reader);
+            if (status.getStatus() == ParseStatus.NICK && !TextUtils.isEmpty(status.getNick())) {
+                onStartParsing(status.getNick(), reader);
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try

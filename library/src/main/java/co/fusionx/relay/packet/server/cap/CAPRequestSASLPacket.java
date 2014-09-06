@@ -6,6 +6,6 @@ public class CAPRequestSASLPacket implements Packet {
 
     @Override
     public String getLine() {
-        return "CAP REQ : sasl multi-prefix";
+        return "CAP REQ :sasl";
     }
 }

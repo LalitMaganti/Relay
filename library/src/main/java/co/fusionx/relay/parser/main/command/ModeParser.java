@@ -14,8 +14,8 @@ import co.fusionx.relay.event.channel.ChannelModeEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
 import co.fusionx.relay.function.Optionals;
-import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 class ModeParser extends CommandParser {
 
@@ -24,10 +24,10 @@ class ModeParser extends CommandParser {
     }
 
     @Override
-    public void onParseCommand(final List<String> parsedArray, final String rawSource) {
-        final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
-        final String recipient = parsedArray.get(2);
-        final String mode = parsedArray.get(3);
+    public void onParseCommand(final List<String> parsedArray, final String prefix) {
+        final String sendingUser = ParseUtils.getNickFromPrefix(prefix);
+        final String recipient = parsedArray.get(0);
+        final String mode = parsedArray.get(1);
         final char firstChar = recipient.charAt(0);
 
         if (RelayChannel.isChannelPrefix(firstChar)) {
@@ -46,21 +46,15 @@ class ModeParser extends CommandParser {
 
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
-            final int messageLength = parsedArray.size();
-            if (messageLength == 4) {
-                // User not specified - therefore channel mode is being changed
-                // TODO - implement this?
-            } else if (messageLength == 5) {
-                // User specified - therefore user mode in channel is being changed
-                onUserModeInChannel(parsedArray, sendingUser, channel, mode);
-            }
+            // TODO - implement channel mode changes
+            onUserModeInChannel(parsedArray, sendingUser, channel, mode);
         });
     }
 
     private void onUserModeInChannel(final List<String> parsedArray, final String sendingNick,
             final RelayChannel channel, final String mode) {
-        final String source = parsedArray.get(4);
-        final String nick = IRCUtils.getNickFromRaw(source);
+        final String source = parsedArray.get(2);
+        final String nick = ParseUtils.getNickFromPrefix(source);
         final boolean appUser = mServer.getUser().isNickEqual(nick);
 
         final Optional<RelayChannelUser> optUser = appUser
@@ -69,6 +63,7 @@ class ModeParser extends CommandParser {
         final Optional<RelayChannelUser> optSending = mUserChannelInterface.getUser(sendingNick);
 
         // Nullity can occur when a ban is being added/removed on a whole range using wildcards
+        final ChannelEvent event;
         if (optUser.isPresent()) {
             final RelayChannelUser user = optUser.get();
 
@@ -76,17 +71,16 @@ class ModeParser extends CommandParser {
             final UserLevel newLevel = parseChannelUserModeChange(mode);
             user.onModeChanged(channel, newLevel);
 
-            final ChannelEvent event = appUser
+            event = appUser
                     ? new ChannelUserLevelChangeEvent(channel, mode, (RelayMainUser) user,
                     oldLevel, newLevel, optSending, sendingNick)
                     : new ChannelWorldLevelChangeEvent(channel, mode, user, oldLevel, newLevel,
                             optSending, sendingNick);
-            channel.postAndStoreEvent(event);
         } else {
-            final ChannelEvent event = new ChannelModeEvent(channel, optSending, sendingNick,
+            event = new ChannelModeEvent(channel, optSending, sendingNick,
                     source, mode);
-            channel.postAndStoreEvent(event);
         }
+        channel.postAndStoreEvent(event);
     }
 
     private UserLevel parseChannelUserModeChange(final String mode) {

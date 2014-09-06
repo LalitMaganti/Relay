@@ -1,6 +1,6 @@
 package co.fusionx.relay.parser.connection;
 
-import org.apache.commons.lang3.StringUtils;
+import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,11 +10,12 @@ import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.base.relay.RelayServer;
 import co.fusionx.relay.constants.ServerCommands;
 import co.fusionx.relay.constants.ServerReplyCodes;
-import co.fusionx.relay.event.server.GenericServerEvent;
+import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.parser.connection.cap.CapParser;
 import co.fusionx.relay.sender.relay.RelayInternalSender;
 import co.fusionx.relay.sender.relay.RelayPacketSender;
-import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 public class ServerConnectionParser {
 
@@ -45,68 +46,97 @@ public class ServerConnectionParser {
         mSuffix = 1;
     }
 
-    public String parseConnect() throws IOException {
+    public ConnectionLineParseStatus parseConnect() throws IOException {
         String line;
         while ((line = mBufferedReader.readLine()) != null) {
-            final List<String> parsedArray = IRCUtils.splitRawLine(line, true);
-            final String command = parsedArray.get(0);
-            switch (command) {
-                case ServerCommands.PING:
-                    // Immediately return
-                    final String source = parsedArray.get(1);
-                    mInternalSender.pongServer(source);
-                    break;
-                case ServerCommands.ERROR:
-                    // We are finished - the server has kicked us out for some reason
-                    return null;
-                case ServerCommands.AUTHENTICATE:
-                    mCapParser.parseCommand(parsedArray);
-                    break;
-                default:
-                    if (StringUtils.isNumeric(parsedArray.get(1))) {
-                        final String nick = parseConnectionCode(mConfiguration.isNickChangeable(),
-                                parsedArray, mConfiguration.getNickStorage());
-                        if (nick != null) {
-                            return nick;
-                        }
-                    } else {
-                        parseConnectionCommand(parsedArray);
-                    }
-                    break;
+            final ConnectionLineParseStatus parseStatus = parseLine(line);
+            if (parseStatus.getStatus() != ParseStatus.OTHER) {
+                return parseStatus;
             }
         }
-        return null;
+        return new ConnectionLineParseStatus(ParseStatus.ERROR, null);
     }
 
-    private String parseConnectionCode(final boolean canChangeNick,
-            final List<String> parsedArray, final NickStorage nickStorage) {
-        final int code = Integer.parseInt(parsedArray.get(1));
+    private ConnectionLineParseStatus parseLine(final String line) {
+        // RFC2812 states that an empty line should be silently ignored
+        if (TextUtils.isEmpty(line)) {
+            return new ConnectionLineParseStatus(ParseStatus.OTHER, null);
+        }
+
+        final List<String> parsedArray = ParseUtils.splitRawLine(line, true);
+        final String prefix = ParseUtils.extractAndRemovePrefix(parsedArray);
+        final String command = parsedArray.remove(0);
+
+        if (ParseUtils.isCommandCode(command)) {
+            final int code = Integer.parseInt(command);
+            return parseConnectionCode(parsedArray, code);
+        } else {
+            return parseConnectionCommand(parsedArray, prefix, command);
+        }
+    }
+
+    private ConnectionLineParseStatus parseConnectionCommand(final List<String> parsedArray,
+            final String prefix, final String command) {
+        switch (command) {
+            case ServerCommands.PING:
+                parsePing(parsedArray);
+                break;
+            case ServerCommands.ERROR:
+                // We are finished - the server has kicked us out for some reason
+                return new ConnectionLineParseStatus(ParseStatus.ERROR, null);
+            case ServerCommands.NOTICE:
+                parseNotice(parsedArray, prefix);
+                break;
+            case ServerCommands.CAP:
+                mCapParser.parseCAP(parsedArray);
+                break;
+            case ServerCommands.AUTHENTICATE:
+                mCapParser.parseAuthenticate(parsedArray);
+                break;
+        }
+        return new ConnectionLineParseStatus(ParseStatus.OTHER, null);
+    }
+
+    private void parsePing(final List<String> parsedArray) {
+        // Immediately return
+        final String source = parsedArray.get(0);
+        mInternalSender.pongServer(source);
+    }
+
+    private void parseNotice(final List<String> parsedArray, final String prefix) {
+        final String sender = ParseUtils.getNickFromPrefix(prefix);
+
+        // final String target = parsedArray.get(0);
+        final String notice = parsedArray.get(1);
+        mServer.postAndStoreEvent(new NoticeEvent(mServer, sender, notice));
+    }
+
+    private ConnectionLineParseStatus parseConnectionCode(final List<String> parsedArray,
+            final int code) {
+        final String target = parsedArray.remove(0); // Remove the target of the reply - ourselves
         switch (code) {
             case ServerReplyCodes.RPL_WELCOME:
                 // We are now logged in.
-                final String nick = parsedArray.get(2);
-                IRCUtils.removeFirstElementFromList(parsedArray, 3);
-                return nick;
+                return new ConnectionLineParseStatus(ParseStatus.NICK, target);
             case ServerReplyCodes.ERR_NICKNAMEINUSE:
-                onNicknameInUse(canChangeNick, nickStorage);
+                onNicknameInUse();
                 break;
             case ServerReplyCodes.ERR_NONICKNAMEGIVEN:
-                mServer.sendNick(nickStorage.getFirst());
-                break;
-            default:
-                if (ServerReplyCodes.saslCodes.contains(code)) {
-                    mCapParser.parseCode(code, parsedArray);
-                }
+                mServer.sendNick(mConfiguration.getNickStorage().getFirst());
                 break;
         }
-        return null;
+        if (ServerReplyCodes.saslCodes.contains(code)) {
+            mCapParser.parseCode(code, parsedArray);
+        }
+        return new ConnectionLineParseStatus(ParseStatus.OTHER, null);
     }
 
-    private void onNicknameInUse(final boolean canChangeNick, final NickStorage nickStorage) {
+    private void onNicknameInUse() {
+        final NickStorage nickStorage = mConfiguration.getNickStorage();
         if (mIndex < nickStorage.getNickCount()) {
             mServer.sendNick(nickStorage.getNickAtPosition(mIndex));
             mIndex++;
-        } else if (canChangeNick) {
+        } else if (mConfiguration.isNickChangeable()) {
             mServer.sendNick(nickStorage.getFirst() + mSuffix);
             mSuffix++;
         } else {
@@ -115,17 +145,29 @@ public class ServerConnectionParser {
         }
     }
 
-    private void parseConnectionCommand(final List<String> parsedArray) {
-        final String command = parsedArray.get(1).toUpperCase();
-        IRCUtils.removeFirstElementFromList(parsedArray, 3);
+    public static enum ParseStatus {
+        NICK,
+        ERROR,
+        OTHER
+    }
 
-        switch (command) {
-            case ServerCommands.NOTICE:
-                mServer.postAndStoreEvent(new GenericServerEvent(mServer, parsedArray.get(0)));
-                break;
-            case ServerCommands.CAP:
-                mCapParser.parseCommand(parsedArray);
-                break;
+    public static class ConnectionLineParseStatus {
+
+        private final ParseStatus mStatus;
+
+        private final String mNick;
+
+        public ConnectionLineParseStatus(final ParseStatus status, final String nick) {
+            mStatus = status;
+            mNick = nick;
+        }
+
+        public String getNick() {
+            return mNick;
+        }
+
+        public ParseStatus getStatus() {
+            return mStatus;
         }
     }
 }
