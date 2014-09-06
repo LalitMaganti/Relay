@@ -1,5 +1,7 @@
 package co.fusionx.relay.sender.relay;
 
+import android.text.TextUtils;
+
 import co.fusionx.relay.base.relay.RelayQueryUser;
 import co.fusionx.relay.packet.user.PrivateActionPacket;
 import co.fusionx.relay.packet.user.PrivateMessagePacket;
@@ -20,20 +22,20 @@ public class RelayQuerySender implements QuerySender {
 
     @Override
     public void sendAction(final String action) {
-        if (!Utils.isNotEmpty(action)) {
+        if (TextUtils.isEmpty(action)) {
             return;
         }
-        mCallHandler.sendPacket(
-                new PrivateActionPacket(mQueryUser.getNick().getNickAsString(), action));
+        mCallHandler.sendPacket(new PrivateActionPacket(mQueryUser.getNick().getNickAsString(),
+                action));
     }
 
     @Override
     public void sendMessage(final String message) {
-        if (!Utils.isNotEmpty(message)) {
+        if (TextUtils.isEmpty(message)) {
             return;
         }
-        mCallHandler.sendPacket(
-                new PrivateMessagePacket(mQueryUser.getNick().getNickAsString(), message));
+        mCallHandler.sendPacket(new PrivateMessagePacket(mQueryUser.getNick().getNickAsString(),
+                message));
     }
 
     @Override

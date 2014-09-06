@@ -176,17 +176,8 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
         mRelayPacketSender.onConnectionTerminated();
     }
 
-    /**
-     * Sets up the writers based on the output stream passed into the method
-     *
-     * @param writer the which the writers will use
-     */
     public void onOutputStreamCreated(final BufferedWriter writer) {
         mRelayPacketSender.onOutputStreamCreated(writer);
-    }
-
-    public RelayIRCConnection getRelayIRCConnection() {
-        return mRelayIRCConnection;
     }
 
     void addUser(final RelayChannelUser user) {

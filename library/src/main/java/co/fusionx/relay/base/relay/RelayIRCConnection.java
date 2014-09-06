@@ -2,8 +2,6 @@ package co.fusionx.relay.base.relay;
 
 import com.google.common.base.Function;
 
-import android.text.TextUtils;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -57,8 +55,6 @@ public class RelayIRCConnection {
     private Socket mSocket;
 
     private int mReconnectAttempts;
-
-    private ServerLineParser mLineParser;
 
     private boolean mStopped;
 
@@ -176,7 +172,7 @@ public class RelayIRCConnection {
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
             // If the nick is null then we have no hope of progressing
-            if (status.getStatus() == ParseStatus.NICK && !TextUtils.isEmpty(status.getNick())) {
+            if (status.getStatus() == ParseStatus.NICK && Utils.isNotEmpty(status.getNick())) {
                 onStartParsing(status.getNick(), reader);
             }
         } catch (final IOException ex) {
@@ -219,9 +215,9 @@ public class RelayIRCConnection {
         }
 
         // Initialise the parser used to parse any lines from the server
-        mLineParser = new ServerLineParser(mServer);
+        final ServerLineParser lineParser = new ServerLineParser(mServer);
         // Loops forever until broken
-        mLineParser.parseMain(reader, mRelayPacketSender);
+        lineParser.parseMain(reader, mRelayPacketSender);
     }
 
     private void onConnecting() {

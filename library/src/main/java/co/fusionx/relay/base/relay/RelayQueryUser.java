@@ -1,5 +1,7 @@
 package co.fusionx.relay.base.relay;
 
+import android.text.TextUtils;
+
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
@@ -8,7 +10,6 @@ import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.query.QueryMessageSelfEvent;
 import co.fusionx.relay.sender.QuerySender;
 import co.fusionx.relay.sender.relay.RelayQuerySender;
-import co.fusionx.relay.util.Utils;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
@@ -41,7 +42,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
     public void sendAction(final String action) {
         mQuerySender.sendAction(action);
 
-        if (!Utils.isNotEmpty(action) || getPreferences().isSelfEventHidden()) {
+        if (TextUtils.isEmpty(action) || getPreferences().isSelfEventHidden()) {
             return;
         }
         postAndStoreEvent(new QueryActionSelfEvent(this, mServer.getUser(), action));
@@ -51,7 +52,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
     public void sendMessage(final String message) {
         mQuerySender.sendMessage(message);
 
-        if (!Utils.isNotEmpty(message) || getPreferences().isSelfEventHidden()) {
+        if (TextUtils.isEmpty(message) || getPreferences().isSelfEventHidden()) {
             return;
         }
         postAndStoreEvent(new QueryMessageSelfEvent(this, mServer.getUser(), message));
