@@ -8,7 +8,6 @@ import org.robolectric.annotation.Config;
 import android.os.Parcel;
 
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.misc.NickStorage;
 
 import static co.fusionx.relay.base.ServerConfiguration.Builder.CREATOR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,27 +17,11 @@ import static org.junit.Assert.assertEquals;
 @RunWith(RobolectricTestRunner.class)
 public class ServerConfigurationTest {
 
-    // Configuration statics
-    public static ServerConfiguration getFreenodeConfiguration() {
-        return getFreenodeConfigurationBuilder().build();
-    }
-
-    // Builder statics
-    private static ServerConfiguration.Builder getFreenodeConfigurationBuilder() {
-        final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
-        builder.setTitle("Freenode");
-        builder.setUrl("irc.freenode.net");
-        builder.setPort(6667);
-        builder.setNickStorage(new NickStorage("holoirctester", "holoirctester", "holoirctester"));
-        builder.setServerUserName("holoirctester");
-        return builder;
-    }
-
     // Builder tests
     @Test
     public void testBuilderParcelling() {
         final Parcel parcel = Parcel.obtain();
-        final ServerConfiguration.Builder expected = getFreenodeConfigurationBuilder();
+        final ServerConfiguration.Builder expected = TestUtils.getFreenodeBuilder();
         expected.writeToParcel(parcel, 0);
 
         // done writing, now reset parcel for reading
@@ -54,15 +37,15 @@ public class ServerConfigurationTest {
     // Configuration tests
     @Test
     public void testBuild() {
-        final ServerConfiguration.Builder builder = getFreenodeConfigurationBuilder();
-        final ServerConfiguration configuration = getFreenodeConfiguration();
+        final ServerConfiguration.Builder builder = TestUtils.getFreenodeBuilder();
+        final ServerConfiguration configuration = TestUtils.getFreenodeConfiguration();
         assertEquals(builder.getTitle(), configuration.getTitle());
     }
 
     @Test
     public void testParcelling() {
         final Parcel parcel = Parcel.obtain();
-        final ServerConfiguration expected = getFreenodeConfiguration();
+        final ServerConfiguration expected = TestUtils.getFreenodeConfiguration();
         expected.writeToParcel(parcel, 0);
 
         // done writing, now reset parcel for reading

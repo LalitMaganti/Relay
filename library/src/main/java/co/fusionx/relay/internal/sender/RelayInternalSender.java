@@ -8,29 +8,29 @@ import co.fusionx.relay.internal.packet.server.internal.ServerPasswordPacket;
 
 public class RelayInternalSender {
 
-    private final RelayPacketSender mRelayPacketSender;
+    private final RelayBaseSender mRelayBaseSender;
 
-    public RelayInternalSender(final RelayPacketSender relayPacketSender) {
-        mRelayPacketSender = relayPacketSender;
+    public RelayInternalSender(final RelayBaseSender relayBaseSender) {
+        mRelayBaseSender = relayBaseSender;
     }
 
     public void pongServer(final String source) {
-        mRelayPacketSender.sendPacket(new PongPacket(source));
+        mRelayBaseSender.sendPacket(new PongPacket(source));
     }
 
     public void sendServerPassword(final String password) {
-        mRelayPacketSender.sendPacket(new ServerPasswordPacket(password));
+        mRelayBaseSender.sendPacket(new ServerPasswordPacket(password));
     }
 
     public void sendNickServPassword(final String password) {
-        mRelayPacketSender.sendPacket(new NickServPasswordPacket(password));
+        mRelayBaseSender.sendPacket(new NickServPasswordPacket(password));
     }
 
     public void sendUser(final String serverUserName, final String realName) {
-        mRelayPacketSender.sendPacket(new UserPacket(serverUserName, realName));
+        mRelayBaseSender.sendPacket(new UserPacket(serverUserName, realName));
     }
 
     public void quitServer(final String quitReason) {
-        mRelayPacketSender.sendPacket(new QuitPacket(quitReason));
+        mRelayBaseSender.sendPacket(new QuitPacket(quitReason));
     }
 }

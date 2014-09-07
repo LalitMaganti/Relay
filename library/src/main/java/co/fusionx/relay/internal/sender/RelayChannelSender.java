@@ -15,41 +15,41 @@ public class RelayChannelSender implements ChannelSender {
 
     private final RelayChannel mChannel;
 
-    private final RelayPacketSender mRelayPacketSender;
+    private final RelayBaseSender mRelayBaseSender;
 
     public RelayChannelSender(final RelayChannel channel,
-            final RelayPacketSender relayPacketSender) {
+            final RelayBaseSender relayBaseSender) {
         mChannel = channel;
-        mRelayPacketSender = relayPacketSender;
+        mRelayBaseSender = relayBaseSender;
     }
 
     @Override
     public void sendAction(final String action) {
-        mRelayPacketSender.sendPacket(new ChannelActionPacket(mChannel.getName(), action));
+        mRelayBaseSender.sendPacket(new ChannelActionPacket(mChannel.getName(), action));
     }
 
     @Override
     public void sendKick(final String userNick, final Optional<String> reason) {
-        mRelayPacketSender.sendPacket(new ChannelKickPacket(mChannel.getName(), userNick, reason));
+        mRelayBaseSender.sendPacket(new ChannelKickPacket(mChannel.getName(), userNick, reason));
     }
 
     @Override
     public void sendMessage(final String message) {
-        mRelayPacketSender.sendPacket(new ChannelMessagePacket(mChannel.getName(), message));
+        mRelayBaseSender.sendPacket(new ChannelMessagePacket(mChannel.getName(), message));
     }
 
     @Override
     public void sendPart(final Optional<String> reason) {
-        mRelayPacketSender.sendPacket(new ChannelPartPacket(mChannel.getName(), reason));
+        mRelayBaseSender.sendPacket(new ChannelPartPacket(mChannel.getName(), reason));
     }
 
     @Override
     public void sendTopic(final String newTopic) {
-        mRelayPacketSender.sendPacket(new ChannelTopicPacket(mChannel.getName(), newTopic));
+        mRelayBaseSender.sendPacket(new ChannelTopicPacket(mChannel.getName(), newTopic));
     }
 
     @Override
     public void sendUserMode(final String userNick, final String mode) {
-        mRelayPacketSender.sendPacket(new ModePacket(mChannel.getName(), userNick, mode));
+        mRelayBaseSender.sendPacket(new ModePacket(mChannel.getName(), userNick, mode));
     }
 }

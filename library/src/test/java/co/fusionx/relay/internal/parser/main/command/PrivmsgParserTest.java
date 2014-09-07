@@ -6,8 +6,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayServerTest;
-import co.fusionx.relay.internal.base.TestMisc;
+import co.fusionx.relay.internal.base.TestUtils;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 @Config(emulateSdk = 18)
@@ -20,9 +19,9 @@ public class PrivmsgParserTest {
 
     // Setup work for the tests
     public PrivmsgParserTest() {
-        RelayConfigurationProvider.onInterfaceReceived(new TestMisc.DefaultRelayConfiguration());
+        RelayConfigurationProvider.onInterfaceReceived(new TestUtils.DefaultRelayConfiguration());
 
-        mServer = RelayServerTest.getDefaultServer();
+        mServer = TestUtils.getFreenodeServer();
         mPrivmsgParser = new PrivmsgParser(mServer, null);
     }
 

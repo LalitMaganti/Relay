@@ -18,7 +18,7 @@ import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.sender.ServerSender;
-import co.fusionx.relay.internal.sender.RelayPacketSender;
+import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
 
 public class RelayServer extends RelayAbstractConversation<ServerEvent> implements Server {
@@ -29,7 +29,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
 
     private final Set<RelayChannelUser> mUsers;
 
-    private final RelayPacketSender mRelayPacketSender;
+    private final RelayBaseSender mRelayBaseSender;
 
     private final ServerSender mServerSender;
 
@@ -62,12 +62,12 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
         mRelayDCCManager = new RelayDCCManager(this);
 
         mServerWideEventBus = new EventBus<>();
-        mRelayPacketSender = new RelayPacketSender();
+        mRelayBaseSender = new RelayBaseSender();
 
         mCapabilities = new HashSet<>();
 
         // Create the server sender
-        mServerSender = new RelayServerSender(mRelayPacketSender);
+        mServerSender = new RelayServerSender(mRelayBaseSender);
     }
 
     @Override
@@ -177,11 +177,11 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
         mUsers.add(mUser);
 
         // Need to remove anything using the old socket OutputStream in-case a reconnection occurs
-        mRelayPacketSender.onConnectionTerminated();
+        mRelayBaseSender.onConnectionTerminated();
     }
 
     public void onOutputStreamCreated(final BufferedWriter writer) {
-        mRelayPacketSender.onOutputStreamCreated(writer);
+        mRelayBaseSender.onOutputStreamCreated(writer);
     }
 
     public void addCapability(final CapCapability capability) {
@@ -200,7 +200,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
         mUsers.remove(user);
     }
 
-    public RelayPacketSender getRelayPacketSender() {
-        return mRelayPacketSender;
+    public RelayBaseSender getRelayBaseSender() {
+        return mRelayBaseSender;
     }
 }

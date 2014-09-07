@@ -25,22 +25,22 @@ import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.ReconnectEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.StopEvent;
-import co.fusionx.relay.internal.parser.connection.ServerConnectionParser;
+import co.fusionx.relay.internal.parser.connection.ConnectionParser;
 import co.fusionx.relay.internal.parser.main.ServerLineParser;
 import co.fusionx.relay.internal.sender.RelayCapSender;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
-import co.fusionx.relay.internal.sender.RelayPacketSender;
+import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
-import static co.fusionx.relay.internal.parser.connection.ServerConnectionParser.ParseStatus;
+import static co.fusionx.relay.internal.parser.connection.ConnectionParser.ParseStatus;
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayIRCConnection {
 
     private final ServerConfiguration mServerConfiguration;
 
-    private final RelayPacketSender mRelayPacketSender;
+    private final RelayBaseSender mRelayBaseSender;
 
     private final RelayServer mServer;
 
@@ -62,9 +62,9 @@ public class RelayIRCConnection {
         mServerConfiguration = serverConfiguration;
 
         mServer = new RelayServer(serverConfiguration, this);
-        mRelayPacketSender = mServer.getRelayPacketSender();
-        mCapSender = new RelayCapSender(mRelayPacketSender);
-        mInternalSender = new RelayInternalSender(mRelayPacketSender);
+        mRelayBaseSender = mServer.getRelayBaseSender();
+        mCapSender = new RelayCapSender(mRelayBaseSender);
+        mInternalSender = new RelayInternalSender(mRelayBaseSender);
     }
 
     void startConnection() {
@@ -172,9 +172,8 @@ public class RelayIRCConnection {
 
         sendInitialMessages();
 
-        final ServerConnectionParser parser = new ServerConnectionParser(mServer, socketReader,
-                mRelayPacketSender);
-        final ServerConnectionParser.ConnectionLineParseStatus status = parser.parseConnect();
+        final ConnectionParser parser = new ConnectionParser(mServer, socketReader);
+        final ConnectionParser.ConnectionLineParseStatus status = parser.parseConnect();
 
         // This nick may well be different from any of the nicks in storage - get the
         // *official* nick from the server itself and use it
@@ -224,7 +223,7 @@ public class RelayIRCConnection {
         // Initialise the parser used to parse any lines from the server
         final ServerLineParser lineParser = new ServerLineParser(mServer);
         // Loops forever until broken
-        lineParser.parseMain(reader, mRelayPacketSender);
+        lineParser.parseMain(reader, mRelayBaseSender);
     }
 
     private void onConnecting() {

@@ -18,11 +18,10 @@ public class RelayChannelTest {
     }
 
     public static RelayChannel getTestChannel(final String channelName) {
-        return new RelayChannel(RelayServerTest.getDefaultServer(), channelName);
+        return new RelayChannel(TestUtils.getFreenodeServer(), channelName);
     }
 
     public static void populateTestChannel(final Channel channel) {
-
     }
 
     @Test

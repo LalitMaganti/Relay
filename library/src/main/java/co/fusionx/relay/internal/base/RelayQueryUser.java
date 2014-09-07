@@ -24,7 +24,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
 
         mNick = new RelayNick(nick);
 
-        mQuerySender = new RelayQuerySender(this, server.getRelayPacketSender());
+        mQuerySender = new RelayQuerySender(this, server.getRelayBaseSender());
     }
 
     @Override

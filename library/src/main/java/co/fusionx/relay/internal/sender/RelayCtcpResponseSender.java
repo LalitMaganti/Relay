@@ -8,29 +8,29 @@ import co.fusionx.relay.internal.packet.server.ctcp.response.VersionResponsePack
 
 public class RelayCtcpResponseSender {
 
-    private final RelayPacketSender mRelayPacketSender;
+    private final RelayBaseSender mRelayBaseSender;
 
-    public RelayCtcpResponseSender(final RelayPacketSender relayPacketSender) {
-        mRelayPacketSender = relayPacketSender;
+    public RelayCtcpResponseSender(final RelayBaseSender relayBaseSender) {
+        mRelayBaseSender = relayBaseSender;
     }
 
     public void sendFingerResponse(final String nick, final String realName) {
-        mRelayPacketSender.sendPacket(new FingerResponsePacket(nick, realName));
+        mRelayBaseSender.sendPacket(new FingerResponsePacket(nick, realName));
     }
 
     public void sendVersionResponse(final String nick) {
-        mRelayPacketSender.sendPacket(new VersionResponsePacket(nick));
+        mRelayBaseSender.sendPacket(new VersionResponsePacket(nick));
     }
 
     public void sendErrMsgResponse(final String nick, final String query) {
-        mRelayPacketSender.sendPacket(new ERRMSGResponsePacket(nick, query));
+        mRelayBaseSender.sendPacket(new ERRMSGResponsePacket(nick, query));
     }
 
     public void sendPingResponse(final String nick, final String timestamp) {
-        mRelayPacketSender.sendPacket(new PingResponsePacket(nick, timestamp));
+        mRelayBaseSender.sendPacket(new PingResponsePacket(nick, timestamp));
     }
 
     public void sendTimeResponse(final String nick) {
-        mRelayPacketSender.sendPacket(new TimeResponsePacket(nick));
+        mRelayBaseSender.sendPacket(new TimeResponsePacket(nick));
     }
 }

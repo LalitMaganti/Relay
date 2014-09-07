@@ -7,7 +7,7 @@ import co.fusionx.relay.internal.packet.Packet;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
-public class RelayPacketSender {
+public class RelayBaseSender {
 
     private BufferedWriter mBufferedWriter;
 

@@ -4,9 +4,9 @@ import co.fusionx.relay.internal.packet.dcc.DCCResumePacket;
 
 public class RelayDCCSender {
 
-    private final RelayPacketSender mServerLineSender;
+    private final RelayBaseSender mServerLineSender;
 
-    public RelayDCCSender(final RelayPacketSender serverLineSender) {
+    public RelayDCCSender(final RelayBaseSender serverLineSender) {
         mServerLineSender = serverLineSender;
     }
 

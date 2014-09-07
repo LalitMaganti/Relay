@@ -10,18 +10,16 @@ import org.robolectric.annotation.Config;
 
 import java.util.List;
 
+import co.fusionx.relay.event.channel.ChannelWorldJoinEvent;
+import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelTest;
 import co.fusionx.relay.internal.base.RelayChannelUser;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayServerTest;
-import co.fusionx.relay.internal.base.TestMisc;
-import co.fusionx.relay.event.channel.ChannelWorldJoinEvent;
-import co.fusionx.relay.event.server.JoinEvent;
+import co.fusionx.relay.internal.base.TestUtils;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 import co.fusionx.relay.util.ParseUtils;
 
-import static co.fusionx.relay.internal.base.ServerConfigurationTest.getFreenodeConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Config(emulateSdk = 18)
@@ -37,7 +35,7 @@ public class JoinParserTest {
     public void testOnJoin() {
         resetFields();
 
-        final String nick = getFreenodeConfiguration().getNickStorage().getFirst();
+        final String nick = mServer.getConfiguration().getNickStorage().getFirst();
 
         final String joinLine = ":holoirctester!holoirctester@test JOIN #relay";
         final List<String> list = ParseUtils.splitRawLine(joinLine, false);
@@ -131,9 +129,9 @@ public class JoinParserTest {
     // TODO - simulate disconnection/reconnection and test what happens then
 
     private void resetFields() {
-        RelayConfigurationProvider.onInterfaceReceived(new TestMisc.DefaultRelayConfiguration());
+        RelayConfigurationProvider.onInterfaceReceived(new TestUtils.DefaultRelayConfiguration());
 
-        mServer = RelayServerTest.getDefaultServer();
+        mServer = TestUtils.getFreenodeServer();
         mJoinParser = new JoinParser(mServer);
     }
 }

@@ -40,7 +40,7 @@ public class CapParser {
         mServer = server;
         mServerConfiguration = server.getConfiguration();
 
-        mCapSender = new RelayCapSender(mServer.getRelayPacketSender());
+        mCapSender = new RelayCapSender(mServer.getRelayBaseSender());
         mCapCommandMap = new EnumMap<>(CapCommand.class);
         initalizeCommandMap(mCapCommandMap);
     }

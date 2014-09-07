@@ -35,7 +35,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
 
         mUsers = new HashSet<>();
 
-        mChannelSender = new RelayChannelSender(this, mServer.getRelayPacketSender());
+        mChannelSender = new RelayChannelSender(this, mServer.getRelayBaseSender());
 
         clearInternalData();
     }

@@ -13,11 +13,10 @@ import co.fusionx.relay.internal.constants.ServerCommands;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.parser.connection.cap.CapParser;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
-import co.fusionx.relay.internal.sender.RelayPacketSender;
 import co.fusionx.relay.misc.NickStorage;
 import co.fusionx.relay.util.ParseUtils;
 
-public class ServerConnectionParser {
+public class ConnectionParser {
 
     private final RelayServer mServer;
 
@@ -33,13 +32,13 @@ public class ServerConnectionParser {
 
     private int mSuffix;
 
-    public ServerConnectionParser(final RelayServer server, final BufferedReader bufferedReader,
-            final RelayPacketSender serverLineSender) {
+    public ConnectionParser(final RelayServer server, final BufferedReader bufferedReader) {
         mServer = server;
         mConfiguration = server.getConfiguration();
+
         mBufferedReader = bufferedReader;
 
-        mInternalSender = new RelayInternalSender(serverLineSender);
+        mInternalSender = new RelayInternalSender(server.getRelayBaseSender());
         mCapParser = new CapParser(server);
 
         mIndex = 1;
@@ -57,7 +56,7 @@ public class ServerConnectionParser {
         return new ConnectionLineParseStatus(ParseStatus.ERROR, null);
     }
 
-    private ConnectionLineParseStatus parseLine(final String line) {
+    ConnectionLineParseStatus parseLine(final String line) {
         // RFC2812 states that an empty line should be silently ignored
         if (TextUtils.isEmpty(line)) {
             return new ConnectionLineParseStatus(ParseStatus.OTHER, null);
