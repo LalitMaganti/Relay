@@ -33,8 +33,8 @@ import co.fusionx.relay.internal.sender.RelayPacketSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 import static co.fusionx.relay.internal.parser.connection.ServerConnectionParser.ParseStatus;
+import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayIRCConnection {
 
@@ -144,44 +144,13 @@ public class RelayIRCConnection {
     private void connect() {
         String disconnectMessage = "";
         try {
-            mSocket = SocketUtils.openSocketConnection(mServerConfiguration);
-
-            final BufferedWriter socketWriter = SocketUtils.getSocketBufferedWriter(mSocket);
-            mServer.onOutputStreamCreated(socketWriter);
-
-            // We are now in the phase where we can say we are connecting to the server
-            onConnecting();
-
-            // By sending this line, the server *should* wait until we end the CAP negotiation
-            // That is if the server supports IRCv3
-            mCapSender.sendLs();
-
-            // Follow RFC2812's recommended order of sending - PASS -> NICK -> USER
-            if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
-                mInternalSender.sendServerPassword(mServerConfiguration.getServerPassword());
-            }
-            mServer.sendNick(mServerConfiguration.getNickStorage().getFirst());
-            mInternalSender.sendUser(mServerConfiguration.getServerUserName(),
-                    Utils.returnNonEmpty(mServerConfiguration.getRealName(), "RelayUser"));
-
-            final BufferedReader reader = SocketUtils.getSocketBufferedReader(mSocket);
-            final ServerConnectionParser parser = new ServerConnectionParser(mServer,
-                    mServerConfiguration, reader, mRelayPacketSender);
-            final ServerConnectionParser.ConnectionLineParseStatus status = parser.parseConnect();
-
-            // This nick may well be different from any of the nicks in storage - get the
-            // *official* nick from the server itself and use it
-            // If the nick is null then we have no hope of progressing
-            if (status.getStatus() == ParseStatus.NICK && Utils.isNotEmpty(status.getNick())) {
-                onStartParsing(status.getNick(), reader);
-            }
+            initializeConnection();
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
             disconnectMessage = ex.getMessage();
         }
 
-        // If it was stopped then this cleanup would have already been performed
         if (mStopped) {
             onStopped();
         } else {
@@ -189,6 +158,44 @@ public class RelayIRCConnection {
         }
         closeSocket();
         mServer.onConnectionTerminated();
+    }
+
+    private void initializeConnection() throws IOException {
+        mSocket = SocketUtils.openSocketConnection(mServerConfiguration);
+
+        final BufferedReader socketReader = SocketUtils.getSocketBufferedReader(mSocket);
+        final BufferedWriter socketWriter = SocketUtils.getSocketBufferedWriter(mSocket);
+        mServer.onOutputStreamCreated(socketWriter);
+
+        // We are now in the phase where we can say we are connecting to the server
+        onConnecting();
+
+        sendInitialMessages();
+
+        final ServerConnectionParser parser = new ServerConnectionParser(mServer,
+                mServerConfiguration, socketReader, mRelayPacketSender);
+        final ServerConnectionParser.ConnectionLineParseStatus status = parser.parseConnect();
+
+        // This nick may well be different from any of the nicks in storage - get the
+        // *official* nick from the server itself and use it
+        // If the nick is null then we have no hope of progressing
+        if (status.getStatus() == ParseStatus.NICK && Utils.isNotEmpty(status.getNick())) {
+            onStartParsing(status.getNick(), socketReader);
+        }
+    }
+
+    private void sendInitialMessages() {
+        // By sending this line, the server *should* wait until we end the CAP negotiation
+        // That is if the server supports IRCv3
+        mCapSender.sendLs();
+
+        // Follow RFC2812's recommended order of sending - PASS -> NICK -> USER
+        if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
+            mInternalSender.sendServerPassword(mServerConfiguration.getServerPassword());
+        }
+        mServer.sendNick(mServerConfiguration.getNickStorage().getFirst());
+        mInternalSender.sendUser(mServerConfiguration.getServerUserName(),
+                Utils.returnNonEmpty(mServerConfiguration.getRealName(), "RelayUser"));
     }
 
     private void onStartParsing(final String nick, final BufferedReader reader) throws IOException {
