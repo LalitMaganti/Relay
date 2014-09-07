@@ -3,6 +3,7 @@ package co.fusionx.relay.constants;
 public enum CapCapability {
     ACCOUNTNOTIFY("account-notify"),
     AWAYNOTIFY("away-notify"),
+    EXTENDEDJOIN("extended-join"),
     MULTIPREFIX("multi-prefix"),
     SASL("sasl");
 

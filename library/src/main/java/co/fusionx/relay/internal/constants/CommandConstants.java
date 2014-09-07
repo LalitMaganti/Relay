@@ -1,8 +1,6 @@
 package co.fusionx.relay.internal.constants;
 
-public class ServerCommands {
-
-    public static final String ACCOUNT = "ACCOUNT";
+public class CommandConstants {
 
     public static final String PING = "PING";
 
@@ -36,6 +34,11 @@ public class ServerCommands {
 
     public static final String WALLOPS = "WALLOPS";
 
-    private ServerCommands() {
+    // IRCv3 commands
+    public static final String ACCOUNT = "ACCOUNT";
+
+    public static final String AWAY = "AWAY";
+
+    private CommandConstants() {
     }
 }

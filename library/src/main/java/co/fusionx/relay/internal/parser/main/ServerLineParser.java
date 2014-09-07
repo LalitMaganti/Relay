@@ -12,7 +12,7 @@ import java.util.Map;
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.constants.ServerCommands;
+import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.parser.main.code.CodeParser;
 import co.fusionx.relay.internal.parser.main.command.CommandParser;
@@ -90,12 +90,12 @@ public class ServerLineParser {
     private boolean parserServerCommand(final List<String> parsedArray, final String prefix,
             final String command) {
         switch (command) {
-            case ServerCommands.PING:
+            case CommandConstants.PING:
                 // Immediately respond & return
                 final String source = parsedArray.get(0);
                 mInternalSender.pongServer(source);
                 return false;
-            case ServerCommands.ERROR:
+            case CommandConstants.ERROR:
                 // We are finished - the server has kicked us
                 // out for some reason
                 return true;

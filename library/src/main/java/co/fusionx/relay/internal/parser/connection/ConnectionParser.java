@@ -9,7 +9,7 @@ import java.util.List;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.constants.ServerCommands;
+import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.parser.connection.cap.CapParser;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
@@ -73,19 +73,19 @@ public class ConnectionParser {
     private ConnectionLineParseStatus parseConnectionCommand(final List<String> parsedArray,
             final String prefix, final String command) {
         switch (command) {
-            case ServerCommands.PING:
+            case CommandConstants.PING:
                 parsePing(parsedArray);
                 break;
-            case ServerCommands.ERROR:
+            case CommandConstants.ERROR:
                 // We are finished - the server has kicked us out for some reason
                 return new ConnectionLineParseStatus(ParseStatus.ERROR, null);
-            case ServerCommands.NOTICE:
+            case CommandConstants.NOTICE:
                 parseNotice(parsedArray, prefix);
                 break;
-            case ServerCommands.CAP:
+            case CommandConstants.CAP:
                 mCapParser.parseCAP(parsedArray);
                 break;
-            case ServerCommands.AUTHENTICATE:
+            case CommandConstants.AUTHENTICATE:
                 mCapParser.parseAuthenticate(parsedArray);
                 break;
         }
