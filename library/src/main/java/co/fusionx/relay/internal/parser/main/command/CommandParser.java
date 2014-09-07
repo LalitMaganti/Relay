@@ -28,7 +28,6 @@ public abstract class CommandParser {
         final CTCPParser ctcpParser = new CTCPParser(server, dccParser);
 
         final Map<String, CommandParser> parserMap = new HashMap<>();
-        parserMap.put(ServerCommands.ACCOUNT, new AccountParser(server));
         parserMap.put(ServerCommands.JOIN, new JoinParser(server));
         parserMap.put(ServerCommands.PRIVMSG, new PrivmsgParser(server, ctcpParser));
         parserMap.put(ServerCommands.NOTICE, new NoticeParser(server, ctcpParser));
@@ -41,6 +40,10 @@ public abstract class CommandParser {
         parserMap.put(ServerCommands.INVITE, new InviteParser(server));
         parserMap.put(ServerCommands.PONG, new PongParser(server));
         parserMap.put(ServerCommands.WALLOPS, new WallopsParser(server));
+
+        // IRCv3 parsers
+        parserMap.put(ServerCommands.ACCOUNT, new AccountParser(server));
+        parserMap.put(ServerCommands.ACCOUNT, new AwayParser(server));
 
         return parserMap;
     }
