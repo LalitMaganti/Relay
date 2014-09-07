@@ -9,16 +9,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import co.fusionx.relay.event.server.GenericServerEvent;
+import co.fusionx.relay.event.server.WhoisEvent;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.constants.ServerCommands;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
-import co.fusionx.relay.event.server.GenericServerEvent;
-import co.fusionx.relay.event.server.WhoisEvent;
 import co.fusionx.relay.internal.parser.main.code.CodeParser;
 import co.fusionx.relay.internal.parser.main.command.CommandParser;
 import co.fusionx.relay.internal.parser.main.command.QuitParser;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
-import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
 
@@ -43,12 +42,11 @@ public class ServerLineParser {
     /**
      * A loop which reads each line from the server as it is received and passes it on to parse
      *
-     * @param reader     the reader associated with the server stream
-     * @param lineSender the writer to write to the server
+     * @param reader the reader associated with the server stream
      */
-    public void parseMain(final BufferedReader reader, final RelayBaseSender lineSender)
+    public void parseMain(final BufferedReader reader)
             throws IOException {
-        mInternalSender = new RelayInternalSender(lineSender);
+        mInternalSender = new RelayInternalSender(mServer.getRelayBaseSender());
 
         while ((mLine = reader.readLine()) != null) {
             final boolean quit = parseLine();
@@ -56,10 +54,6 @@ public class ServerLineParser {
                 return;
             }
         }
-    }
-
-    public String getCurrentLine() {
-        return mLine;
     }
 
     /**

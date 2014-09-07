@@ -22,8 +22,6 @@ public class ConnectionParser {
 
     private final ServerConfiguration mConfiguration;
 
-    private final BufferedReader mBufferedReader;
-
     private final RelayInternalSender mInternalSender;
 
     private final CapParser mCapParser;
@@ -32,11 +30,9 @@ public class ConnectionParser {
 
     private int mSuffix;
 
-    public ConnectionParser(final RelayServer server, final BufferedReader bufferedReader) {
+    public ConnectionParser(final RelayServer server) {
         mServer = server;
         mConfiguration = server.getConfiguration();
-
-        mBufferedReader = bufferedReader;
 
         mInternalSender = new RelayInternalSender(server.getRelayBaseSender());
         mCapParser = new CapParser(server);
@@ -45,9 +41,9 @@ public class ConnectionParser {
         mSuffix = 1;
     }
 
-    public ConnectionLineParseStatus parseConnect() throws IOException {
+    public ConnectionLineParseStatus parseConnect(final BufferedReader reader) throws IOException {
         String line;
-        while ((line = mBufferedReader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             final ConnectionLineParseStatus parseStatus = parseLine(line);
             if (parseStatus.getStatus() != ParseStatus.OTHER) {
                 return parseStatus;

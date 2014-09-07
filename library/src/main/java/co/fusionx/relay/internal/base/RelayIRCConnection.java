@@ -27,9 +27,9 @@ import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.StopEvent;
 import co.fusionx.relay.internal.parser.connection.ConnectionParser;
 import co.fusionx.relay.internal.parser.main.ServerLineParser;
+import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.internal.sender.RelayCapSender;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
-import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
@@ -172,8 +172,8 @@ public class RelayIRCConnection {
 
         sendInitialMessages();
 
-        final ConnectionParser parser = new ConnectionParser(mServer, socketReader);
-        final ConnectionParser.ConnectionLineParseStatus status = parser.parseConnect();
+        final ConnectionParser parser = new ConnectionParser(mServer);
+        final ConnectionParser.ConnectionLineParseStatus status = parser.parseConnect(socketReader);
 
         // This nick may well be different from any of the nicks in storage - get the
         // *official* nick from the server itself and use it
@@ -223,7 +223,7 @@ public class RelayIRCConnection {
         // Initialise the parser used to parse any lines from the server
         final ServerLineParser lineParser = new ServerLineParser(mServer);
         // Loops forever until broken
-        lineParser.parseMain(reader, mRelayBaseSender);
+        lineParser.parseMain(reader);
     }
 
     private void onConnecting() {
