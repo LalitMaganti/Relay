@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.util.List;
 
 import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.constants.ServerCommands;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
-import co.fusionx.relay.event.server.NoticeEvent;
-import co.fusionx.relay.misc.NickStorage;
 import co.fusionx.relay.internal.parser.connection.cap.CapParser;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.internal.sender.RelayPacketSender;
+import co.fusionx.relay.misc.NickStorage;
 import co.fusionx.relay.util.ParseUtils;
 
 public class ServerConnectionParser {

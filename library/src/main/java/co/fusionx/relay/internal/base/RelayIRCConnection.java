@@ -48,9 +48,9 @@ public class RelayIRCConnection {
 
     private final RelayInternalSender mInternalSender;
 
-    private Thread mMainThread;
-
     private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
+
+    private Thread mConnectionThread;
 
     private Socket mSocket;
 
@@ -68,14 +68,14 @@ public class RelayIRCConnection {
     }
 
     void startConnection() {
-        mMainThread = new Thread(() -> {
+        mConnectionThread = new Thread(() -> {
             try {
                 connectToServer();
             } catch (final Exception ex) {
                 getPreferences().handleException(ex);
             }
         });
-        mMainThread.start();
+        mConnectionThread.start();
     }
 
     void stopConnection() {
@@ -86,8 +86,8 @@ public class RelayIRCConnection {
         if (mStatus == ConnectionStatus.CONNECTED) {
             mStopped = true;
             mInternalSender.quitServer(getPreferences().getQuitReason());
-        } else if (mMainThread.isAlive()) {
-            mMainThread.interrupt();
+        } else if (mConnectionThread.isAlive()) {
+            mConnectionThread.interrupt();
         }
     }
 
