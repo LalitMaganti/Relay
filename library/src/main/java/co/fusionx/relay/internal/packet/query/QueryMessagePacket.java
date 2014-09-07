@@ -1,14 +1,14 @@
-package co.fusionx.relay.internal.packet.user;
+package co.fusionx.relay.internal.packet.query;
 
 import co.fusionx.relay.internal.packet.Packet;
 
-public class PrivateMessagePacket implements Packet {
+public class QueryMessagePacket implements Packet {
 
     public final String userNick;
 
     public final String message;
 
-    public PrivateMessagePacket(String userNick, String message) {
+    public QueryMessagePacket(String userNick, String message) {
         this.userNick = userNick;
         this.message = message;
     }

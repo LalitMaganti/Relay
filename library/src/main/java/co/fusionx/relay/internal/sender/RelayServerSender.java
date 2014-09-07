@@ -1,6 +1,5 @@
 package co.fusionx.relay.internal.sender;
 
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.packet.server.JoinPacket;
 import co.fusionx.relay.internal.packet.server.NickChangePacket;
 import co.fusionx.relay.internal.packet.server.RawPacket;
@@ -9,13 +8,10 @@ import co.fusionx.relay.sender.ServerSender;
 
 public class RelayServerSender implements ServerSender {
 
-    private final RelayServer mServer;
+    private final RelayPacketSender mSender;
 
-    private final RelayPacketSender mCallHandler;
-
-    public RelayServerSender(final RelayServer server, final RelayPacketSender callHandler) {
-        mServer = server;
-        mCallHandler = callHandler;
+    public RelayServerSender(final RelayPacketSender sender) {
+        mSender = sender;
     }
 
     @Override
@@ -25,21 +21,21 @@ public class RelayServerSender implements ServerSender {
 
     @Override
     public void sendJoin(final String channelName) {
-        mCallHandler.sendPacket(new JoinPacket(channelName));
+        mSender.sendPacket(new JoinPacket(channelName));
     }
 
     @Override
     public void sendNick(final String newNick) {
-        mCallHandler.sendPacket(new NickChangePacket(newNick));
+        mSender.sendPacket(new NickChangePacket(newNick));
     }
 
     @Override
     public void sendWhois(final String nick) {
-        mCallHandler.sendPacket(new WhoisPacket(nick));
+        mSender.sendPacket(new WhoisPacket(nick));
     }
 
     @Override
     public void sendRawLine(final String rawLine) {
-        mCallHandler.sendPacket(new RawPacket(rawLine));
+        mSender.sendPacket(new RawPacket(rawLine));
     }
 }

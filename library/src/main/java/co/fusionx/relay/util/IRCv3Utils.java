@@ -2,9 +2,9 @@ package co.fusionx.relay.util;
 
 import android.util.Pair;
 
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.internal.base.RelayServer;
 
 public class IRCv3Utils {
 

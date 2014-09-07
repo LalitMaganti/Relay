@@ -67,7 +67,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
         mCapabilities = new HashSet<>();
 
         // Create the server sender
-        mServerSender = new RelayServerSender(this, mRelayPacketSender);
+        mServerSender = new RelayServerSender(mRelayPacketSender);
     }
 
     @Override

@@ -3,20 +3,19 @@ package co.fusionx.relay.internal.sender;
 import android.text.TextUtils;
 
 import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.packet.user.PrivateActionPacket;
-import co.fusionx.relay.internal.packet.user.PrivateMessagePacket;
+import co.fusionx.relay.internal.packet.query.QueryActionPacket;
+import co.fusionx.relay.internal.packet.query.QueryMessagePacket;
 import co.fusionx.relay.sender.QuerySender;
 
 public class RelayQuerySender implements QuerySender {
 
     private final RelayQueryUser mQueryUser;
 
-    private final RelayPacketSender mCallHandler;
+    private final RelayPacketSender mSender;
 
-    public RelayQuerySender(final RelayQueryUser queryUser,
-            final RelayPacketSender callHandler) {
+    public RelayQuerySender(final RelayQueryUser queryUser, final RelayPacketSender sender) {
         mQueryUser = queryUser;
-        mCallHandler = callHandler;
+        mSender = sender;
     }
 
     @Override
@@ -24,8 +23,7 @@ public class RelayQuerySender implements QuerySender {
         if (TextUtils.isEmpty(action)) {
             return;
         }
-        mCallHandler.sendPacket(new PrivateActionPacket(mQueryUser.getNick().getNickAsString(),
-                action));
+        mSender.sendPacket(new QueryActionPacket(mQueryUser.getNick().getNickAsString(), action));
     }
 
     @Override
@@ -33,8 +31,7 @@ public class RelayQuerySender implements QuerySender {
         if (TextUtils.isEmpty(message)) {
             return;
         }
-        mCallHandler.sendPacket(new PrivateMessagePacket(mQueryUser.getNick().getNickAsString(),
-                message));
+        mSender.sendPacket(new QueryMessagePacket(mQueryUser.getNick().getNickAsString(), message));
     }
 
     @Override

@@ -33,14 +33,14 @@ public class ServerConnectionParser {
 
     private int mSuffix;
 
-    public ServerConnectionParser(final RelayServer server, final ServerConfiguration configuration,
-            final BufferedReader bufferedReader, final RelayPacketSender serverLineSender) {
+    public ServerConnectionParser(final RelayServer server, final BufferedReader bufferedReader,
+            final RelayPacketSender serverLineSender) {
         mServer = server;
-        mConfiguration = configuration;
+        mConfiguration = server.getConfiguration();
         mBufferedReader = bufferedReader;
 
         mInternalSender = new RelayInternalSender(serverLineSender);
-        mCapParser = new CapParser(server, configuration);
+        mCapParser = new CapParser(server);
 
         mIndex = 1;
         mSuffix = 1;
