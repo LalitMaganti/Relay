@@ -15,10 +15,10 @@ public class RelayChannelSender implements ChannelSender {
 
     private final RelayChannel mChannel;
 
-    private final RelayBaseSender mRelayBaseSender;
+    private final BaseSender mRelayBaseSender;
 
     public RelayChannelSender(final RelayChannel channel,
-            final RelayBaseSender relayBaseSender) {
+            final BaseSender relayBaseSender) {
         mChannel = channel;
         mRelayBaseSender = relayBaseSender;
     }

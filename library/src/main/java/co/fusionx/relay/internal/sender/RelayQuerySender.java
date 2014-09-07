@@ -11,9 +11,9 @@ public class RelayQuerySender implements QuerySender {
 
     private final RelayQueryUser mQueryUser;
 
-    private final RelayBaseSender mSender;
+    private final BaseSender mSender;
 
-    public RelayQuerySender(final RelayQueryUser queryUser, final RelayBaseSender sender) {
+    public RelayQuerySender(final RelayQueryUser queryUser, final BaseSender sender) {
         mQueryUser = queryUser;
         mSender = sender;
     }

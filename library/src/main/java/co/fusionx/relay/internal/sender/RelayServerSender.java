@@ -8,9 +8,9 @@ import co.fusionx.relay.sender.ServerSender;
 
 public class RelayServerSender implements ServerSender {
 
-    private final RelayBaseSender mSender;
+    private final BaseSender mSender;
 
-    public RelayServerSender(final RelayBaseSender sender) {
+    public RelayServerSender(final BaseSender sender) {
         mSender = sender;
     }
 

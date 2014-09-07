@@ -67,7 +67,7 @@ public class RelayConnectionManager implements ConnectionManager {
             throw new IllegalArgumentException("Server not managed by this manager");
         }
 
-        if (connection.getStatus() != ConnectionStatus.DISCONNECTED) {
+        if (server.getStatus() != ConnectionStatus.DISCONNECTED) {
             throw new IllegalArgumentException("Server not in disconnected state");
         }
 

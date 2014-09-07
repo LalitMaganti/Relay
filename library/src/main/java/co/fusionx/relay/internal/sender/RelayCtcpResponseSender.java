@@ -8,9 +8,9 @@ import co.fusionx.relay.internal.packet.server.ctcp.response.VersionResponsePack
 
 public class RelayCtcpResponseSender {
 
-    private final RelayBaseSender mRelayBaseSender;
+    private final BaseSender mRelayBaseSender;
 
-    public RelayCtcpResponseSender(final RelayBaseSender relayBaseSender) {
+    public RelayCtcpResponseSender(final BaseSender relayBaseSender) {
         mRelayBaseSender = relayBaseSender;
     }
 

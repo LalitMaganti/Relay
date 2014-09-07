@@ -12,24 +12,23 @@ import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.constants.CapCapability;
-import co.fusionx.relay.internal.dcc.RelayDCCManager;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.misc.EventBus;
-import co.fusionx.relay.sender.ServerSender;
+import co.fusionx.relay.internal.dcc.RelayDCCManager;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
+import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.sender.ServerSender;
 
 public class RelayServer extends RelayAbstractConversation<ServerEvent> implements Server {
 
     private final ServerConfiguration mConfiguration;
 
-    private final RelayIRCConnection mRelayIRCConnection;
-
     private final Set<RelayChannelUser> mUsers;
 
-    private final RelayBaseSender mRelayBaseSender;
+    private final BaseSender mRelayBaseSender;
 
     private final ServerSender mServerSender;
 
@@ -43,12 +42,12 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
 
     private final RelayDCCManager mRelayDCCManager;
 
-    public RelayServer(final ServerConfiguration configuration,
-            final RelayIRCConnection connection) {
+    private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
+
+    public RelayServer(final ServerConfiguration configuration) {
         super(null);
 
         mConfiguration = configuration;
-        mRelayIRCConnection = connection;
 
         // Set the nick name to the first choice nick
         mUser = new RelayMainUser(configuration.getNickStorage().getFirst());
@@ -77,57 +76,6 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
         }
         final RelayServer server = (RelayServer) o;
         return getTitle().equals(server.getTitle());
-    }
-
-    // Server Interface
-    @Override
-    public Collection<RelayChannelUser> getUsers() {
-        return mUsers;
-    }
-
-    @Override
-    public String getId() {
-        return getTitle();
-    }
-
-    @Override
-    public RelayServer getServer() {
-        return this;
-    }
-
-    @Override
-    public RelayUserChannelInterface getUserChannelInterface() {
-        return mUserChannelInterface;
-    }
-
-    @Override
-    public RelayMainUser getUser() {
-        return mUser;
-    }
-
-    @Override
-    public String getTitle() {
-        return mConfiguration.getTitle();
-    }
-
-    @Override
-    public ConnectionStatus getStatus() {
-        return mRelayIRCConnection.getStatus();
-    }
-
-    @Override
-    public EventBus<Event> getServerWideBus() {
-        return mServerWideEventBus;
-    }
-
-    @Override
-    public ServerConfiguration getConfiguration() {
-        return mConfiguration;
-    }
-
-    @Override
-    public RelayDCCManager getDCCManager() {
-        return mRelayDCCManager;
     }
 
     // ServerSender interface
@@ -200,7 +148,63 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
         mUsers.remove(user);
     }
 
-    public RelayBaseSender getRelayBaseSender() {
+    public BaseSender getBaseSender() {
         return mRelayBaseSender;
+    }
+
+    public void updateStatus(final ConnectionStatus status) {
+        mStatus = status;
+    }
+
+    // Conversation Interface
+    @Override
+    public String getId() {
+        return getTitle();
+    }
+
+    @Override
+    public RelayServer getServer() {
+        return this;
+    }
+
+    // Server Interface - getters
+    @Override
+    public Collection<RelayChannelUser> getUsers() {
+        return mUsers;
+    }
+
+    @Override
+    public RelayUserChannelInterface getUserChannelInterface() {
+        return mUserChannelInterface;
+    }
+
+    @Override
+    public RelayMainUser getUser() {
+        return mUser;
+    }
+
+    @Override
+    public String getTitle() {
+        return mConfiguration.getTitle();
+    }
+
+    @Override
+    public ConnectionStatus getStatus() {
+        return mStatus;
+    }
+
+    @Override
+    public EventBus<Event> getServerWideBus() {
+        return mServerWideEventBus;
+    }
+
+    @Override
+    public ServerConfiguration getConfiguration() {
+        return mConfiguration;
+    }
+
+    @Override
+    public RelayDCCManager getDCCManager() {
+        return mRelayDCCManager;
     }
 }

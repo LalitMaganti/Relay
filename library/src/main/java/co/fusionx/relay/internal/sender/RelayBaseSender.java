@@ -9,7 +9,9 @@ import co.fusionx.relay.internal.packet.Packet;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
-public class RelayBaseSender {
+public class RelayBaseSender implements BaseSender {
+
+    private final Object mLock = new Object();
 
     private final ExecutorService mExecutorService;
 
@@ -19,30 +21,39 @@ public class RelayBaseSender {
         mExecutorService = Executors.newCachedThreadPool();
     }
 
-    void sendPacket(final Packet packet) {
+    @Override
+    public void sendPacket(final Packet packet) {
         final String line = packet.getLine();
         mExecutorService.submit(() -> sendLine(line));
     }
 
-    private void sendLine(final String line) {
-        if (mBufferedWriter == null) {
-            getPreferences().logServerLine(line);
-            return;
-        }
-
-        try {
-            mBufferedWriter.write(String.format("%s\r\n", line));
-            mBufferedWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    @Override
     public void onOutputStreamCreated(final BufferedWriter writer) {
-        mBufferedWriter = writer;
+        synchronized (mLock) {
+            mBufferedWriter = writer;
+        }
     }
 
+    @Override
     public void onConnectionTerminated() {
-        mBufferedWriter = null;
+        synchronized (mLock) {
+            mBufferedWriter = null;
+        }
+    }
+
+    private void sendLine(final String line) {
+        synchronized (mLock) {
+            if (mBufferedWriter == null) {
+                getPreferences().logServerLine(line);
+                return;
+            }
+
+            try {
+                mBufferedWriter.write(String.format("%s\r\n", line));
+                mBufferedWriter.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

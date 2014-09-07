@@ -34,7 +34,7 @@ public class ConnectionParser {
         mServer = server;
         mConfiguration = server.getConfiguration();
 
-        mInternalSender = new RelayInternalSender(server.getRelayBaseSender());
+        mInternalSender = new RelayInternalSender(server.getBaseSender());
         mCapParser = new CapParser(server);
 
         mIndex = 1;

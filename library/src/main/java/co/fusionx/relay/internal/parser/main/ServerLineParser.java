@@ -46,7 +46,7 @@ public class ServerLineParser {
      */
     public void parseMain(final BufferedReader reader)
             throws IOException {
-        mInternalSender = new RelayInternalSender(mServer.getRelayBaseSender());
+        mInternalSender = new RelayInternalSender(mServer.getBaseSender());
 
         String line;
         while ((line = reader.readLine()) != null) {

@@ -27,7 +27,6 @@ import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.StopEvent;
 import co.fusionx.relay.internal.parser.connection.ConnectionParser;
 import co.fusionx.relay.internal.parser.main.ServerLineParser;
-import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.internal.sender.RelayCapSender;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.util.SocketUtils;
@@ -40,15 +39,11 @@ public class RelayIRCConnection {
 
     private final ServerConfiguration mServerConfiguration;
 
-    private final RelayBaseSender mRelayBaseSender;
-
     private final RelayServer mServer;
-
-    private final RelayCapSender mCapSender;
 
     private final RelayInternalSender mInternalSender;
 
-    private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
+    private final RelayCapSender mCapSender;
 
     private Thread mConnectionThread;
 
@@ -60,26 +55,19 @@ public class RelayIRCConnection {
 
     RelayIRCConnection(final ServerConfiguration serverConfiguration) {
         mServerConfiguration = serverConfiguration;
+        mServer = new RelayServer(serverConfiguration);
 
-        mServer = new RelayServer(serverConfiguration, this);
-        mRelayBaseSender = mServer.getRelayBaseSender();
-        mCapSender = new RelayCapSender(mRelayBaseSender);
-        mInternalSender = new RelayInternalSender(mRelayBaseSender);
+        mInternalSender = new RelayInternalSender(mServer.getBaseSender());
+        mCapSender = new RelayCapSender(mServer.getBaseSender());
     }
 
     void startConnection() {
-        mConnectionThread = new Thread(() -> {
-            try {
-                connectToServer();
-            } catch (final Exception ex) {
-                getPreferences().handleException(ex);
-            }
-        });
+        mConnectionThread = new Thread(this::connectToServerSilently);
         mConnectionThread.start();
     }
 
     void stopConnection() {
-        if (mStatus == ConnectionStatus.CONNECTED) {
+        if (mServer.getStatus() == ConnectionStatus.CONNECTED) {
             mStopped = true;
             mInternalSender.quitServer(getPreferences().getQuitReason());
         } else if (mConnectionThread.isAlive()) {
@@ -87,18 +75,14 @@ public class RelayIRCConnection {
         }
     }
 
-    RelayServer getServer() {
-        return mServer;
+    private void connectToServerSilently() {
+        try {
+            connectToServer();
+        } catch (final Exception ex) {
+            getPreferences().handleException(ex);
+        }
     }
 
-    ConnectionStatus getStatus() {
-        return mStatus;
-    }
-
-    /**
-     * Method which keeps trying to reconnect to the server the number of times specified and if
-     * the user has not explicitly tried to disconnect
-     */
     private void connectToServer() {
         connect();
 
@@ -120,9 +104,6 @@ public class RelayIRCConnection {
         onDisconnected("Disconnected from server (no reconnect pending).", false);
     }
 
-    /**
-     * Closes the socket if it is not already closed
-     */
     private void closeSocket() {
         if (mSocket == null || mSocket.isClosed()) {
             mSocket = null;
@@ -166,8 +147,10 @@ public class RelayIRCConnection {
         // We are now in the phase where we can say we are connecting to the server
         onConnecting();
 
+        // Send the registration messages to the server
         sendInitialMessages();
 
+        // Setup the connection parser and start parsing
         final ConnectionParser parser = new ConnectionParser(mServer);
         final ConnectionParser.ConnectionLineParseStatus status = parser.parseConnect(socketReader);
 
@@ -223,13 +206,13 @@ public class RelayIRCConnection {
     }
 
     private void onConnecting() {
-        mStatus = ConnectionStatus.CONNECTING;
+        mServer.updateStatus(ConnectionStatus.CONNECTING);
 
         mServer.postAndStoreEvent(new ConnectingEvent(mServer));
     }
 
     private void onReconnecting() {
-        mStatus = ConnectionStatus.RECONNECTING;
+        mServer.updateStatus(ConnectionStatus.RECONNECTING);
 
         mServer.postAndStoreEvent(new ReconnectEvent(mServer));
     }
@@ -249,7 +232,7 @@ public class RelayIRCConnection {
     }
 
     private void onStopped() {
-        mStatus = ConnectionStatus.STOPPED;
+        mServer.updateStatus(ConnectionStatus.STOPPED);
 
         for (final RelayChannel channel : mServer.getUser().getChannels()) {
             channel.postAndStoreEvent(new ChannelStopEvent(channel));
@@ -269,7 +252,7 @@ public class RelayIRCConnection {
             final Function<RelayChannel, ChannelEvent> channelFunction,
             final Function<RelayQueryUser, QueryEvent> queryFunction,
             final Supplier<ServerEvent> serverFunction) {
-        mStatus = status;
+        mServer.updateStatus(status);
 
         for (final RelayChannel channel : mServer.getUser().getChannels()) {
             channel.postAndStoreEvent(channelFunction.apply(channel));
@@ -284,5 +267,10 @@ public class RelayIRCConnection {
 
     private boolean isReconnectNeeded() {
         return mReconnectAttempts < getPreferences().getReconnectAttemptsCount();
+    }
+
+    // Getters
+    RelayServer getServer() {
+        return mServer;
     }
 }

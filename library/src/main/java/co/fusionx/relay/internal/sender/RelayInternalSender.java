@@ -8,9 +8,9 @@ import co.fusionx.relay.internal.packet.server.internal.ServerPasswordPacket;
 
 public class RelayInternalSender {
 
-    private final RelayBaseSender mRelayBaseSender;
+    private final BaseSender mRelayBaseSender;
 
-    public RelayInternalSender(final RelayBaseSender relayBaseSender) {
+    public RelayInternalSender(final BaseSender relayBaseSender) {
         mRelayBaseSender = relayBaseSender;
     }
 

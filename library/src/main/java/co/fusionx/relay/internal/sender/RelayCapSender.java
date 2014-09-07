@@ -9,9 +9,9 @@ import co.fusionx.relay.internal.packet.server.cap.SaslRequestPlainAuthPacket;
 
 public class RelayCapSender {
 
-    private final RelayBaseSender mSender;
+    private final BaseSender mSender;
 
-    public RelayCapSender(final RelayBaseSender sender) {
+    public RelayCapSender(final BaseSender sender) {
         mSender = sender;
     }
 
