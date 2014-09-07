@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.RelayUserChannelInterface;
 import co.fusionx.relay.internal.constants.CommandConstants;
@@ -42,8 +43,12 @@ public abstract class CommandParser {
         parserMap.put(CommandConstants.WALLOPS, new WallopsParser(server));
 
         // IRCv3 parsers
-        parserMap.put(CommandConstants.ACCOUNT, new AccountParser(server));
-        parserMap.put(CommandConstants.AWAY, new AwayParser(server));
+        if (server.getCapabilities().contains(CapCapability.ACCOUNTNOTIFY)) {
+            parserMap.put(CommandConstants.ACCOUNT, new AccountParser(server));
+        }
+        if (server.getCapabilities().contains(CapCapability.AWAYNOTIFY)) {
+            parserMap.put(CommandConstants.AWAY, new AwayParser(server));
+        }
 
         return parserMap;
     }

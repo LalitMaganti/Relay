@@ -4,13 +4,14 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.internal.base.RelayChannel;
-import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldJoinEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.internal.base.RelayChannel;
+import co.fusionx.relay.internal.base.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayServer;
 
 class JoinParser extends CommandParser {
 
@@ -39,6 +40,16 @@ class JoinParser extends CommandParser {
         }
         // Put the user and channel together
         mUserChannelInterface.coupleUserAndChannel(user, channel);
+
+        if (mServer.getCapabilities().contains(CapCapability.EXTENDEDJOIN)) {
+            // We should have 2 parameters after the channel name
+            if (parsedArray.size() == 3) {
+                final String accountName = parsedArray.get(1);
+                final String realName = parsedArray.get(2);
+            } else {
+                // TODO - this should never happen - the server is messing up if this is the case
+            }
+        }
 
         // Post the event to the channel
         final ChannelEvent event = new ChannelWorldJoinEvent(channel, user);
