@@ -2,35 +2,37 @@ package co.fusionx.relay.internal.constants;
 
 public class ServerCommands {
 
-    public final static String PING = "PING";
+    public static final String ACCOUNT = "ACCOUNT";
 
-    public final static String ERROR = "ERROR";
+    public static final String PING = "PING";
 
-    public final static String NOTICE = "NOTICE";
+    public static final String ERROR = "ERROR";
 
-    public final static String PRIVMSG = "PRIVMSG";
+    public static final String NOTICE = "NOTICE";
 
-    public final static String PART = "PART";
+    public static final String PRIVMSG = "PRIVMSG";
 
-    public final static String JOIN = "JOIN";
+    public static final String PART = "PART";
 
-    public final static String QUIT = "QUIT";
+    public static final String JOIN = "JOIN";
 
-    public final static String MODE = "MODE";
+    public static final String QUIT = "QUIT";
 
-    public final static String NICK = "NICK";
+    public static final String MODE = "MODE";
 
-    public final static String TOPIC = "TOPIC";
+    public static final String NICK = "NICK";
 
-    public final static String CAP = "CAP";
+    public static final String TOPIC = "TOPIC";
 
-    public final static String AUTHENTICATE = "AUTHENTICATE";
+    public static final String CAP = "CAP";
 
-    public final static String KICK = "KICK";
+    public static final String AUTHENTICATE = "AUTHENTICATE";
 
-    public final static String INVITE = "INVITE";
+    public static final String KICK = "KICK";
 
-    public final static String PONG = "PONG";
+    public static final String INVITE = "INVITE";
+
+    public static final String PONG = "PONG";
 
     public static final String WALLOPS = "WALLOPS";
 
