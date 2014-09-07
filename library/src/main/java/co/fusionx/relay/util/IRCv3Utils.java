@@ -2,7 +2,7 @@ package co.fusionx.relay.util;
 
 import android.util.Pair;
 
-import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.constants.UserLevel;
 

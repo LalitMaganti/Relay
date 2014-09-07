@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
-import co.fusionx.relay.base.relay.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayChannelUser;
 
 public class KickEvent extends ServerEvent {
 

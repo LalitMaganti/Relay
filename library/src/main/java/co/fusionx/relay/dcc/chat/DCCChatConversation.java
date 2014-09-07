@@ -3,8 +3,8 @@ package co.fusionx.relay.dcc.chat;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import co.fusionx.relay.base.relay.RelayAbstractConversation;
-import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.internal.base.RelayAbstractConversation;
+import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;

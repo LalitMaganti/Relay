@@ -2,7 +2,7 @@ package co.fusionx.relay.event.channel;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.Nick;
-import co.fusionx.relay.base.relay.RelayMainUser;
+import co.fusionx.relay.internal.base.RelayMainUser;
 
 public class ChannelNickChangeEvent extends ChannelEvent {
 

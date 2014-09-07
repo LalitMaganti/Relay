@@ -1,7 +1,7 @@
 package co.fusionx.relay.event.query;
 
 import co.fusionx.relay.base.QueryUser;
-import co.fusionx.relay.base.relay.RelayMainUser;
+import co.fusionx.relay.internal.base.RelayMainUser;
 
 public class QueryMessageSelfEvent extends QuerySelfEvent {
 

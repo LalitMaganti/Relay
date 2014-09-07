@@ -2,7 +2,7 @@ package co.fusionx.relay.dcc.pending;
 
 import java.io.File;
 
-import co.fusionx.relay.dcc.RelayDCCManager;
+import co.fusionx.relay.internal.dcc.RelayDCCManager;
 
 public class DCCPendingSendConnection extends DCCPendingConnection {
 

@@ -1,6 +1,6 @@
 package co.fusionx.relay.dcc.pending;
 
-import co.fusionx.relay.dcc.RelayDCCManager;
+import co.fusionx.relay.internal.dcc.RelayDCCManager;
 
 public class DCCPendingChatConnection extends DCCPendingConnection {
 

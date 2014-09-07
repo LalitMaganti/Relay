@@ -7,8 +7,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import co.fusionx.relay.base.relay.RelayAbstractConversation;
-import co.fusionx.relay.base.relay.RelayServer;
+import co.fusionx.relay.internal.base.RelayAbstractConversation;
+import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;

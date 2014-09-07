@@ -9,7 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
-import co.fusionx.relay.sender.relay.RelayDCCSender;
+import co.fusionx.relay.internal.sender.RelayDCCSender;
 import co.fusionx.relay.util.DCCUtils;
 import co.fusionx.relay.util.IOUtils;
 import okio.BufferedSink;

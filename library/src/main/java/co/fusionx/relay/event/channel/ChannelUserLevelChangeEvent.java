@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.relay.RelayMainUser;
+import co.fusionx.relay.internal.base.RelayMainUser;
 import co.fusionx.relay.constants.UserLevel;
 
 public class ChannelUserLevelChangeEvent extends ChannelEvent {
