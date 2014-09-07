@@ -1,6 +1,7 @@
 package co.fusionx.relay.internal.base;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,7 +10,6 @@ import java.net.Socket;
 import java.util.Collection;
 
 import co.fusionx.relay.base.ConnectionStatus;
-import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
 import co.fusionx.relay.event.channel.ChannelDisconnectEvent;
@@ -172,8 +172,8 @@ public class RelayIRCConnection {
 
         sendInitialMessages();
 
-        final ServerConnectionParser parser = new ServerConnectionParser(mServer,
-                mServerConfiguration, socketReader, mRelayPacketSender);
+        final ServerConnectionParser parser = new ServerConnectionParser(mServer, socketReader,
+                mRelayPacketSender);
         final ServerConnectionParser.ConnectionLineParseStatus status = parser.parseConnect();
 
         // This nick may well be different from any of the nicks in storage - get the
@@ -243,14 +243,14 @@ public class RelayIRCConnection {
         onStatusChanged(ConnectionStatus.CONNECTED,
                 ChannelConnectEvent::new,
                 QueryConnectEvent::new,
-                server -> new ConnectEvent(server, mServerConfiguration.getUrl()));
+                () -> new ConnectEvent(mServer, mServerConfiguration.getUrl()));
     }
 
     private void onDisconnected(final String serverMessage, final boolean retryPending) {
         onStatusChanged(ConnectionStatus.DISCONNECTED,
                 channel -> new ChannelDisconnectEvent(channel, serverMessage),
                 user -> new QueryDisconnectEvent(user, serverMessage),
-                server -> new DisconnectEvent(server, serverMessage, retryPending));
+                () -> new DisconnectEvent(mServer, serverMessage, retryPending));
     }
 
     private void onStopped() {
@@ -273,7 +273,7 @@ public class RelayIRCConnection {
     private void onStatusChanged(final ConnectionStatus status,
             final Function<RelayChannel, ChannelEvent> channelFunction,
             final Function<RelayQueryUser, QueryEvent> queryFunction,
-            final Function<Server, ServerEvent> serverFunction) {
+            final Supplier<ServerEvent> serverFunction) {
         mStatus = status;
 
         for (final RelayChannel channel : mServer.getUser().getChannels()) {
@@ -284,7 +284,7 @@ public class RelayIRCConnection {
             user.postAndStoreEvent(queryFunction.apply(user));
         }
 
-        mServer.postAndStoreEvent(serverFunction.apply(mServer));
+        mServer.postAndStoreEvent(serverFunction.get());
     }
 
     private boolean isReconnectNeeded() {
