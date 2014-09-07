@@ -79,10 +79,6 @@ public class RelayIRCConnection {
     }
 
     void stopConnection() {
-        // Send the stop events and set the status before we talk to the server - ensures
-        // that we don't get concurrent modifications
-        onStopped();
-
         if (mStatus == ConnectionStatus.CONNECTED) {
             mStopped = true;
             mInternalSender.quitServer(getPreferences().getQuitReason());

@@ -48,8 +48,9 @@ public class ServerLineParser {
             throws IOException {
         mInternalSender = new RelayInternalSender(mServer.getRelayBaseSender());
 
-        while ((mLine = reader.readLine()) != null) {
-            final boolean quit = parseLine();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            final boolean quit = parseLine(line);
             if (quit) {
                 return;
             }
@@ -61,14 +62,16 @@ public class ServerLineParser {
      *
      * @return a boolean indicating whether the server has disconnected
      */
-    boolean parseLine() {
+    boolean parseLine(final String line) {
         // RFC2812 states that an empty line should be silently ignored
-        if (TextUtils.isEmpty(mLine)) {
+        if (TextUtils.isEmpty(line)) {
             return false;
         }
+        mLine = line;
+        Log.e("Relay", line);
 
         // Split the line
-        final List<String> parsedArray = ParseUtils.splitRawLine(mLine, true);
+        final List<String> parsedArray = ParseUtils.splitRawLine(line, true);
 
         // Get the prefix if it exists
         final String prefix = ParseUtils.extractAndRemovePrefix(parsedArray);
