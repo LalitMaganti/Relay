@@ -17,6 +17,7 @@ import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.parser.main.code.CodeParser;
 import co.fusionx.relay.internal.parser.main.command.CommandParser;
 import co.fusionx.relay.internal.parser.main.command.QuitParser;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
@@ -25,18 +26,20 @@ public class ServerLineParser {
 
     private final RelayServer mServer;
 
+    private final RelayInternalSender mInternalSender;
+
     private final Map<String, CommandParser> mCommandParserMap;
 
     private final SparseArray<CodeParser> mCodeParser;
 
-    private RelayInternalSender mInternalSender;
-
     private String mLine;
 
-    public ServerLineParser(final RelayServer server) {
+    public ServerLineParser(final RelayServer server, final BaseSender sender) {
         mServer = server;
+        mInternalSender = new RelayInternalSender(sender);
+
         mCodeParser = CodeParser.getParserMap(server);
-        mCommandParserMap = CommandParser.getParserMap(server);
+        mCommandParserMap = CommandParser.getParserMap(server, sender);
     }
 
     /**
@@ -46,8 +49,6 @@ public class ServerLineParser {
      */
     public void parseMain(final BufferedReader reader)
             throws IOException {
-        mInternalSender = new RelayInternalSender(mServer.getBaseSender());
-
         String line;
         while ((line = reader.readLine()) != null) {
             final boolean quit = parseLine(line);

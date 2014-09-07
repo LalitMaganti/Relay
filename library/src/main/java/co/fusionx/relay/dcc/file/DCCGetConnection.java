@@ -9,6 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayDCCSender;
 import co.fusionx.relay.util.DCCUtils;
 import co.fusionx.relay.util.IOUtils;
@@ -25,11 +26,11 @@ public class DCCGetConnection extends DCCFileConnection {
     private CountDownLatch mCountDownLatch;
 
     public DCCGetConnection(final DCCPendingConnection pendingConnection,
-            final DCCFileConversation conversation, final File file) {
+            final BaseSender baseSender, final DCCFileConversation conversation, final File file) {
         super(pendingConnection, conversation);
 
+        mRelayDCCSender = new RelayDCCSender(baseSender);
         mFile = file;
-        mRelayDCCSender = new RelayDCCSender(conversation.getServer().getBaseSender());
     }
 
     @Override

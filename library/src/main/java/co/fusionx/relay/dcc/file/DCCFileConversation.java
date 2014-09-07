@@ -7,21 +7,26 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import co.fusionx.relay.internal.base.RelayAbstractConversation;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
+import co.fusionx.relay.internal.base.RelayAbstractConversation;
+import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.internal.sender.BaseSender;
 
 public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent> {
+
+    private final BaseSender mBaseSender;
 
     private final String mNick;
 
     private final Map<String, DCCFileConnection> mConnectionList;
 
-    public DCCFileConversation(final RelayServer server, final String nick) {
+    public DCCFileConversation(final RelayServer server, final BaseSender baseSender,
+            final String nick) {
         super(server);
 
+        mBaseSender = baseSender;
         mNick = nick;
 
         mConnectionList = new HashMap<>();
@@ -32,7 +37,8 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
     }
 
     public void getFile(final DCCPendingSendConnection connection, final File file) {
-        final DCCGetConnection getConnection = new DCCGetConnection(connection, this, file);
+        final DCCGetConnection getConnection = new DCCGetConnection(connection, mBaseSender, this,
+                file);
         mConnectionList.put(connection.getArgument(), getConnection);
         getConnection.startConnection();
 

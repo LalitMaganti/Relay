@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
@@ -17,8 +19,6 @@ import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.internal.dcc.RelayDCCManager;
 import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.internal.sender.RelayBaseSender;
-import co.fusionx.relay.internal.sender.RelayServerSender;
 import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.sender.ServerSender;
 
@@ -26,47 +26,35 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
 
     private final ServerConfiguration mConfiguration;
 
-    private final Set<RelayChannelUser> mUsers;
-
-    private final BaseSender mRelayBaseSender;
-
-    private final ServerSender mServerSender;
-
     private final EventBus<Event> mServerWideEventBus;
 
     private final Set<CapCapability> mCapabilities;
 
     private final RelayUserChannelInterface mUserChannelInterface;
 
-    private final RelayMainUser mUser;
-
     private final RelayDCCManager mRelayDCCManager;
+
+    private final BaseSender mBaseSender;
+
+    private final ServerSender mServerSender;
 
     private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
 
-    public RelayServer(final ServerConfiguration configuration) {
+    @Inject
+    RelayServer(final ServerConfiguration configuration,
+            final BaseSender baseSender, final ServerSender serverSender) {
         super(null);
 
         mConfiguration = configuration;
+        mBaseSender = baseSender;
+        mServerSender = serverSender;
 
-        // Set the nick name to the first choice nick
-        mUser = new RelayMainUser(configuration.getNickStorage().getFirst());
-
-        mUsers = new HashSet<>();
-        mUsers.add(mUser);
-
-        mUserChannelInterface = new RelayUserChannelInterface(this);
-
-        // Create the DCCManager
-        mRelayDCCManager = new RelayDCCManager(this);
+        mUserChannelInterface = new RelayUserChannelInterface(this, baseSender);
+        mRelayDCCManager = new RelayDCCManager(this, baseSender);
 
         mServerWideEventBus = new EventBus<>();
-        mRelayBaseSender = new RelayBaseSender();
 
         mCapabilities = new HashSet<>();
-
-        // Create the server sender
-        mServerSender = new RelayServerSender(mRelayBaseSender);
     }
 
     @Override
@@ -118,18 +106,14 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
     }
 
     public void onConnectionTerminated() {
-        // Clear the global list of users - it's now invalid
-        mUsers.clear();
-
-        // Keep our own user inside though
-        mUsers.add(mUser);
+        mUserChannelInterface.onConnectionTerminated();
 
         // Need to remove anything using the old socket OutputStream in-case a reconnection occurs
-        mRelayBaseSender.onConnectionTerminated();
+        mBaseSender.onConnectionTerminated();
     }
 
     public void onOutputStreamCreated(final BufferedWriter writer) {
-        mRelayBaseSender.onOutputStreamCreated(writer);
+        mBaseSender.onOutputStreamCreated(writer);
     }
 
     public void addCapability(final CapCapability capability) {
@@ -138,18 +122,6 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
 
     public ImmutableSet<CapCapability> getCapabilities() {
         return ImmutableSet.copyOf(mCapabilities);
-    }
-
-    void addUser(final RelayChannelUser user) {
-        mUsers.add(user);
-    }
-
-    void removeUser(final RelayChannelUser user) {
-        mUsers.remove(user);
-    }
-
-    public BaseSender getBaseSender() {
-        return mRelayBaseSender;
     }
 
     public void updateStatus(final ConnectionStatus status) {
@@ -170,7 +142,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
     // Server Interface - getters
     @Override
     public Collection<RelayChannelUser> getUsers() {
-        return mUsers;
+        return mUserChannelInterface.getUsers();
     }
 
     @Override
@@ -180,7 +152,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
 
     @Override
     public RelayMainUser getUser() {
-        return mUser;
+        return mUserChannelInterface.getMainUser();
     }
 
     @Override

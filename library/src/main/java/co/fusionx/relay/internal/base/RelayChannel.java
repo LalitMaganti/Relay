@@ -8,11 +8,14 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.UserChannelInterface;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;
-import co.fusionx.relay.sender.ChannelSender;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayChannelSender;
+import co.fusionx.relay.sender.ChannelSender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
@@ -22,20 +25,23 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
     private final static ImmutableList<Character> CHANNEL_PREFIXES = ImmutableList.of('#', '&',
             '+', '!');
 
+    private final RelayMainUser mUser;
+
     private final String mChannelName;
 
     private final Collection<RelayChannelUser> mUsers;
 
     private final ChannelSender mChannelSender;
 
-    RelayChannel(final RelayServer server, final String channelName) {
+    RelayChannel(final Server server, final RelayMainUser user, final BaseSender baseSender,
+            final String channelName) {
         super(server);
 
+        mUser = user;
+        mChannelSender = new RelayChannelSender(this, baseSender);
         mChannelName = channelName;
 
         mUsers = new HashSet<>();
-
-        mChannelSender = new RelayChannelSender(this, mServer.getBaseSender());
 
         clearInternalData();
     }
@@ -114,7 +120,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
     @Override
     public void sendAction(final String action) {
         mChannelSender.sendAction(action);
-        sendChannelSelfMessage(() -> new ChannelActionEvent(this, action, mServer.getUser()));
+        sendChannelSelfMessage(() -> new ChannelActionEvent(this, action, mUser));
     }
 
     @Override
@@ -125,7 +131,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
     @Override
     public void sendMessage(final String message) {
         mChannelSender.sendMessage(message);
-        sendChannelSelfMessage(() -> new ChannelMessageEvent(this, message, mServer.getUser()));
+        sendChannelSelfMessage(() -> new ChannelMessageEvent(this, message, mUser));
     }
 
     @Override

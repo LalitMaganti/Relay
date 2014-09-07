@@ -4,20 +4,37 @@ import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.UserChannelInterface;
 import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.util.ParseUtils;
 
 public class RelayUserChannelInterface implements UserChannelInterface {
 
     private final Collection<RelayQueryUser> mQueryUsers;
 
-    private final RelayServer mServer;
+    private final Set<RelayChannelUser> mUsers;
 
-    RelayUserChannelInterface(final RelayServer server) {
+    private final RelayMainUser mUser;
+
+    private final Server mServer;
+
+    private final BaseSender mBaseSender;
+
+    RelayUserChannelInterface(final Server server, final BaseSender baseSender) {
         mServer = server;
+        mBaseSender = baseSender;
+
+        // Set the nick name to the first choice nick
+        mUser = new RelayMainUser(server.getConfiguration().getNickStorage().getFirst());
+
+        mUsers = new HashSet<>();
+        mUsers.add(mUser);
 
         mQueryUsers = new LinkedHashSet<>();
     }
@@ -29,7 +46,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     public Optional<RelayChannel> getChannel(final String name) {
         // Channel names have to unique disregarding case - not having ignore-case here leads
         // to null channels when the channel does actually exist
-        return FluentIterable.from(mServer.getUser().getChannels())
+        return FluentIterable.from(mUser.getChannels())
                 .filter(c -> name.equalsIgnoreCase(c.getName()))
                 .first();
     }
@@ -39,7 +56,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      */
     @Override
     public Optional<RelayChannelUser> getUser(final String nick) {
-        return FluentIterable.from(mServer.getUsers())
+        return FluentIterable.from(mUsers)
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
                 .first();
     }
@@ -107,7 +124,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      * @return the channels the user had joined
      */
     public Collection<RelayChannel> removeUser(final RelayChannelUser user) {
-        mServer.removeUser(user);
+        mUsers.remove(user);
         return user.getChannels();
     }
 
@@ -145,7 +162,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
         user.addChannel(channel, userLevel);
 
         // Also remember to add the user to the global list
-        mServer.addUser(user);
+        mUsers.add(user);
     }
 
     /**
@@ -172,7 +189,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
         // The app user check is to make sure that the app user isn't removed from the list of
         // users
         if (setOfChannels.size() == 0 && !(user instanceof RelayMainUser)) {
-            mServer.removeUser(user);
+            mUsers.remove(user);
         }
     }
 
@@ -195,11 +212,11 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     }
 
     public RelayChannel getNewChannel(final String channelName) {
-        return new RelayChannel(mServer, channelName);
+        return new RelayChannel(mServer, mUser, mBaseSender, channelName);
     }
 
     public RelayQueryUser addQueryUser(final String nick) {
-        final RelayQueryUser user = new RelayQueryUser(nick, mServer);
+        final RelayQueryUser user = new RelayQueryUser(mServer, this, mBaseSender, nick);
         mQueryUsers.add(user);
         return user;
     }
@@ -207,5 +224,21 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     public void removeQueryUser(final RelayQueryUser user) {
         mQueryUsers.remove(user);
         user.markInvalid();
+    }
+
+    public Set<RelayChannelUser> getUsers() {
+        return mUsers;
+    }
+
+    public RelayMainUser getMainUser() {
+        return mUser;
+    }
+
+    public void onConnectionTerminated() {
+        // Clear the global list of users - it's now invalid
+        mUsers.clear();
+
+        // Keep our own user inside though
+        mUsers.add(mUser);
     }
 }

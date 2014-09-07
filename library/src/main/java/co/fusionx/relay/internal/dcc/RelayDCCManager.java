@@ -19,6 +19,7 @@ import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
+import co.fusionx.relay.internal.sender.BaseSender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
@@ -32,8 +33,12 @@ public class RelayDCCManager implements DCCManager {
 
     private final RelayServer mServer;
 
-    public RelayDCCManager(final RelayServer relayServer) {
+    private final BaseSender mBaseSender;
+
+    public RelayDCCManager(final RelayServer relayServer, final BaseSender baseSender) {
         mServer = relayServer;
+        mBaseSender = baseSender;
+
         mChatConversations = new HashMap<>();
         mFileConversations = new HashMap<>();
         mPendingConnections = new HashSet<>();
@@ -74,7 +79,7 @@ public class RelayDCCManager implements DCCManager {
                 .first();
         // Get the conversation or a new one if it does not exist
         final DCCFileConversation conversation = optConversation
-                .or(new DCCFileConversation(mServer, connection.getDccRequestNick()));
+                .or(new DCCFileConversation(mServer, mBaseSender, connection.getDccRequestNick()));
         // If the conversation was not present add it
         if (!optConversation.isPresent()) {
             mFileConversations.put(connection.getDccRequestNick(), conversation);

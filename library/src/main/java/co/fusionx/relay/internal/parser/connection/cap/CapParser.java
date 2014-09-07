@@ -19,6 +19,7 @@ import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.constants.CapCommand;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.function.Consumer;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayCapSender;
 import co.fusionx.relay.util.ParseUtils;
 
@@ -36,11 +37,11 @@ public class CapParser {
 
     private Set<ModifiedCapability> mPossibleCapabilities;
 
-    public CapParser(final RelayServer server) {
+    public CapParser(final RelayServer server, final BaseSender sender) {
         mServer = server;
         mServerConfiguration = server.getConfiguration();
 
-        mCapSender = new RelayCapSender(mServer.getBaseSender());
+        mCapSender = new RelayCapSender(sender);
         mCapCommandMap = new EnumMap<>(CapCommand.class);
         initalizeCommandMap(mCapCommandMap);
     }

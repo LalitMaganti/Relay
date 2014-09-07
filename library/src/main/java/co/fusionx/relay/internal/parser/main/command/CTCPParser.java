@@ -4,18 +4,19 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.internal.base.RelayChannel;
-import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelInterface;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.VersionEvent;
+import co.fusionx.relay.internal.base.RelayChannel;
+import co.fusionx.relay.internal.base.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayQueryUser;
+import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.internal.base.RelayUserChannelInterface;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.internal.parser.main.MentionParser;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayCtcpResponseSender;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
@@ -30,13 +31,14 @@ public class CTCPParser {
 
     private final RelayCtcpResponseSender mCtcpResponseSender;
 
-    public CTCPParser(final RelayServer server, final DCCParser dccParser) {
+    public CTCPParser(final RelayServer server, final BaseSender sender,
+            final DCCParser dccParser) {
         mServer = server;
         mDCCParser = dccParser;
 
         mUserChannelInterface = server.getUserChannelInterface();
 
-        mCtcpResponseSender = new RelayCtcpResponseSender(server.getBaseSender());
+        mCtcpResponseSender = new RelayCtcpResponseSender(sender);
     }
 
     public static boolean isCtcp(final String message) {

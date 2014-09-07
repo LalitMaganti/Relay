@@ -12,6 +12,7 @@ import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.parser.connection.cap.CapParser;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.misc.NickStorage;
 import co.fusionx.relay.util.ParseUtils;
@@ -30,12 +31,12 @@ public class ConnectionParser {
 
     private int mSuffix;
 
-    public ConnectionParser(final RelayServer server) {
+    public ConnectionParser(final RelayServer server, final BaseSender sender) {
         mServer = server;
         mConfiguration = server.getConfiguration();
 
-        mInternalSender = new RelayInternalSender(server.getBaseSender());
-        mCapParser = new CapParser(server);
+        mInternalSender = new RelayInternalSender(sender);
+        mCapParser = new CapParser(server, sender);
 
         mIndex = 1;
         mSuffix = 1;

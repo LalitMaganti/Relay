@@ -8,6 +8,7 @@ import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.RelayUserChannelInterface;
 import co.fusionx.relay.internal.constants.CommandConstants;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.misc.EventBus;
 
 public abstract class CommandParser {
@@ -24,9 +25,10 @@ public abstract class CommandParser {
         mEventBus = server.getServerWideBus();
     }
 
-    public static Map<String, CommandParser> getParserMap(final RelayServer server) {
+    public static Map<String, CommandParser> getParserMap(final RelayServer server,
+            final BaseSender sender) {
         final DCCParser dccParser = new DCCParser(server);
-        final CTCPParser ctcpParser = new CTCPParser(server, dccParser);
+        final CTCPParser ctcpParser = new CTCPParser(server, sender, dccParser);
 
         final Map<String, CommandParser> parserMap = new HashMap<>();
         parserMap.put(CommandConstants.JOIN, new JoinParser(server));

@@ -14,6 +14,7 @@ import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.interfaces.RelayConfiguration;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
+import dagger.ObjectGraph;
 
 public class RelayConnectionManager implements ConnectionManager {
 
@@ -49,7 +50,9 @@ public class RelayConnectionManager implements ConnectionManager {
 
         final boolean exists = connection != null;
         if (!exists) {
-            connection = new RelayIRCConnection(configuration);
+            final ObjectGraph objectGraph = ObjectGraph.create(new RelayBaseModule(configuration));
+            connection = objectGraph.get(RelayIRCConnection.class);
+
             connection.startConnection();
             mConnectionMap.put(configuration.getTitle(), connection);
         }

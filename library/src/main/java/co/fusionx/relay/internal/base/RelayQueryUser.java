@@ -4,27 +4,36 @@ import android.text.TextUtils;
 
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.query.QueryMessageSelfEvent;
-import co.fusionx.relay.sender.QuerySender;
+import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayQuerySender;
+import co.fusionx.relay.sender.QuerySender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implements QueryUser {
 
+    private final RelayUserChannelInterface mUserChannelInterface;
+
+    private final RelayMainUser mUser;
+
     private final Nick mNick;
 
     private final QuerySender mQuerySender;
 
-    public RelayQueryUser(final String nick, final RelayServer server) {
+    public RelayQueryUser(final Server server, final RelayUserChannelInterface userChannelInterface,
+            final BaseSender sender, final String nick) {
         super(server);
 
-        mNick = new RelayNick(nick);
+        mUserChannelInterface = userChannelInterface;
+        mUser = mUserChannelInterface.getMainUser();
 
-        mQuerySender = new RelayQuerySender(this, server.getBaseSender());
+        mNick = new RelayNick(nick);
+        mQuerySender = new RelayQuerySender(this, sender);
     }
 
     @Override
@@ -45,7 +54,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
         if (TextUtils.isEmpty(action) || getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new QueryActionSelfEvent(this, mServer.getUser(), action));
+        postAndStoreEvent(new QueryActionSelfEvent(this, mUser, action));
     }
 
     @Override
@@ -55,14 +64,14 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
         if (TextUtils.isEmpty(message) || getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new QueryMessageSelfEvent(this, mServer.getUser(), message));
+        postAndStoreEvent(new QueryMessageSelfEvent(this, mUser, message));
     }
 
     @Override
     public void close() {
         mQuerySender.close();
 
-        mServer.getUserChannelInterface().removeQueryUser(this);
+        mUserChannelInterface.removeQueryUser(this);
         postAndStoreEvent(new QueryClosedEvent(this));
     }
 
