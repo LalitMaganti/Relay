@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
-import co.fusionx.relay.internal.base.RelayChannelUser;
 import co.fusionx.relay.constants.UserLevel;
 
 public class ChannelWorldKickEvent extends ChannelWorldUserEvent {
@@ -19,7 +18,7 @@ public class ChannelWorldKickEvent extends ChannelWorldUserEvent {
     public final String reason;
 
     public ChannelWorldKickEvent(final Channel channel, final ChannelUser kickedUser,
-            final UserLevel level, final Optional<RelayChannelUser> optKickingUser,
+            final UserLevel level, final Optional<? extends ChannelUser> optKickingUser,
             final String kickingNickString, final String reason) {
         super(channel, kickedUser);
 

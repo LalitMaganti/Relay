@@ -18,7 +18,7 @@ public class RelayServerTest {
     public void testOnServerEvent() {
         final RelayServer server = TestUtils.getFreenodeServer();
         final ServerEvent event = new GenericServerEvent(server, "This is a test message");
-        server.postAndStoreEvent(event);
+        server.getBus().post(event);
         assertThat(server.getBuffer())
                 .contains(event);
     }

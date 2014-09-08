@@ -6,21 +6,20 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelWorldKickEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.util.ParseUtils;
 
 public class KickParser extends RemoveUserParser {
 
-    public KickParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface) {
-        super(server, userChannelInterface);
+    public KickParser(final Server server, final RelayUserChannelDao dao) {
+        super(server, dao);
     }
 
     /**
@@ -43,7 +42,7 @@ public class KickParser extends RemoveUserParser {
             final String rawSource, final RelayChannel channel, final ChannelUser kickedUser) {
         final UserLevel level = kickedUser.getChannelPrivileges(channel);
         final String kickingNick = ParseUtils.getNickFromPrefix(rawSource);
-        final Optional<RelayChannelUser> optKickUser = mDao.getUser(kickingNick);
+        final Optional<? extends ChannelUser> optKickUser = mDao.getUser(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
 
         return new ChannelWorldKickEvent(channel, kickedUser, level, optKickUser, kickingNick,
@@ -61,7 +60,7 @@ public class KickParser extends RemoveUserParser {
     void onRemoved(final List<String> parsedArray, final String rawSource,
             final RelayChannel channel) {
         final String kickingNick = ParseUtils.getNickFromPrefix(rawSource);
-        final Optional<RelayChannelUser> optKickUser = mDao.getUser(kickingNick);
+        final Optional<? extends ChannelUser> optKickUser = mDao.getUser(kickingNick);
 
         // Remove the channel only after we've finished with it
         final Collection<RelayChannelUser> users = mDao.removeChannel(channel);
@@ -70,7 +69,6 @@ public class KickParser extends RemoveUserParser {
         }
 
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
-        mServer.postAndStoreEvent(new KickEvent(mServer, channel, optKickUser, kickingNick,
-                reason));
+        mServer.getBus().post(new KickEvent(mServer, channel, optKickUser, kickingNick, reason));
     }
 }

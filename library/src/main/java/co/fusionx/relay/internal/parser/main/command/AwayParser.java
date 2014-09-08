@@ -2,13 +2,14 @@ package co.fusionx.relay.internal.parser.main.command;
 
 import java.util.List;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.util.ParseUtils;
 
 public class AwayParser extends CommandParser {
 
-    public AwayParser(final RelayServer server,
+    public AwayParser(final Server server,
             final RelayUserChannelDao userChannelInterface) {
         super(server, userChannelInterface);
     }

@@ -47,13 +47,13 @@ public class QuitParser extends CommandParser {
             for (final RelayChannel channel : channels) {
                 final UserLevel level = user.getChannelPrivileges(channel);
                 mDao.removeUserFromChannel(channel, user);
-                channel.postAndStoreEvent(new ChannelWorldQuitEvent(channel, user, level, reason));
+                channel.getBus().post(new ChannelWorldQuitEvent(channel, user, level, reason));
             }
         });
 
         final Optional<RelayQueryUser> optQuery = mUser.getQueryUser(userNick);
         Optionals.ifPresent(optQuery,
-                queryUser -> queryUser.postAndStoreEvent(new QueryQuitWorldEvent(queryUser)));
+                queryUser -> queryUser.getBus().post(new QueryQuitWorldEvent(queryUser)));
     }
 
     private void onQuit() {

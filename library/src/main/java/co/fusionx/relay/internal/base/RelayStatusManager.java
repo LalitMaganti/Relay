@@ -71,14 +71,14 @@ public class RelayStatusManager implements StatusManager {
     public void onConnecting() {
         mStatus = SessionStatus.CONNECTING;
 
-        mServer.postAndStoreEvent(new ConnectingEvent(mServer));
+        mServer.getBus().post(new ConnectingEvent(mServer));
     }
 
     @Override
     public void onReconnecting() {
         mStatus = SessionStatus.RECONNECTING;
 
-        mServer.postAndStoreEvent(new ReconnectEvent(mServer));
+        mServer.getBus().post(new ReconnectEvent(mServer));
     }
 
     @Override
@@ -114,16 +114,16 @@ public class RelayStatusManager implements StatusManager {
         mStatus = SessionStatus.STOPPED;
 
         for (final RelayChannel channel : mDao.getUser().getChannels()) {
-            channel.postAndStoreEvent(new ChannelStopEvent(channel));
+            channel.getBus().post(new ChannelStopEvent(channel));
             channel.markInvalid();
         }
 
         for (final RelayQueryUser user : mDao.getUser().getQueryUsers()) {
-            user.postAndStoreEvent(new QueryStopEvent(user));
+            user.getBus().post(new QueryStopEvent(user));
             user.markInvalid();
         }
 
-        mServer.postAndStoreEvent(new StopEvent(mServer));
+        mServer.getBus().post(new StopEvent(mServer));
         mServer.markInvalid();
     }
 
@@ -134,11 +134,11 @@ public class RelayStatusManager implements StatusManager {
         mStatus = status;
 
         FluentIterables.forEach(FluentIterable.from(mDao.getUser().getChannels()),
-                c -> c.postAndStoreEvent(channelFunction.apply(c)));
+                c -> c.getBus().post(channelFunction.apply(c)));
 
         FluentIterables.forEach(FluentIterable.from(mDao.getUser().getQueryUsers()),
-                u -> u.postAndStoreEvent(queryFunction.apply(u)));
+                u -> u.getBus().post(queryFunction.apply(u)));
 
-        mServer.postAndStoreEvent(serverFunction.get());
+        mServer.getBus().post(serverFunction.get());
     }
 }

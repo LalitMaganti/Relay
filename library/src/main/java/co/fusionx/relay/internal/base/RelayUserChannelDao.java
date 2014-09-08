@@ -15,7 +15,7 @@ import co.fusionx.relay.base.UserChannelDao;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 import co.fusionx.relay.util.ParseUtils;
 
 @Singleton
@@ -25,23 +25,23 @@ public class RelayUserChannelDao implements UserChannelDao {
 
     private final RelayLibraryUser mUser;
 
-    private final EventBus<Event> mConnectionWideEventBus;
+    private final GenericBus<Event> mConnectionWideBus;
 
     private final ServerConfiguration mConfiguration;
 
     private final BaseSender mBaseSender;
 
     @Inject
-    RelayUserChannelDao(final EventBus<Event> connectionWideEventBus,
+    RelayUserChannelDao(final GenericBus<Event> connectionWideBus,
             final ServerConfiguration configuration,
             final BaseSender baseSender) {
-        mConnectionWideEventBus = connectionWideEventBus;
+        mConnectionWideBus = connectionWideBus;
         mConfiguration = configuration;
         mBaseSender = baseSender;
 
         // Set the nick name to the first choice nick
         mUser = new RelayLibraryUser(configuration.getNickStorage().getFirst(),
-                connectionWideEventBus, configuration, baseSender);
+                connectionWideBus, configuration, baseSender);
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);
@@ -210,7 +210,7 @@ public class RelayUserChannelDao implements UserChannelDao {
     }
 
     public RelayChannel getNewChannel(final String channelName) {
-        return new RelayChannel(mConnectionWideEventBus, mUser, mConfiguration, mBaseSender,
+        return new RelayChannel(mConnectionWideBus, mUser, mConfiguration, mBaseSender,
                 channelName);
     }
 

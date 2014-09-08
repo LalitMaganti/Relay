@@ -10,23 +10,23 @@ import co.fusionx.relay.base.LibraryUser;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 
 public class RelayLibraryUser extends RelayChannelUser implements LibraryUser {
 
     private final Collection<RelayQueryUser> mQueryUsers;
 
-    private final EventBus<Event> mConnectionWideEventBus;
+    private final GenericBus<Event> mConnectionWideBus;
 
     private final ServerConfiguration mConfiguration;
 
     private final BaseSender mBaseSender;
 
-    public RelayLibraryUser(final String nick, final EventBus<Event> connectionWideEventBus,
+    public RelayLibraryUser(final String nick, final GenericBus<Event> connectionWideBus,
             final ServerConfiguration configuration, final BaseSender baseSender) {
         super(nick);
 
-        mConnectionWideEventBus = connectionWideEventBus;
+        mConnectionWideBus = connectionWideBus;
         mConfiguration = configuration;
         mBaseSender = baseSender;
 
@@ -52,7 +52,7 @@ public class RelayLibraryUser extends RelayChannelUser implements LibraryUser {
     }
 
     public RelayQueryUser addQueryUser(final String nick) {
-        final RelayQueryUser user = new RelayQueryUser(mConnectionWideEventBus, this,
+        final RelayQueryUser user = new RelayQueryUser(mConnectionWideBus, this,
                 mConfiguration, mBaseSender, nick);
         mQueryUsers.add(user);
         return user;

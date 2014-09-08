@@ -1,27 +1,27 @@
 package co.fusionx.relay.internal.base;
 
-import java.util.ArrayList;
+import com.fusionx.bus.Bus;
+
 import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.BufferingBus;
+import co.fusionx.relay.misc.ForwardingBus;
+import co.fusionx.relay.misc.GenericBus;
 
 public abstract class RelayAbstractConversation<T extends Event> implements Conversation<T> {
 
-    private final List<T> mBuffer;
+    private final BufferingBus<T> mBus;
 
-    private final EventBus<T> mEventBus;
-
-    private final EventBus<Event> mConnectionWideEventBus;
+    private final GenericBus<Event> mSessionBus;
 
     private boolean mValid;
 
-    public RelayAbstractConversation(final EventBus<Event> eventBus) {
-        mConnectionWideEventBus = eventBus;
+    public RelayAbstractConversation(final GenericBus<Event> sessionBus) {
+        mSessionBus = sessionBus;
 
-        mBuffer = new ArrayList<>();
-        mEventBus = new EventBus<>();
+        mBus = new BufferingBus<>(new ForwardingBus<>(new Bus(), sessionBus));
         mValid = true;
     }
 
@@ -29,8 +29,8 @@ public abstract class RelayAbstractConversation<T extends Event> implements Conv
      * {@inheritDoc}
      */
     @Override
-    public EventBus<T> getBus() {
-        return mEventBus;
+    public GenericBus<T> getBus() {
+        return mBus;
     }
 
     /**
@@ -46,20 +46,12 @@ public abstract class RelayAbstractConversation<T extends Event> implements Conv
      */
     @Override
     public List<T> getBuffer() {
-        return mBuffer;
+        return mBus.getBuffer();
     }
 
     @Override
-    public EventBus<Event> getConnectionWideBus() {
-        return mConnectionWideEventBus;
-    }
-
-    // Implementation specific methods
-    public void postAndStoreEvent(final T event) {
-        mBuffer.add(event);
-
-        mEventBus.post(event);
-        mConnectionWideEventBus.post(event);
+    public GenericBus<Event> getSessionBus() {
+        return mSessionBus;
     }
 
     public void markInvalid() {

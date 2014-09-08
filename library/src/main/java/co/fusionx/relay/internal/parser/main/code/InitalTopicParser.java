@@ -42,7 +42,7 @@ public class InitalTopicParser extends CodeParser {
 
         LogUtils.logOptionalBug(optional, mServer);
         Optionals.ifPresent(optional, channel -> {
-            channel.postAndStoreEvent(new ChannelInitialTopicEvent(channel, nick, mTempTopic));
+            channel.getBus().post(new ChannelInitialTopicEvent(channel, nick, mTempTopic));
             mTempTopic = null;
         });
     }

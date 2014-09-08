@@ -2,12 +2,15 @@ package co.fusionx.relay.misc;
 
 import com.fusionx.bus.Bus;
 
-public class EventBus<T> implements GenericBus<T> {
+public class ForwardingBus<T> implements GenericBus<T> {
 
     private final Bus mBus;
 
-    public EventBus() {
-        mBus = new Bus();
+    private final GenericBus<? super T> mForwardBus;
+
+    public ForwardingBus(final Bus bus, final GenericBus<? super T> forwardBus) {
+        mBus = bus;
+        mForwardBus = forwardBus;
     }
 
     @Override
@@ -28,5 +31,6 @@ public class EventBus<T> implements GenericBus<T> {
     @Override
     public void post(final T event) {
         mBus.post(event);
+        mForwardBus.post(event);
     }
 }

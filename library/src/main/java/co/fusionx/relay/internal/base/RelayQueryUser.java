@@ -12,7 +12,7 @@ import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.query.QueryMessageSelfEvent;
 import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayQuerySender;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 import co.fusionx.relay.sender.QuerySender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
@@ -27,9 +27,9 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
 
     private final QuerySender mQuerySender;
 
-    public RelayQueryUser(final EventBus<Event> eventBus, final RelayLibraryUser relayLibraryUser,
+    public RelayQueryUser(final GenericBus<Event> bus, final RelayLibraryUser relayLibraryUser,
             final ServerConfiguration configuration, final BaseSender sender, final String nick) {
-        super(eventBus);
+        super(bus);
 
         mConfiguration = configuration;
         mUser = relayLibraryUser;
@@ -56,7 +56,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
         if (TextUtils.isEmpty(action) || getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new QueryActionSelfEvent(this, mUser, action));
+        getBus().post(new QueryActionSelfEvent(this, mUser, action));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
         if (TextUtils.isEmpty(message) || getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new QueryMessageSelfEvent(this, mUser, message));
+        getBus().post(new QueryMessageSelfEvent(this, mUser, message));
     }
 
     @Override
@@ -74,7 +74,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
         mQuerySender.close();
 
         mUser.removeQueryUser(this);
-        postAndStoreEvent(new QueryClosedEvent(this));
+        getBus().post(new QueryClosedEvent(this));
     }
 
     // Equals and hashcode

@@ -6,7 +6,7 @@ import android.util.Pair;
 
 import java.util.Set;
 
-public interface ConnectionManager {
+public interface SessionManager {
 
     /**
      * Creates a connection with the IRC server and tries to connect to it
@@ -60,12 +60,12 @@ public interface ConnectionManager {
      *
      * @return the number of servers which are managed
      */
-    int getServerCount();
+    int getSessionCount();
 
     /**
      * Returns an immutable set of the servers which are currently managed by this manager
      *
      * @return an immutable set of the servers which are managed by this manager
      */
-    Set<? extends IRCSession> getConnectionSet();
+    Set<? extends IRCSession> getSessionSet();
 }

@@ -14,7 +14,7 @@ import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayAbstractConversation;
 import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 
 public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent> {
 
@@ -26,10 +26,10 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
 
     private final Map<String, DCCFileConnection> mConnectionList;
 
-    public DCCFileConversation(final EventBus<Event> eventBus,
+    public DCCFileConversation(final GenericBus<Event> bus,
             final ServerConfiguration serverConfiguration,
             final BaseSender baseSender, final String nick) {
-        super(eventBus);
+        super(bus);
 
         mServerConfiguration = serverConfiguration;
         mBaseSender = baseSender;
@@ -48,7 +48,7 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
         mConnectionList.put(connection.getArgument(), getConnection);
         getConnection.startConnection();
 
-        postAndStoreEvent(new DCCFileGetStartedEvent(this, getConnection));
+        getBus().post(new DCCFileGetStartedEvent(this, getConnection));
     }
 
     public Collection<DCCFileConnection> getFileConnections() {

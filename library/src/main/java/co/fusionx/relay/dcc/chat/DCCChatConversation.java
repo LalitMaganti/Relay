@@ -10,7 +10,7 @@ import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayAbstractConversation;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent> {
@@ -23,10 +23,10 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
 
     private final DCCPendingConnection mPendingConnection;
 
-    public DCCChatConversation(final EventBus<Event> eventBus,
+    public DCCChatConversation(final GenericBus<Event> bus,
             final ServerConfiguration serverConfiguration,
             final DCCPendingConnection pendingConnection) {
-        super(eventBus);
+        super(bus);
 
         mServerConfiguration = serverConfiguration;
         mPendingConnection = pendingConnection;
@@ -45,7 +45,7 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
         if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new DCCChatSelfMessageEvent(this, null, message));
+        getBus().post(new DCCChatSelfMessageEvent(this, null, message));
     }
 
     public void sendAction(final String action) {
@@ -56,7 +56,7 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
             return;
         }
         // TODO - this is wrong  fix it
-        postAndStoreEvent(new DCCChatSelfActionEvent(this, null, action));
+        getBus().post(new DCCChatSelfActionEvent(this, null, action));
     }
 
     public void closeChat() {

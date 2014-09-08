@@ -14,7 +14,7 @@ import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.internal.dcc.RelayDCCManager;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 import co.fusionx.relay.sender.ServerSender;
 
 @Singleton
@@ -32,7 +32,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
     RelayServer(final ServerConfiguration configuration,
             final ServerSender serverSender,
             final RelayDCCManager dccManager,
-            final EventBus<Event> superBus) {
+            final GenericBus<Event> superBus) {
         super(superBus);
 
         mConfiguration = configuration;

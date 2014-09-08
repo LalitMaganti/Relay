@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
@@ -13,7 +14,6 @@ import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
 import co.fusionx.relay.internal.base.RelayLibraryUser;
 import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.internal.parser.main.MentionParser;
@@ -24,7 +24,7 @@ import co.fusionx.relay.util.ParseUtils;
 
 public class CTCPParser {
 
-    private final RelayServer mServer;
+    private final Server mServer;
 
     private final RelayLibraryUser mUser;
 
@@ -34,7 +34,7 @@ public class CTCPParser {
 
     private final RelayCtcpResponseSender mCtcpResponseSender;
 
-    public CTCPParser(final RelayServer server, final RelayUserChannelDao dao,
+    public CTCPParser(final Server server, final RelayUserChannelDao dao,
             final BaseSender sender, final DCCParser dccParser) {
         mServer = server;
         mDCCParser = dccParser;
@@ -91,9 +91,9 @@ public class CTCPParser {
         final Optional<RelayQueryUser> optional = mUser.getQueryUser(nick);
         final RelayQueryUser user = optional.or(mUser.addQueryUser(nick));
         if (!optional.isPresent()) {
-            mServer.postAndStoreEvent(new NewPrivateMessageEvent(mServer, user));
+            mServer.getBus().post(new NewPrivateMessageEvent(mServer, user));
         }
-        user.postAndStoreEvent(new QueryActionWorldEvent(user, action));
+        user.getBus().post(new QueryActionWorldEvent(user, action));
     }
 
     private void onParseChannelAction(final String channelName, final String sendingNick,
@@ -104,7 +104,7 @@ public class CTCPParser {
         Optionals.ifPresent(optChannel, channel -> {
             final Optional<RelayChannelUser> optUser = mUserChannelDao.getUser(sendingNick);
             final boolean mention = MentionParser.onMentionableCommand(action,
-                    mUserChannelDao.getUser().getNick().getNickAsString());
+                    mUser.getNick().getNickAsString());
 
             final ChannelEvent event;
             if (optUser.isPresent()) {
@@ -112,7 +112,7 @@ public class CTCPParser {
             } else {
                 event = new ChannelWorldActionEvent(channel, action, sendingNick, mention);
             }
-            channel.postAndStoreEvent(event);
+            channel.getBus().post(event);
         });
     }
     // Commands End Here
@@ -129,7 +129,7 @@ public class CTCPParser {
         } else if (message.startsWith("VERSION")) {
             final String nick = ParseUtils.getNickFromPrefix(prefix);
             final String version = message.replace("VERSION", "");
-            mServer.postAndStoreEvent(new VersionEvent(mServer, nick, version));
+            mServer.getBus().post(new VersionEvent(mServer, nick, version));
         } else if (message.startsWith("SOURCE")) {
         } else if (message.startsWith("USERINFO")) {
         } else if (message.startsWith("ERRMSG")) {

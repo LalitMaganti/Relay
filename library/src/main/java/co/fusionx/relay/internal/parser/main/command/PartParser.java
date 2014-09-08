@@ -51,6 +51,6 @@ public class PartParser extends RemoveUserParser {
         for (final RelayChannelUser user : users) {
             mDao.removeChannelFromUser(channel, user);
         }
-        channel.postAndStoreEvent(new PartEvent(channel));
+        channel.getBus().post(new PartEvent(channel));
     }
 }

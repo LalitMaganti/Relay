@@ -75,16 +75,16 @@ public class CapParser {
         switch (code) {
             case ServerReplyCodes.RPL_SASL_LOGGED_IN:
                 final String loginMessage = parsedArray.get(2);
-                mServer.postAndStoreEvent(new GenericServerEvent(mServer, loginMessage));
+                mServer.getBus().post(new GenericServerEvent(mServer, loginMessage));
                 break;
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String successful = parsedArray.get(0);
-                mServer.postAndStoreEvent(new GenericServerEvent(mServer, successful));
+                mServer.getBus().post(new GenericServerEvent(mServer, successful));
                 break;
             case ServerReplyCodes.ERR_SASL_FAIL:
             case ServerReplyCodes.ERR_SASL_TOO_LONG:
                 final String error = parsedArray.get(0);
-                mServer.postAndStoreEvent(new GenericServerEvent(mServer, error));
+                mServer.getBus().post(new GenericServerEvent(mServer, error));
                 break;
         }
         mCapSender.sendEnd();

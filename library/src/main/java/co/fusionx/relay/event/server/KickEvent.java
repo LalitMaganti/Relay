@@ -6,7 +6,6 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.Server;
-import co.fusionx.relay.internal.base.RelayChannelUser;
 
 public class KickEvent extends ServerEvent {
 
@@ -19,7 +18,7 @@ public class KickEvent extends ServerEvent {
     public final String reason;
 
     public KickEvent(final Server server, final Channel channel,
-            final Optional<RelayChannelUser> optKickingUser, final String kickingNickString,
+            final Optional<? extends ChannelUser> optKickingUser, final String kickingNickString,
             final String reason) {
         super(server);
 

@@ -48,9 +48,9 @@ public class ErrorParser extends CodeParser {
         // If the user is null then this no such nick event happened for another reason
         if (optional.isPresent()) {
             final RelayQueryUser user = optional.get();
-            user.postAndStoreEvent(new QueryNoSuchNickEvent(user, message));
+            user.getBus().post(new QueryNoSuchNickEvent(user, message));
         } else {
-            mServer.postAndStoreEvent(new GenericServerEvent(mServer, message));
+            mServer.getBus().post(new GenericServerEvent(mServer, message));
         }
     }
 }

@@ -1,13 +1,13 @@
 package co.fusionx.relay.base;
 
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 
 public interface IRCSession {
 
     public SessionStatus getStatus();
 
-    public EventBus<Event> getSessionBus();
+    public GenericBus<Event> getSessionBus();
 
     public Server getServer();
 

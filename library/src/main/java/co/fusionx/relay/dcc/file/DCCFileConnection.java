@@ -35,8 +35,8 @@ public abstract class DCCFileConnection extends DCCConnection {
 
         final long newProgress = (mBytesTransferred * 100) / mPendingConnection.getSize();
         if (progress != newProgress) {
-            mFileConversation.postAndStoreEvent(new DCCFileProgressEvent(mFileConversation, this,
-                    getProgress()));
+            mFileConversation.getBus().post(new DCCFileProgressEvent(mFileConversation, this,
+                        getProgress()));
         }
     }
 }

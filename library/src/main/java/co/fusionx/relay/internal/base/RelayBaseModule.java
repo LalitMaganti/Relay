@@ -41,6 +41,7 @@ import co.fusionx.relay.internal.parser.main.command.WallopsParser;
 import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
+import co.fusionx.relay.misc.GenericBus;
 import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.sender.ServerSender;
 import dagger.Module;
@@ -98,7 +99,7 @@ public class RelayBaseModule {
 
     @Singleton
     @Provides
-    public EventBus<Event> provideServerWideEventBus() {
+    public GenericBus<Event> provideServerWideEventBus() {
         return new EventBus<>();
     }
 
@@ -147,7 +148,7 @@ public class RelayBaseModule {
 
     @Provides
     @Singleton
-    public SparseArray<CodeParser> provideCodeParserMap(final EventBus<Event> superBus,
+    public SparseArray<CodeParser> provideCodeParserMap(final GenericBus<Event> superBus,
             final RelayServer server, final RelayUserChannelDao dao, final BaseSender sender) {
         final SparseArray<CodeParser> parserMap = new SparseArray<>();
 

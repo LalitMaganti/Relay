@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import java.util.List;
 
 import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.server.ServerNickChangeEvent;
@@ -42,13 +43,14 @@ public class NickParser extends CommandParser {
             user.setNick(newNick);
 
             if (appUser) {
-                mServer.postAndStoreEvent(new ServerNickChangeEvent(mServer, oldNick, user));
+                mServer.getBus().post(new ServerNickChangeEvent(mServer, oldNick, user));
             }
 
             for (final RelayChannel channel : user.getChannels()) {
-                channel.postAndStoreEvent(appUser
+                final ChannelEvent event = appUser
                         ? new ChannelNickChangeEvent(channel, oldNick, mUser)
-                        : new ChannelWorldNickChangeEvent(channel, oldNick, user));
+                        : new ChannelWorldNickChangeEvent(channel, oldNick, user);
+                channel.getBus().post(event);
             }
         });
     }

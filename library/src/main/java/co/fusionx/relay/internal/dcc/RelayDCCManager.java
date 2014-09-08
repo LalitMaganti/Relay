@@ -24,7 +24,7 @@ import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
@@ -37,17 +37,17 @@ public class RelayDCCManager implements DCCManager {
 
     private final Set<DCCPendingConnection> mPendingConnections;
 
-    private final EventBus<Event> mEventBus;
+    private final GenericBus<Event> mBus;
 
     private final ServerConfiguration mServerConfiguration;
 
     private final BaseSender mBaseSender;
 
     @Inject
-    public RelayDCCManager(final EventBus<Event> eventBus,
+    public RelayDCCManager(final GenericBus<Event> bus,
             final ServerConfiguration serverConfiguration,
             final BaseSender baseSender) {
-        mEventBus = eventBus;
+        mBus = bus;
         mServerConfiguration = serverConfiguration;
         mBaseSender = baseSender;
 
@@ -91,7 +91,7 @@ public class RelayDCCManager implements DCCManager {
                 .first();
         // Get the conversation or a new one if it does not exist
         final DCCFileConversation conversation = optConversation
-                .or(() -> new DCCFileConversation(mEventBus, mServerConfiguration, mBaseSender,
+                .or(() -> new DCCFileConversation(mBus, mServerConfiguration, mBaseSender,
                         connection.getDccRequestNick()));
 
         // If the conversation was not present add it
@@ -102,7 +102,7 @@ public class RelayDCCManager implements DCCManager {
         conversation.getFile(connection, file);
 
         // The conversation has been started
-        mEventBus.post(new DCCFileConversationStartedEvent(conversation));
+        mBus.post(new DCCFileConversationStartedEvent(conversation));
     }
 
     public void acceptDCCConnection(final DCCPendingChatConnection connection) {
@@ -114,7 +114,7 @@ public class RelayDCCManager implements DCCManager {
         // This chat is no longer pending - remove it
         mPendingConnections.remove(connection);
 
-        final DCCChatConversation conversation = new DCCChatConversation(mEventBus,
+        final DCCChatConversation conversation = new DCCChatConversation(mBus,
                 mServerConfiguration, connection);
         mChatConversations.put(connection.getDccRequestNick(), conversation);
         conversation.startChat();

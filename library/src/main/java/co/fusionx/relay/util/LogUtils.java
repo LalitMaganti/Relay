@@ -10,8 +10,6 @@ public class LogUtils {
     private static final String TAG = "Relay";
 
     public static void logOptionalBug(final Optional<?> optional, final Server server) {
-        if (!optional.isPresent()) {
-            RelayConfigurationProvider.getPreferences().logMissingData(server);
-        }
+        RelayConfigurationProvider.getPreferences().logMissingData(server);
     }
 }

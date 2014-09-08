@@ -18,4 +18,13 @@ public class Optionals {
         }
         return Optional.absent();
     }
+
+    public static <T> void run(final Optional<T> optional, final Consumer<T> consumer,
+            final Runnable runnable) {
+        if (optional.isPresent()) {
+            consumer.apply(optional.get());
+        } else {
+            runnable.run();
+        }
+    }
 }

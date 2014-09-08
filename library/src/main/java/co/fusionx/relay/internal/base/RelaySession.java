@@ -11,7 +11,7 @@ import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.UserChannelDao;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 import dagger.ObjectGraph;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
@@ -30,7 +30,7 @@ public class RelaySession implements IRCSession {
     RelayUserChannelDao mDao;
 
     @Inject
-    EventBus<Event> mSessionBus;
+    GenericBus<Event> mSessionBus;
 
     @Inject
     ScheduledExecutorService mScheduledExecutorService;
@@ -78,7 +78,7 @@ public class RelaySession implements IRCSession {
     }
 
     @Override
-    public EventBus<Event> getSessionBus() {
+    public GenericBus<Event> getSessionBus() {
         return mSessionBus;
     }
 

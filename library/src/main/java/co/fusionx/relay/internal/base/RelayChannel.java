@@ -15,7 +15,7 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;
 import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayChannelSender;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.misc.GenericBus;
 import co.fusionx.relay.sender.ChannelSender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
@@ -36,17 +36,18 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
 
     private final ServerConfiguration mServerConfiguration;
 
-    RelayChannel(final EventBus<Event> eventBus,
+    RelayChannel(final GenericBus<Event> bus,
             final RelayLibraryUser relayLibraryUser,
             final ServerConfiguration serverConfiguration,
             final BaseSender baseSender,
             final String channelName) {
-        super(eventBus);
+        super(bus);
+
+        mChannelName = channelName;
         mServerConfiguration = serverConfiguration;
 
         mUser = relayLibraryUser;
-        mChannelSender = new RelayChannelSender(this, baseSender);
-        mChannelName = channelName;
+        mChannelSender = new RelayChannelSender(channelName, baseSender);
 
         mUsers = new HashSet<>();
 
@@ -174,6 +175,6 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
         if (getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(function.get());
+        getBus().post(function.get());
     }
 }

@@ -73,7 +73,7 @@ public class DCCParser {
         // Send the event
         final DCCPendingChatConnection connection = new DCCPendingChatConnection(nick,
                 mServer.getDCCManager(), ipAddress, port, "chat", 0);
-        mServer.postAndStoreEvent(new DCCChatRequestEvent(mServer, connection));
+        mServer.getBus().post(new DCCChatRequestEvent(mServer, connection));
     }
 
     private void parseSendCommand(final String nick, final String fileName,
@@ -91,6 +91,6 @@ public class DCCParser {
         // Send the event
         final DCCPendingSendConnection connection = new DCCPendingSendConnection(nick,
                 mServer.getDCCManager(), ipAddress, port, fileName, size);
-        mServer.postAndStoreEvent(new DCCSendRequestEvent(mServer, connection));
+        mServer.getBus().post(new DCCSendRequestEvent(mServer, connection));
     }
 }

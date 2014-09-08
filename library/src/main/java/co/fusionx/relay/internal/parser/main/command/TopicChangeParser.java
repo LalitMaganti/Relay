@@ -27,7 +27,7 @@ public class TopicChangeParser extends CommandParser {
         LogUtils.logOptionalBug(optChan, mServer);
         Optionals.ifPresent(optChan, channel -> {
             final String newTopic = parsedArray.get(1);
-            channel.postAndStoreEvent(new ChannelTopicEvent(channel, user, newTopic));
+            channel.getBus().post(new ChannelTopicEvent(channel, user, newTopic));
         });
     }
 }
