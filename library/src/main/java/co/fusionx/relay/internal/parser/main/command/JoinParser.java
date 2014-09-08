@@ -11,14 +11,16 @@ import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 
 public class JoinParser extends CommandParser {
 
     public JoinParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface) {
-        super(server, userChannelInterface);
+            final RelayUserChannelGroup ucmanager,
+            final RelayQueryUserGroup queryManager) {
+        super(server, ucmanager, queryManager);
     }
 
     @Override
@@ -26,22 +28,22 @@ public class JoinParser extends CommandParser {
         final String channelName = parsedArray.get(0);
 
         // Retrieve the user and channel
-        final RelayChannelUser user = mDao.getUserFromPrefix(prefix);
-        final Optional<RelayChannel> optChannel = mDao.getChannel(channelName);
+        final RelayChannelUser user = mUCManager.getUserFromPrefix(prefix);
+        final Optional<RelayChannel> optChannel = mUCManager.getChannel(channelName);
         RelayChannel channel = optChannel.orNull();
 
         // Store whether the user is the app user
-        final boolean appUser = mUser.isNickEqual(user);
+        final boolean appUser = mUCManager.getUser().isNickEqual(user);
         if (channel == null) {
             // If the channel is null then we haven't joined it before (disconnection) and we should
             // create a new channel
-            channel = mDao.getNewChannel(channelName);
+            channel = mUCManager.getNewChannel(channelName);
         } else if (appUser) {
             // If the channel is not null then we simply clear the data of the channel
             channel.clearInternalData();
         }
         // Put the user and channel together
-        mDao.coupleUserAndChannel(user, channel);
+        mUCManager.coupleUserAndChannel(user, channel);
 
         if (mServer.getCapabilities().contains(CapCapability.EXTENDEDJOIN)) {
             // We should have 2 parameters after the channel name

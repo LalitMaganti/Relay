@@ -7,7 +7,7 @@ import org.robolectric.annotation.Config;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class UserChannelDaoTest {
+public class UserChannelGroupTest {
 
     @Test
     public void test() {

@@ -2,9 +2,7 @@ package co.fusionx.relay.base;
 
 import com.google.common.base.Optional;
 
-import java.util.Collection;
-
-public interface UserChannelDao {
+public interface UserChannelGroup {
 
     /**
      * Gets the user who is currently using the library
@@ -14,7 +12,7 @@ public interface UserChannelDao {
     public LibraryUser getUser();
 
     /**
-     * Get the channel by name from the list of channels which have been joined by the user
+     * Get the channel by name from the list of channels which have been joined by the library user
      *
      * @param name the name of channel to retrieve
      * @return an optional possibly containing the channel matching the specified name

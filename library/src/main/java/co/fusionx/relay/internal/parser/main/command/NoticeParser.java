@@ -8,21 +8,21 @@ import co.fusionx.relay.event.channel.ChannelNoticeEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayQueryUser;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.util.ParseUtils;
 
 public class NoticeParser extends CommandParser {
 
     private final CTCPParser mCTCPParser;
 
-    public NoticeParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface,
-            final CTCPParser CTCPParser) {
-        super(server, userChannelInterface);
+    public NoticeParser(final RelayServer server, final RelayUserChannelGroup ucmanager,
+            final RelayQueryUserGroup queryManager, final CTCPParser ctcpParser) {
+        super(server, ucmanager, queryManager);
 
-        mCTCPParser = CTCPParser;
+        mCTCPParser = ctcpParser;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class NoticeParser extends CommandParser {
 
             if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelNotice(recipient, notice, sendingNick);
-            } else if (recipient.equals(mUser.getNick().getNickAsString())) {
+            } else if (recipient.equals(mUCManager.getUser().getNick().getNickAsString())) {
                 onParseUserNotice(sendingNick, notice);
             }
         }
@@ -46,7 +46,7 @@ public class NoticeParser extends CommandParser {
 
     private void onParseChannelNotice(final String channelName, final String sendingNick,
             final String notice) {
-        final Optional<RelayChannel> optChannel = mDao.getChannel(channelName);
+        final Optional<RelayChannel> optChannel = mUCManager.getChannel(channelName);
         if (optChannel.isPresent()) {
             final RelayChannel channel = optChannel.get();
             channel.getBus().post(new ChannelNoticeEvent(channel, sendingNick, notice));
@@ -58,7 +58,7 @@ public class NoticeParser extends CommandParser {
     }
 
     private void onParseUserNotice(final String sendingNick, final String notice) {
-        final Optional<RelayQueryUser> optUser = mUser.getQueryUser(sendingNick);
+        final Optional<RelayQueryUser> optUser = mQueryManager.getQueryUser(sendingNick);
         if (optUser.isPresent()) {
             final RelayQueryUser user = optUser.get();
             user.getBus().post(new QueryMessageWorldEvent(user, notice));

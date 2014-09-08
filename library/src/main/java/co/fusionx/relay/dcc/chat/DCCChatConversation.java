@@ -3,14 +3,14 @@ package co.fusionx.relay.dcc.chat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayAbstractConversation;
-import co.fusionx.relay.misc.GenericBus;
+import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent> {
@@ -19,16 +19,16 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
 
     private final DCCChatConnection mDCCChatConnection;
 
-    private final ServerConfiguration mServerConfiguration;
+    private final ConnectionConfiguration mConnectionConfiguration;
 
     private final DCCPendingConnection mPendingConnection;
 
     public DCCChatConversation(final GenericBus<Event> bus,
-            final ServerConfiguration serverConfiguration,
+            final ConnectionConfiguration connectionConfiguration,
             final DCCPendingConnection pendingConnection) {
         super(bus);
 
-        mServerConfiguration = serverConfiguration;
+        mConnectionConfiguration = connectionConfiguration;
         mPendingConnection = pendingConnection;
 
         mDCCChatConnection = new DCCChatConnection(mPendingConnection, this);
@@ -79,14 +79,14 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
         }
 
         final DCCChatConversation that = (DCCChatConversation) o;
-        return mServerConfiguration.getTitle().equals(that.mServerConfiguration.getTitle())
+        return mConnectionConfiguration.getTitle().equals(that.mConnectionConfiguration.getTitle())
                 && mPendingConnection.getDccRequestNick()
                 .equals(that.mPendingConnection.getDccRequestNick());
     }
 
     @Override
     public int hashCode() {
-        int result = mServerConfiguration.getTitle().hashCode();
+        int result = mConnectionConfiguration.getTitle().hashCode();
         result = 31 * result + mPendingConnection.hashCode();
         return result;
     }

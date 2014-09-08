@@ -11,47 +11,24 @@ import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
 
-import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.internal.base.TestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-@Config(emulateSdk = 18)
-@RunWith(RobolectricTestRunner.class)
 public class ConnectionParserTest {
 
     @Test
     public void testSaslAuthentication() {
-        final ServerConfiguration.Builder builder = TestUtils.getFreenodeBuilderSasl();
-        final RelayServer server = TestUtils.getServerFromConfiguration(builder.build());
+        final ConnectionConfiguration.Builder builder = TestUtils.getFreenodeBuilderSasl();
         try {
             final PipedReader readerForTesting = new PipedReader();
             final PipedWriter writerForParser = new PipedWriter(readerForTesting);
 
             final BufferedReader bufferedReaderForTesting = new BufferedReader(readerForTesting);
             final BufferedWriter bufferedWriterForParser = new BufferedWriter(writerForParser);
-            server.mBaseSender.onOutputStreamCreated(bufferedWriterForParser);
 
-            final ConnectionParser connectionParser = new ConnectionParser(server);
-            connectionParser.parseLine(":test.server CAP * LS :sasl");
-
-            if (!bufferedReaderForTesting.ready()) {
-                fail("SASL not requested");
-            }
-            // Check that we request the correct line
-            assertThat(bufferedReaderForTesting.readLine())
-                    .isEqualTo("CAP REQ :sasl");
-
-            connectionParser.parseLine(":test.server CAP * ACK :sasl");
-
-            if (!bufferedReaderForTesting.ready()) {
-                fail("SASL not working");
-            }
-            // Check that we request the correct line
-            assertThat(bufferedReaderForTesting.readLine())
-                    .isEqualTo("AUTHENTICATE PLAIN");
         } catch (IOException e) {
             e.printStackTrace();
         }

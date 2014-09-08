@@ -10,38 +10,38 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.base.UserChannelDao;
+import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.base.UserChannelGroup;
+import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.misc.GenericBus;
+import co.fusionx.relay.internal.sender.base.RelayChannelSender;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
 import co.fusionx.relay.util.ParseUtils;
 
 @Singleton
-public class RelayUserChannelDao implements UserChannelDao {
+public class RelayUserChannelGroup implements UserChannelGroup {
 
     private final Set<RelayChannelUser> mUsers;
 
     private final RelayLibraryUser mUser;
 
-    private final GenericBus<Event> mConnectionWideBus;
+    private final GenericBus<Event> mSessionBus;
 
-    private final ServerConfiguration mConfiguration;
+    private final ConnectionConfiguration mConfiguration;
 
-    private final BaseSender mBaseSender;
+    private final PacketSender mPacketSender;
 
     @Inject
-    RelayUserChannelDao(final GenericBus<Event> connectionWideBus,
-            final ServerConfiguration configuration,
-            final BaseSender baseSender) {
-        mConnectionWideBus = connectionWideBus;
+    RelayUserChannelGroup(final GenericBus<Event> sessionBus,
+            final ConnectionConfiguration configuration,
+            final PacketSender packetSender) {
+        mSessionBus = sessionBus;
         mConfiguration = configuration;
-        mBaseSender = baseSender;
+        mPacketSender = packetSender;
 
         // Set the nick name to the first choice nick
-        mUser = new RelayLibraryUser(configuration.getNickStorage().getFirst(),
-                connectionWideBus, configuration, baseSender);
+        mUser = new RelayLibraryUser(configuration.getNickStorage().getFirst());
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);
@@ -210,8 +210,13 @@ public class RelayUserChannelDao implements UserChannelDao {
     }
 
     public RelayChannel getNewChannel(final String channelName) {
-        return new RelayChannel(mConnectionWideBus, mUser, mConfiguration, mBaseSender,
+        final RelayChannelSender channelSender = new RelayChannelSender(mPacketSender, mUser);
+        final RelayChannel channel = new RelayChannel(mSessionBus, mConfiguration, channelSender,
                 channelName);
+
+        // Horrible but has to be done - see the comment on the method
+        channelSender.setChannel(channel);
+        return channel;
     }
 
     public Set<RelayChannelUser> getUsers() {

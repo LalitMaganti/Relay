@@ -1,10 +1,9 @@
 package co.fusionx.relay.base;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 
 import android.util.Pair;
-
-import java.util.Set;
 
 public interface SessionManager {
 
@@ -15,7 +14,7 @@ public interface SessionManager {
      * @return a pair of objects - the first item is a boolean which is true if the server already
      * exists in the manager. The second item is the connection created.
      */
-    Pair<Boolean, ? extends IRCSession> requestConnection(ServerConfiguration configuration);
+    Pair<Boolean, ? extends Session> requestConnection(ConnectionConfiguration configuration);
 
     /**
      * Reconnect to the specified server
@@ -24,7 +23,7 @@ public interface SessionManager {
      * @throws IllegalArgumentException if the server is not in this manager or if the server is
      *                                  not in the ConnectionStatus.Disconnected state
      */
-    void requestReconnection(IRCSession server);
+    void requestReconnection(Session server);
 
     /**
      * Disconnect from the server with the specified name and removes it from this manager
@@ -53,19 +52,19 @@ public interface SessionManager {
      * @param serverName the name of the server you're wanting to get
      * @return the server with the required title if it exists - this may be null
      */
-    Optional<IRCSession> getConnectionIfExists(String serverName);
+    Optional<Session> getConnectionIfExists(String serverName);
 
     /**
      * Returns the number of servers which are currently managed by this manager
      *
      * @return the number of servers which are managed
      */
-    int getSessionCount();
+    public int size();
 
     /**
-     * Returns an immutable set of the servers which are currently managed by this manager
+     * Returns an immutable copy of the servers which are currently managed by this manager
      *
-     * @return an immutable set of the servers which are managed by this manager
+     * @return an immutable copy of the servers which are managed by this manager
      */
-    Set<? extends IRCSession> getSessionSet();
+    public ImmutableSet<? extends Session> sessions();
 }

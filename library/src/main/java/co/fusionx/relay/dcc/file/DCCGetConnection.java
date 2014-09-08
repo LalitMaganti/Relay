@@ -9,8 +9,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.internal.sender.RelayDCCSender;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.sender.packet.DCCPacketSender;
 import co.fusionx.relay.util.DCCUtils;
 import co.fusionx.relay.util.IOUtils;
 import okio.BufferedSink;
@@ -21,15 +21,15 @@ public class DCCGetConnection extends DCCFileConnection {
 
     private final File mFile;
 
-    private final RelayDCCSender mRelayDCCSender;
+    private final DCCPacketSender mDCCPacketSender;
 
     private CountDownLatch mCountDownLatch;
 
     public DCCGetConnection(final DCCPendingConnection pendingConnection,
-            final BaseSender baseSender, final DCCFileConversation conversation, final File file) {
+            final PacketSender packetSender, final DCCFileConversation conversation, final File file) {
         super(pendingConnection, conversation);
 
-        mRelayDCCSender = new RelayDCCSender(baseSender);
+        mDCCPacketSender = new DCCPacketSender(packetSender);
         mFile = file;
     }
 
@@ -97,7 +97,7 @@ public class DCCGetConnection extends DCCFileConnection {
     }
 
     private boolean tryResume(final long position) throws InterruptedException {
-        mRelayDCCSender.requestResume(mPendingConnection.getDccRequestNick(),
+        mDCCPacketSender.requestResume(mPendingConnection.getDccRequestNick(),
                 getFileName(), mPendingConnection.getPort(), position);
 
         mCountDownLatch = new CountDownLatch(1);

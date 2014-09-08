@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.sender;
+package co.fusionx.relay.internal.sender.packet;
 
 import co.fusionx.relay.internal.packet.server.cap.CAPEndPacket;
 import co.fusionx.relay.internal.packet.server.cap.CAPLSPacket;
@@ -7,11 +7,11 @@ import co.fusionx.relay.internal.packet.server.cap.CAPRequestSASLPacket;
 import co.fusionx.relay.internal.packet.server.cap.CapRequestCapabilitiesPacket;
 import co.fusionx.relay.internal.packet.server.cap.SaslRequestPlainAuthPacket;
 
-public class RelayCapSender {
+public class CapPacketSender {
 
-    private final BaseSender mSender;
+    private final PacketSender mSender;
 
-    public RelayCapSender(final BaseSender sender) {
+    public CapPacketSender(final PacketSender sender) {
         mSender = sender;
     }
 

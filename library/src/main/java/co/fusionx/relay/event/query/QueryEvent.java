@@ -3,11 +3,9 @@ package co.fusionx.relay.event.query;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.event.Event;
 
-public abstract class QueryEvent extends Event {
-
-    public final QueryUser user;
+public abstract class QueryEvent extends Event<QueryUser, QueryEvent> {
 
     QueryEvent(final QueryUser user) {
-        this.user = user;
+        super(user);
     }
 }

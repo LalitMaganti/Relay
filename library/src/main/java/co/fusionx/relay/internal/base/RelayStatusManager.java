@@ -9,7 +9,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
 import co.fusionx.relay.event.channel.ChannelDisconnectEvent;
@@ -32,22 +32,25 @@ import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 @Singleton
 public class RelayStatusManager implements StatusManager {
 
-    private final ServerConfiguration mConfiguration;
+    private final ConnectionConfiguration mConfiguration;
 
     private final RelayServer mServer;
 
-    private final RelayUserChannelDao mDao;
+    private final RelayUserChannelGroup mDao;
+
+    private final RelayQueryUserGroup mQueryManager;
 
     private int mReconnectAttempts;
 
     private SessionStatus mStatus = SessionStatus.DISCONNECTED;
 
     @Inject
-    public RelayStatusManager(final ServerConfiguration configuration, final RelayServer server,
-            final RelayUserChannelDao dao) {
+    public RelayStatusManager(final ConnectionConfiguration configuration, final RelayServer server,
+            final RelayUserChannelGroup dao, final RelayQueryUserGroup queryManager) {
         mConfiguration = configuration;
         mServer = server;
         mDao = dao;
+        mQueryManager = queryManager;
 
         mReconnectAttempts = 0;
     }
@@ -118,7 +121,7 @@ public class RelayStatusManager implements StatusManager {
             channel.markInvalid();
         }
 
-        for (final RelayQueryUser user : mDao.getUser().getQueryUsers()) {
+        for (final RelayQueryUser user : mQueryManager.getQueryUsers()) {
             user.getBus().post(new QueryStopEvent(user));
             user.markInvalid();
         }
@@ -136,7 +139,7 @@ public class RelayStatusManager implements StatusManager {
         FluentIterables.forEach(FluentIterable.from(mDao.getUser().getChannels()),
                 c -> c.getBus().post(channelFunction.apply(c)));
 
-        FluentIterables.forEach(FluentIterable.from(mDao.getUser().getQueryUsers()),
+        FluentIterables.forEach(FluentIterable.from(mQueryManager.getQueryUsers()),
                 u -> u.getBus().post(queryFunction.apply(u)));
 
         mServer.getBus().post(serverFunction.get());

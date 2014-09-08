@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.constants.CapCommand;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.function.Consumer;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.internal.sender.RelayCapSender;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.sender.packet.CapPacketSender;
 import co.fusionx.relay.util.ParseUtils;
 
 import static co.fusionx.relay.constants.CapCapability.SASL;
@@ -31,17 +31,17 @@ public class CapParser {
 
     private final RelayServer mServer;
 
-    private final ServerConfiguration mServerConfiguration;
+    private final ConnectionConfiguration mConnectionConfiguration;
 
-    private final RelayCapSender mCapSender;
+    private final CapPacketSender mCapSender;
 
     private Set<ModifiedCapability> mPossibleCapabilities;
 
-    public CapParser(final RelayServer server, final BaseSender sender) {
+    public CapParser(final RelayServer server, final PacketSender sender) {
         mServer = server;
-        mServerConfiguration = server.getConfiguration();
+        mConnectionConfiguration = server.getConfiguration();
 
-        mCapSender = new RelayCapSender(sender);
+        mCapSender = new CapPacketSender(sender);
         mCapCommandMap = new EnumMap<>(CapCommand.class);
         initalizeCommandMap(mCapCommandMap);
     }
@@ -106,8 +106,8 @@ public class CapParser {
         final String argument = parsedArray.get(0);
         switch (argument) {
             case "+":
-                final String username = mServerConfiguration.getSaslUsername();
-                final String password = mServerConfiguration.getSaslPassword();
+                final String username = mConnectionConfiguration.getSaslUsername();
+                final String password = mConnectionConfiguration.getSaslPassword();
                 mCapSender.sendSaslPlainAuthentication(username, password);
                 break;
         }
@@ -130,7 +130,7 @@ public class CapParser {
         // before we try anything else
         if (mPossibleCapabilities.size() > 1 || mPossibleCapabilities.size() > 0 && !hasSasl) {
             mCapSender.sendRequestCapabilities(joinNonSaslCapabilities(mPossibleCapabilities));
-        } else if (hasSasl && mServerConfiguration.shouldSendSasl()) {
+        } else if (hasSasl && mConnectionConfiguration.shouldSendSasl()) {
             mCapSender.sendRequestSasl();
         } else {
             mCapSender.sendEnd();
@@ -164,7 +164,7 @@ public class CapParser {
         }
 
         final boolean hasSasl = serverHasCapability(SASL);
-        if (hasSasl && mServerConfiguration.shouldSendSasl()) {
+        if (hasSasl && mConnectionConfiguration.shouldSendSasl()) {
             mCapSender.sendRequestSasl();
         } else {
             mCapSender.sendEnd();

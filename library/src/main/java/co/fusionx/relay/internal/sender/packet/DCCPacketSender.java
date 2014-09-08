@@ -1,12 +1,12 @@
-package co.fusionx.relay.internal.sender;
+package co.fusionx.relay.internal.sender.packet;
 
 import co.fusionx.relay.internal.packet.dcc.DCCResumePacket;
 
-public class RelayDCCSender {
+public class DCCPacketSender {
 
-    private final BaseSender mServerLineSender;
+    private final PacketSender mServerLineSender;
 
-    public RelayDCCSender(final BaseSender serverLineSender) {
+    public DCCPacketSender(final PacketSender serverLineSender) {
         mServerLineSender = serverLineSender;
     }
 

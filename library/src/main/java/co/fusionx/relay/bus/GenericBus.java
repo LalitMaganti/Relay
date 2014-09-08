@@ -1,4 +1,4 @@
-package co.fusionx.relay.misc;
+package co.fusionx.relay.bus;
 
 public interface GenericBus<T> {
 

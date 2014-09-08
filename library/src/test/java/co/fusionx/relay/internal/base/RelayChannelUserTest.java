@@ -11,14 +11,6 @@ import co.fusionx.relay.base.ChannelUser;
 @RunWith(RobolectricTestRunner.class)
 public class RelayChannelUserTest {
 
-    public static ChannelUser getTestChannelUser() {
-        return getTestChannelUser("#relay");
-    }
-
-    public static ChannelUser getTestChannelUser(final String channelName) {
-        return new RelayChannelUser(channelName);
-    }
-
     @Test
     public void test() {
     }

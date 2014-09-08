@@ -5,10 +5,11 @@ import com.fusionx.bus.Bus;
 import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.misc.BufferingBus;
-import co.fusionx.relay.misc.ForwardingBus;
-import co.fusionx.relay.misc.GenericBus;
+import co.fusionx.relay.internal.bus.BufferingBus;
+import co.fusionx.relay.internal.bus.ConversationBus;
+import co.fusionx.relay.internal.bus.ForwardingBus;
 
 public abstract class RelayAbstractConversation<T extends Event> implements Conversation<T> {
 

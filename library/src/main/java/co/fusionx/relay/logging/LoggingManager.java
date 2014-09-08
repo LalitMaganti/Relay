@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.query.QueryEvent;
@@ -25,9 +25,9 @@ public abstract class LoggingManager {
 
     private final LoggingPreferences mLoggingPreferences;
 
-    private final Map<IRCSession, LogHandler> mLoggingConnections;
+    private final Map<Session, LogHandler> mLoggingConnections;
 
-    private ExecutorService sLoggingService;
+    private ExecutorService mLoggingService;
 
     private boolean mStarted;
 
@@ -37,7 +37,7 @@ public abstract class LoggingManager {
         mStarted = false;
     }
 
-    public void addConnectionToManager(final IRCSession server) {
+    public void addConnectionToManager(final Session server) {
         if (mLoggingConnections.containsKey(server)) {
             throw new IllegalArgumentException("This server is already present in this manager");
         }
@@ -49,7 +49,7 @@ public abstract class LoggingManager {
         }
     }
 
-    public void removeConnectionFromManager(final IRCSession server) {
+    public void removeConnectionFromManager(final Session server) {
         final LogHandler handler = mLoggingConnections.get(server);
         if (handler == null) {
             throw new IllegalArgumentException("This server is not present in this manager");
@@ -67,7 +67,7 @@ public abstract class LoggingManager {
         mStarted = true;
 
         // Start the logging service
-        sLoggingService = Executors.newSingleThreadExecutor();
+        mLoggingService = Executors.newSingleThreadExecutor();
 
         for (final LogHandler handler : mLoggingConnections.values()) {
             handler.startLogging();
@@ -85,18 +85,18 @@ public abstract class LoggingManager {
         }
 
         // Kill the logging service
-        sLoggingService.shutdownNow();
-        sLoggingService = null;
+        mLoggingService.shutdownNow();
+        mLoggingService = null;
     }
 
-    public abstract CharSequence getMessageFromEvent(final IRCSession connection,
+    public abstract CharSequence getMessageFromEvent(final Session connection,
             final Event event);
 
     public boolean isStarted() {
         return mStarted;
     }
 
-    private String getServerPath(final IRCSession connection) {
+    private String getServerPath(final Session connection) {
         return String.format("%s/%s", mLoggingPreferences.getLoggingPath(),
                 connection.getServer().getTitle());
     }
@@ -107,26 +107,26 @@ public abstract class LoggingManager {
 
         private static final int LOG_PRIORITY = 500;
 
-        private final IRCSession mConnection;
+        private final Session mSession;
 
-        public LogHandler(final IRCSession connection) {
-            mConnection = connection;
+        public LogHandler(final Session session) {
+            mSession = session;
         }
 
         public void startLogging() {
-            mConnection.getSessionBus().register(this, LOG_PRIORITY);
+            mSession.getSessionBus().register(this, LOG_PRIORITY);
         }
 
         public void stopLogging() {
-            mConnection.getSessionBus().unregister(this);
+            mSession.getSessionBus().unregister(this);
         }
 
         public void onEvent(final ServerEvent event) {
             if (shouldLogEvent(event)) {
-                final CharSequence sequence = getMessageFromEvent(mConnection, event);
+                final CharSequence sequence = getMessageFromEvent(mSession, event);
                 // If logging path is null then that's an issue
                 if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
-                    sLoggingService.submit(new LoggingRunnable(mConnection, event,
+                    mLoggingService.submit(new LoggingRunnable(mSession, event,
                             sequence.toString(), ""));
                 } else {
                     // TODO - throw an exception
@@ -136,12 +136,11 @@ public abstract class LoggingManager {
 
         public void onEvent(final ChannelEvent event) {
             if (shouldLogEvent(event)) {
-                final CharSequence sequence = getMessageFromEvent(mConnection, event);
+                final CharSequence sequence = getMessageFromEvent(mSession, event);
                 // If logging path is null then that's an issue
                 if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
-                    sLoggingService
-                            .submit(new LoggingRunnable(mConnection, event, sequence.toString(),
-                                    event.channel.getName()));
+                    mLoggingService.submit(new LoggingRunnable(mSession, event,
+                            sequence.toString(), event.conversation.getName()));
                 } else {
                     // TODO - throw an exception
                 }
@@ -150,12 +149,12 @@ public abstract class LoggingManager {
 
         public void onEvent(final QueryEvent event) {
             if (shouldLogEvent(event)) {
-                final CharSequence sequence = getMessageFromEvent(mConnection, event);
+                final CharSequence sequence = getMessageFromEvent(mSession, event);
                 // If logging path is null then that's an issue
                 if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
-                    sLoggingService
-                            .submit(new LoggingRunnable(mConnection, event, sequence.toString(),
-                                    event.user.getNick().getNickAsString()));
+                    mLoggingService
+                            .submit(new LoggingRunnable(mSession, event, sequence.toString(),
+                                    event.conversation.getNick().getNickAsString()));
                 } else {
                     // TODO - throw an exception
                 }
@@ -167,15 +166,15 @@ public abstract class LoggingManager {
 
         public final String mLogString;
 
-        private final IRCSession mConnection;
+        private final Session mSession;
 
         private final Event mEvent;
 
         private final String mDirectory;
 
-        private LoggingRunnable(final IRCSession connection, final Event event,
+        private LoggingRunnable(final Session session, final Event event,
                 final String logString, final String directory) {
-            mConnection = connection;
+            mSession = session;
             mEvent = event;
             mLogString = logString;
             mDirectory = directory;
@@ -183,7 +182,7 @@ public abstract class LoggingManager {
 
         @Override
         public void run() {
-            final String path = getServerPath(mConnection);
+            final String path = getServerPath(mSession);
             final String line = mLoggingPreferences.shouldLogTimestamps()
                     ? String.format("%s: %s", mEvent.timestamp.format("%H:%M:%S"), mLogString)
                     : mLogString;

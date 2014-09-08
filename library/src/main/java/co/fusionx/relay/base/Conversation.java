@@ -3,7 +3,7 @@ package co.fusionx.relay.base;
 import java.util.List;
 
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.misc.GenericBus;
+import co.fusionx.relay.bus.GenericBus;
 
 public interface Conversation<E extends Event> {
 
@@ -16,7 +16,7 @@ public interface Conversation<E extends Event> {
     public GenericBus<E> getBus();
 
     /**
-     * Returns whether the conversation is valid - i.e. is it attached and managed by the server
+     * Returns whether the conversation is valid - i.e. is it attached and managed by the session
      *
      * @return the validity of the conversation
      */

@@ -1,16 +1,20 @@
-package co.fusionx.relay.misc;
+package co.fusionx.relay.internal.bus;
 
-import com.fusionx.bus.Bus;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ForwardingBus<T> implements GenericBus<T> {
+import co.fusionx.relay.bus.GenericBus;
 
-    private final Bus mBus;
+public class BufferingBus<T> implements GenericBus<T> {
 
-    private final GenericBus<? super T> mForwardBus;
+    private final List<T> mBuffer;
 
-    public ForwardingBus(final Bus bus, final GenericBus<? super T> forwardBus) {
+    private final GenericBus<T> mBus;
+
+    public BufferingBus(final GenericBus<T> bus) {
         mBus = bus;
-        mForwardBus = forwardBus;
+
+        mBuffer = new ArrayList<>();
     }
 
     @Override
@@ -31,6 +35,10 @@ public class ForwardingBus<T> implements GenericBus<T> {
     @Override
     public void post(final T event) {
         mBus.post(event);
-        mForwardBus.post(event);
+        mBuffer.add(event);
+    }
+
+    public List<T> getBuffer() {
+        return mBuffer;
     }
 }

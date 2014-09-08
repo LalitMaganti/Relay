@@ -14,7 +14,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.dcc.DCCManager;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.event.file.DCCFileConversationStartedEvent;
@@ -23,8 +23,8 @@ import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.misc.GenericBus;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.bus.GenericBus;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
@@ -39,17 +39,17 @@ public class RelayDCCManager implements DCCManager {
 
     private final GenericBus<Event> mBus;
 
-    private final ServerConfiguration mServerConfiguration;
+    private final ConnectionConfiguration mConnectionConfiguration;
 
-    private final BaseSender mBaseSender;
+    private final PacketSender mPacketSender;
 
     @Inject
     public RelayDCCManager(final GenericBus<Event> bus,
-            final ServerConfiguration serverConfiguration,
-            final BaseSender baseSender) {
+            final ConnectionConfiguration connectionConfiguration,
+            final PacketSender packetSender) {
         mBus = bus;
-        mServerConfiguration = serverConfiguration;
-        mBaseSender = baseSender;
+        mConnectionConfiguration = connectionConfiguration;
+        mPacketSender = packetSender;
 
         mChatConversations = new HashMap<>();
         mFileConversations = new HashMap<>();
@@ -91,7 +91,7 @@ public class RelayDCCManager implements DCCManager {
                 .first();
         // Get the conversation or a new one if it does not exist
         final DCCFileConversation conversation = optConversation
-                .or(() -> new DCCFileConversation(mBus, mServerConfiguration, mBaseSender,
+                .or(() -> new DCCFileConversation(mBus, mConnectionConfiguration, mPacketSender,
                         connection.getDccRequestNick()));
 
         // If the conversation was not present add it
@@ -115,7 +115,7 @@ public class RelayDCCManager implements DCCManager {
         mPendingConnections.remove(connection);
 
         final DCCChatConversation conversation = new DCCChatConversation(mBus,
-                mServerConfiguration, connection);
+                mConnectionConfiguration, connection);
         mChatConversations.put(connection.getDccRequestNick(), conversation);
         conversation.startChat();
     }

@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.sender;
+package co.fusionx.relay.internal.sender.packet;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import co.fusionx.relay.internal.packet.Packet;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
-public class RelayBaseSender implements BaseSender {
+public class PacketSender {
 
     private final Object mLock = new Object();
 
@@ -17,24 +17,21 @@ public class RelayBaseSender implements BaseSender {
 
     private BufferedWriter mBufferedWriter;
 
-    public RelayBaseSender() {
+    public PacketSender() {
         mExecutorService = Executors.newCachedThreadPool();
     }
 
-    @Override
     public void sendPacket(final Packet packet) {
         final String line = packet.getLine();
         mExecutorService.submit(() -> sendLine(line));
     }
 
-    @Override
     public void onOutputStreamCreated(final BufferedWriter writer) {
         synchronized (mLock) {
             mBufferedWriter = writer;
         }
     }
 
-    @Override
     public void onConnectionTerminated() {
         synchronized (mLock) {
             mBufferedWriter = null;

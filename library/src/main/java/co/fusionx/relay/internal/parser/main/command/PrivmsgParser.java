@@ -10,9 +10,10 @@ import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayQueryUser;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.internal.parser.main.MentionParser;
 import co.fusionx.relay.util.LogUtils;
@@ -24,11 +25,11 @@ public class PrivmsgParser extends CommandParser {
     private final CTCPParser mCTCPParser;
 
     public PrivmsgParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface,
-            final CTCPParser CTCPParser) {
-        super(server, userChannelInterface);
+            final RelayUserChannelGroup userChannelInterface,
+            final RelayQueryUserGroup queryManager, final CTCPParser ctcpParser) {
+        super(server, userChannelInterface, queryManager);
 
-        mCTCPParser = CTCPParser;
+        mCTCPParser = ctcpParser;
     }
 
     @Override
@@ -50,8 +51,8 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final Optional<RelayQueryUser> optional = mUser.getQueryUser(nick);
-        final RelayQueryUser user = optional.or(mUser.addQueryUser(nick));
+        final Optional<RelayQueryUser> optional = mQueryManager.getQueryUser(nick);
+        final RelayQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
         if (!optional.isPresent()) {
             mServer.getBus().post(new NewPrivateMessageEvent(mServer, user));
         }
@@ -60,16 +61,16 @@ public class PrivmsgParser extends CommandParser {
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
             final String rawMessage) {
-        final Optional<RelayChannel> optChannel = mDao.getChannel(channelName);
+        final Optional<RelayChannel> optChannel = mUCManager.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
             // TODO - actually parse the colours
             final String message = Utils.stripColorsFromMessage(rawMessage);
             final boolean mention = MentionParser.onMentionableCommand(message,
-                    mUser.getNick().getNickAsString());
+                    mUCManager.getUser().getNick().getNickAsString());
 
-            final Optional<RelayChannelUser> optUser = mDao.getUser(sendingNick);
+            final Optional<RelayChannelUser> optUser = mUCManager.getUser(sendingNick);
             final ChannelEvent event;
             if (optUser.isPresent()) {
                 event = new ChannelWorldMessageEvent(channel, message, optUser.get(), mention);

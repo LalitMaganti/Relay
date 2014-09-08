@@ -6,8 +6,9 @@ import java.util.List;
 
 import co.fusionx.relay.event.channel.ChannelInitialTopicEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
@@ -18,8 +19,9 @@ public class InitalTopicParser extends CodeParser {
     private String mTempTopic;
 
     public InitalTopicParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface) {
-        super(server, userChannelInterface);
+            final RelayUserChannelGroup userChannelInterface,
+            final RelayQueryUserGroup queryManager) {
+        super(server, userChannelInterface, queryManager);
     }
 
     @Override

@@ -12,13 +12,13 @@ import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.VersionEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayLibraryUser;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.internal.parser.main.MentionParser;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.internal.sender.RelayCtcpResponseSender;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.sender.packet.CtcpResponsePacketSender;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
@@ -26,22 +26,23 @@ public class CTCPParser {
 
     private final Server mServer;
 
-    private final RelayLibraryUser mUser;
+    private final RelayQueryUserGroup mQueryManager;
 
     private final DCCParser mDCCParser;
 
-    private final RelayUserChannelDao mUserChannelDao;
+    private final RelayUserChannelGroup mUserChannelDao;
 
-    private final RelayCtcpResponseSender mCtcpResponseSender;
+    private final CtcpResponsePacketSender mCtcpResponseSender;
 
-    public CTCPParser(final Server server, final RelayUserChannelDao dao,
-            final BaseSender sender, final DCCParser dccParser) {
+    public CTCPParser(final Server server, final RelayUserChannelGroup dao,
+            final RelayQueryUserGroup queryManager, final PacketSender sender,
+            final DCCParser dccParser) {
         mServer = server;
+        mQueryManager = queryManager;
         mDCCParser = dccParser;
         mUserChannelDao = dao;
 
-        mUser = dao.getUser();
-        mCtcpResponseSender = new RelayCtcpResponseSender(sender);
+        mCtcpResponseSender = new CtcpResponsePacketSender(sender);
     }
 
     public static boolean isCtcp(final String message) {
@@ -88,8 +89,8 @@ public class CTCPParser {
     }
 
     private void onParseUserAction(final String nick, final String action) {
-        final Optional<RelayQueryUser> optional = mUser.getQueryUser(nick);
-        final RelayQueryUser user = optional.or(mUser.addQueryUser(nick));
+        final Optional<RelayQueryUser> optional = mQueryManager.getQueryUser(nick);
+        final RelayQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
         if (!optional.isPresent()) {
             mServer.getBus().post(new NewPrivateMessageEvent(mServer, user));
         }
@@ -104,7 +105,7 @@ public class CTCPParser {
         Optionals.ifPresent(optChannel, channel -> {
             final Optional<RelayChannelUser> optUser = mUserChannelDao.getUser(sendingNick);
             final boolean mention = MentionParser.onMentionableCommand(action,
-                    mUser.getNick().getNickAsString());
+                    mUserChannelDao.getUser().getNick().getNickAsString());
 
             final ChannelEvent event;
             if (optUser.isPresent()) {

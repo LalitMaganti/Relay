@@ -1,6 +1,8 @@
-package co.fusionx.relay.misc;
+package co.fusionx.relay.internal.bus;
 
 import com.fusionx.bus.Bus;
+
+import co.fusionx.relay.bus.GenericBus;
 
 public class EventBus<T> implements GenericBus<T> {
 

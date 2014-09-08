@@ -10,9 +10,10 @@ import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.query.QueryQuitWorldEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayQueryUser;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.ParseUtils;
 
@@ -21,14 +22,15 @@ public class QuitParser extends CommandParser {
     private boolean mIsUserQuit;
 
     public QuitParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface) {
-        super(server, userChannelInterface);
+            final RelayUserChannelGroup ucmanager,
+            final RelayQueryUserGroup queryManager) {
+        super(server, ucmanager, queryManager);
     }
 
     @Override
     public void onParseCommand(final List<String> parsedArray, final String prefix) {
         final String nick = ParseUtils.getNickFromPrefix(prefix);
-        if (mUser.isNickEqual(nick)) {
+        if (mUCManager.getUser().isNickEqual(nick)) {
             onQuit();
         } else {
             onUserQuit(parsedArray, nick);
@@ -40,18 +42,18 @@ public class QuitParser extends CommandParser {
     }
 
     private void onUserQuit(final List<String> parsed, final String userNick) {
-        final Optional<RelayChannelUser> optUser = mDao.getUser(userNick);
+        final Optional<RelayChannelUser> optUser = mUCManager.getUser(userNick);
         Optionals.ifPresent(optUser, user -> {
-            final Collection<RelayChannel> channels = mDao.removeUser(user);
+            final Collection<RelayChannel> channels = mUCManager.removeUser(user);
             final String reason = parsed.size() == 2 ? parsed.get(1).replace("\"", "") : "";
             for (final RelayChannel channel : channels) {
                 final UserLevel level = user.getChannelPrivileges(channel);
-                mDao.removeUserFromChannel(channel, user);
+                mUCManager.removeUserFromChannel(channel, user);
                 channel.getBus().post(new ChannelWorldQuitEvent(channel, user, level, reason));
             }
         });
 
-        final Optional<RelayQueryUser> optQuery = mUser.getQueryUser(userNick);
+        final Optional<RelayQueryUser> optQuery = mQueryManager.getQueryUser(userNick);
         Optionals.ifPresent(optQuery,
                 queryUser -> queryUser.getBus().post(new QueryQuitWorldEvent(queryUser)));
     }

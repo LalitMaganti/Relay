@@ -2,6 +2,7 @@ package co.fusionx.relay.internal.base;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
 
 import android.util.Pair;
 
@@ -9,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.base.IRCSession;
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.base.SessionManager;
 import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.interfaces.RelayConfiguration;
@@ -40,7 +41,7 @@ public class RelaySessionManager implements SessionManager {
      * {@inheritDoc}
      */
     @Override
-    public Pair<Boolean, IRCSession> requestConnection(final ServerConfiguration configuration) {
+    public Pair<Boolean, Session> requestConnection(final ConnectionConfiguration configuration) {
         RelaySession session = mSessionMap.get(configuration.getTitle());
 
         final boolean exists = session != null;
@@ -57,7 +58,7 @@ public class RelaySessionManager implements SessionManager {
      * {@inheritDoc}
      */
     @Override
-    public void requestReconnection(final IRCSession session) {
+    public void requestReconnection(final Session session) {
         final RelaySession relaySession = mSessionMap.get(session.getServer().getTitle());
 
         if (relaySession == null) {
@@ -99,7 +100,7 @@ public class RelaySessionManager implements SessionManager {
      * {@inheritDoc}
      */
     @Override
-    public Optional<IRCSession> getConnectionIfExists(final String serverName) {
+    public Optional<Session> getConnectionIfExists(final String serverName) {
         final RelaySession connection = mSessionMap.get(serverName);
         return Optional.fromNullable(connection);
     }
@@ -108,7 +109,7 @@ public class RelaySessionManager implements SessionManager {
      * {@inheritDoc}
      */
     @Override
-    public int getSessionCount() {
+    public int size() {
         return mSessionMap.size();
     }
 
@@ -116,7 +117,7 @@ public class RelaySessionManager implements SessionManager {
      * {@inheritDoc}
      */
     @Override
-    public Set<? extends IRCSession> getSessionSet() {
+    public ImmutableSet<? extends Session> sessions() {
         return FluentIterable.from(mSessionMap.values()).toSet();
     }
 }

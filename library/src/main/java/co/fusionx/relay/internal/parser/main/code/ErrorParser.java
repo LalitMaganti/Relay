@@ -6,16 +6,18 @@ import java.util.List;
 
 import co.fusionx.relay.event.query.QueryNoSuchNickEvent;
 import co.fusionx.relay.event.server.GenericServerEvent;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayQueryUser;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 
 public class ErrorParser extends CodeParser {
 
     public ErrorParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface) {
-        super(server, userChannelInterface);
+            final RelayUserChannelGroup userChannelInterface,
+            final RelayQueryUserGroup queryManager) {
+        super(server, userChannelInterface, queryManager);
     }
 
     @Override
@@ -43,7 +45,7 @@ public class ErrorParser extends CodeParser {
     private void onNoSuchNickError(final List<String> parsedArray) {
         final String nick = parsedArray.get(0);
         final String message = parsedArray.get(1);
-        final Optional<RelayQueryUser> optional = mUser.getQueryUser(nick);
+        final Optional<RelayQueryUser> optional = mQueryManager.getQueryUser(nick);
 
         // If the user is null then this no such nick event happened for another reason
         if (optional.isPresent()) {

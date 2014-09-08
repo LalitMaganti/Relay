@@ -8,7 +8,7 @@ public class QueryActionPacket implements Packet {
 
     public final String message;
 
-    public QueryActionPacket(String userNick, String message) {
+    public QueryActionPacket(final String userNick, String message) {
         this.userNick = userNick;
         this.message = message;
     }

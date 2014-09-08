@@ -1,41 +1,29 @@
 package co.fusionx.relay.internal.base;
 
-import android.text.TextUtils;
-
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.QueryUser;
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.event.query.QueryActionSelfEvent;
-import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.event.query.QueryMessageSelfEvent;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.internal.sender.RelayQuerySender;
-import co.fusionx.relay.misc.GenericBus;
 import co.fusionx.relay.sender.QuerySender;
-
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implements QueryUser {
 
-    private final ServerConfiguration mConfiguration;
-
-    private final RelayLibraryUser mUser;
-
-    private final Nick mNick;
+    private final ConnectionConfiguration mConfiguration;
 
     private final QuerySender mQuerySender;
 
-    public RelayQueryUser(final GenericBus<Event> bus, final RelayLibraryUser relayLibraryUser,
-            final ServerConfiguration configuration, final BaseSender sender, final String nick) {
+    private final Nick mNick;
+
+    public RelayQueryUser(final GenericBus<Event> bus, final ConnectionConfiguration configuration,
+            final QuerySender querySender, final String nick) {
         super(bus);
 
         mConfiguration = configuration;
-        mUser = relayLibraryUser;
+        mQuerySender = querySender;
 
         mNick = new RelayNick(nick);
-        mQuerySender = new RelayQuerySender(this, sender);
     }
 
     @Override
@@ -46,35 +34,6 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
     @Override
     public Nick getNick() {
         return mNick;
-    }
-
-    // QuerySender interface
-    @Override
-    public void sendAction(final String action) {
-        mQuerySender.sendAction(action);
-
-        if (TextUtils.isEmpty(action) || getPreferences().isSelfEventHidden()) {
-            return;
-        }
-        getBus().post(new QueryActionSelfEvent(this, mUser, action));
-    }
-
-    @Override
-    public void sendMessage(final String message) {
-        mQuerySender.sendMessage(message);
-
-        if (TextUtils.isEmpty(message) || getPreferences().isSelfEventHidden()) {
-            return;
-        }
-        getBus().post(new QueryMessageSelfEvent(this, mUser, message));
-    }
-
-    @Override
-    public void close() {
-        mQuerySender.close();
-
-        mUser.removeQueryUser(this);
-        getBus().post(new QueryClosedEvent(this));
     }
 
     // Equals and hashcode
@@ -96,5 +55,21 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
         int result = mConfiguration.getTitle().hashCode();
         result = 31 * result + mNick.hashCode();
         return result;
+    }
+
+    // QuerySender interface
+    @Override
+    public void sendAction(final String action) {
+        mQuerySender.sendAction(action);
+    }
+
+    @Override
+    public void sendMessage(final String message) {
+        mQuerySender.sendMessage(message);
+    }
+
+    @Override
+    public void close() {
+        mQuerySender.close();
     }
 }

@@ -1,45 +1,56 @@
 package co.fusionx.relay.internal.base;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.base.Session;
+import co.fusionx.relay.base.QueryUserGroup;
 import co.fusionx.relay.base.Server;
-import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.base.SessionStatus;
-import co.fusionx.relay.base.UserChannelDao;
+import co.fusionx.relay.base.UserChannelGroup;
+import co.fusionx.relay.dcc.DCCManager;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.misc.GenericBus;
+import co.fusionx.relay.internal.dcc.RelayDCCManager;
+import co.fusionx.relay.bus.GenericBus;
 import dagger.ObjectGraph;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
-public class RelaySession implements IRCSession {
+public class RelaySession implements Session {
 
     private final ObjectGraph mObjectGraph;
+
+    private final ScheduledExecutorService mScheduledExecutorService;
 
     @Inject
     StatusManager mStatusManager;
 
     @Inject
-    RelayServer mServer;
-
-    @Inject
-    RelayUserChannelDao mDao;
-
-    @Inject
     GenericBus<Event> mSessionBus;
 
     @Inject
-    ScheduledExecutorService mScheduledExecutorService;
+    RelayServer mServer;
+
+    @Inject
+    RelayUserChannelGroup mDao;
+
+    @Inject
+    RelayQueryUserGroup mQueryManager;
+
+    @Inject
+    RelayDCCManager mDCCManager;
 
     private RelayIRCConnection mConnection;
 
-    public RelaySession(final ServerConfiguration configuration) {
+    public RelaySession(final ConnectionConfiguration configuration) {
         mObjectGraph = ObjectGraph.create(new RelayBaseModule(configuration));
         mObjectGraph.inject(this);
+
+        mScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     }
 
     public void startSession() {
@@ -88,7 +99,17 @@ public class RelaySession implements IRCSession {
     }
 
     @Override
-    public UserChannelDao getUserChannelDao() {
+    public UserChannelGroup getUserChannelManager() {
         return mDao;
+    }
+
+    @Override
+    public QueryUserGroup getQueryManager() {
+        return mQueryManager;
+    }
+
+    @Override
+    public DCCManager getDCCManager() {
+        return mDCCManager;
     }
 }

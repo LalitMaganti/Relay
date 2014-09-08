@@ -13,14 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(RobolectricTestRunner.class)
 public class RelayChannelTest {
 
-    public static RelayChannel getTestChannel() {
-        return getTestChannel("#relay");
-    }
-
-    public static RelayChannel getTestChannel(final String channelName) {
-        return new RelayChannel(TestUtils.getFreenodeServer(), channelName);
-    }
-
     public static void populateTestChannel(final Channel channel) {
     }
 

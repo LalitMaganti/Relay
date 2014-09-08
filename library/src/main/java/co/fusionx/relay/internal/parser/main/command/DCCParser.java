@@ -2,7 +2,7 @@ package co.fusionx.relay.internal.parser.main.command;
 
 import java.util.List;
 
-import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.dcc.file.DCCFileConnection;
 import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.dcc.file.DCCGetConnection;
@@ -10,15 +10,19 @@ import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
+import co.fusionx.relay.internal.dcc.RelayDCCManager;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
 
 public class DCCParser {
 
-    private final RelayServer mServer;
+    private final Server mServer;
 
-    public DCCParser(final RelayServer server) {
+    private final RelayDCCManager mDCCManager;
+
+    public DCCParser(final Server server, final RelayDCCManager dccManager) {
         mServer = server;
+        mDCCManager = dccManager;
     }
 
     // Examples of parsedArray lines
@@ -55,7 +59,7 @@ public class DCCParser {
         final int port = Integer.parseInt(parsedArray.remove(0));
         final long position = Long.parseLong(parsedArray.remove(0));
 
-        final DCCFileConversation conversation = mServer.getDCCManager().getFileConversation(nick);
+        final DCCFileConversation conversation = mDCCManager.getFileConversation(nick);
         final DCCFileConnection connection = conversation.getFileConnection(fileName);
         final DCCGetConnection getConnection = (DCCGetConnection) connection;
 
@@ -72,7 +76,7 @@ public class DCCParser {
 
         // Send the event
         final DCCPendingChatConnection connection = new DCCPendingChatConnection(nick,
-                mServer.getDCCManager(), ipAddress, port, "chat", 0);
+                mDCCManager, ipAddress, port, "chat", 0);
         mServer.getBus().post(new DCCChatRequestEvent(mServer, connection));
     }
 
@@ -90,7 +94,7 @@ public class DCCParser {
 
         // Send the event
         final DCCPendingSendConnection connection = new DCCPendingSendConnection(nick,
-                mServer.getDCCManager(), ipAddress, port, fileName, size);
+                mDCCManager, ipAddress, port, fileName, size);
         mServer.getBus().post(new DCCSendRequestEvent(mServer, connection));
     }
 }

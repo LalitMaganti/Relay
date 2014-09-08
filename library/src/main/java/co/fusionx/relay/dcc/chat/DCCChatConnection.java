@@ -14,8 +14,6 @@ import co.fusionx.relay.util.SocketUtils;
 
 class DCCChatConnection extends DCCConnection {
 
-    private final DCCPendingConnection mPendingConversation;
-
     private final DCCChatConversation mConversation;
 
     protected BufferedReader mBufferedReader;
@@ -27,7 +25,6 @@ class DCCChatConnection extends DCCConnection {
         super(pendingConversation);
 
         mConversation = conversation;
-        mPendingConversation = pendingConversation;
     }
 
     @Override
@@ -35,7 +32,7 @@ class DCCChatConnection extends DCCConnection {
         mConversation.getBus().post(new DCCChatStartedEvent(mConversation));
 
         try {
-            mSocket = new Socket(mPendingConversation.getIP(), mPendingConversation.getPort());
+            mSocket = new Socket(mPendingConnection.getIP(), mPendingConnection.getPort());
 
             mBufferedReader = SocketUtils.getSocketBufferedReader(mSocket);
             mBufferedWriter = SocketUtils.getSocketBufferedWriter(mSocket);

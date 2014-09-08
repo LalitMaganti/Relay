@@ -8,13 +8,13 @@ import java.net.Socket;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.internal.parser.connection.ConnectionParser;
 import co.fusionx.relay.internal.parser.main.ServerLineParser;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.internal.sender.RelayCapSender;
-import co.fusionx.relay.internal.sender.RelayInternalSender;
-import co.fusionx.relay.internal.sender.RelayServerSender;
+import co.fusionx.relay.internal.sender.base.RelayServerSender;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.sender.packet.CapPacketSender;
+import co.fusionx.relay.internal.sender.packet.InternalPacketSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
@@ -25,17 +25,17 @@ import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 @Singleton
 public class RelayIRCConnection {
 
-    private final ServerConfiguration mServerConfiguration;
+    private final ConnectionConfiguration mConnectionConfiguration;
 
     private final StatusManager mStatusManager;
 
-    private final RelayUserChannelDao mDao;
+    private final RelayUserChannelGroup mDao;
 
-    private final BaseSender mBaseSender;
+    private final PacketSender mPacketSender;
 
-    private final RelayInternalSender mInternalSender;
+    private final InternalPacketSender mInternalSender;
 
-    private final RelayCapSender mCapSender;
+    private final CapPacketSender mCapSender;
 
     private final ConnectionParser mConnectionParser;
 
@@ -48,20 +48,20 @@ public class RelayIRCConnection {
     private boolean mStopped;
 
     @Inject
-    RelayIRCConnection(final ServerConfiguration serverConfiguration,
-            final StatusManager statusManager, final RelayUserChannelDao dao,
+    RelayIRCConnection(final ConnectionConfiguration connectionConfiguration,
+            final StatusManager statusManager, final RelayUserChannelGroup dao,
             final ConnectionParser connectionParser, final ServerLineParser lineParser,
-            final BaseSender baseSender) {
-        mServerConfiguration = serverConfiguration;
+            final RelayServerSender serverSender, final PacketSender packetSender) {
+        mConnectionConfiguration = connectionConfiguration;
         mStatusManager = statusManager;
         mDao = dao;
         mConnectionParser = connectionParser;
         mLineParser = lineParser;
-        mBaseSender = baseSender;
+        mServerSender = serverSender;
+        mPacketSender = packetSender;
 
-        mServerSender = new RelayServerSender(baseSender);
-        mInternalSender = new RelayInternalSender(baseSender);
-        mCapSender = new RelayCapSender(baseSender);
+        mInternalSender = new InternalPacketSender(packetSender);
+        mCapSender = new CapPacketSender(packetSender);
     }
 
     void connect() {
@@ -83,11 +83,11 @@ public class RelayIRCConnection {
     }
 
     private void connectQuietly() throws IOException {
-        mSocket = SocketUtils.openSocketConnection(mServerConfiguration);
+        mSocket = SocketUtils.openSocketConnection(mConnectionConfiguration);
 
         final BufferedReader socketReader = SocketUtils.getSocketBufferedReader(mSocket);
         final BufferedWriter socketWriter = SocketUtils.getSocketBufferedWriter(mSocket);
-        mBaseSender.onOutputStreamCreated(socketWriter);
+        mPacketSender.onOutputStreamCreated(socketWriter);
 
         // We are now in the phase where we can say we are connecting to the server
         mStatusManager.onConnecting();
@@ -112,18 +112,18 @@ public class RelayIRCConnection {
         mCapSender.sendLs();
 
         // Follow RFC2812's recommended order of sending - PASS -> NICK -> USER
-        if (Utils.isNotEmpty(mServerConfiguration.getServerPassword())) {
-            mInternalSender.sendServerPassword(mServerConfiguration.getServerPassword());
+        if (Utils.isNotEmpty(mConnectionConfiguration.getServerPassword())) {
+            mInternalSender.sendServerPassword(mConnectionConfiguration.getServerPassword());
         }
-        mServerSender.sendNick(mServerConfiguration.getNickStorage().getFirst());
-        mInternalSender.sendUser(mServerConfiguration.getServerUserName(),
-                Utils.returnNonEmpty(mServerConfiguration.getRealName(), "RelayUser"));
+        mServerSender.sendNick(mConnectionConfiguration.getNickStorage().getFirst());
+        mInternalSender.sendUser(mConnectionConfiguration.getServerUserName(),
+                Utils.returnNonEmpty(mConnectionConfiguration.getRealName(), "RelayUser"));
     }
 
     private void sendPostRegisterMessages() {
         // Identifies with NickServ if the password exists
-        if (Utils.isNotEmpty(mServerConfiguration.getNickservPassword())) {
-            mInternalSender.sendNickServPassword(mServerConfiguration.getNickservPassword());
+        if (Utils.isNotEmpty(mConnectionConfiguration.getNickservPassword())) {
+            mInternalSender.sendNickServPassword(mConnectionConfiguration.getNickservPassword());
         }
     }
 

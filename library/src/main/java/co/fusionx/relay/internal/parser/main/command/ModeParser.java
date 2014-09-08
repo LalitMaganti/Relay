@@ -13,15 +13,18 @@ import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
 public class ModeParser extends CommandParser {
 
-    public ModeParser(final Server server, final RelayUserChannelDao dao) {
-        super(server, dao);
+    public ModeParser(final Server server,
+            final RelayUserChannelGroup ucmanager,
+            final RelayQueryUserGroup queryManager) {
+        super(server, ucmanager, queryManager);
     }
 
     @Override
@@ -43,7 +46,7 @@ public class ModeParser extends CommandParser {
             final String sendingUser, final String mode) {
         // The recipient is a channel (i.e. the mode of a user in the channel is being changed
         // or possibly the mode of the channel itself)
-        final Optional<RelayChannel> optChannel = mDao.getChannel(recipient);
+        final Optional<RelayChannel> optChannel = mUCManager.getChannel(recipient);
 
         Optionals.run(optChannel, channel -> {
             // TODO - implement channel mode changes
@@ -55,12 +58,12 @@ public class ModeParser extends CommandParser {
             final RelayChannel channel, final String mode) {
         final String source = parsedArray.get(2);
         final String nick = ParseUtils.getNickFromPrefix(source);
-        final boolean appUser = mUser.isNickEqual(nick);
+        final boolean appUser = mUCManager.getUser().isNickEqual(nick);
 
         final Optional<RelayChannelUser> optUser = appUser
-                ? Optional.of(mUser)
-                : mDao.getUser(nick);
-        final Optional<? extends ChannelUser> optSending = mDao.getUser(sendingNick);
+                ? Optional.of(mUCManager.getUser())
+                : mUCManager.getUser(nick);
+        final Optional<? extends ChannelUser> optSending = mUCManager.getUser(sendingNick);
 
         // Nullity can occur when a ban is being added/removed on a whole range using wildcards
         final ChannelEvent event;
@@ -72,8 +75,8 @@ public class ModeParser extends CommandParser {
             user.onModeChanged(channel, newLevel);
 
             event = appUser
-                    ? new ChannelUserLevelChangeEvent(channel, mode, mUser, oldLevel, newLevel,
-                    optSending, sendingNick)
+                    ? new ChannelUserLevelChangeEvent(channel, mode, mUCManager.getUser(), oldLevel,
+                    newLevel, optSending, sendingNick)
                     : new ChannelWorldLevelChangeEvent(channel, mode, user, oldLevel, newLevel,
                             optSending, sendingNick);
         } else {

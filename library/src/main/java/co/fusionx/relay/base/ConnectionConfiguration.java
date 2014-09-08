@@ -10,16 +10,16 @@ import java.util.List;
 import co.fusionx.relay.misc.NickStorage;
 import co.fusionx.relay.util.Utils;
 
-public class ServerConfiguration implements Parcelable {
+public class ConnectionConfiguration implements Parcelable {
 
-    public static final Parcelable.Creator<ServerConfiguration> CREATOR =
-            new Parcelable.Creator<ServerConfiguration>() {
-                public ServerConfiguration createFromParcel(Parcel in) {
-                    return new ServerConfiguration(in);
+    public static final Parcelable.Creator<ConnectionConfiguration> CREATOR =
+            new Parcelable.Creator<ConnectionConfiguration>() {
+                public ConnectionConfiguration createFromParcel(Parcel in) {
+                    return new ConnectionConfiguration(in);
                 }
 
-                public ServerConfiguration[] newArray(int size) {
-                    return new ServerConfiguration[size];
+                public ConnectionConfiguration[] newArray(int size) {
+                    return new ConnectionConfiguration[size];
                 }
             };
 
@@ -100,7 +100,7 @@ public class ServerConfiguration implements Parcelable {
      */
     private final List<String> mAutoJoinChannels;
 
-    private ServerConfiguration(final Parcel in) {
+    private ConnectionConfiguration(final Parcel in) {
         mTitle = in.readString();
         mUrl = in.readString();
         mPort = in.readInt();
@@ -125,7 +125,7 @@ public class ServerConfiguration implements Parcelable {
         in.readStringList(mAutoJoinChannels);
     }
 
-    private ServerConfiguration(final Builder builder) {
+    private ConnectionConfiguration(final Builder builder) {
         mTitle = builder.getTitle();
         mUrl = builder.getUrl();
         mPort = builder.getPort();
@@ -184,8 +184,8 @@ public class ServerConfiguration implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof ServerConfiguration) {
-            final ServerConfiguration configuration = (ServerConfiguration) o;
+        if (o instanceof ConnectionConfiguration) {
+            final ConnectionConfiguration configuration = (ConnectionConfiguration) o;
             return mTitle.equals(configuration.getTitle());
         }
         return false;
@@ -407,13 +407,13 @@ public class ServerConfiguration implements Parcelable {
             in.readStringList(mAutoJoinChannels);
         }
 
-        public ServerConfiguration build() {
+        public ConnectionConfiguration build() {
             if (TextUtils.isEmpty(mTitle)) {
                 throw new IllegalArgumentException("The server title cannot be empty");
             } else if (TextUtils.isEmpty(mUrl)) {
                 throw new IllegalArgumentException("The server URL cannot be empty");
             }
-            return new ServerConfiguration(this);
+            return new ConnectionConfiguration(this);
         }
 
         public int describeContents() {

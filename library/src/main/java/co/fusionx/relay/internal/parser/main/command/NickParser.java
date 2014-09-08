@@ -11,25 +11,28 @@ import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.server.ServerNickChangeEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
 public class NickParser extends CommandParser {
 
-    public NickParser(final RelayServer server, final RelayUserChannelDao dao) {
-        super(server, dao);
+    public NickParser(final RelayServer server,
+            final RelayUserChannelGroup ucmanager,
+            final RelayQueryUserGroup queryManager) {
+        super(server, ucmanager, queryManager);
     }
 
     @Override
     public void onParseCommand(final List<String> parsedArray, final String prefix) {
         final String oldRawNick = ParseUtils.getNickFromPrefix(prefix);
-        final boolean appUser = mUser.isNickEqual(oldRawNick);
+        final boolean appUser = mUCManager.getUser().isNickEqual(oldRawNick);
         final Optional<RelayChannelUser> optUser = appUser
-                ? Optional.of(mUser)
-                : mDao.getUser(oldRawNick);
+                ? Optional.of(mUCManager.getUser())
+                : mUCManager.getUser(oldRawNick);
 
         // The can happen in cases where gave a nick to the server but it ignored this nick and
         // gave use another one instead. Then half way through the server notice phase it
@@ -48,7 +51,7 @@ public class NickParser extends CommandParser {
 
             for (final RelayChannel channel : user.getChannels()) {
                 final ChannelEvent event = appUser
-                        ? new ChannelNickChangeEvent(channel, oldNick, mUser)
+                        ? new ChannelNickChangeEvent(channel, oldNick, mUCManager.getUser())
                         : new ChannelWorldNickChangeEvent(channel, oldNick, user);
                 channel.getBus().post(event);
             }

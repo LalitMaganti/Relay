@@ -8,26 +8,28 @@ import java.util.List;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayQueryUserGroup;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.channel.PartEvent;
-import co.fusionx.relay.internal.base.RelayUserChannelDao;
+import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.util.ParseUtils;
 
 public class PartParser extends RemoveUserParser {
 
     public PartParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface) {
-        super(server, userChannelInterface);
+            final RelayUserChannelGroup ucmanager,
+            final RelayQueryUserGroup queryManager) {
+        super(server, ucmanager, queryManager);
     }
 
     @Override
     public Optional<RelayChannelUser> getRemovedUser(final List<String> parsedArray,
             final String rawSource) {
         final String userNick = ParseUtils.getNickFromPrefix(rawSource);
-        return mDao.getUser(userNick);
+        return mUCManager.getUser(userNick);
     }
 
     @Override
@@ -47,9 +49,9 @@ public class PartParser extends RemoveUserParser {
             return;
         }
 
-        final Collection<RelayChannelUser> users = mDao.removeChannel(channel);
+        final Collection<RelayChannelUser> users = mUCManager.removeChannel(channel);
         for (final RelayChannelUser user : users) {
-            mDao.removeChannelFromUser(channel, user);
+            mUCManager.removeChannelFromUser(channel, user);
         }
         channel.getBus().post(new PartEvent(channel));
     }

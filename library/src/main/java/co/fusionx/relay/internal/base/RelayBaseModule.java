@@ -4,16 +4,15 @@ import android.util.SparseArray;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
+import co.fusionx.relay.internal.dcc.RelayDCCManager;
 import co.fusionx.relay.internal.parser.main.code.CodeParser;
 import co.fusionx.relay.internal.parser.main.code.ErrorParser;
 import co.fusionx.relay.internal.parser.main.code.InitalTopicParser;
@@ -38,11 +37,10 @@ import co.fusionx.relay.internal.parser.main.command.PrivmsgParser;
 import co.fusionx.relay.internal.parser.main.command.QuitParser;
 import co.fusionx.relay.internal.parser.main.command.TopicChangeParser;
 import co.fusionx.relay.internal.parser.main.command.WallopsParser;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.internal.sender.RelayBaseSender;
-import co.fusionx.relay.internal.sender.RelayServerSender;
-import co.fusionx.relay.misc.GenericBus;
-import co.fusionx.relay.misc.EventBus;
+import co.fusionx.relay.internal.sender.base.RelayServerSender;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.bus.EventBus;
+import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.sender.ServerSender;
 import dagger.Module;
 import dagger.Provides;
@@ -63,38 +61,34 @@ import static co.fusionx.relay.internal.constants.CommandConstants.TOPIC;
 import static co.fusionx.relay.internal.constants.CommandConstants.WALLOPS;
 
 @Module(injects = {
-        RelaySession.class, RelayIRCConnection.class, RelayServer.class, RelayUserChannelDao.class
+        RelaySession.class, RelayIRCConnection.class, RelayServer.class,
+        RelayUserChannelGroup.class
 })
 public class RelayBaseModule {
 
-    private final ServerConfiguration mConfiguration;
+    private final ConnectionConfiguration mConfiguration;
 
-    public RelayBaseModule(final ServerConfiguration serverConfiguration) {
-        mConfiguration = serverConfiguration;
+    public RelayBaseModule(final ConnectionConfiguration connectionConfiguration) {
+        mConfiguration = connectionConfiguration;
     }
 
     @Provides
-    public ServerConfiguration provideConfiguration() {
+    public ConnectionConfiguration provideConfiguration() {
         return mConfiguration;
     }
 
     @Provides
     @Singleton
-    public StatusManager provideStatusManager(final ServerConfiguration configuration,
-            final RelayServer server, final RelayUserChannelDao dao) {
-        return new RelayStatusManager(configuration, server, dao);
-    }
-
-    @Provides
-    @Singleton
-    public ScheduledExecutorService provideMainExecutorService() {
-        return Executors.newSingleThreadScheduledExecutor();
+    public StatusManager provideStatusManager(final ConnectionConfiguration configuration,
+            final RelayServer server, final RelayUserChannelGroup dao,
+            final RelayQueryUserGroup queryManager) {
+        return new RelayStatusManager(configuration, server, dao, queryManager);
     }
 
     @Singleton
     @Provides
-    public BaseSender provideBaseSender() {
-        return new RelayBaseSender();
+    public PacketSender provideBaseSender() {
+        return new PacketSender();
     }
 
     @Singleton
@@ -104,43 +98,39 @@ public class RelayBaseModule {
     }
 
     @Provides
-    public ServerSender provideServerSender(final BaseSender sender) {
-        return new RelayServerSender(sender);
-    }
-
-    @Provides
     @Singleton
     public Map<String, CommandParser> provideCommandParserMap(final RelayServer server,
-            final RelayUserChannelDao dao, final BaseSender sender) {
-        final DCCParser dccParser = new DCCParser(server);
-        final CTCPParser ctcpParser = new CTCPParser(server, dao, sender, dccParser);
+            final RelayUserChannelGroup dao, final PacketSender sender,
+            final RelayDCCManager dccManager, final RelayQueryUserGroup queryManager) {
+        final DCCParser dccParser = new DCCParser(server, dccManager);
+        final CTCPParser ctcpParser = new CTCPParser(server, dao, queryManager, sender, dccParser);
 
         final Map<String, CommandParser> parserMap = new HashMap<>();
 
         // Core RFC parsers
-        parserMap.put(PING, new PingParser(server, dao, sender));
-        parserMap.put(ERROR, new ErrorCommandParser(server, dao));
+        parserMap.put(PING, new PingParser(server, dao, queryManager, sender));
+        parserMap.put(ERROR, new ErrorCommandParser(server, dao, queryManager));
 
         // RFC parsers
-        parserMap.put(JOIN, new JoinParser(server, dao));
-        parserMap.put(PRIVMSG, new PrivmsgParser(server, dao, ctcpParser));
-        parserMap.put(NOTICE, new NoticeParser(server, dao, ctcpParser));
-        parserMap.put(PART, new PartParser(server, dao));
-        parserMap.put(MODE, new ModeParser(server, dao));
-        parserMap.put(QUIT, new QuitParser(server, dao));
-        parserMap.put(NICK, new NickParser(server, dao));
-        parserMap.put(TOPIC, new TopicChangeParser(server, dao));
-        parserMap.put(KICK, new KickParser(server, dao));
-        parserMap.put(INVITE, new InviteParser(server, dao));
-        parserMap.put(PONG, new PongParser(server, dao));
-        parserMap.put(WALLOPS, new WallopsParser(server, dao));
+        parserMap.put(JOIN, new JoinParser(server, dao, queryManager));
+        parserMap.put(PRIVMSG, new PrivmsgParser(server, dao, queryManager, ctcpParser));
+        parserMap.put(NOTICE, new NoticeParser(server, dao, queryManager, ctcpParser));
+        parserMap.put(PART, new PartParser(server, dao, queryManager));
+        parserMap.put(MODE, new ModeParser(server, dao, queryManager));
+        parserMap.put(QUIT, new QuitParser(server, dao, queryManager));
+        parserMap.put(NICK, new NickParser(server, dao, queryManager));
+        parserMap.put(TOPIC, new TopicChangeParser(server, dao, queryManager));
+        parserMap.put(KICK, new KickParser(server, dao, queryManager));
+        parserMap.put(INVITE, new InviteParser(server, dao, queryManager));
+        parserMap.put(PONG, new PongParser(server, dao, queryManager));
+        parserMap.put(WALLOPS, new WallopsParser(server, dao, queryManager));
 
         // Optional IRCv3 parsers
         if (server.getCapabilities().contains(CapCapability.ACCOUNTNOTIFY)) {
-            parserMap.put(CommandConstants.ACCOUNT, new AccountParser(server, dao));
+            parserMap.put(CommandConstants.ACCOUNT, new AccountParser(server, dao, queryManager));
         }
         if (server.getCapabilities().contains(CapCapability.AWAYNOTIFY)) {
-            parserMap.put(CommandConstants.AWAY, new AwayParser(server, dao));
+            parserMap.put(CommandConstants.AWAY, new AwayParser(server, dao, queryManager));
         }
 
         return parserMap;
@@ -149,23 +139,24 @@ public class RelayBaseModule {
     @Provides
     @Singleton
     public SparseArray<CodeParser> provideCodeParserMap(final GenericBus<Event> superBus,
-            final RelayServer server, final RelayUserChannelDao dao, final BaseSender sender) {
+            final RelayServer server, final RelayUserChannelGroup dao,
+            final RelayQueryUserGroup queryManager, final PacketSender sender) {
         final SparseArray<CodeParser> parserMap = new SparseArray<>();
 
-        final InitalTopicParser topicChangeParser = new InitalTopicParser(server, dao);
+        final InitalTopicParser topicChangeParser = new InitalTopicParser(server, dao, null);
         parserMap.put(ServerReplyCodes.RPL_TOPIC, topicChangeParser);
         parserMap.put(ServerReplyCodes.RPL_TOPICWHOTIME, topicChangeParser);
 
-        final NameParser nameParser = new NameParser(server, dao);
+        final NameParser nameParser = new NameParser(server, dao, queryManager);
         parserMap.put(ServerReplyCodes.RPL_NAMREPLY, nameParser);
         parserMap.put(ServerReplyCodes.RPL_ENDOFNAMES, nameParser);
 
-        final MotdParser motdParser = new MotdParser(server, dao);
+        final MotdParser motdParser = new MotdParser(server, dao, queryManager);
         parserMap.put(ServerReplyCodes.RPL_MOTDSTART, motdParser);
         parserMap.put(ServerReplyCodes.RPL_MOTD, motdParser);
         parserMap.put(ServerReplyCodes.RPL_ENDOFMOTD, motdParser);
 
-        final ErrorParser errorParser = new ErrorParser(server, dao);
+        final ErrorParser errorParser = new ErrorParser(server, dao, null);
         parserMap.put(ServerReplyCodes.ERR_NOSUCHNICK, errorParser);
         parserMap.put(ServerReplyCodes.ERR_NICKNAMEINUSE, errorParser);
 

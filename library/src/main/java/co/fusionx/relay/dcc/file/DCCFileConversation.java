@@ -7,32 +7,32 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayAbstractConversation;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.misc.GenericBus;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.bus.GenericBus;
 
 public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent> {
 
-    private final ServerConfiguration mServerConfiguration;
+    private final ConnectionConfiguration mConnectionConfiguration;
 
-    private final BaseSender mBaseSender;
+    private final PacketSender mPacketSender;
 
     private final String mNick;
 
     private final Map<String, DCCFileConnection> mConnectionList;
 
     public DCCFileConversation(final GenericBus<Event> bus,
-            final ServerConfiguration serverConfiguration,
-            final BaseSender baseSender, final String nick) {
+            final ConnectionConfiguration connectionConfiguration,
+            final PacketSender packetSender, final String nick) {
         super(bus);
 
-        mServerConfiguration = serverConfiguration;
-        mBaseSender = baseSender;
+        mConnectionConfiguration = connectionConfiguration;
+        mPacketSender = packetSender;
         mNick = nick;
 
         mConnectionList = new HashMap<>();
@@ -43,7 +43,7 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
     }
 
     public void getFile(final DCCPendingSendConnection connection, final File file) {
-        final DCCGetConnection getConnection = new DCCGetConnection(connection, mBaseSender, this,
+        final DCCGetConnection getConnection = new DCCGetConnection(connection, mPacketSender, this,
                 file);
         mConnectionList.put(connection.getArgument(), getConnection);
         getConnection.startConnection();
@@ -71,13 +71,13 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
         }
 
         final DCCFileConversation that = (DCCFileConversation) o;
-        return mServerConfiguration.getTitle().equals(that.mServerConfiguration.getTitle())
+        return mConnectionConfiguration.getTitle().equals(that.mConnectionConfiguration.getTitle())
                 && mNick.equals(that.mNick);
     }
 
     @Override
     public int hashCode() {
-        int result = mServerConfiguration.getTitle().hashCode();
+        int result = mConnectionConfiguration.getTitle().hashCode();
         result = 31 * result + mNick.hashCode();
         return result;
     }

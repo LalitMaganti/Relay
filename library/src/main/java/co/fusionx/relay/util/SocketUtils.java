@@ -34,11 +34,11 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 
 public class SocketUtils {
 
-    public static Socket openSocketConnection(final ServerConfiguration configuration) throws
+    public static Socket openSocketConnection(final ConnectionConfiguration configuration) throws
             IOException {
         final Socket socket;
         final InetSocketAddress address = new InetSocketAddress(configuration.getUrl(),
@@ -56,7 +56,7 @@ public class SocketUtils {
         return socket;
     }
 
-    private static SSLSocketFactory getSSLSocketFactory(final ServerConfiguration configuration) {
+    private static SSLSocketFactory getSSLSocketFactory(final ConnectionConfiguration configuration) {
         if (!configuration.shouldAcceptAllSSLCertificates() &&
                 TextUtils.isEmpty(configuration.getClientAuthenticationKeyPath())) {
             return (SSLSocketFactory) SSLSocketFactory.getDefault();
