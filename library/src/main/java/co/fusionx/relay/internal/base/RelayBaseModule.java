@@ -4,6 +4,8 @@ import android.util.SparseArray;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Singleton;
 
@@ -22,6 +24,7 @@ import co.fusionx.relay.internal.parser.main.command.AwayParser;
 import co.fusionx.relay.internal.parser.main.command.CTCPParser;
 import co.fusionx.relay.internal.parser.main.command.CommandParser;
 import co.fusionx.relay.internal.parser.main.command.DCCParser;
+import co.fusionx.relay.internal.parser.main.command.ErrorCommandParser;
 import co.fusionx.relay.internal.parser.main.command.InviteParser;
 import co.fusionx.relay.internal.parser.main.command.JoinParser;
 import co.fusionx.relay.internal.parser.main.command.KickParser;
@@ -29,6 +32,7 @@ import co.fusionx.relay.internal.parser.main.command.ModeParser;
 import co.fusionx.relay.internal.parser.main.command.NickParser;
 import co.fusionx.relay.internal.parser.main.command.NoticeParser;
 import co.fusionx.relay.internal.parser.main.command.PartParser;
+import co.fusionx.relay.internal.parser.main.command.PingParser;
 import co.fusionx.relay.internal.parser.main.command.PongParser;
 import co.fusionx.relay.internal.parser.main.command.PrivmsgParser;
 import co.fusionx.relay.internal.parser.main.command.QuitParser;
@@ -42,6 +46,7 @@ import co.fusionx.relay.sender.ServerSender;
 import dagger.Module;
 import dagger.Provides;
 
+import static co.fusionx.relay.internal.constants.CommandConstants.ERROR;
 import static co.fusionx.relay.internal.constants.CommandConstants.INVITE;
 import static co.fusionx.relay.internal.constants.CommandConstants.JOIN;
 import static co.fusionx.relay.internal.constants.CommandConstants.KICK;
@@ -49,6 +54,7 @@ import static co.fusionx.relay.internal.constants.CommandConstants.MODE;
 import static co.fusionx.relay.internal.constants.CommandConstants.NICK;
 import static co.fusionx.relay.internal.constants.CommandConstants.NOTICE;
 import static co.fusionx.relay.internal.constants.CommandConstants.PART;
+import static co.fusionx.relay.internal.constants.CommandConstants.PING;
 import static co.fusionx.relay.internal.constants.CommandConstants.PONG;
 import static co.fusionx.relay.internal.constants.CommandConstants.PRIVMSG;
 import static co.fusionx.relay.internal.constants.CommandConstants.QUIT;
@@ -56,7 +62,7 @@ import static co.fusionx.relay.internal.constants.CommandConstants.TOPIC;
 import static co.fusionx.relay.internal.constants.CommandConstants.WALLOPS;
 
 @Module(injects = {
-        RelayIRCConnection.class, RelayServer.class, RelayUserChannelDao.class
+        RelaySession.class, RelayIRCConnection.class, RelayServer.class, RelayUserChannelDao.class
 })
 public class RelayBaseModule {
 
@@ -69,6 +75,19 @@ public class RelayBaseModule {
     @Provides
     public ServerConfiguration provideConfiguration() {
         return mConfiguration;
+    }
+
+    @Provides
+    @Singleton
+    public StatusManager provideStatusManager(final ServerConfiguration configuration,
+            final RelayServer server, final RelayUserChannelDao dao) {
+        return new RelayStatusManager(configuration, server, dao);
+    }
+
+    @Provides
+    @Singleton
+    public ScheduledExecutorService provideMainExecutorService() {
+        return Executors.newSingleThreadScheduledExecutor();
     }
 
     @Singleton
@@ -96,6 +115,12 @@ public class RelayBaseModule {
         final CTCPParser ctcpParser = new CTCPParser(server, dao, sender, dccParser);
 
         final Map<String, CommandParser> parserMap = new HashMap<>();
+
+        // Core RFC parsers
+        parserMap.put(PING, new PingParser(server, dao, sender));
+        parserMap.put(ERROR, new ErrorCommandParser(server, dao));
+
+        // RFC parsers
         parserMap.put(JOIN, new JoinParser(server, dao));
         parserMap.put(PRIVMSG, new PrivmsgParser(server, dao, ctcpParser));
         parserMap.put(NOTICE, new NoticeParser(server, dao, ctcpParser));
@@ -109,7 +134,7 @@ public class RelayBaseModule {
         parserMap.put(PONG, new PongParser(server, dao));
         parserMap.put(WALLOPS, new WallopsParser(server, dao));
 
-        // IRCv3 parsers
+        // Optional IRCv3 parsers
         if (server.getCapabilities().contains(CapCapability.ACCOUNTNOTIFY)) {
             parserMap.put(CommandConstants.ACCOUNT, new AccountParser(server, dao));
         }

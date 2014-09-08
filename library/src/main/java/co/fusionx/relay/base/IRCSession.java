@@ -3,11 +3,11 @@ package co.fusionx.relay.base;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.misc.EventBus;
 
-public interface IRCConnection {
+public interface IRCSession {
 
-    public ConnectionStatus getStatus();
+    public SessionStatus getStatus();
 
-    public EventBus<Event> getSuperBus();
+    public EventBus<Event> getSessionBus();
 
     public Server getServer();
 

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.base.IRCConnection;
+import co.fusionx.relay.base.IRCSession;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.query.QueryEvent;
@@ -25,7 +25,7 @@ public abstract class LoggingManager {
 
     private final LoggingPreferences mLoggingPreferences;
 
-    private final Map<IRCConnection, LogHandler> mLoggingConnections;
+    private final Map<IRCSession, LogHandler> mLoggingConnections;
 
     private ExecutorService sLoggingService;
 
@@ -37,7 +37,7 @@ public abstract class LoggingManager {
         mStarted = false;
     }
 
-    public void addConnectionToManager(final IRCConnection server) {
+    public void addConnectionToManager(final IRCSession server) {
         if (mLoggingConnections.containsKey(server)) {
             throw new IllegalArgumentException("This server is already present in this manager");
         }
@@ -49,7 +49,7 @@ public abstract class LoggingManager {
         }
     }
 
-    public void removeConnectionFromManager(final IRCConnection server) {
+    public void removeConnectionFromManager(final IRCSession server) {
         final LogHandler handler = mLoggingConnections.get(server);
         if (handler == null) {
             throw new IllegalArgumentException("This server is not present in this manager");
@@ -89,14 +89,14 @@ public abstract class LoggingManager {
         sLoggingService = null;
     }
 
-    public abstract CharSequence getMessageFromEvent(final IRCConnection connection,
+    public abstract CharSequence getMessageFromEvent(final IRCSession connection,
             final Event event);
 
     public boolean isStarted() {
         return mStarted;
     }
 
-    private String getServerPath(final IRCConnection connection) {
+    private String getServerPath(final IRCSession connection) {
         return String.format("%s/%s", mLoggingPreferences.getLoggingPath(),
                 connection.getServer().getTitle());
     }
@@ -107,18 +107,18 @@ public abstract class LoggingManager {
 
         private static final int LOG_PRIORITY = 500;
 
-        private final IRCConnection mConnection;
+        private final IRCSession mConnection;
 
-        public LogHandler(final IRCConnection connection) {
+        public LogHandler(final IRCSession connection) {
             mConnection = connection;
         }
 
         public void startLogging() {
-            mConnection.getSuperBus().register(this, LOG_PRIORITY);
+            mConnection.getSessionBus().register(this, LOG_PRIORITY);
         }
 
         public void stopLogging() {
-            mConnection.getSuperBus().unregister(this);
+            mConnection.getSessionBus().unregister(this);
         }
 
         public void onEvent(final ServerEvent event) {
@@ -167,13 +167,13 @@ public abstract class LoggingManager {
 
         public final String mLogString;
 
-        private final IRCConnection mConnection;
+        private final IRCSession mConnection;
 
         private final Event mEvent;
 
         private final String mDirectory;
 
-        private LoggingRunnable(final IRCConnection connection, final Event event,
+        private LoggingRunnable(final IRCSession connection, final Event event,
                 final String logString, final String directory) {
             mConnection = connection;
             mEvent = event;

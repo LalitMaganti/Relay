@@ -35,7 +35,7 @@ public class KickParser extends RemoveUserParser {
     public Optional<RelayChannelUser> getRemovedUser(final List<String> parsedArray,
             final String rawSource) {
         final String kickedNick = parsedArray.get(3);
-        return mUserChannelInterface.getUser(kickedNick);
+        return mDao.getUser(kickedNick);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class KickParser extends RemoveUserParser {
             final String rawSource, final RelayChannel channel, final ChannelUser kickedUser) {
         final UserLevel level = kickedUser.getChannelPrivileges(channel);
         final String kickingNick = ParseUtils.getNickFromPrefix(rawSource);
-        final Optional<RelayChannelUser> optKickUser = mUserChannelInterface.getUser(kickingNick);
+        final Optional<RelayChannelUser> optKickUser = mDao.getUser(kickingNick);
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
 
         return new ChannelWorldKickEvent(channel, kickedUser, level, optKickUser, kickingNick,
@@ -61,12 +61,12 @@ public class KickParser extends RemoveUserParser {
     void onRemoved(final List<String> parsedArray, final String rawSource,
             final RelayChannel channel) {
         final String kickingNick = ParseUtils.getNickFromPrefix(rawSource);
-        final Optional<RelayChannelUser> optKickUser = mUserChannelInterface.getUser(kickingNick);
+        final Optional<RelayChannelUser> optKickUser = mDao.getUser(kickingNick);
 
         // Remove the channel only after we've finished with it
-        final Collection<RelayChannelUser> users = mUserChannelInterface.removeChannel(channel);
+        final Collection<RelayChannelUser> users = mDao.removeChannel(channel);
         for (final RelayChannelUser user : users) {
-            mUserChannelInterface.removeChannelFromUser(channel, user);
+            mDao.removeChannelFromUser(channel, user);
         }
 
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";

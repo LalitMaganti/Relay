@@ -44,7 +44,7 @@ public class ModeParser extends CommandParser {
             final String sendingUser, final String mode) {
         // The recipient is a channel (i.e. the mode of a user in the channel is being changed
         // or possibly the mode of the channel itself)
-        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(recipient);
+        final Optional<RelayChannel> optChannel = mDao.getChannel(recipient);
 
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
@@ -61,8 +61,8 @@ public class ModeParser extends CommandParser {
 
         final Optional<RelayChannelUser> optUser = appUser
                 ? Optional.of(mUser)
-                : mUserChannelInterface.getUser(nick);
-        final Optional<RelayChannelUser> optSending = mUserChannelInterface.getUser(sendingNick);
+                : mDao.getUser(nick);
+        final Optional<RelayChannelUser> optSending = mDao.getUser(sendingNick);
 
         // Nullity can occur when a ban is being added/removed on a whole range using wildcards
         final ChannelEvent event;

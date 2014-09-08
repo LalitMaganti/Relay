@@ -18,9 +18,8 @@ import co.fusionx.relay.util.ParseUtils;
 
 public class NickParser extends CommandParser {
 
-    public NickParser(final RelayServer server,
-            final RelayUserChannelDao userChannelInterface) {
-        super(server, userChannelInterface);
+    public NickParser(final RelayServer server, final RelayUserChannelDao dao) {
+        super(server, dao);
     }
 
     @Override
@@ -29,7 +28,7 @@ public class NickParser extends CommandParser {
         final boolean appUser = mUser.isNickEqual(oldRawNick);
         final Optional<RelayChannelUser> optUser = appUser
                 ? Optional.of(mUser)
-                : mUserChannelInterface.getUser(oldRawNick);
+                : mDao.getUser(oldRawNick);
 
         // The can happen in cases where gave a nick to the server but it ignored this nick and
         // gave use another one instead. Then half way through the server notice phase it

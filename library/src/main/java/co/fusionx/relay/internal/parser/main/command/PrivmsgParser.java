@@ -60,7 +60,7 @@ public class PrivmsgParser extends CommandParser {
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
             final String rawMessage) {
-        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
+        final Optional<RelayChannel> optChannel = mDao.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
@@ -69,7 +69,7 @@ public class PrivmsgParser extends CommandParser {
             final boolean mention = MentionParser.onMentionableCommand(message,
                     mUser.getNick().getNickAsString());
 
-            final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
+            final Optional<RelayChannelUser> optUser = mDao.getUser(sendingNick);
             final ChannelEvent event;
             if (optUser.isPresent()) {
                 event = new ChannelWorldMessageEvent(channel, message, optUser.get(), mention);

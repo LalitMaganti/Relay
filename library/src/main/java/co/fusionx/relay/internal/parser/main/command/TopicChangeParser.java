@@ -21,8 +21,8 @@ public class TopicChangeParser extends CommandParser {
 
     @Override
     public void onParseCommand(List<String> parsedArray, String prefix) {
-        final ChannelUser user = mUserChannelInterface.getUserFromPrefix(prefix);
-        final Optional<RelayChannel> optChan = mUserChannelInterface.getChannel(parsedArray.get(0));
+        final ChannelUser user = mDao.getUserFromPrefix(prefix);
+        final Optional<RelayChannel> optChan = mDao.getChannel(parsedArray.get(0));
 
         LogUtils.logOptionalBug(optChan, mServer);
         Optionals.ifPresent(optChan, channel -> {

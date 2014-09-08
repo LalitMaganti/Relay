@@ -23,7 +23,7 @@ public abstract class RemoveUserParser extends CommandParser {
     @Override
     public void onParseCommand(final List<String> parsedArray, final String prefix) {
         final String channelName = parsedArray.get(0);
-        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
+        final Optional<RelayChannel> optChannel = mDao.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
@@ -51,7 +51,7 @@ public abstract class RemoveUserParser extends CommandParser {
 
     private void onUserRemoved(final List<String> parsedArray, final String rawSource,
             final RelayChannel channel, final RelayChannelUser removedUser) {
-        mUserChannelInterface.decoupleUserAndChannel(removedUser, channel);
+        mDao.decoupleUserAndChannel(removedUser, channel);
 
         channel.postAndStoreEvent(getEvent(parsedArray, rawSource, channel, removedUser));
     }

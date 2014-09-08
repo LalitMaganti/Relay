@@ -1,6 +1,6 @@
 package co.fusionx.relay.base;
 
-public enum ConnectionStatus {
+public enum SessionStatus {
     CONNECTING,
     CONNECTED,
     RECONNECTING,

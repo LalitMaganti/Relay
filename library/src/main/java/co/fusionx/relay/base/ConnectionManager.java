@@ -15,7 +15,7 @@ public interface ConnectionManager {
      * @return a pair of objects - the first item is a boolean which is true if the server already
      * exists in the manager. The second item is the connection created.
      */
-    Pair<Boolean, ? extends IRCConnection> requestConnection(ServerConfiguration configuration);
+    Pair<Boolean, ? extends IRCSession> requestConnection(ServerConfiguration configuration);
 
     /**
      * Reconnect to the specified server
@@ -24,7 +24,7 @@ public interface ConnectionManager {
      * @throws IllegalArgumentException if the server is not in this manager or if the server is
      *                                  not in the ConnectionStatus.Disconnected state
      */
-    void requestReconnection(IRCConnection server);
+    void requestReconnection(IRCSession server);
 
     /**
      * Disconnect from the server with the specified name and removes it from this manager
@@ -53,7 +53,7 @@ public interface ConnectionManager {
      * @param serverName the name of the server you're wanting to get
      * @return the server with the required title if it exists - this may be null
      */
-    Optional<IRCConnection> getConnectionIfExists(String serverName);
+    Optional<IRCSession> getConnectionIfExists(String serverName);
 
     /**
      * Returns the number of servers which are currently managed by this manager
@@ -67,5 +67,5 @@ public interface ConnectionManager {
      *
      * @return an immutable set of the servers which are managed by this manager
      */
-    Set<? extends IRCConnection> getConnectionSet();
+    Set<? extends IRCSession> getConnectionSet();
 }

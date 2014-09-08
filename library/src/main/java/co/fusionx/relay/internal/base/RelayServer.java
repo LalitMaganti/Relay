@@ -8,7 +8,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.constants.CapCapability;

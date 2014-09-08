@@ -10,19 +10,17 @@ import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.base.ConnectionManager;
-import co.fusionx.relay.base.ConnectionStatus;
-import co.fusionx.relay.base.IRCConnection;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.IRCSession;
 import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.interfaces.RelayConfiguration;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
-import dagger.ObjectGraph;
 
 public class RelayConnectionManager implements ConnectionManager {
 
     private static ConnectionManager sConnectionManager;
 
-    private final Map<String, RelayIRCConnection> mConnectionMap = new HashMap<>();
+    private final Map<String, RelaySession> mConnectionMap = new HashMap<>();
 
     private RelayConnectionManager() {
     }
@@ -46,16 +44,15 @@ public class RelayConnectionManager implements ConnectionManager {
      * {@inheritDoc}
      */
     @Override
-    public Pair<Boolean, ? extends IRCConnection> requestConnection(final ServerConfiguration
+    public Pair<Boolean, ? extends IRCSession> requestConnection(final ServerConfiguration
             configuration) {
-        RelayIRCConnection connection = mConnectionMap.get(configuration.getTitle());
+        RelaySession connection = mConnectionMap.get(configuration.getTitle());
 
         final boolean exists = connection != null;
         if (!exists) {
-            final ObjectGraph objectGraph = ObjectGraph.create(new RelayBaseModule(configuration));
-            connection = objectGraph.get(RelayIRCConnection.class);
+            connection = new RelaySession(configuration);
+            connection.startSession();
 
-            connection.startConnection();
             mConnectionMap.put(configuration.getTitle(), connection);
         }
         return new Pair<>(exists, connection);
@@ -65,19 +62,18 @@ public class RelayConnectionManager implements ConnectionManager {
      * {@inheritDoc}
      */
     @Override
-    public void requestReconnection(final IRCConnection connection) {
-        final RelayIRCConnection realConnection = mConnectionMap
-                .get(connection.getServer().getTitle());
+    public void requestReconnection(final IRCSession connection) {
+        final RelaySession realConnection = mConnectionMap.get(connection.getServer().getTitle());
 
         if (realConnection == null) {
             throw new IllegalArgumentException("Server not managed by this manager");
         }
 
-        if (realConnection.getStatus() != ConnectionStatus.DISCONNECTED) {
+        if (realConnection.getStatus() != SessionStatus.DISCONNECTED) {
             throw new IllegalArgumentException("Server not in disconnected state");
         }
 
-        realConnection.startConnection();
+        realConnection.startSession();
     }
 
     /**
@@ -85,9 +81,9 @@ public class RelayConnectionManager implements ConnectionManager {
      */
     @Override
     public boolean requestStoppageAndRemoval(final String serverName) {
-        final RelayIRCConnection connection = mConnectionMap.get(serverName);
+        final RelaySession connection = mConnectionMap.get(serverName);
         if (connection != null) {
-            connection.stopConnection();
+            connection.stopSession();
             mConnectionMap.remove(serverName);
         }
         return mConnectionMap.isEmpty();
@@ -98,8 +94,8 @@ public class RelayConnectionManager implements ConnectionManager {
      */
     @Override
     public void requestDisconnectAll() {
-        for (final RelayIRCConnection connection : mConnectionMap.values()) {
-            connection.stopConnection();
+        for (final RelaySession connection : mConnectionMap.values()) {
+            connection.stopSession();
         }
         mConnectionMap.clear();
     }
@@ -108,8 +104,8 @@ public class RelayConnectionManager implements ConnectionManager {
      * {@inheritDoc}
      */
     @Override
-    public Optional<IRCConnection> getConnectionIfExists(final String serverName) {
-        final RelayIRCConnection connection = mConnectionMap.get(serverName);
+    public Optional<IRCSession> getConnectionIfExists(final String serverName) {
+        final RelaySession connection = mConnectionMap.get(serverName);
         return Optional.fromNullable(connection);
     }
 
@@ -125,7 +121,7 @@ public class RelayConnectionManager implements ConnectionManager {
      * {@inheritDoc}
      */
     @Override
-    public Set<? extends IRCConnection> getConnectionSet() {
+    public Set<? extends IRCSession> getConnectionSet() {
         return FluentIterable.from(mConnectionMap.values()).toSet();
     }
 }

@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.internal.base.RelayServer;
@@ -31,9 +33,11 @@ public class ConnectionParser {
 
     private int mSuffix;
 
-    public ConnectionParser(final RelayServer server, final BaseSender sender) {
+    @Inject
+    public ConnectionParser(final ServerConfiguration configuration, final RelayServer server,
+            final BaseSender sender) {
+        mConfiguration = configuration;
         mServer = server;
-        mConfiguration = server.getConfiguration();
 
         mInternalSender = new RelayInternalSender(sender);
         mCapParser = new CapParser(server, sender);

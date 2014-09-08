@@ -10,27 +10,21 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.parser.main.code.CodeParser;
 import co.fusionx.relay.internal.parser.main.command.CommandParser;
-import co.fusionx.relay.internal.parser.main.command.QuitParser;
-import co.fusionx.relay.internal.sender.BaseSender;
-import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
 
-@Singleton
 public class ServerLineParser {
 
     private final RelayServer mServer;
 
-    private final RelayInternalSender mInternalSender;
+    // private final RelayInternalSender mInternalSender;
 
     private final Map<String, CommandParser> mCommandParserMap;
 
@@ -39,14 +33,11 @@ public class ServerLineParser {
     private String mLine;
 
     @Inject
-    public ServerLineParser(final RelayServer server,
-            final BaseSender sender,
-            final Map<String, CommandParser> commandParserMap,
-            final SparseArray<CodeParser> codeParserMap) {
+    public ServerLineParser(final RelayServer server, final SparseArray<CodeParser> codeParsers,
+            final Map<String, CommandParser> commandParsers) {
         mServer = server;
-        mCodeParser = codeParserMap;
-        mCommandParserMap = commandParserMap;
-        mInternalSender = new RelayInternalSender(sender);
+        mCodeParser = codeParsers;
+        mCommandParserMap = commandParsers;
     }
 
     /**
@@ -100,18 +91,6 @@ public class ServerLineParser {
     // The server is sending a command to us - parse what it is
     private boolean parserServerCommand(final List<String> parsedArray, final String prefix,
             final String command) {
-        switch (command) {
-            case CommandConstants.PING:
-                // Immediately respond & return
-                final String source = parsedArray.get(0);
-                mInternalSender.pongServer(source);
-                return false;
-            case CommandConstants.ERROR:
-                // We are finished - the server has kicked us
-                // out for some reason
-                return true;
-        }
-
         // Parse the command
         final CommandParser parser = mCommandParserMap.get(command);
         // Silently fail if the parser is null - just ignore this line
@@ -119,12 +98,7 @@ public class ServerLineParser {
             return false;
         }
         parser.onParseCommand(parsedArray, prefix);
-
-        if (parser instanceof QuitParser) {
-            final QuitParser quitParser = (QuitParser) parser;
-            return quitParser.isUserQuit();
-        }
-        return false;
+        return parser.isUserQuit();
     }
 
     private void parseServerCode(final List<String> parsedArray, final int code) {

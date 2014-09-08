@@ -27,7 +27,7 @@ public class PartParser extends RemoveUserParser {
     public Optional<RelayChannelUser> getRemovedUser(final List<String> parsedArray,
             final String rawSource) {
         final String userNick = ParseUtils.getNickFromPrefix(rawSource);
-        return mUserChannelInterface.getUser(userNick);
+        return mDao.getUser(userNick);
     }
 
     @Override
@@ -47,9 +47,9 @@ public class PartParser extends RemoveUserParser {
             return;
         }
 
-        final Collection<RelayChannelUser> users = mUserChannelInterface.removeChannel(channel);
+        final Collection<RelayChannelUser> users = mDao.removeChannel(channel);
         for (final RelayChannelUser user : users) {
-            mUserChannelInterface.removeChannelFromUser(channel, user);
+            mDao.removeChannelFromUser(channel, user);
         }
         channel.postAndStoreEvent(new PartEvent(channel));
     }

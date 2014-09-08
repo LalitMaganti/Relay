@@ -26,8 +26,8 @@ public class JoinParser extends CommandParser {
         final String channelName = parsedArray.get(0);
 
         // Retrieve the user and channel
-        final RelayChannelUser user = mUserChannelInterface.getUserFromPrefix(prefix);
-        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
+        final RelayChannelUser user = mDao.getUserFromPrefix(prefix);
+        final Optional<RelayChannel> optChannel = mDao.getChannel(channelName);
         RelayChannel channel = optChannel.orNull();
 
         // Store whether the user is the app user
@@ -35,13 +35,13 @@ public class JoinParser extends CommandParser {
         if (channel == null) {
             // If the channel is null then we haven't joined it before (disconnection) and we should
             // create a new channel
-            channel = mUserChannelInterface.getNewChannel(channelName);
+            channel = mDao.getNewChannel(channelName);
         } else if (appUser) {
             // If the channel is not null then we simply clear the data of the channel
             channel.clearInternalData();
         }
         // Put the user and channel together
-        mUserChannelInterface.coupleUserAndChannel(user, channel);
+        mDao.coupleUserAndChannel(user, channel);
 
         if (mServer.getCapabilities().contains(CapCapability.EXTENDEDJOIN)) {
             // We should have 2 parameters after the channel name

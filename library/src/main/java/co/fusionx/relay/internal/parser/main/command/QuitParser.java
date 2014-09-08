@@ -40,13 +40,13 @@ public class QuitParser extends CommandParser {
     }
 
     private void onUserQuit(final List<String> parsed, final String userNick) {
-        final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(userNick);
+        final Optional<RelayChannelUser> optUser = mDao.getUser(userNick);
         Optionals.ifPresent(optUser, user -> {
-            final Collection<RelayChannel> channels = mUserChannelInterface.removeUser(user);
+            final Collection<RelayChannel> channels = mDao.removeUser(user);
             final String reason = parsed.size() == 2 ? parsed.get(1).replace("\"", "") : "";
             for (final RelayChannel channel : channels) {
                 final UserLevel level = user.getChannelPrivileges(channel);
-                mUserChannelInterface.removeUserFromChannel(channel, user);
+                mDao.removeUserFromChannel(channel, user);
                 channel.postAndStoreEvent(new ChannelWorldQuitEvent(channel, user, level, reason));
             }
         });

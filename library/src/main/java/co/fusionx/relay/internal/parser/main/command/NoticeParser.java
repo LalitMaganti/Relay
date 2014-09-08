@@ -46,7 +46,7 @@ public class NoticeParser extends CommandParser {
 
     private void onParseChannelNotice(final String channelName, final String sendingNick,
             final String notice) {
-        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
+        final Optional<RelayChannel> optChannel = mDao.getChannel(channelName);
         if (optChannel.isPresent()) {
             final RelayChannel channel = optChannel.get();
             channel.postAndStoreEvent(new ChannelNoticeEvent(channel, sendingNick, notice));
