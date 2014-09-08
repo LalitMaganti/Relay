@@ -5,11 +5,13 @@ import android.util.Log;
 import java.util.List;
 
 import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 
 public class AccountParser extends CommandParser {
 
-    AccountParser(final RelayServer server) {
-        super(server);
+    public AccountParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override

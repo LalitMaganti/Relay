@@ -4,7 +4,14 @@ import com.google.common.base.Optional;
 
 import java.util.Collection;
 
-public interface UserChannelInterface {
+public interface UserChannelDao {
+
+    /**
+     * Gets the user who is currently using the library
+     *
+     * @return the user of the library
+     */
+    public LibraryUser getUser();
 
     /**
      * Get the channel by name from the list of channels which have been joined by the user
@@ -21,17 +28,4 @@ public interface UserChannelInterface {
      * @return an optional possibly containing the user matching the specified nick
      */
     public Optional<? extends ChannelUser> getUser(final String nick);
-
-    /**
-     * Get a collection of the users we are querying on this server
-     */
-    public Collection<? extends QueryUser> getQueryUsers();
-
-    /**
-     * Get the user by nick from list of users we are querying
-     *
-     * @param nick the nick of user to retrieve
-     * @return an optional possibly containing the query user matching the specified nick
-     */
-    public Optional<? extends QueryUser> getQueryUser(final String nick);
 }

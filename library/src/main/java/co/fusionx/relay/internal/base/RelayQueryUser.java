@@ -4,33 +4,35 @@ import android.text.TextUtils;
 
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.QueryUser;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.query.QueryMessageSelfEvent;
 import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayQuerySender;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.sender.QuerySender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implements QueryUser {
 
-    private final RelayUserChannelInterface mUserChannelInterface;
+    private final ServerConfiguration mConfiguration;
 
-    private final RelayMainUser mUser;
+    private final RelayLibraryUser mUser;
 
     private final Nick mNick;
 
     private final QuerySender mQuerySender;
 
-    public RelayQueryUser(final Server server, final RelayUserChannelInterface userChannelInterface,
-            final BaseSender sender, final String nick) {
-        super(server);
+    public RelayQueryUser(final EventBus<Event> eventBus, final RelayLibraryUser relayLibraryUser,
+            final ServerConfiguration configuration, final BaseSender sender, final String nick) {
+        super(eventBus);
 
-        mUserChannelInterface = userChannelInterface;
-        mUser = mUserChannelInterface.getMainUser();
+        mConfiguration = configuration;
+        mUser = relayLibraryUser;
 
         mNick = new RelayNick(nick);
         mQuerySender = new RelayQuerySender(this, sender);
@@ -71,7 +73,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
     public void close() {
         mQuerySender.close();
 
-        mUserChannelInterface.removeQueryUser(this);
+        mUser.removeQueryUser(this);
         postAndStoreEvent(new QueryClosedEvent(this));
     }
 
@@ -85,12 +87,13 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
         }
 
         final RelayQueryUser user = (RelayQueryUser) o;
-        return mNick.equals(user.mNick) && mServer.equals(user.mServer);
+        return mConfiguration.getTitle().equals(user.mConfiguration.getTitle())
+                && mNick.equals(user.mNick);
     }
 
     @Override
     public int hashCode() {
-        int result = mServer.hashCode();
+        int result = mConfiguration.getTitle().hashCode();
         result = 31 * result + mNick.hashCode();
         return result;
     }

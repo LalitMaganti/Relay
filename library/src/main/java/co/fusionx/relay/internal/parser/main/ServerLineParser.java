@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
 import co.fusionx.relay.internal.base.RelayServer;
@@ -22,6 +25,7 @@ import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
 
+@Singleton
 public class ServerLineParser {
 
     private final RelayServer mServer;
@@ -34,12 +38,15 @@ public class ServerLineParser {
 
     private String mLine;
 
-    public ServerLineParser(final RelayServer server, final BaseSender sender) {
+    @Inject
+    public ServerLineParser(final RelayServer server,
+            final BaseSender sender,
+            final Map<String, CommandParser> commandParserMap,
+            final SparseArray<CodeParser> codeParserMap) {
         mServer = server;
+        mCodeParser = codeParserMap;
+        mCommandParserMap = commandParserMap;
         mInternalSender = new RelayInternalSender(sender);
-
-        mCodeParser = CodeParser.getParserMap(server);
-        mCommandParserMap = CommandParser.getParserMap(server, sender);
     }
 
     /**

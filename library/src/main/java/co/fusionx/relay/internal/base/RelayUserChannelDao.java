@@ -5,38 +5,54 @@ import com.google.common.collect.FluentIterable;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
-import co.fusionx.relay.base.Server;
-import co.fusionx.relay.base.UserChannelInterface;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.UserChannelDao;
 import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.sender.BaseSender;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.util.ParseUtils;
 
-public class RelayUserChannelInterface implements UserChannelInterface {
-
-    private final Collection<RelayQueryUser> mQueryUsers;
+@Singleton
+public class RelayUserChannelDao implements UserChannelDao {
 
     private final Set<RelayChannelUser> mUsers;
 
-    private final RelayMainUser mUser;
+    private final RelayLibraryUser mUser;
 
-    private final Server mServer;
+    private final EventBus<Event> mConnectionWideEventBus;
+
+    private final ServerConfiguration mConfiguration;
 
     private final BaseSender mBaseSender;
 
-    RelayUserChannelInterface(final Server server, final BaseSender baseSender) {
-        mServer = server;
+    @Inject
+    RelayUserChannelDao(final EventBus<Event> connectionWideEventBus,
+            final ServerConfiguration configuration,
+            final BaseSender baseSender) {
+        mConnectionWideEventBus = connectionWideEventBus;
+        mConfiguration = configuration;
         mBaseSender = baseSender;
 
         // Set the nick name to the first choice nick
-        mUser = new RelayMainUser(server.getConfiguration().getNickStorage().getFirst());
+        mUser = new RelayLibraryUser(configuration.getNickStorage().getFirst(),
+                connectionWideEventBus, configuration, baseSender);
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);
+    }
 
-        mQueryUsers = new LinkedHashSet<>();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RelayLibraryUser getUser() {
+        return mUser;
     }
 
     /**
@@ -57,24 +73,6 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     @Override
     public Optional<RelayChannelUser> getUser(final String nick) {
         return FluentIterable.from(mUsers)
-                .filter(u -> nick.equals(u.getNick().getNickAsString()))
-                .first();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<RelayQueryUser> getQueryUsers() {
-        return mQueryUsers;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<RelayQueryUser> getQueryUser(final String nick) {
-        return FluentIterable.from(mQueryUsers)
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
                 .first();
     }
@@ -135,7 +133,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
      * @return the users that were in the channel
      */
     public Collection<RelayChannelUser> removeChannel(final RelayChannel channel) {
-        mServer.getUser().getChannels().remove(channel);
+        mUser.getChannels().remove(channel);
         channel.markInvalid();
         return channel.getUsers();
     }
@@ -188,7 +186,7 @@ public class RelayUserChannelInterface implements UserChannelInterface {
 
         // The app user check is to make sure that the app user isn't removed from the list of
         // users
-        if (setOfChannels.size() == 0 && !(user instanceof RelayMainUser)) {
+        if (setOfChannels.size() == 0 && !(user instanceof RelayLibraryUser)) {
             mUsers.remove(user);
         }
     }
@@ -212,26 +210,12 @@ public class RelayUserChannelInterface implements UserChannelInterface {
     }
 
     public RelayChannel getNewChannel(final String channelName) {
-        return new RelayChannel(mServer, mUser, mBaseSender, channelName);
-    }
-
-    public RelayQueryUser addQueryUser(final String nick) {
-        final RelayQueryUser user = new RelayQueryUser(mServer, this, mBaseSender, nick);
-        mQueryUsers.add(user);
-        return user;
-    }
-
-    public void removeQueryUser(final RelayQueryUser user) {
-        mQueryUsers.remove(user);
-        user.markInvalid();
+        return new RelayChannel(mConnectionWideEventBus, mUser, mConfiguration, mBaseSender,
+                channelName);
     }
 
     public Set<RelayChannelUser> getUsers() {
         return mUsers;
-    }
-
-    public RelayMainUser getMainUser() {
-        return mUser;
     }
 
     public void onConnectionTerminated() {

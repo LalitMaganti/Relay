@@ -9,17 +9,19 @@ import co.fusionx.relay.internal.base.RelayChannelUser;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.util.ParseUtils;
 
 import static co.fusionx.relay.internal.constants.ServerReplyCodes.RPL_NAMREPLY;
 import static co.fusionx.relay.util.IRCv3Utils.consumeNickPrefixes;
 
-class NameParser extends CodeParser {
+public class NameParser extends CodeParser {
 
     private RelayChannel mChannel;
 
-    public NameParser(final RelayServer server) {
-        super(server);
+    public NameParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override

@@ -10,9 +10,12 @@ import java.net.Socket;
 import java.util.Collection;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
 import co.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
@@ -32,23 +35,33 @@ import co.fusionx.relay.internal.parser.main.ServerLineParser;
 import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayCapSender;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
 import static co.fusionx.relay.internal.parser.connection.ConnectionParser.ParseStatus;
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
-public class RelayIRCConnection {
+@Singleton
+public class RelayIRCConnection implements IRCConnection {
+
+    private final EventBus<Event> mEventBus;
 
     private final ServerConfiguration mServerConfiguration;
 
     private final RelayServer mServer;
+
+    private final RelayUserChannelDao mUserChannelDao;
 
     private final BaseSender mBaseSender;
 
     private final RelayInternalSender mInternalSender;
 
     private final RelayCapSender mCapSender;
+
+    private final RelayLibraryUser mUser;
+
+    private final ServerLineParser mLineParser;
 
     private Thread mConnectionThread;
 
@@ -58,13 +71,23 @@ public class RelayIRCConnection {
 
     private boolean mStopped;
 
+    private ConnectionStatus mStatus;
+
     @Inject
-    RelayIRCConnection(final ServerConfiguration serverConfiguration,
-            final RelayServer server, final BaseSender baseSender) {
+    RelayIRCConnection(final EventBus<Event> eventBus,
+            final ServerConfiguration serverConfiguration,
+            final RelayServer server,
+            final RelayUserChannelDao userChannelDao,
+            final ServerLineParser parser,
+            final BaseSender baseSender) {
+        mEventBus = eventBus;
         mServerConfiguration = serverConfiguration;
         mServer = server;
+        mUserChannelDao = userChannelDao;
+        mLineParser = parser;
         mBaseSender = baseSender;
 
+        mUser = userChannelDao.getUser();
         mInternalSender = new RelayInternalSender(baseSender);
         mCapSender = new RelayCapSender(baseSender);
     }
@@ -75,7 +98,7 @@ public class RelayIRCConnection {
     }
 
     void stopConnection() {
-        if (mServer.getStatus() == ConnectionStatus.CONNECTED) {
+        if (mStatus == ConnectionStatus.CONNECTED) {
             mStopped = true;
             mInternalSender.quitServer(getPreferences().getQuitReason());
         } else if (mConnectionThread.isAlive()) {
@@ -142,7 +165,7 @@ public class RelayIRCConnection {
             onDisconnected(disconnectMessage, isReconnectNeeded());
         }
         closeSocket();
-        mServer.onConnectionTerminated();
+        mUserChannelDao.onConnectionTerminated();
     }
 
     private void initializeConnection() throws IOException {
@@ -150,7 +173,7 @@ public class RelayIRCConnection {
 
         final BufferedReader socketReader = SocketUtils.getSocketBufferedReader(mSocket);
         final BufferedWriter socketWriter = SocketUtils.getSocketBufferedWriter(mSocket);
-        mServer.onOutputStreamCreated(socketWriter);
+        mBaseSender.onOutputStreamCreated(socketWriter);
 
         // We are now in the phase where we can say we are connecting to the server
         onConnecting();
@@ -187,7 +210,7 @@ public class RelayIRCConnection {
     private void onStartParsing(final String nick, final BufferedReader reader) throws IOException {
         // Since we are now connected, reset the reconnect attempts
         mReconnectAttempts = 0;
-        mServer.getUser().setNick(nick);
+        mUserChannelDao.getUser().setNick(nick);
         onConnected();
 
         // Identifies with NickServ if the password exists
@@ -195,7 +218,7 @@ public class RelayIRCConnection {
             mInternalSender.sendNickServPassword(mServerConfiguration.getNickservPassword());
         }
 
-        final Collection<RelayChannel> channels = mServer.getUser().getChannels();
+        final Collection<RelayChannel> channels = mUserChannelDao.getUser().getChannels();
         if (channels.isEmpty()) {
             // Automatically join the channels specified in the configuration
             for (final String channelName : mServerConfiguration.getAutoJoinChannels()) {
@@ -207,20 +230,18 @@ public class RelayIRCConnection {
             }
         }
 
-        // Initialise the parser used to parse any lines from the server
-        final ServerLineParser lineParser = new ServerLineParser(mServer, mBaseSender);
         // Loops forever until broken
-        lineParser.parseMain(reader);
+        mLineParser.parseMain(reader);
     }
 
     private void onConnecting() {
-        mServer.updateStatus(ConnectionStatus.CONNECTING);
+        mStatus = ConnectionStatus.CONNECTING;
 
         mServer.postAndStoreEvent(new ConnectingEvent(mServer));
     }
 
     private void onReconnecting() {
-        mServer.updateStatus(ConnectionStatus.RECONNECTING);
+        mStatus = ConnectionStatus.RECONNECTING;
 
         mServer.postAndStoreEvent(new ReconnectEvent(mServer));
     }
@@ -240,14 +261,14 @@ public class RelayIRCConnection {
     }
 
     private void onStopped() {
-        mServer.updateStatus(ConnectionStatus.STOPPED);
+        mStatus = ConnectionStatus.STOPPED;
 
-        for (final RelayChannel channel : mServer.getUser().getChannels()) {
+        for (final RelayChannel channel : mUserChannelDao.getUser().getChannels()) {
             channel.postAndStoreEvent(new ChannelStopEvent(channel));
             channel.markInvalid();
         }
 
-        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+        for (final RelayQueryUser user : mUser.getQueryUsers()) {
             user.postAndStoreEvent(new QueryStopEvent(user));
             user.markInvalid();
         }
@@ -260,13 +281,13 @@ public class RelayIRCConnection {
             final Function<RelayChannel, ChannelEvent> channelFunction,
             final Function<RelayQueryUser, QueryEvent> queryFunction,
             final Supplier<ServerEvent> serverFunction) {
-        mServer.updateStatus(status);
+        mStatus = status;
 
-        for (final RelayChannel channel : mServer.getUser().getChannels()) {
+        for (final RelayChannel channel : mUserChannelDao.getUser().getChannels()) {
             channel.postAndStoreEvent(channelFunction.apply(channel));
         }
 
-        for (final RelayQueryUser user : mServer.getUserChannelInterface().getQueryUsers()) {
+        for (final RelayQueryUser user : mUser.getQueryUsers()) {
             user.postAndStoreEvent(queryFunction.apply(user));
         }
 
@@ -277,8 +298,23 @@ public class RelayIRCConnection {
         return mReconnectAttempts < getPreferences().getReconnectAttemptsCount();
     }
 
-    // Getters
-    RelayServer getServer() {
+    @Override
+    public ConnectionStatus getStatus() {
+        return mStatus;
+    }
+
+    @Override
+    public RelayServer getServer() {
         return mServer;
+    }
+
+    @Override
+    public EventBus<Event> getSuperBus() {
+        return mEventBus;
+    }
+
+    @Override
+    public RelayUserChannelDao getUserChannelDao() {
+        return mUserChannelDao;
     }
 }

@@ -1,35 +1,38 @@
 package co.fusionx.relay.dcc.chat;
 
-import android.os.Handler;
-import android.os.HandlerThread;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import co.fusionx.relay.internal.base.RelayAbstractConversation;
-import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
+import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.base.RelayAbstractConversation;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent> {
 
-    private final Handler mCallHandler;
+    private final ExecutorService mExecutorService;
 
     private final DCCChatConnection mDCCChatConnection;
 
+    private final ServerConfiguration mServerConfiguration;
+
     private final DCCPendingConnection mPendingConnection;
 
-    public DCCChatConversation(final RelayServer server,
+    public DCCChatConversation(final EventBus<Event> eventBus,
+            final ServerConfiguration serverConfiguration,
             final DCCPendingConnection pendingConnection) {
-        super(server);
+        super(eventBus);
 
+        mServerConfiguration = serverConfiguration;
         mPendingConnection = pendingConnection;
 
         mDCCChatConnection = new DCCChatConnection(mPendingConnection, this);
-
-        final HandlerThread handlerThread = new HandlerThread("dccConnection");
-        handlerThread.start();
-        mCallHandler = new Handler(handlerThread.getLooper());
+        mExecutorService = Executors.newCachedThreadPool();
     }
 
     public void startChat() {
@@ -37,22 +40,23 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
     }
 
     public void sendMessage(final String message) {
-        mCallHandler.post(() -> mDCCChatConnection.writeLine(message));
+        mExecutorService.submit(() -> mDCCChatConnection.writeLine(message));
 
         if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new DCCChatSelfMessageEvent(this, message));
+        postAndStoreEvent(new DCCChatSelfMessageEvent(this, null, message));
     }
 
     public void sendAction(final String action) {
         final String line = String.format("\u0001ACTION %1$s\u0001", action);
-        mCallHandler.post(() -> mDCCChatConnection.writeLine(line));
+        mExecutorService.submit(() -> mDCCChatConnection.writeLine(line));
 
         if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new DCCChatSelfActionEvent(this, action));
+        // TODO - this is wrong  fix it
+        postAndStoreEvent(new DCCChatSelfActionEvent(this, null, action));
     }
 
     public void closeChat() {
@@ -75,14 +79,14 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
         }
 
         final DCCChatConversation that = (DCCChatConversation) o;
-        return mPendingConnection.getDccRequestNick()
-                .equals(that.mPendingConnection.getDccRequestNick())
-                && mServer.equals(that.mServer);
+        return mServerConfiguration.getTitle().equals(that.mServerConfiguration.getTitle())
+                && mPendingConnection.getDccRequestNick()
+                .equals(that.mPendingConnection.getDccRequestNick());
     }
 
     @Override
     public int hashCode() {
-        int result = mServer.hashCode();
+        int result = mServerConfiguration.getTitle().hashCode();
         result = 31 * result + mPendingConnection.hashCode();
         return result;
     }

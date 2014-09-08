@@ -4,20 +4,22 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
+import co.fusionx.relay.event.channel.ChannelInitialTopicEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
-import co.fusionx.relay.event.channel.ChannelInitialTopicEvent;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
-class TopicParser extends CodeParser {
+public class InitalTopicParser extends CodeParser {
 
-    private String tempTopic;
+    private String mTempTopic;
 
-    TopicParser(final RelayServer server) {
-        super(server);
+    public InitalTopicParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override
@@ -30,7 +32,7 @@ class TopicParser extends CodeParser {
     }
 
     private void onTopic(final List<String> parsedArray) {
-        tempTopic = parsedArray.get(1);
+        mTempTopic = parsedArray.get(1);
     }
 
     private void onTopicInfo(final List<String> parsedArray) {
@@ -40,8 +42,8 @@ class TopicParser extends CodeParser {
 
         LogUtils.logOptionalBug(optional, mServer);
         Optionals.ifPresent(optional, channel -> {
-            channel.postAndStoreEvent(new ChannelInitialTopicEvent(channel, nick, tempTopic));
-            tempTopic = null;
+            channel.postAndStoreEvent(new ChannelInitialTopicEvent(channel, nick, mTempTopic));
+            mTempTopic = null;
         });
     }
 }

@@ -7,14 +7,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
+import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayAbstractConversation;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.sender.BaseSender;
+import co.fusionx.relay.misc.EventBus;
 
 public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent> {
+
+    private final ServerConfiguration mServerConfiguration;
 
     private final BaseSender mBaseSender;
 
@@ -22,10 +26,12 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
 
     private final Map<String, DCCFileConnection> mConnectionList;
 
-    public DCCFileConversation(final RelayServer server, final BaseSender baseSender,
-            final String nick) {
-        super(server);
+    public DCCFileConversation(final EventBus<Event> eventBus,
+            final ServerConfiguration serverConfiguration,
+            final BaseSender baseSender, final String nick) {
+        super(eventBus);
 
+        mServerConfiguration = serverConfiguration;
         mBaseSender = baseSender;
         mNick = nick;
 
@@ -65,12 +71,13 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
         }
 
         final DCCFileConversation that = (DCCFileConversation) o;
-        return mNick.equals(that.mNick) && mServer.equals(that.mServer);
+        return mServerConfiguration.getTitle().equals(that.mServerConfiguration.getTitle())
+                && mNick.equals(that.mNick);
     }
 
     @Override
     public int hashCode() {
-        int result = mServer.hashCode();
+        int result = mServerConfiguration.getTitle().hashCode();
         result = 31 * result + mNick.hashCode();
         return result;
     }

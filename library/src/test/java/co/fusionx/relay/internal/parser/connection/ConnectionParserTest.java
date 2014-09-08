@@ -32,7 +32,7 @@ public class ConnectionParserTest {
 
             final BufferedReader bufferedReaderForTesting = new BufferedReader(readerForTesting);
             final BufferedWriter bufferedWriterForParser = new BufferedWriter(writerForParser);
-            server.onOutputStreamCreated(bufferedWriterForParser);
+            server.mBaseSender.onOutputStreamCreated(bufferedWriterForParser);
 
             final ConnectionParser connectionParser = new ConnectionParser(server);
             connectionParser.parseLine(":test.server CAP * LS :sasl");

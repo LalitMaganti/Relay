@@ -12,11 +12,13 @@ import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
 import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 
-class JoinParser extends CommandParser {
+public class JoinParser extends CommandParser {
 
-    public JoinParser(final RelayServer server) {
-        super(server);
+    public JoinParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override
@@ -29,7 +31,7 @@ class JoinParser extends CommandParser {
         RelayChannel channel = optChannel.orNull();
 
         // Store whether the user is the app user
-        final boolean appUser = mServer.getUser().isNickEqual(user);
+        final boolean appUser = mUser.isNickEqual(user);
         if (channel == null) {
             // If the channel is null then we haven't joined it before (disconnection) and we should
             // create a new channel
@@ -57,7 +59,7 @@ class JoinParser extends CommandParser {
 
         if (appUser) {
             // Also post a server event if the user who joined was the app user
-            final ServerEvent joinEvent = new JoinEvent(channel);
+            final ServerEvent joinEvent = new JoinEvent(mServer, channel);
             mServer.postAndStoreEvent(joinEvent);
         }
     }

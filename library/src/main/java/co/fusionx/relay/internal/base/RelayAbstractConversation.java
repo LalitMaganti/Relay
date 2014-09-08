@@ -4,37 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.misc.EventBus;
 
 public abstract class RelayAbstractConversation<T extends Event> implements Conversation<T> {
 
-    protected final Server mServer;
+    private final List<T> mBuffer;
 
-    protected final List<T> mBuffer;
+    private final EventBus<T> mEventBus;
 
-    protected final EventBus<T> mEventBus;
+    private final EventBus<Event> mConnectionWideEventBus;
 
-    protected boolean mValid;
+    private boolean mValid;
 
-    // For RelayServer implementation, the server cane be null - RelayServer MUST override
-    // getServer however
-    public RelayAbstractConversation(final Server server) {
-        mServer = server;
+    public RelayAbstractConversation(final EventBus<Event> eventBus) {
+        mConnectionWideEventBus = eventBus;
+
         mBuffer = new ArrayList<>();
         mEventBus = new EventBus<>();
         mValid = true;
-    }
-
-    /**
-     * Returns the server this channel is attached to
-     *
-     * @return the server this channel belongs to
-     */
-    @Override
-    public Server getServer() {
-        return mServer;
     }
 
     /**
@@ -54,13 +42,16 @@ public abstract class RelayAbstractConversation<T extends Event> implements Conv
     }
 
     /**
-     * Gets the buffer of the channel - the events which occured since this channel was created
-     *
-     * @return a list of the events
+     * {@inheritDoc}
      */
     @Override
     public List<T> getBuffer() {
         return mBuffer;
+    }
+
+    @Override
+    public EventBus<Event> getConnectionWideBus() {
+        return mConnectionWideEventBus;
     }
 
     // Implementation specific methods
@@ -68,7 +59,7 @@ public abstract class RelayAbstractConversation<T extends Event> implements Conv
         mBuffer.add(event);
 
         mEventBus.post(event);
-        getServer().getServerWideBus().post(event);
+        mConnectionWideEventBus.post(event);
     }
 
     public void markInvalid() {

@@ -8,13 +8,15 @@ import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.event.channel.ChannelTopicEvent;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
 
-public class TopicParser extends CommandParser {
+public class TopicChangeParser extends CommandParser {
 
-    public TopicParser(final RelayServer server) {
-        super(server);
+    public TopicChangeParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override

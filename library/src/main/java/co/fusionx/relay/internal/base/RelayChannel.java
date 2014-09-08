@@ -8,13 +8,14 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.Server;
-import co.fusionx.relay.base.UserChannelInterface;
+import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;
 import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayChannelSender;
+import co.fusionx.relay.misc.EventBus;
 import co.fusionx.relay.sender.ChannelSender;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
@@ -25,7 +26,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
     private final static ImmutableList<Character> CHANNEL_PREFIXES = ImmutableList.of('#', '&',
             '+', '!');
 
-    private final RelayMainUser mUser;
+    private final RelayLibraryUser mUser;
 
     private final String mChannelName;
 
@@ -33,11 +34,17 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
 
     private final ChannelSender mChannelSender;
 
-    RelayChannel(final Server server, final RelayMainUser user, final BaseSender baseSender,
-            final String channelName) {
-        super(server);
+    private final ServerConfiguration mServerConfiguration;
 
-        mUser = user;
+    RelayChannel(final EventBus<Event> eventBus,
+            final RelayLibraryUser relayLibraryUser,
+            final ServerConfiguration serverConfiguration,
+            final BaseSender baseSender,
+            final String channelName) {
+        super(eventBus);
+        mServerConfiguration = serverConfiguration;
+
+        mUser = relayLibraryUser;
         mChannelSender = new RelayChannelSender(this, baseSender);
         mChannelName = channelName;
 
@@ -96,7 +103,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
             return false;
         }
         final RelayChannel otherChannel = (RelayChannel) o;
-        return otherChannel.getServer().equals(getServer())
+        return mServerConfiguration.getTitle().equals(otherChannel.mServerConfiguration.getTitle())
                 && otherChannel.getName().equalsIgnoreCase(mChannelName);
     }
 

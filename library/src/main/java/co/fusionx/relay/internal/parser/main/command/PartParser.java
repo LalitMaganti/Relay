@@ -13,12 +13,14 @@ import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.channel.PartEvent;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.util.ParseUtils;
 
 public class PartParser extends RemoveUserParser {
 
-    public PartParser(final RelayServer server) {
-        super(server);
+    public PartParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override

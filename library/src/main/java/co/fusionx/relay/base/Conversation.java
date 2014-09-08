@@ -9,9 +9,9 @@ public interface Conversation<E extends Event> {
 
     public String getId();
 
-    public Server getServer();
-
     public List<? extends E> getBuffer();
+
+    public EventBus<Event> getConnectionWideBus();
 
     public EventBus<? extends E> getBus();
 

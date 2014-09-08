@@ -11,9 +11,10 @@ import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.VersionEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
+import co.fusionx.relay.internal.base.RelayLibraryUser;
 import co.fusionx.relay.internal.base.RelayQueryUser;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelInterface;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.internal.parser.main.MentionParser;
 import co.fusionx.relay.internal.sender.BaseSender;
@@ -25,19 +26,21 @@ public class CTCPParser {
 
     private final RelayServer mServer;
 
+    private final RelayLibraryUser mUser;
+
     private final DCCParser mDCCParser;
 
-    private final RelayUserChannelInterface mUserChannelInterface;
+    private final RelayUserChannelDao mUserChannelDao;
 
     private final RelayCtcpResponseSender mCtcpResponseSender;
 
-    public CTCPParser(final RelayServer server, final BaseSender sender,
-            final DCCParser dccParser) {
+    public CTCPParser(final RelayServer server, final RelayUserChannelDao dao,
+            final BaseSender sender, final DCCParser dccParser) {
         mServer = server;
         mDCCParser = dccParser;
+        mUserChannelDao = dao;
 
-        mUserChannelInterface = server.getUserChannelInterface();
-
+        mUser = dao.getUser();
         mCtcpResponseSender = new RelayCtcpResponseSender(sender);
     }
 
@@ -85,23 +88,23 @@ public class CTCPParser {
     }
 
     private void onParseUserAction(final String nick, final String action) {
-        final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
-        final RelayQueryUser user = optional.or(mUserChannelInterface.addQueryUser(nick));
+        final Optional<RelayQueryUser> optional = mUser.getQueryUser(nick);
+        final RelayQueryUser user = optional.or(mUser.addQueryUser(nick));
         if (!optional.isPresent()) {
-            mServer.postAndStoreEvent(new NewPrivateMessageEvent(user));
+            mServer.postAndStoreEvent(new NewPrivateMessageEvent(mServer, user));
         }
         user.postAndStoreEvent(new QueryActionWorldEvent(user, action));
     }
 
     private void onParseChannelAction(final String channelName, final String sendingNick,
             final String action) {
-        final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
+        final Optional<RelayChannel> optChannel = mUserChannelDao.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
-            final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
+            final Optional<RelayChannelUser> optUser = mUserChannelDao.getUser(sendingNick);
             final boolean mention = MentionParser.onMentionableCommand(action,
-                    mServer.getUser().getNick().getNickAsString());
+                    mUserChannelDao.getUser().getNick().getNickAsString());
 
             final ChannelEvent event;
             if (optUser.isPresent()) {

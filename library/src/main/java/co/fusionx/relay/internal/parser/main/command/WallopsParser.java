@@ -4,12 +4,14 @@ import java.util.List;
 
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.event.server.WallopsEvent;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.util.ParseUtils;
 
 public class WallopsParser extends CommandParser {
 
-    WallopsParser(final RelayServer server) {
-        super(server);
+    public WallopsParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override

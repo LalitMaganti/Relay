@@ -48,7 +48,7 @@ public class RelayChannelUser implements ChannelUser {
             final RelayChannel relayChannel = (RelayChannel) channel;
             final UserLevel level = mUserLevelMap.get(relayChannel);
             if (level == null) {
-                getPreferences().logMissingData(relayChannel.getServer());
+                // getPreferences().logMissingData(relayChannel.getServer());
             }
             return level == null ? UserLevel.NONE : level;
         }

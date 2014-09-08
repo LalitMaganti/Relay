@@ -1,5 +1,7 @@
 package co.fusionx.relay.base;
 
+import com.google.common.base.Optional;
+
 import android.util.Pair;
 
 import java.util.Set;
@@ -11,18 +13,18 @@ public interface ConnectionManager {
      *
      * @param configuration the configuration you want to connect with
      * @return a pair of objects - the first item is a boolean which is true if the server already
-     * exists in the manager. The second item is the server which was created.
+     * exists in the manager. The second item is the connection created.
      */
-    Pair<Boolean, ? extends Server> requestConnection(ServerConfiguration configuration);
+    Pair<Boolean, ? extends IRCConnection> requestConnection(ServerConfiguration configuration);
 
     /**
      * Reconnect to the specified server
      *
-     * @param server the server to reconnect to
+     * @param server the connection to reconnect
      * @throws IllegalArgumentException if the server is not in this manager or if the server is
      *                                  not in the ConnectionStatus.Disconnected state
      */
-    void requestReconnection(Server server);
+    void requestReconnection(IRCConnection server);
 
     /**
      * Disconnect from the server with the specified name and removes it from this manager
@@ -51,7 +53,7 @@ public interface ConnectionManager {
      * @param serverName the name of the server you're wanting to get
      * @return the server with the required title if it exists - this may be null
      */
-    Server getServerIfExists(String serverName);
+    Optional<IRCConnection> getConnectionIfExists(String serverName);
 
     /**
      * Returns the number of servers which are currently managed by this manager
@@ -65,5 +67,5 @@ public interface ConnectionManager {
      *
      * @return an immutable set of the servers which are managed by this manager
      */
-    Set<? extends Server> getImmutableServerSet();
+    Set<? extends IRCConnection> getConnectionSet();
 }

@@ -2,7 +2,7 @@ package co.fusionx.relay.event.channel;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.Nick;
-import co.fusionx.relay.internal.base.RelayMainUser;
+import co.fusionx.relay.internal.base.RelayLibraryUser;
 
 public class ChannelNickChangeEvent extends ChannelEvent {
 
@@ -10,10 +10,10 @@ public class ChannelNickChangeEvent extends ChannelEvent {
 
     public final Nick newNick;
 
-    public final RelayMainUser relayUser;
+    public final RelayLibraryUser relayUser;
 
     public ChannelNickChangeEvent(final Channel channel, final Nick oldNick,
-            final RelayMainUser user) {
+            final RelayLibraryUser user) {
         super(channel);
 
         this.oldNick = oldNick;

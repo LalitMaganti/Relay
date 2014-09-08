@@ -1,5 +1,6 @@
 package co.fusionx.relay.internal.base;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 
 import android.util.Pair;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 import co.fusionx.relay.base.ConnectionManager;
 import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.interfaces.RelayConfiguration;
@@ -44,7 +46,7 @@ public class RelayConnectionManager implements ConnectionManager {
      * {@inheritDoc}
      */
     @Override
-    public Pair<Boolean, ? extends Server> requestConnection(final ServerConfiguration
+    public Pair<Boolean, ? extends IRCConnection> requestConnection(final ServerConfiguration
             configuration) {
         RelayIRCConnection connection = mConnectionMap.get(configuration.getTitle());
 
@@ -56,25 +58,26 @@ public class RelayConnectionManager implements ConnectionManager {
             connection.startConnection();
             mConnectionMap.put(configuration.getTitle(), connection);
         }
-        return new Pair<>(exists, connection.getServer());
+        return new Pair<>(exists, connection);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void requestReconnection(final Server server) {
-        final RelayIRCConnection connection = mConnectionMap.get(server.getTitle());
+    public void requestReconnection(final IRCConnection connection) {
+        final RelayIRCConnection realConnection = mConnectionMap
+                .get(connection.getServer().getTitle());
 
-        if (connection == null) {
+        if (realConnection == null) {
             throw new IllegalArgumentException("Server not managed by this manager");
         }
 
-        if (server.getStatus() != ConnectionStatus.DISCONNECTED) {
+        if (realConnection.getStatus() != ConnectionStatus.DISCONNECTED) {
             throw new IllegalArgumentException("Server not in disconnected state");
         }
 
-        connection.startConnection();
+        realConnection.startConnection();
     }
 
     /**
@@ -105,11 +108,9 @@ public class RelayConnectionManager implements ConnectionManager {
      * {@inheritDoc}
      */
     @Override
-    public Server getServerIfExists(final String serverName) {
-        if (mConnectionMap.containsKey(serverName)) {
-            return mConnectionMap.get(serverName).getServer();
-        }
-        return null;
+    public Optional<IRCConnection> getConnectionIfExists(final String serverName) {
+        final RelayIRCConnection connection = mConnectionMap.get(serverName);
+        return Optional.fromNullable(connection);
     }
 
     /**
@@ -124,9 +125,7 @@ public class RelayConnectionManager implements ConnectionManager {
      * {@inheritDoc}
      */
     @Override
-    public Set<? extends Server> getImmutableServerSet() {
-        return FluentIterable.from(mConnectionMap.values())
-                .transform(RelayIRCConnection::getServer)
-                .toSet();
+    public Set<? extends IRCConnection> getConnectionSet() {
+        return FluentIterable.from(mConnectionMap.values()).toSet();
     }
 }

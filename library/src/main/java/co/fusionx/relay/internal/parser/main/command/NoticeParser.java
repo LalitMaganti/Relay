@@ -4,20 +4,23 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.internal.base.RelayChannel;
-import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.event.channel.ChannelNoticeEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NoticeEvent;
+import co.fusionx.relay.internal.base.RelayChannel;
+import co.fusionx.relay.internal.base.RelayQueryUser;
+import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.util.ParseUtils;
 
-class NoticeParser extends CommandParser {
+public class NoticeParser extends CommandParser {
 
     private final CTCPParser mCTCPParser;
 
-    public NoticeParser(final RelayServer server, final CTCPParser CTCPParser) {
-        super(server);
+    public NoticeParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface,
+            final CTCPParser CTCPParser) {
+        super(server, userChannelInterface);
 
         mCTCPParser = CTCPParser;
     }
@@ -35,7 +38,7 @@ class NoticeParser extends CommandParser {
 
             if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelNotice(recipient, notice, sendingNick);
-            } else if (recipient.equals(mServer.getUser().getNick().getNickAsString())) {
+            } else if (recipient.equals(mUser.getNick().getNickAsString())) {
                 onParseUserNotice(sendingNick, notice);
             }
         }
@@ -55,7 +58,7 @@ class NoticeParser extends CommandParser {
     }
 
     private void onParseUserNotice(final String sendingNick, final String notice) {
-        final Optional<RelayQueryUser> optUser = mUserChannelInterface.getQueryUser(sendingNick);
+        final Optional<RelayQueryUser> optUser = mUser.getQueryUser(sendingNick);
         if (optUser.isPresent()) {
             final RelayQueryUser user = optUser.get();
             user.postAndStoreEvent(new QueryMessageWorldEvent(user, notice));

@@ -15,7 +15,8 @@ import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class UserInputParser {
 
-    public static void onParseChannelMessage(final Channel channel, final String message) {
+    public static void onParseChannelMessage(final Server server,
+            final Channel channel, final String message) {
         final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
@@ -63,14 +64,15 @@ public class UserInputParser {
                 }
                 break;
             default:
-                onParseServerCommand(channel.getServer(), message);
+                onParseServerCommand(server, message);
                 return;
         }
 
-        onUnknownEvent(channel.getServer(), message);
+        onUnknownEvent(server, message);
     }
 
-    public static void onParseUserMessage(final QueryUser queryUser, final String message) {
+    public static void onParseUserMessage(final Server server, final QueryUser queryUser,
+            final String message) {
         final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
@@ -91,10 +93,10 @@ public class UserInputParser {
                 }
                 break;
             default:
-                onParseServerCommand(queryUser.getServer(), message);
+                onParseServerCommand(server, message);
                 return;
         }
-        onUnknownEvent(queryUser.getServer(), message);
+        onUnknownEvent(server, message);
     }
 
     private static boolean parseUserCloseCommand(final int arrayLength, final QueryUser queryUser) {
@@ -176,7 +178,8 @@ public class UserInputParser {
         // server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
     }
 
-    public static void onParseDCCChatEvent(final DCCChatConversation chatConnection,
+    public static void onParseDCCChatEvent(final Server server,
+            final DCCChatConversation chatConnection,
             final String message) {
         final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
@@ -199,9 +202,9 @@ public class UserInputParser {
                 }
                 break;
             default:
-                onParseServerCommand(chatConnection.getServer(), message);
+                onParseServerCommand(server, message);
                 return;
         }
-        onUnknownEvent(chatConnection.getServer(), message);
+        onUnknownEvent(server, message);
     }
 }

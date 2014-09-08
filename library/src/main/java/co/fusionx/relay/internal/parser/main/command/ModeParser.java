@@ -6,21 +6,23 @@ import java.util.List;
 
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayMainUser;
+import co.fusionx.relay.internal.base.RelayLibraryUser;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelModeEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
-class ModeParser extends CommandParser {
+public class ModeParser extends CommandParser {
 
-    public ModeParser(final RelayServer server) {
-        super(server);
+    public ModeParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override
@@ -55,10 +57,10 @@ class ModeParser extends CommandParser {
             final RelayChannel channel, final String mode) {
         final String source = parsedArray.get(2);
         final String nick = ParseUtils.getNickFromPrefix(source);
-        final boolean appUser = mServer.getUser().isNickEqual(nick);
+        final boolean appUser = mUser.isNickEqual(nick);
 
         final Optional<RelayChannelUser> optUser = appUser
-                ? Optional.of(mServer.getUser())
+                ? Optional.of(mUser)
                 : mUserChannelInterface.getUser(nick);
         final Optional<RelayChannelUser> optSending = mUserChannelInterface.getUser(sendingNick);
 
@@ -72,7 +74,7 @@ class ModeParser extends CommandParser {
             user.onModeChanged(channel, newLevel);
 
             event = appUser
-                    ? new ChannelUserLevelChangeEvent(channel, mode, (RelayMainUser) user,
+                    ? new ChannelUserLevelChangeEvent(channel, mode, (RelayLibraryUser) user,
                     oldLevel, newLevel, optSending, sendingNick)
                     : new ChannelWorldLevelChangeEvent(channel, mode, user, oldLevel, newLevel,
                             optSending, sendingNick);

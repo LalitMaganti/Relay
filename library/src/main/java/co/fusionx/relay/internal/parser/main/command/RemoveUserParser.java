@@ -5,17 +5,19 @@ import com.google.common.base.Optional;
 import java.util.List;
 
 import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
 import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import co.fusionx.relay.internal.base.RelayUserChannelDao;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
 
 public abstract class RemoveUserParser extends CommandParser {
 
-    RemoveUserParser(RelayServer server) {
-        super(server);
+    public RemoveUserParser(final RelayServer server,
+            final RelayUserChannelDao userChannelInterface) {
+        super(server, userChannelInterface);
     }
 
     @Override
@@ -29,7 +31,7 @@ public abstract class RemoveUserParser extends CommandParser {
             LogUtils.logOptionalBug(optUser, mServer);
 
             Optionals.ifPresent(optUser, user -> {
-                if (mServer.getUser().isNickEqual(user.getNick().getNickAsString())) {
+                if (mUser.isNickEqual(user.getNick().getNickAsString())) {
                     onRemoved(parsedArray, prefix, channel);
                 } else {
                     onUserRemoved(parsedArray, prefix, channel, user);
