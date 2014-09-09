@@ -1,30 +1,30 @@
 package co.fusionx.relay.internal.base;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.Socket;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.parser.connection.ConnectionParser;
-import co.fusionx.relay.internal.parser.main.ServerLineParser;
-import co.fusionx.relay.internal.sender.base.RelayServerSender;
-import co.fusionx.relay.internal.sender.packet.CapPacketSender;
-import co.fusionx.relay.internal.sender.packet.InternalPacketSender;
-import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.parser.ConnectionParser;
+import co.fusionx.relay.internal.parser.ServerLineParser;
+import co.fusionx.relay.internal.sender.InternalSender;
+import co.fusionx.relay.internal.sender.RelayServerSender;
+import co.fusionx.relay.internal.sender.CapPacketSender;
+import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
-import static co.fusionx.relay.internal.parser.connection.ConnectionParser.ConnectionLineParseStatus;
-import static co.fusionx.relay.internal.parser.connection.ConnectionParser.ParseStatus;
+import static co.fusionx.relay.internal.parser.ConnectionParser.ConnectionLineParseStatus;
+import static co.fusionx.relay.internal.parser.ConnectionParser.ParseStatus;
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
-@Singleton
 public class RelayIRCConnection {
 
     private final ConnectionConfiguration mConnectionConfiguration;
@@ -41,7 +41,7 @@ public class RelayIRCConnection {
 
     private final PacketSender mPacketSender;
 
-    private final InternalPacketSender mInternalSender;
+    private final InternalSender mInternalSender;
 
     private final CapPacketSender mCapSender;
 
@@ -55,7 +55,7 @@ public class RelayIRCConnection {
             final InternalStatusManager internalStatusManager,
             final ConnectionParser connectionParser, final ServerLineParser lineParser,
             final PacketSender sender, final RelayServerSender serverSender,
-            final InternalPacketSender internalPacketSender,
+            final InternalSender internalSender,
             final CapPacketSender capPacketSender) {
         mConnectionConfiguration = connectionConfiguration;
         mUserChannelGroup = userChannelGroup;
@@ -66,7 +66,7 @@ public class RelayIRCConnection {
 
         mPacketSender = sender;
         mServerSender = serverSender;
-        mInternalSender = internalPacketSender;
+        mInternalSender = internalSender;
         mCapSender = capPacketSender;
     }
 
@@ -117,7 +117,7 @@ public class RelayIRCConnection {
         // This nick may well be different from any of the nicks in storage - get the
         // *official* nick from the server itself and use it
         // If the nick is null then we have no hope of progressing
-        if (status.getStatus() == ParseStatus.NICK && Utils.isNotEmpty(status.getNick())) {
+        if (status.getStatus() == ParseStatus.NICK && StringUtils.isNotEmpty(status.getNick())) {
             onStartParsing(status.getNick(), socketReader);
         }
     }
@@ -128,7 +128,7 @@ public class RelayIRCConnection {
         mCapSender.sendLs();
 
         // Follow RFC2812's recommended order of sending - PASS -> NICK -> USER
-        if (Utils.isNotEmpty(mConnectionConfiguration.getServerPassword())) {
+        if (StringUtils.isNotEmpty(mConnectionConfiguration.getServerPassword())) {
             mInternalSender.sendServerPassword(mConnectionConfiguration.getServerPassword());
         }
         mServerSender.sendNick(mConnectionConfiguration.getNickStorage().getFirst());
@@ -138,7 +138,7 @@ public class RelayIRCConnection {
 
     private void sendPostRegisterMessages() {
         // Identifies with NickServ if the password exists
-        if (Utils.isNotEmpty(mConnectionConfiguration.getNickservPassword())) {
+        if (StringUtils.isNotEmpty(mConnectionConfiguration.getNickservPassword())) {
             mInternalSender.sendNickServPassword(mConnectionConfiguration.getNickservPassword());
         }
     }

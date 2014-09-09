@@ -6,5 +6,5 @@ import co.fusionx.relay.event.server.ServerEvent;
 
 public interface InternalServer extends InternalConversation<ServerEvent>, Server {
 
-    void addCapability(CapCapability capability);
+    public void addCapability(CapCapability capability);
 }

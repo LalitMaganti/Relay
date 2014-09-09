@@ -1,14 +1,14 @@
 package co.fusionx.relay.core;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import co.fusionx.relay.misc.NickStorage;
-import co.fusionx.relay.util.Utils;
 
 public class ConnectionConfiguration implements Parcelable {
 
@@ -155,7 +155,7 @@ public class ConnectionConfiguration implements Parcelable {
 
     // Helper methods
     public boolean shouldSendSasl() {
-        return Utils.isNotEmpty(mSaslUsername) && Utils.isNotEmpty(mSaslPassword);
+        return StringUtils.isNotEmpty(mSaslUsername) && StringUtils.isNotEmpty(mSaslPassword);
     }
 
     public void writeToParcel(final Parcel out, final int flags) {
@@ -408,9 +408,9 @@ public class ConnectionConfiguration implements Parcelable {
         }
 
         public ConnectionConfiguration build() {
-            if (TextUtils.isEmpty(mTitle)) {
+            if (StringUtils.isEmpty(mTitle)) {
                 throw new IllegalArgumentException("The server title cannot be empty");
-            } else if (TextUtils.isEmpty(mUrl)) {
+            } else if (StringUtils.isEmpty(mUrl)) {
                 throw new IllegalArgumentException("The server URL cannot be empty");
             }
             return new ConnectionConfiguration(this);

@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import co.fusionx.relay.conversation.Channel;
 import co.fusionx.relay.core.ConnectionConfiguration;
@@ -19,11 +18,10 @@ import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalLibraryUser;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.sender.base.RelayChannelSender;
-import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.sender.RelayChannelSender;
+import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.util.ParseUtils;
 
-@Singleton
 public class RelayUserChannelGroup implements InternalUserChannelGroup {
 
     private final Set<InternalChannelUser> mUsers;

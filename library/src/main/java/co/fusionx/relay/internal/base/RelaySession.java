@@ -51,7 +51,7 @@ public class RelaySession implements Session {
     private RelayIRCConnection mConnection;
 
     public RelaySession(final ConnectionConfiguration configuration) {
-        mObjectGraph = ObjectGraph.create(new RelayBaseModule(configuration));
+        mObjectGraph = ObjectGraph.create(new RelayModule(configuration));
         mObjectGraph.inject(this);
 
         mScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();

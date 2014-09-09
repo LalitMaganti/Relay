@@ -1,12 +1,8 @@
 package co.fusionx.relay.util;
 
-import android.text.TextUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
-
-    public static boolean isNotEmpty(final CharSequence cs) {
-        return !TextUtils.isEmpty(cs);
-    }
 
     public static String stripColorsFromMessage(final String line) {
         final int length = line.length();
@@ -94,6 +90,6 @@ public class Utils {
     }
 
     public static String returnNonEmpty(final String first, final String second) {
-        return Utils.isNotEmpty(first) ? first : second;
+        return StringUtils.isNotEmpty(first) ? first : second;
     }
 }

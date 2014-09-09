@@ -13,7 +13,7 @@ import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayAbstractConversation;
-import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.bus.GenericBus;
 
 public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent> {

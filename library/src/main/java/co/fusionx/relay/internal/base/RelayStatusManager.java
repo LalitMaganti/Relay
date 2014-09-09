@@ -30,7 +30,6 @@ import co.fusionx.relay.internal.function.FluentIterables;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
-@Singleton
 public class RelayStatusManager implements InternalStatusManager {
 
     private final ConnectionConfiguration mConfiguration;

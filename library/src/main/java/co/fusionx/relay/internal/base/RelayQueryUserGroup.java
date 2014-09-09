@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.core.ConnectionConfiguration;
@@ -16,10 +15,9 @@ import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.sender.base.RelayQuerySender;
-import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.sender.RelayQuerySender;
+import co.fusionx.relay.internal.sender.PacketSender;
 
-@Singleton
 public class RelayQueryUserGroup implements InternalQueryUserGroup {
 
     private final GenericBus<Event> mSessionBus;

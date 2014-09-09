@@ -1,37 +1,32 @@
 package co.fusionx.relay.internal.bus;
 
-import com.fusionx.bus.Bus;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import co.fusionx.relay.bus.GenericBus;
 
-public class EventBus<T> implements GenericBus<T> {
+public class FakeEventBus<T> implements GenericBus<T> {
 
-    private final Bus mBus;
-
-    public EventBus() {
-        mBus = new Bus();
-    }
+    private T mLastEvent;
 
     @Override
     public void register(final Object object) {
-        mBus.register(object);
+        // This is fake
     }
 
     @Override
     public void register(final Object object, final int priority) {
-        mBus.register(object, priority);
+        // This is fake
     }
 
     @Override
     public void unregister(final Object object) {
-        mBus.unregister(object);
+        // This is fake
     }
 
     @Override
     public void post(final T event) {
-        mBus.post(event);
+        mLastEvent = event;
+    }
+
+    public T lastEvent() {
+        return mLastEvent;
     }
 }

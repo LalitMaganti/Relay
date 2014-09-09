@@ -28,7 +28,7 @@ public class ParseUtils {
      */
     public static List<String> splitRawLine(final String input, final boolean colonDelimiter) {
         final List<String> stringParts = new ArrayList<>();
-        if (TextUtils.isEmpty(input)) {
+        if (StringUtils.isEmpty(input)) {
             return stringParts;
         }
 

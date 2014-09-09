@@ -23,7 +23,7 @@ import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.bus.GenericBus;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;

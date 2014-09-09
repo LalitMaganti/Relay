@@ -2,24 +2,18 @@ package co.fusionx.relay.internal.base;
 
 import com.google.common.collect.ImmutableSet;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
-import co.fusionx.relay.internal.sender.base.RelayServerSender;
-import co.fusionx.relay.internal.sender.packet.PacketSender;
 import co.fusionx.relay.sender.ServerSender;
 
-@Singleton
 public class RelayServer extends RelayAbstractConversation<ServerEvent>
         implements InternalServer {
 
@@ -30,14 +24,14 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent>
     private final ServerSender mServerSender;
 
     @Inject
-    RelayServer(final GenericBus<Event> sessionBus, final ConnectionConfiguration configuration,
-            final PacketSender packetSender, final InternalQueryUserGroup group) {
+    public RelayServer(final GenericBus<Event> sessionBus,
+            final ConnectionConfiguration configuration, final ServerSender serverSender,
+            final Set<CapCapability> capCapabilities) {
         super(sessionBus);
 
         mConfiguration = configuration;
-        mServerSender = new RelayServerSender(packetSender, this, group);
-
-        mCapabilities = new HashSet<>();
+        mCapabilities = capCapabilities;
+        mServerSender = serverSender;
     }
 
     // Internal methods
@@ -52,7 +46,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent>
         return getTitle();
     }
 
-    // Server Interface - getters
+    // Server Interface
     @Override
     public String getTitle() {
         return mConfiguration.getTitle();
