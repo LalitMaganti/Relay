@@ -1,14 +1,15 @@
 package co.fusionx.relay.internal.base;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
-import co.fusionx.relay.base.Nick;
-import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.Nick;
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.query.QueryEvent;
+import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.sender.QuerySender;
 
-public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implements QueryUser {
+public class RelayQueryUser extends RelayAbstractConversation<QueryEvent>
+        implements InternalQueryUser {
 
     private final ConnectionConfiguration mConfiguration;
 
@@ -41,7 +42,7 @@ public class RelayQueryUser extends RelayAbstractConversation<QueryEvent> implem
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof RelayQueryUser)) {
+        } else if (!(o instanceof InternalQueryUser)) {
             return false;
         }
 

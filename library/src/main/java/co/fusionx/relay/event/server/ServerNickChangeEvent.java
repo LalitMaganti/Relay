@@ -1,8 +1,8 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.Nick;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.core.ChannelUser;
+import co.fusionx.relay.core.Nick;
+import co.fusionx.relay.conversation.Server;
 
 public class ServerNickChangeEvent extends ServerEvent {
 

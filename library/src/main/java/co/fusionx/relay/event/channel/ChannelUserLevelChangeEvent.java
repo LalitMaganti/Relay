@@ -2,10 +2,10 @@ package co.fusionx.relay.event.channel;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.internal.base.RelayLibraryUser;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.internal.core.InternalLibraryUser;
 
 public class ChannelUserLevelChangeEvent extends ChannelEvent {
 
@@ -15,14 +15,14 @@ public class ChannelUserLevelChangeEvent extends ChannelEvent {
 
     public final String rawMode;
 
-    public final RelayLibraryUser user;
+    public final InternalLibraryUser user;
 
     public final Optional<? extends ChannelUser> changingUser;
 
     public final String changingNick;
 
     public ChannelUserLevelChangeEvent(final Channel channel, final String rawMode,
-            final RelayLibraryUser user, final UserLevel oldLevel, final UserLevel newLevel,
+            final InternalLibraryUser user, final UserLevel oldLevel, final UserLevel newLevel,
             final Optional<? extends ChannelUser> changingUser,
             final String changingNick) {
         super(channel);

@@ -3,8 +3,8 @@ package co.fusionx.relay.internal.sender.base;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.LibraryUser;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;

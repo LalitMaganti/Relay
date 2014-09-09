@@ -1,5 +1,8 @@
 package co.fusionx.relay.internal.sender.packet;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import co.fusionx.relay.internal.packet.server.NickServPasswordPacket;
 import co.fusionx.relay.internal.packet.server.QuitPacket;
 import co.fusionx.relay.internal.packet.server.UserPacket;
@@ -10,6 +13,7 @@ public class InternalPacketSender {
 
     private final PacketSender mPacketSender;
 
+    @Inject
     public InternalPacketSender(final PacketSender packetSender) {
         mPacketSender = packetSender;
     }

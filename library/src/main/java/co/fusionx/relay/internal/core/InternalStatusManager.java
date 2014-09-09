@@ -1,8 +1,8 @@
-package co.fusionx.relay.internal.base;
+package co.fusionx.relay.internal.core;
 
-import co.fusionx.relay.base.SessionStatus;
+import co.fusionx.relay.core.SessionStatus;
 
-public interface StatusManager {
+public interface InternalStatusManager {
 
     public SessionStatus getStatus();
 

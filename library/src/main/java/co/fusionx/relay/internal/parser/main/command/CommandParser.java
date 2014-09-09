@@ -2,22 +2,22 @@ package co.fusionx.relay.internal.parser.main.command;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Server;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
+import co.fusionx.relay.conversation.Server;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 
 public abstract class CommandParser {
 
-    final RelayUserChannelGroup mUCManager;
+    final InternalUserChannelGroup mUserChannelGroup;
 
-    final RelayQueryUserGroup mQueryManager;
+    final InternalQueryUserGroup mQueryManager;
 
     final Server mServer;
 
-    CommandParser(final Server server, final RelayUserChannelGroup dao,
-            final RelayQueryUserGroup queryManager) {
+    CommandParser(final Server server, final InternalUserChannelGroup dao,
+            final InternalQueryUserGroup queryManager) {
         mServer = server;
-        mUCManager = dao;
+        mUserChannelGroup = dao;
         mQueryManager = queryManager;
     }
 

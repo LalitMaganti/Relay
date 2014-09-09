@@ -10,21 +10,25 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
-import co.fusionx.relay.base.UserChannelGroup;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.core.InternalChannel;
+import co.fusionx.relay.internal.core.InternalChannelUser;
+import co.fusionx.relay.internal.core.InternalLibraryUser;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.sender.base.RelayChannelSender;
 import co.fusionx.relay.internal.sender.packet.PacketSender;
 import co.fusionx.relay.util.ParseUtils;
 
 @Singleton
-public class RelayUserChannelGroup implements UserChannelGroup {
+public class RelayUserChannelGroup implements InternalUserChannelGroup {
 
-    private final Set<RelayChannelUser> mUsers;
+    private final Set<InternalChannelUser> mUsers;
 
-    private final RelayLibraryUser mUser;
+    private final InternalLibraryUser mUser;
 
     private final GenericBus<Event> mSessionBus;
 
@@ -51,7 +55,7 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * {@inheritDoc}
      */
     @Override
-    public RelayLibraryUser getUser() {
+    public InternalLibraryUser getUser() {
         return mUser;
     }
 
@@ -59,7 +63,7 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * {@inheritDoc}
      */
     @Override
-    public Optional<RelayChannel> getChannel(final String name) {
+    public Optional<InternalChannel> getChannel(final String name) {
         // Channel names have to unique disregarding case - not having ignore-case here leads
         // to null channels when the channel does actually exist
         return FluentIterable.from(mUser.getChannels())
@@ -71,7 +75,7 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * {@inheritDoc}
      */
     @Override
-    public Optional<RelayChannelUser> getUser(final String nick) {
+    public Optional<InternalChannelUser> getUser(final String nick) {
         return FluentIterable.from(mUsers)
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
                 .first();
@@ -85,7 +89,8 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param user    the user to add to the channel
      * @param channel the channel to add to the user
      */
-    public void coupleUserAndChannel(final RelayChannelUser user, final RelayChannel channel) {
+    @Override
+    public void coupleUserAndChannel(final InternalChannelUser user, final InternalChannel channel) {
         coupleUserAndChannel(user, channel, UserLevel.NONE);
     }
 
@@ -97,7 +102,8 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param channel   the channel to add to the user
      * @param userLevel the level to give the user in the channel
      */
-    public void coupleUserAndChannel(final RelayChannelUser user, final RelayChannel channel,
+    @Override
+    public void coupleUserAndChannel(final InternalChannelUser user, final InternalChannel channel,
             final UserLevel userLevel) {
         addUserToChannel(channel, user);
         addChannelToUser(channel, user, userLevel);
@@ -110,7 +116,9 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param user    the user to remove from the channel and/or remove it from the global list
      * @param channel the channel to remove from the user
      */
-    public void decoupleUserAndChannel(final RelayChannelUser user, final RelayChannel channel) {
+    @Override
+    public void decoupleUserAndChannel(final InternalChannelUser user,
+            final InternalChannel channel) {
         removeUserFromChannel(channel, user);
         removeChannelFromUser(channel, user);
     }
@@ -121,7 +129,8 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param user the user to remove from the global list
      * @return the channels the user had joined
      */
-    public Collection<RelayChannel> removeUser(final RelayChannelUser user) {
+    @Override
+    public Collection<InternalChannel> removeUser(final InternalChannelUser user) {
         mUsers.remove(user);
         return user.getChannels();
     }
@@ -132,7 +141,8 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param channel the channel to remove
      * @return the users that were in the channel
      */
-    public Collection<RelayChannelUser> removeChannel(final RelayChannel channel) {
+    @Override
+    public Collection<InternalChannelUser> removeChannel(final InternalChannel channel) {
         mUser.getChannels().remove(channel);
         channel.markInvalid();
         return channel.getUsers();
@@ -144,7 +154,7 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param channel the channel to add the user to
      * @param user    the user to add to the channel
      */
-    void addUserToChannel(final RelayChannel channel, final RelayChannelUser user) {
+    void addUserToChannel(final InternalChannel channel, final InternalChannelUser user) {
         channel.addUser(user);
     }
 
@@ -155,7 +165,7 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param user      the user to add to the channel to
      * @param userLevel the level to give the user in the channel
      */
-    void addChannelToUser(final RelayChannel channel, final RelayChannelUser user,
+    void addChannelToUser(final InternalChannel channel, final InternalChannelUser user,
             final UserLevel userLevel) {
         user.addChannel(channel, userLevel);
 
@@ -169,7 +179,8 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param channel the channel to remove from the user
      * @param user    the user the channel is to be removed from
      */
-    public void removeUserFromChannel(RelayChannel channel, RelayChannelUser user) {
+    @Override
+    public void removeUserFromChannel(InternalChannel channel, InternalChannelUser user) {
         channel.removeUser(user);
     }
 
@@ -180,13 +191,14 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param channel the channel to remove from the user
      * @param user    the user to remove the channel from or remove from the global list
      */
-    public void removeChannelFromUser(final RelayChannel channel, final RelayChannelUser user) {
-        final Collection<RelayChannel> setOfChannels = user.getChannels();
+    @Override
+    public void removeChannelFromUser(final InternalChannel channel, final InternalChannelUser user) {
+        final Collection<? extends Channel> setOfChannels = user.getChannels();
         user.removeChannel(channel);
 
         // The app user check is to make sure that the app user isn't removed from the list of
         // users
-        if (setOfChannels.size() == 0 && !(user instanceof RelayLibraryUser)) {
+        if (setOfChannels.size() == 0 && !(user instanceof InternalLibraryUser)) {
             mUsers.remove(user);
         }
     }
@@ -197,7 +209,8 @@ public class RelayUserChannelGroup implements UserChannelGroup {
      * @param rawSource the source of the user to retrieve
      * @return the user matching the source or null of none match
      */
-    public RelayChannelUser getUserFromPrefix(final String rawSource) {
+    @Override
+    public InternalChannelUser getUserFromPrefix(final String rawSource) {
         final String nick = ParseUtils.getNickFromPrefix(rawSource);
         return getNonNullUser(nick);
     }
@@ -205,13 +218,15 @@ public class RelayUserChannelGroup implements UserChannelGroup {
     /**
      * {@inheritDoc}
      */
-    public RelayChannelUser getNonNullUser(final String nick) {
+    @Override
+    public InternalChannelUser getNonNullUser(final String nick) {
         return getUser(nick).or(new RelayChannelUser(nick));
     }
 
-    public RelayChannel getNewChannel(final String channelName) {
+    @Override
+    public InternalChannel getNewChannel(final String channelName) {
         final RelayChannelSender channelSender = new RelayChannelSender(mPacketSender, mUser);
-        final RelayChannel channel = new RelayChannel(mSessionBus, mConfiguration, channelSender,
+        final InternalChannel channel = new RelayChannel(mSessionBus, mConfiguration, channelSender,
                 channelName);
 
         // Horrible but has to be done - see the comment on the method
@@ -219,10 +234,12 @@ public class RelayUserChannelGroup implements UserChannelGroup {
         return channel;
     }
 
-    public Set<RelayChannelUser> getUsers() {
+    @Override
+    public Set<InternalChannelUser> getUsers() {
         return mUsers;
     }
 
+    @Override
     public void onConnectionTerminated() {
         // Clear the global list of users - it's now invalid
         mUsers.clear();

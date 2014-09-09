@@ -2,10 +2,10 @@ package co.fusionx.relay.event.server;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.Nick;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.ChannelUser;
+import co.fusionx.relay.core.Nick;
+import co.fusionx.relay.conversation.Server;
 
 public class KickEvent extends ServerEvent {
 

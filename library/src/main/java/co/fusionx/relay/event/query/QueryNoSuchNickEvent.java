@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.query;
 
-import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.conversation.QueryUser;
 
 public class QueryNoSuchNickEvent extends QueryWorldEvent {
 

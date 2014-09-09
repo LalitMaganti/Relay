@@ -4,11 +4,11 @@ import android.util.Pair;
 
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.constants.UserLevel;
-import co.fusionx.relay.internal.base.RelayServer;
+import co.fusionx.relay.internal.core.InternalServer;
 
 public class IRCv3Utils {
 
-    public static Pair<String, UserLevel> consumeNickPrefixes(final RelayServer server,
+    public static Pair<String, UserLevel> consumeNickPrefixes(final InternalServer server,
             final String rawNick) {
         if (server.getCapabilities().contains(CapCapability.MULTIPREFIX)) {
             UserLevel level = UserLevel.NONE;

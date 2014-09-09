@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.event.server.GenericServerEvent;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.constants.CapCommand;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.function.Consumer;
 import co.fusionx.relay.internal.sender.packet.PacketSender;
 import co.fusionx.relay.internal.sender.packet.CapPacketSender;
@@ -29,7 +29,7 @@ public class CapParser {
 
     private final Map<CapCommand, Consumer<List<String>>> mCapCommandMap;
 
-    private final RelayServer mServer;
+    private final InternalServer mServer;
 
     private final ConnectionConfiguration mConnectionConfiguration;
 
@@ -37,7 +37,7 @@ public class CapParser {
 
     private Set<ModifiedCapability> mPossibleCapabilities;
 
-    public CapParser(final RelayServer server, final PacketSender sender) {
+    public CapParser(final InternalServer server, final PacketSender sender) {
         mServer = server;
         mConnectionConfiguration = server.getConfiguration();
 

@@ -6,16 +6,20 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
-import co.fusionx.relay.base.Session;
-import co.fusionx.relay.base.QueryUserGroup;
-import co.fusionx.relay.base.Server;
-import co.fusionx.relay.base.SessionStatus;
-import co.fusionx.relay.base.UserChannelGroup;
+import co.fusionx.relay.bus.GenericBus;
+import co.fusionx.relay.conversation.Server;
+import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.QueryUserGroup;
+import co.fusionx.relay.core.Session;
+import co.fusionx.relay.core.SessionStatus;
+import co.fusionx.relay.core.UserChannelGroup;
 import co.fusionx.relay.dcc.DCCManager;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
+import co.fusionx.relay.internal.core.InternalStatusManager;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.dcc.RelayDCCManager;
-import co.fusionx.relay.bus.GenericBus;
 import dagger.ObjectGraph;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
@@ -27,19 +31,19 @@ public class RelaySession implements Session {
     private final ScheduledExecutorService mScheduledExecutorService;
 
     @Inject
-    StatusManager mStatusManager;
+    InternalStatusManager mInternalStatusManager;
 
     @Inject
     GenericBus<Event> mSessionBus;
 
     @Inject
-    RelayServer mServer;
+    InternalServer mServer;
 
     @Inject
-    RelayUserChannelGroup mDao;
+    InternalUserChannelGroup mDao;
 
     @Inject
-    RelayQueryUserGroup mQueryManager;
+    InternalQueryUserGroup mQueryManager;
 
     @Inject
     RelayDCCManager mDCCManager;
@@ -55,7 +59,7 @@ public class RelaySession implements Session {
 
     public void startSession() {
         try {
-            startSessionQuietly();
+            startConnect(0);
         } catch (final RuntimeException ex) {
             getPreferences().handleException(ex);
         }
@@ -69,23 +73,23 @@ public class RelaySession implements Session {
         }
     }
 
-    private void startSessionQuietly() {
-        // Start the session with no delay
-        startConnect(0);
+    private void startConnect(final int delay) {
+        mScheduledExecutorService.schedule(this::connect, delay, TimeUnit.MILLISECONDS);
+    }
 
-        for (; mStatusManager.isReconnectNeeded(); mStatusManager.incrementAttemptCount()) {
+    private void connect() {
+        mConnection = mObjectGraph.get(RelayIRCConnection.class);
+        mConnection.connect();
+
+        if (!mConnection.isStopped() && mInternalStatusManager.isReconnectNeeded()) {
+            mInternalStatusManager.onReconnecting();
             startConnect(5000);
         }
     }
 
-    private void startConnect(final int delay) {
-        mConnection = mObjectGraph.get(RelayIRCConnection.class);
-        mScheduledExecutorService.schedule(mConnection::connect, delay, TimeUnit.MILLISECONDS);
-    }
-
     @Override
     public SessionStatus getStatus() {
-        return mStatusManager.getStatus();
+        return mInternalStatusManager.getStatus();
     }
 
     @Override

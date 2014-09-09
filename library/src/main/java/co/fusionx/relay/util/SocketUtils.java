@@ -34,7 +34,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
 
 public class SocketUtils {
 

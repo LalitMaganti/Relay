@@ -4,17 +4,18 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.core.ChannelUser;
+import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelModeEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
-import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
+import co.fusionx.relay.internal.core.InternalChannel;
+import co.fusionx.relay.internal.core.InternalChannelUser;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
@@ -22,8 +23,8 @@ import co.fusionx.relay.util.ParseUtils;
 public class ModeParser extends CommandParser {
 
     public ModeParser(final Server server,
-            final RelayUserChannelGroup ucmanager,
-            final RelayQueryUserGroup queryManager) {
+            final InternalUserChannelGroup ucmanager,
+            final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);
     }
 
@@ -46,7 +47,7 @@ public class ModeParser extends CommandParser {
             final String sendingUser, final String mode) {
         // The recipient is a channel (i.e. the mode of a user in the channel is being changed
         // or possibly the mode of the channel itself)
-        final Optional<RelayChannel> optChannel = mUCManager.getChannel(recipient);
+        final Optional<InternalChannel> optChannel = mUserChannelGroup.getChannel(recipient);
 
         Optionals.run(optChannel, channel -> {
             // TODO - implement channel mode changes
@@ -55,27 +56,27 @@ public class ModeParser extends CommandParser {
     }
 
     private void onUserModeInChannel(final List<String> parsedArray, final String sendingNick,
-            final RelayChannel channel, final String mode) {
+            final InternalChannel channel, final String mode) {
         final String source = parsedArray.get(2);
         final String nick = ParseUtils.getNickFromPrefix(source);
-        final boolean appUser = mUCManager.getUser().isNickEqual(nick);
+        final boolean appUser = mUserChannelGroup.getUser().isNickEqual(nick);
 
-        final Optional<RelayChannelUser> optUser = appUser
-                ? Optional.of(mUCManager.getUser())
-                : mUCManager.getUser(nick);
-        final Optional<? extends ChannelUser> optSending = mUCManager.getUser(sendingNick);
+        final Optional<InternalChannelUser> optUser = appUser
+                ? Optional.of(mUserChannelGroup.getUser())
+                : mUserChannelGroup.getUser(nick);
+        final Optional<? extends ChannelUser> optSending = mUserChannelGroup.getUser(sendingNick);
 
         // Nullity can occur when a ban is being added/removed on a whole range using wildcards
         final ChannelEvent event;
         if (optUser.isPresent()) {
-            final RelayChannelUser user = optUser.get();
+            final InternalChannelUser user = optUser.get();
 
             final UserLevel oldLevel = user.getChannelPrivileges(channel);
             final UserLevel newLevel = parseChannelUserModeChange(mode);
             user.onModeChanged(channel, newLevel);
 
             event = appUser
-                    ? new ChannelUserLevelChangeEvent(channel, mode, mUCManager.getUser(), oldLevel,
+                    ? new ChannelUserLevelChangeEvent(channel, mode, mUserChannelGroup.getUser(), oldLevel,
                     newLevel, optSending, sendingNick)
                     : new ChannelWorldLevelChangeEvent(channel, mode, user, oldLevel, newLevel,
                             optSending, sendingNick);

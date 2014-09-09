@@ -1,7 +1,8 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.conversation;
 
 import java.util.Collection;
 
+import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.sender.ChannelSender;
 

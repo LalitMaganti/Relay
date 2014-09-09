@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.ChannelUser;
+import co.fusionx.relay.core.Nick;
 
 public abstract class ChannelWorldUserEvent extends ChannelEvent {
 

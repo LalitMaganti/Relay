@@ -2,13 +2,12 @@ package co.fusionx.relay.internal.sender.base;
 
 import android.text.TextUtils;
 
-import co.fusionx.relay.base.LibraryUser;
-import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryMessageSelfEvent;
-import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalQueryUser;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.packet.query.QueryActionPacket;
 import co.fusionx.relay.internal.packet.query.QueryMessagePacket;
 import co.fusionx.relay.internal.sender.packet.PacketSender;
@@ -24,12 +23,12 @@ public class RelayQuerySender implements QuerySender {
 
     private final String mQueryNick;
 
-    private final RelayQueryUserGroup mQueryGroup;
+    private final InternalQueryUserGroup mQueryGroup;
 
-    private RelayQueryUser mQueryUser;
+    private InternalQueryUser mQueryUser;
 
     public RelayQuerySender(final PacketSender sender, final LibraryUser user,
-            final RelayQueryUserGroup queryGroup) {
+            final InternalQueryUserGroup queryGroup) {
         mSender = sender;
         mUser = user;
         mQueryGroup = queryGroup;
@@ -39,7 +38,7 @@ public class RelayQuerySender implements QuerySender {
 
     // I tried very hard to avoid this but no matter how much I tried to abstract this away,
     // circular dependencies keep popping up due to having to send the channel in events
-    public void setQueryUser(final RelayQueryUser queryUser) {
+    public void setQueryUser(final InternalQueryUser queryUser) {
         mQueryUser = queryUser;
     }
 

@@ -8,13 +8,15 @@ import java.net.Socket;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.internal.core.InternalStatusManager;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.parser.connection.ConnectionParser;
 import co.fusionx.relay.internal.parser.main.ServerLineParser;
 import co.fusionx.relay.internal.sender.base.RelayServerSender;
-import co.fusionx.relay.internal.sender.packet.PacketSender;
 import co.fusionx.relay.internal.sender.packet.CapPacketSender;
 import co.fusionx.relay.internal.sender.packet.InternalPacketSender;
+import co.fusionx.relay.internal.sender.packet.PacketSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
@@ -27,15 +29,9 @@ public class RelayIRCConnection {
 
     private final ConnectionConfiguration mConnectionConfiguration;
 
-    private final StatusManager mStatusManager;
+    private final InternalStatusManager mInternalStatusManager;
 
-    private final RelayUserChannelGroup mDao;
-
-    private final PacketSender mPacketSender;
-
-    private final InternalPacketSender mInternalSender;
-
-    private final CapPacketSender mCapSender;
+    private final InternalUserChannelGroup mUserChannelGroup;
 
     private final ConnectionParser mConnectionParser;
 
@@ -43,25 +39,39 @@ public class RelayIRCConnection {
 
     private final RelayServerSender mServerSender;
 
+    private final PacketSender mPacketSender;
+
+    private final InternalPacketSender mInternalSender;
+
+    private final CapPacketSender mCapSender;
+
     private Socket mSocket;
 
     private boolean mStopped;
 
     @Inject
     RelayIRCConnection(final ConnectionConfiguration connectionConfiguration,
-            final StatusManager statusManager, final RelayUserChannelGroup dao,
+            final InternalUserChannelGroup userChannelGroup,
+            final InternalStatusManager internalStatusManager,
             final ConnectionParser connectionParser, final ServerLineParser lineParser,
-            final RelayServerSender serverSender, final PacketSender packetSender) {
+            final PacketSender sender, final RelayServerSender serverSender,
+            final InternalPacketSender internalPacketSender,
+            final CapPacketSender capPacketSender) {
         mConnectionConfiguration = connectionConfiguration;
-        mStatusManager = statusManager;
-        mDao = dao;
+        mUserChannelGroup = userChannelGroup;
+        mInternalStatusManager = internalStatusManager;
+
         mConnectionParser = connectionParser;
         mLineParser = lineParser;
-        mServerSender = serverSender;
-        mPacketSender = packetSender;
 
-        mInternalSender = new InternalPacketSender(packetSender);
-        mCapSender = new CapPacketSender(packetSender);
+        mPacketSender = sender;
+        mServerSender = serverSender;
+        mInternalSender = internalPacketSender;
+        mCapSender = capPacketSender;
+    }
+
+    public boolean isStopped() {
+        return mStopped;
     }
 
     void connect() {
@@ -73,13 +83,19 @@ public class RelayIRCConnection {
         }
 
         if (mStopped) {
-            mStatusManager.onStopped();
+            mInternalStatusManager.onStopped();
             closeSocket();
         } else {
-            mStatusManager.onDisconnected(disconnectMessage, mStatusManager.isReconnectNeeded());
+            mInternalStatusManager.onDisconnected(disconnectMessage,
+                    mInternalStatusManager.isReconnectNeeded());
             closeSocket();
-            mDao.onConnectionTerminated();
+            mUserChannelGroup.onConnectionTerminated();
         }
+    }
+
+    void disconnect() {
+        mStopped = true;
+        mInternalSender.quitServer(getPreferences().getQuitReason());
     }
 
     private void connectQuietly() throws IOException {
@@ -90,7 +106,7 @@ public class RelayIRCConnection {
         mPacketSender.onOutputStreamCreated(socketWriter);
 
         // We are now in the phase where we can say we are connecting to the server
-        mStatusManager.onConnecting();
+        mInternalStatusManager.onConnecting();
 
         // Send the registration messages to the server
         sendRegistrationMessages();
@@ -128,18 +144,13 @@ public class RelayIRCConnection {
     }
 
     private void onStartParsing(final String nick, final BufferedReader reader) throws IOException {
-        mDao.getUser().setNick(nick);
+        mUserChannelGroup.getUser().setNick(nick);
         sendPostRegisterMessages();
 
-        mStatusManager.onConnected();
+        mInternalStatusManager.onConnected();
 
         // Loops forever until broken
         mLineParser.parseMain(reader);
-    }
-
-    void disconnect() {
-        mStopped = true;
-        mInternalSender.quitServer(getPreferences().getQuitReason());
     }
 
     private void closeSocket() {

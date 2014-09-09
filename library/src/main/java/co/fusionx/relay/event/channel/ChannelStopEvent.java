@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.channel;
 
-import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.conversation.Channel;
 
 public class ChannelStopEvent extends ChannelEvent {
 

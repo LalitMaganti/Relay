@@ -8,18 +8,19 @@ import co.fusionx.relay.event.channel.ChannelNoticeEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
+import co.fusionx.relay.internal.core.InternalChannel;
+import co.fusionx.relay.internal.core.InternalQueryUser;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.util.ParseUtils;
 
 public class NoticeParser extends CommandParser {
 
     private final CTCPParser mCTCPParser;
 
-    public NoticeParser(final RelayServer server, final RelayUserChannelGroup ucmanager,
-            final RelayQueryUserGroup queryManager, final CTCPParser ctcpParser) {
+    public NoticeParser(final InternalServer server, final InternalUserChannelGroup ucmanager,
+            final InternalQueryUserGroup queryManager, final CTCPParser ctcpParser) {
         super(server, ucmanager, queryManager);
 
         mCTCPParser = ctcpParser;
@@ -38,7 +39,7 @@ public class NoticeParser extends CommandParser {
 
             if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
                 onParseChannelNotice(recipient, notice, sendingNick);
-            } else if (recipient.equals(mUCManager.getUser().getNick().getNickAsString())) {
+            } else if (recipient.equals(mUserChannelGroup.getUser().getNick().getNickAsString())) {
                 onParseUserNotice(sendingNick, notice);
             }
         }
@@ -46,9 +47,9 @@ public class NoticeParser extends CommandParser {
 
     private void onParseChannelNotice(final String channelName, final String sendingNick,
             final String notice) {
-        final Optional<RelayChannel> optChannel = mUCManager.getChannel(channelName);
+        final Optional<InternalChannel> optChannel = mUserChannelGroup.getChannel(channelName);
         if (optChannel.isPresent()) {
-            final RelayChannel channel = optChannel.get();
+            final InternalChannel channel = optChannel.get();
             channel.getBus().post(new ChannelNoticeEvent(channel, sendingNick, notice));
         } else {
             // If we're not in this channel then send the notice to the server instead
@@ -58,9 +59,9 @@ public class NoticeParser extends CommandParser {
     }
 
     private void onParseUserNotice(final String sendingNick, final String notice) {
-        final Optional<RelayQueryUser> optUser = mQueryManager.getQueryUser(sendingNick);
+        final Optional<InternalQueryUser> optUser = mQueryManager.getQueryUser(sendingNick);
         if (optUser.isPresent()) {
-            final RelayQueryUser user = optUser.get();
+            final InternalQueryUser user = optUser.get();
             user.getBus().post(new QueryMessageWorldEvent(user, notice));
         } else {
             mServer.getBus().post(new NoticeEvent(mServer, sendingNick, notice));

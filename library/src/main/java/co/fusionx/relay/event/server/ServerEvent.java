@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.event.Event;
 
 public class ServerEvent extends Event<Server, ServerEvent> {

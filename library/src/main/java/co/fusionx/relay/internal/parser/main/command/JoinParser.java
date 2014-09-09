@@ -9,17 +9,17 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldJoinEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.internal.base.RelayChannel;
-import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
+import co.fusionx.relay.internal.core.InternalChannel;
+import co.fusionx.relay.internal.core.InternalChannelUser;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 
 public class JoinParser extends CommandParser {
 
-    public JoinParser(final RelayServer server,
-            final RelayUserChannelGroup ucmanager,
-            final RelayQueryUserGroup queryManager) {
+    public JoinParser(final InternalServer server,
+            final InternalUserChannelGroup ucmanager,
+            final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);
     }
 
@@ -28,22 +28,22 @@ public class JoinParser extends CommandParser {
         final String channelName = parsedArray.get(0);
 
         // Retrieve the user and channel
-        final RelayChannelUser user = mUCManager.getUserFromPrefix(prefix);
-        final Optional<RelayChannel> optChannel = mUCManager.getChannel(channelName);
-        RelayChannel channel = optChannel.orNull();
+        final InternalChannelUser user = mUserChannelGroup.getUserFromPrefix(prefix);
+        final Optional<InternalChannel> optChannel = mUserChannelGroup.getChannel(channelName);
+        InternalChannel channel = optChannel.orNull();
 
         // Store whether the user is the app user
-        final boolean appUser = mUCManager.getUser().isNickEqual(user);
+        final boolean appUser = mUserChannelGroup.getUser().isNickEqual(user);
         if (channel == null) {
             // If the channel is null then we haven't joined it before (disconnection) and we should
             // create a new channel
-            channel = mUCManager.getNewChannel(channelName);
+            channel = mUserChannelGroup.getNewChannel(channelName);
         } else if (appUser) {
             // If the channel is not null then we simply clear the data of the channel
             channel.clearInternalData();
         }
         // Put the user and channel together
-        mUCManager.coupleUserAndChannel(user, channel);
+        mUserChannelGroup.coupleUserAndChannel(user, channel);
 
         if (mServer.getCapabilities().contains(CapCapability.EXTENDEDJOIN)) {
             // We should have 2 parameters after the channel name

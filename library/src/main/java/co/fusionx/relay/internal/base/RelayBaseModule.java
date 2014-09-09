@@ -7,11 +7,17 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.CapCapability;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.bus.EventBus;
 import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
+import co.fusionx.relay.internal.core.InternalStatusManager;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.dcc.RelayDCCManager;
 import co.fusionx.relay.internal.parser.main.code.CodeParser;
 import co.fusionx.relay.internal.parser.main.code.ErrorParser;
@@ -37,11 +43,7 @@ import co.fusionx.relay.internal.parser.main.command.PrivmsgParser;
 import co.fusionx.relay.internal.parser.main.command.QuitParser;
 import co.fusionx.relay.internal.parser.main.command.TopicChangeParser;
 import co.fusionx.relay.internal.parser.main.command.WallopsParser;
-import co.fusionx.relay.internal.sender.base.RelayServerSender;
 import co.fusionx.relay.internal.sender.packet.PacketSender;
-import co.fusionx.relay.internal.bus.EventBus;
-import co.fusionx.relay.bus.GenericBus;
-import co.fusionx.relay.sender.ServerSender;
 import dagger.Module;
 import dagger.Provides;
 
@@ -72,6 +74,7 @@ public class RelayBaseModule {
         mConfiguration = connectionConfiguration;
     }
 
+    // Base
     @Provides
     public ConnectionConfiguration provideConfiguration() {
         return mConfiguration;
@@ -79,29 +82,57 @@ public class RelayBaseModule {
 
     @Provides
     @Singleton
-    public StatusManager provideStatusManager(final ConnectionConfiguration configuration,
-            final RelayServer server, final RelayUserChannelGroup dao,
-            final RelayQueryUserGroup queryManager) {
+    public InternalQueryUserGroup provideUserGroup(final GenericBus<Event> sessionBus,
+            final ConnectionConfiguration configuration,
+            final PacketSender packetSender,
+            final InternalUserChannelGroup userChannelGroup) {
+        return new RelayQueryUserGroup(sessionBus, configuration, packetSender, userChannelGroup);
+    }
+
+    @Provides
+    @Singleton
+    public InternalServer provideServer(final GenericBus<Event> sessionBus,
+            final ConnectionConfiguration configuration,
+            final PacketSender packetSender,
+            final InternalQueryUserGroup queryUserGroup) {
+        return new RelayServer(sessionBus, configuration, packetSender, queryUserGroup);
+    }
+
+    @Provides
+    @Singleton
+    public InternalStatusManager provideStatusManager(final ConnectionConfiguration configuration,
+            final InternalServer server, final InternalUserChannelGroup dao,
+            final InternalQueryUserGroup queryManager) {
         return new RelayStatusManager(configuration, server, dao, queryManager);
     }
 
+    @Provides
+    @Singleton
+    public InternalUserChannelGroup provideUserChannelGroup(final GenericBus<Event> sessionBus,
+            final ConnectionConfiguration configuration, final PacketSender packetSender) {
+        return new RelayUserChannelGroup(sessionBus, configuration, packetSender);
+    }
+
+    // Bus
+    @Singleton
+    @Provides
+    public GenericBus<Event> provideSessionBus() {
+        return new EventBus<>();
+    }
+
+    // Sender
     @Singleton
     @Provides
     public PacketSender provideBaseSender() {
         return new PacketSender();
     }
 
-    @Singleton
-    @Provides
-    public GenericBus<Event> provideServerWideEventBus() {
-        return new EventBus<>();
-    }
-
+    // Parser
     @Provides
     @Singleton
-    public Map<String, CommandParser> provideCommandParserMap(final RelayServer server,
-            final RelayUserChannelGroup dao, final PacketSender sender,
-            final RelayDCCManager dccManager, final RelayQueryUserGroup queryManager) {
+    public Map<String, CommandParser> provideCommandParserMap(final InternalServer server,
+            final InternalUserChannelGroup dao, final PacketSender sender,
+            final RelayDCCManager dccManager, final InternalQueryUserGroup queryManager) {
         final DCCParser dccParser = new DCCParser(server, dccManager);
         final CTCPParser ctcpParser = new CTCPParser(server, dao, queryManager, sender, dccParser);
 
@@ -139,8 +170,8 @@ public class RelayBaseModule {
     @Provides
     @Singleton
     public SparseArray<CodeParser> provideCodeParserMap(final GenericBus<Event> superBus,
-            final RelayServer server, final RelayUserChannelGroup dao,
-            final RelayQueryUserGroup queryManager, final PacketSender sender) {
+            final InternalServer server, final InternalUserChannelGroup dao,
+            final InternalQueryUserGroup queryManager, final PacketSender sender) {
         final SparseArray<CodeParser> parserMap = new SparseArray<>();
 
         final InitalTopicParser topicChangeParser = new InitalTopicParser(server, dao, null);

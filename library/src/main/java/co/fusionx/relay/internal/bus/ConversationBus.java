@@ -2,7 +2,7 @@ package co.fusionx.relay.internal.bus;
 
 import com.google.common.base.Function;
 
-import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.conversation.Conversation;
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.event.Event;
 

@@ -7,9 +7,9 @@ import org.robolectric.annotation.Config;
 
 import android.os.Parcel;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
 
-import static co.fusionx.relay.base.ConnectionConfiguration.Builder.CREATOR;
+import static co.fusionx.relay.core.ConnectionConfiguration.Builder.CREATOR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 

@@ -4,9 +4,9 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.QueryUser;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.conversation.QueryUser;
+import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;

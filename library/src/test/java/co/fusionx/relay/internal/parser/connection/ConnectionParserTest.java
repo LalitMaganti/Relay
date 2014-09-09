@@ -1,9 +1,6 @@
 package co.fusionx.relay.internal.parser.connection;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,7 +8,7 @@ import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.internal.base.TestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;

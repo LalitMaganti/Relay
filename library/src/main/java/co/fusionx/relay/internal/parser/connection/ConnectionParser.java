@@ -8,11 +8,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.event.server.NoticeEvent;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.parser.connection.cap.CapParser;
 import co.fusionx.relay.internal.sender.packet.PacketSender;
 import co.fusionx.relay.internal.sender.packet.InternalPacketSender;
@@ -21,7 +21,7 @@ import co.fusionx.relay.util.ParseUtils;
 
 public class ConnectionParser {
 
-    private final RelayServer mServer;
+    private final InternalServer mServer;
 
     private final ConnectionConfiguration mConfiguration;
 
@@ -34,7 +34,7 @@ public class ConnectionParser {
     private int mSuffix;
 
     @Inject
-    public ConnectionParser(final ConnectionConfiguration configuration, final RelayServer server,
+    public ConnectionParser(final ConnectionConfiguration configuration, final InternalServer server,
             final PacketSender sender) {
         mConfiguration = configuration;
         mServer = server;

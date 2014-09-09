@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Server;
 
 public class StopEvent extends StatusChangeEvent {
 

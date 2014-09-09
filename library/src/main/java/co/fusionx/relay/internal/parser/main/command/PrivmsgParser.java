@@ -9,11 +9,12 @@ import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.internal.base.RelayChannel;
-import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
+import co.fusionx.relay.internal.core.InternalChannel;
+import co.fusionx.relay.internal.core.InternalChannelUser;
+import co.fusionx.relay.internal.core.InternalQueryUser;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.internal.parser.main.MentionParser;
 import co.fusionx.relay.util.LogUtils;
@@ -24,9 +25,9 @@ public class PrivmsgParser extends CommandParser {
 
     private final CTCPParser mCTCPParser;
 
-    public PrivmsgParser(final RelayServer server,
-            final RelayUserChannelGroup userChannelInterface,
-            final RelayQueryUserGroup queryManager, final CTCPParser ctcpParser) {
+    public PrivmsgParser(final InternalServer server,
+            final InternalUserChannelGroup userChannelInterface,
+            final InternalQueryUserGroup queryManager, final CTCPParser ctcpParser) {
         super(server, userChannelInterface, queryManager);
 
         mCTCPParser = ctcpParser;
@@ -51,8 +52,8 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final Optional<RelayQueryUser> optional = mQueryManager.getQueryUser(nick);
-        final RelayQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
+        final Optional<InternalQueryUser> optional = mQueryManager.getQueryUser(nick);
+        final InternalQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
         if (!optional.isPresent()) {
             mServer.getBus().post(new NewPrivateMessageEvent(mServer, user));
         }
@@ -61,16 +62,16 @@ public class PrivmsgParser extends CommandParser {
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
             final String rawMessage) {
-        final Optional<RelayChannel> optChannel = mUCManager.getChannel(channelName);
+        final Optional<InternalChannel> optChannel = mUserChannelGroup.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
             // TODO - actually parse the colours
             final String message = Utils.stripColorsFromMessage(rawMessage);
             final boolean mention = MentionParser.onMentionableCommand(message,
-                    mUCManager.getUser().getNick().getNickAsString());
+                    mUserChannelGroup.getUser().getNick().getNickAsString());
 
-            final Optional<RelayChannelUser> optUser = mUCManager.getUser(sendingNick);
+            final Optional<InternalChannelUser> optUser = mUserChannelGroup.getUser(sendingNick);
             final ChannelEvent event;
             if (optUser.isPresent()) {
                 event = new ChannelWorldMessageEvent(channel, message, optUser.get(), mention);

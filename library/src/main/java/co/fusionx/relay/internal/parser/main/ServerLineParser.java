@@ -13,8 +13,8 @@ import javax.inject.Inject;
 
 import co.fusionx.relay.event.server.GenericServerEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.parser.main.code.CodeParser;
 import co.fusionx.relay.internal.parser.main.command.CommandParser;
 import co.fusionx.relay.util.IRCUtils;
@@ -22,7 +22,7 @@ import co.fusionx.relay.util.ParseUtils;
 
 public class ServerLineParser {
 
-    private final RelayServer mServer;
+    private final InternalServer mServer;
 
     // private final RelayInternalSender mInternalSender;
 
@@ -33,7 +33,7 @@ public class ServerLineParser {
     private String mLine;
 
     @Inject
-    public ServerLineParser(final RelayServer server, final SparseArray<CodeParser> codeParsers,
+    public ServerLineParser(final InternalServer server, final SparseArray<CodeParser> codeParsers,
             final Map<String, CommandParser> commandParsers) {
         mServer = server;
         mCodeParser = codeParsers;

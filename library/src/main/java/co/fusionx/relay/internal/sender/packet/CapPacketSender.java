@@ -1,5 +1,7 @@
 package co.fusionx.relay.internal.sender.packet;
 
+import javax.inject.Inject;
+
 import co.fusionx.relay.internal.packet.server.cap.CAPEndPacket;
 import co.fusionx.relay.internal.packet.server.cap.CAPLSPacket;
 import co.fusionx.relay.internal.packet.server.cap.CAPPlainSASLAuthPacket;
@@ -11,6 +13,7 @@ public class CapPacketSender {
 
     private final PacketSender mSender;
 
+    @Inject
     public CapPacketSender(final PacketSender sender) {
         mSender = sender;
     }

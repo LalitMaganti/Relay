@@ -2,16 +2,16 @@ package co.fusionx.relay.internal.parser.main.command;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Server;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
+import co.fusionx.relay.conversation.Server;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.util.ParseUtils;
 
 public class AwayParser extends CommandParser {
 
     public AwayParser(final Server server,
-            final RelayUserChannelGroup ucmanager,
-            final RelayQueryUserGroup queryManager) {
+            final InternalUserChannelGroup ucmanager,
+            final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);
     }
 

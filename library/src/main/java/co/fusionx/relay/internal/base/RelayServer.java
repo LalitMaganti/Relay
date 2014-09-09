@@ -8,27 +8,30 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
-import co.fusionx.relay.base.Server;
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.CapCapability;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.sender.base.RelayServerSender;
 import co.fusionx.relay.internal.sender.packet.PacketSender;
+import co.fusionx.relay.sender.ServerSender;
 
 @Singleton
-public class RelayServer extends RelayAbstractConversation<ServerEvent> implements Server {
+public class RelayServer extends RelayAbstractConversation<ServerEvent>
+        implements InternalServer {
 
     private final ConnectionConfiguration mConfiguration;
 
     private final Set<CapCapability> mCapabilities;
 
-    private final RelayServerSender mServerSender;
+    private final ServerSender mServerSender;
 
     @Inject
     RelayServer(final GenericBus<Event> sessionBus, final ConnectionConfiguration configuration,
-            final PacketSender packetSender, final RelayQueryUserGroup group) {
+            final PacketSender packetSender, final InternalQueryUserGroup group) {
         super(sessionBus);
 
         mConfiguration = configuration;
@@ -38,6 +41,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
     }
 
     // Internal methods
+    @Override
     public void addCapability(final CapCapability capability) {
         mCapabilities.add(capability);
     }
@@ -67,11 +71,11 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent> implemen
     // Equals and hashcode
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof RelayServer)) {
+        if (!(o instanceof InternalServer)) {
             return false;
         }
 
-        final RelayServer server = (RelayServer) o;
+        final InternalServer server = (InternalServer) o;
         return getTitle().equals(server.getTitle());
     }
 

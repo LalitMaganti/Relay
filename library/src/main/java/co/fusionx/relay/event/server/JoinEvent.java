@@ -1,7 +1,7 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.conversation.Server;
 
 public final class JoinEvent extends ServerEvent {
 

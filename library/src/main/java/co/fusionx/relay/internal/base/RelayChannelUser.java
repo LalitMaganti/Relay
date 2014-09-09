@@ -4,16 +4,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.Nick;
 import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.internal.core.InternalChannel;
+import co.fusionx.relay.internal.core.InternalChannelUser;
 
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
+public class RelayChannelUser implements InternalChannelUser {
 
-public class RelayChannelUser implements ChannelUser {
-
-    private final Map<RelayChannel, UserLevel> mUserLevelMap;
+    private final Map<InternalChannel, UserLevel> mUserLevelMap;
 
     private RelayNick mNick;
 
@@ -26,27 +25,30 @@ public class RelayChannelUser implements ChannelUser {
     }
 
     @Override
-    public Set<RelayChannel> getChannels() {
+    public Set<InternalChannel> getChannels() {
         return mUserLevelMap.keySet();
     }
 
-    public void addChannel(final RelayChannel channel, final UserLevel level) {
+    @Override
+    public void addChannel(final InternalChannel channel, final UserLevel level) {
         mUserLevelMap.put(channel, level);
     }
 
-    public void removeChannel(final RelayChannel channel) {
+    @Override
+    public void removeChannel(final InternalChannel channel) {
         mUserLevelMap.remove(channel);
     }
 
-    public void onModeChanged(final RelayChannel channel, final UserLevel mode) {
+    @Override
+    public void onModeChanged(final InternalChannel channel, final UserLevel mode) {
         mUserLevelMap.put(channel, mode);
     }
 
     @Override
     public UserLevel getChannelPrivileges(final Channel channel) {
-        if (channel instanceof RelayChannel) {
-            final RelayChannel relayChannel = (RelayChannel) channel;
-            final UserLevel level = mUserLevelMap.get(relayChannel);
+        if (channel instanceof InternalChannel) {
+            final InternalChannel internalChannel = (InternalChannel) channel;
+            final UserLevel level = mUserLevelMap.get(internalChannel);
             if (level == null) {
                 // getPreferences().logMissingData(relayChannel.getServer());
             }
@@ -65,15 +67,18 @@ public class RelayChannelUser implements ChannelUser {
         return mNick;
     }
 
+    @Override
     public void setNick(final String nick) {
         mNick = new RelayNick(nick);
     }
 
+    @Override
     public boolean isNickEqual(final String nick) {
         return mNick.getNickAsString().equals(nick);
     }
 
-    public boolean isNickEqual(final RelayChannelUser user) {
+    @Override
+    public boolean isNickEqual(final InternalChannelUser user) {
         return mNick.equals(user.getNick());
     }
 }

@@ -1,4 +1,4 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.conversation;
 
 import java.util.List;
 

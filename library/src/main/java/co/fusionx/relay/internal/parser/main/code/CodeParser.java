@@ -2,21 +2,21 @@ package co.fusionx.relay.internal.parser.main.code;
 
 import java.util.List;
 
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 
 public abstract class CodeParser {
 
-    final RelayUserChannelGroup mUserChannelInterface;
+    final InternalUserChannelGroup mUserChannelInterface;
 
-    final RelayServer mServer;
+    final InternalServer mServer;
 
-    final RelayQueryUserGroup mQueryManager;
+    final InternalQueryUserGroup mQueryManager;
 
-    CodeParser(final RelayServer server,
-            final RelayUserChannelGroup userChannelInterface,
-            final RelayQueryUserGroup queryManager) {
+    CodeParser(final InternalServer server,
+            final InternalUserChannelGroup userChannelInterface,
+            final InternalQueryUserGroup queryManager) {
         mServer = server;
         mUserChannelInterface = userChannelInterface;
         mQueryManager = queryManager;

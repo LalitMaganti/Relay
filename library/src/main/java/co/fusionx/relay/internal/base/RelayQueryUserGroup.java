@@ -9,17 +9,18 @@ import java.util.LinkedHashSet;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
-import co.fusionx.relay.base.LibraryUser;
-import co.fusionx.relay.base.QueryUserGroup;
-import co.fusionx.relay.base.UserChannelGroup;
 import co.fusionx.relay.bus.GenericBus;
+import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.core.InternalQueryUser;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.sender.base.RelayQuerySender;
 import co.fusionx.relay.internal.sender.packet.PacketSender;
 
 @Singleton
-public class RelayQueryUserGroup implements QueryUserGroup {
+public class RelayQueryUserGroup implements InternalQueryUserGroup {
 
     private final GenericBus<Event> mSessionBus;
 
@@ -29,15 +30,16 @@ public class RelayQueryUserGroup implements QueryUserGroup {
 
     private final ConnectionConfiguration mConfiguration;
 
-    private final Collection<RelayQueryUser> mQueryUsers;
+    private final Collection<InternalQueryUser> mQueryUsers;
 
     @Inject
-    public RelayQueryUserGroup(final GenericBus<Event> sessionBus, final PacketSender sender,
-            final RelayUserChannelGroup group, final ConnectionConfiguration configuration) {
+    public RelayQueryUserGroup(final GenericBus<Event> sessionBus,
+            final ConnectionConfiguration configuration, final PacketSender sender,
+            final InternalUserChannelGroup group) {
         mSessionBus = sessionBus;
+        mConfiguration = configuration;
         mSender = sender;
         mUser = group.getUser();
-        mConfiguration = configuration;
 
         mQueryUsers = new LinkedHashSet<>();
     }
@@ -46,7 +48,7 @@ public class RelayQueryUserGroup implements QueryUserGroup {
      * {@inheritDoc}
      */
     @Override
-    public Collection<RelayQueryUser> getQueryUsers() {
+    public Collection<InternalQueryUser> getQueryUsers() {
         return mQueryUsers;
     }
 
@@ -54,15 +56,17 @@ public class RelayQueryUserGroup implements QueryUserGroup {
      * {@inheritDoc}
      */
     @Override
-    public Optional<RelayQueryUser> getQueryUser(final String nick) {
+    public Optional<InternalQueryUser> getQueryUser(final String nick) {
         return FluentIterable.from(mQueryUsers)
                 .filter(u -> nick.equals(u.getNick().getNickAsString()))
                 .first();
     }
 
-    public RelayQueryUser addQueryUser(final String nick) {
+    @Override
+    public InternalQueryUser addQueryUser(final String nick) {
         final RelayQuerySender sender = new RelayQuerySender(mSender, mUser, this);
-        final RelayQueryUser user = new RelayQueryUser(mSessionBus, mConfiguration, sender, nick);
+        final InternalQueryUser user = new RelayQueryUser(mSessionBus, mConfiguration, sender,
+                nick);
 
         // Horrible but has to be done - see the comment on the method
         sender.setQueryUser(user);
@@ -71,7 +75,8 @@ public class RelayQueryUserGroup implements QueryUserGroup {
         return user;
     }
 
-    public void removeQueryUser(final RelayQueryUser user) {
+    @Override
+    public void removeQueryUser(final InternalQueryUser user) {
         mQueryUsers.remove(user);
         user.markInvalid();
     }

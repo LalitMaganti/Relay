@@ -2,8 +2,8 @@ package co.fusionx.relay.internal.base;
 
 import android.util.Log;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.interfaces.RelayConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 

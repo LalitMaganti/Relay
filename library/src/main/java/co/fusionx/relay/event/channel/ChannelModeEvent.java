@@ -2,8 +2,8 @@ package co.fusionx.relay.event.channel;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.ChannelUser;
 
 public class ChannelModeEvent extends ChannelEvent {
 

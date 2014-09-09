@@ -4,13 +4,13 @@ import android.util.Pair;
 
 import java.util.List;
 
-import co.fusionx.relay.internal.base.RelayChannel;
-import co.fusionx.relay.internal.base.RelayChannelUser;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
+import co.fusionx.relay.internal.core.InternalChannel;
+import co.fusionx.relay.internal.core.InternalChannelUser;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.util.ParseUtils;
 
 import static co.fusionx.relay.internal.constants.ServerReplyCodes.RPL_NAMREPLY;
@@ -18,11 +18,11 @@ import static co.fusionx.relay.util.IRCv3Utils.consumeNickPrefixes;
 
 public class NameParser extends CodeParser {
 
-    private RelayChannel mChannel;
+    private InternalChannel mChannel;
 
-    public NameParser(final RelayServer server,
-            final RelayUserChannelGroup userChannelInterface,
-            final RelayQueryUserGroup queryManager) {
+    public NameParser(final InternalServer server,
+            final InternalUserChannelGroup userChannelInterface,
+            final InternalQueryUserGroup queryManager) {
         super(server, userChannelInterface, queryManager);
     }
 
@@ -47,7 +47,7 @@ public class NameParser extends CodeParser {
 
         for (final String rawNick : listOfUsers) {
             final Pair<String, UserLevel> pair = consumeNickPrefixes(mServer, rawNick);
-            final RelayChannelUser user = mUserChannelInterface.getNonNullUser(pair.first);
+            final InternalChannelUser user = mUserChannelInterface.getNonNullUser(pair.first);
             mUserChannelInterface.coupleUserAndChannel(user, mChannel, pair.second);
         }
     }

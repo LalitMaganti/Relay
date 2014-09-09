@@ -6,17 +6,17 @@ import java.util.List;
 
 import co.fusionx.relay.event.query.QueryNoSuchNickEvent;
 import co.fusionx.relay.event.server.GenericServerEvent;
-import co.fusionx.relay.internal.base.RelayQueryUserGroup;
-import co.fusionx.relay.internal.base.RelayQueryUser;
-import co.fusionx.relay.internal.base.RelayServer;
-import co.fusionx.relay.internal.base.RelayUserChannelGroup;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
+import co.fusionx.relay.internal.core.InternalQueryUser;
+import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 
 public class ErrorParser extends CodeParser {
 
-    public ErrorParser(final RelayServer server,
-            final RelayUserChannelGroup userChannelInterface,
-            final RelayQueryUserGroup queryManager) {
+    public ErrorParser(final InternalServer server,
+            final InternalUserChannelGroup userChannelInterface,
+            final InternalQueryUserGroup queryManager) {
         super(server, userChannelInterface, queryManager);
     }
 
@@ -45,11 +45,11 @@ public class ErrorParser extends CodeParser {
     private void onNoSuchNickError(final List<String> parsedArray) {
         final String nick = parsedArray.get(0);
         final String message = parsedArray.get(1);
-        final Optional<RelayQueryUser> optional = mQueryManager.getQueryUser(nick);
+        final Optional<InternalQueryUser> optional = mQueryManager.getQueryUser(nick);
 
         // If the user is null then this no such nick event happened for another reason
         if (optional.isPresent()) {
-            final RelayQueryUser user = optional.get();
+            final InternalQueryUser user = optional.get();
             user.getBus().post(new QueryNoSuchNickEvent(user, message));
         } else {
             mServer.getBus().post(new GenericServerEvent(mServer, message));

@@ -6,14 +6,16 @@ import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.internal.core.InternalChannel;
+import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.sender.ChannelSender;
 
-public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implements Channel {
+public class RelayChannel extends RelayAbstractConversation<ChannelEvent>
+        implements InternalChannel {
 
     // As set out in RFC2812
     private final static ImmutableList<Character> CHANNEL_PREFIXES = ImmutableList.of('#', '&',
@@ -23,7 +25,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
 
     private final String mChannelName;
 
-    private final Collection<RelayChannelUser> mUsers;
+    private final Collection<InternalChannelUser> mUsers;
 
     private final ConnectionConfiguration mConfiguration;
 
@@ -49,16 +51,19 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
     }
 
     // Helpers
+    @Override
     public void clearInternalData() {
         // Clear the list of users
         mUsers.clear();
     }
 
-    void addUser(final RelayChannelUser user) {
+    @Override
+    public void addUser(final InternalChannelUser user) {
         mUsers.add(user);
     }
 
-    void removeUser(final RelayChannelUser user) {
+    @Override
+    public void removeUser(final InternalChannelUser user) {
         mUsers.remove(user);
     }
 
@@ -70,7 +75,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
      * @return list of users currently in the channel
      */
     @Override
-    public Collection<RelayChannelUser> getUsers() {
+    public Collection<InternalChannelUser> getUsers() {
         return mUsers;
     }
 
@@ -100,7 +105,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
      */
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof RelayChannel)) {
+        if (!(o instanceof InternalChannel)) {
             return false;
         }
         final RelayChannel otherChannel = (RelayChannel) o;

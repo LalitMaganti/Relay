@@ -2,7 +2,7 @@ package co.fusionx.relay.internal.parser.main.command;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.dcc.file.DCCFileConnection;
 import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.dcc.file.DCCGetConnection;

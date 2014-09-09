@@ -2,7 +2,7 @@ package co.fusionx.relay.event;
 
 import android.text.format.Time;
 
-import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.conversation.Conversation;
 
 public class Event<T extends Conversation<U>, U extends Event> {
 

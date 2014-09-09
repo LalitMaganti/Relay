@@ -1,8 +1,7 @@
 package co.fusionx.relay.event.channel;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.LibraryUser;
-import co.fusionx.relay.internal.base.RelayLibraryUser;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.LibraryUser;
 
 public class ChannelMessageEvent extends ChannelEvent {
 

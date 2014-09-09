@@ -2,9 +2,9 @@ package co.fusionx.relay.event.channel;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.ChannelUser;
+import co.fusionx.relay.core.Nick;
 import co.fusionx.relay.constants.UserLevel;
 
 public class ChannelWorldKickEvent extends ChannelWorldUserEvent {

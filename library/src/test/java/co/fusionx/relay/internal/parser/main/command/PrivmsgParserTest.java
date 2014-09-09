@@ -5,15 +5,15 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.TestUtils;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class PrivmsgParserTest {
 
-    private RelayServer mServer;
+    private InternalServer mServer;
 
     private PrivmsgParser mPrivmsgParser;
 
