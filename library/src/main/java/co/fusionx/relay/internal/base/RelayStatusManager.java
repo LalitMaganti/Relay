@@ -68,6 +68,11 @@ public class RelayStatusManager implements InternalStatusManager {
     }
 
     @Override
+    public void resetAttemptCount() {
+        mReconnectAttempts = 0;
+    }
+
+    @Override
     public boolean isReconnectNeeded() {
         return mReconnectAttempts < getPreferences().getReconnectAttemptsCount();
     }

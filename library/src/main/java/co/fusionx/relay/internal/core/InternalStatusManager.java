@@ -8,6 +8,8 @@ public interface InternalStatusManager {
 
     public void incrementAttemptCount();
 
+    public void resetAttemptCount();
+
     public boolean isReconnectNeeded();
 
     public void onConnecting();

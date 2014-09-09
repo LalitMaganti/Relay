@@ -59,7 +59,9 @@ public class RelaySession implements Session {
 
     public void startSession() {
         try {
-            startConnect(0);
+            mInternalStatusManager.resetAttemptCount();
+
+            startConnect(this::connect, 0);
         } catch (final RuntimeException ex) {
             getPreferences().handleException(ex);
         }
@@ -73,8 +75,8 @@ public class RelaySession implements Session {
         }
     }
 
-    private void startConnect(final int delay) {
-        mScheduledExecutorService.schedule(this::connect, delay, TimeUnit.MILLISECONDS);
+    private void startConnect(final Runnable runnable, final int delay) {
+        mScheduledExecutorService.schedule(runnable, delay, TimeUnit.MILLISECONDS);
     }
 
     private void connect() {
@@ -83,8 +85,15 @@ public class RelaySession implements Session {
 
         if (!mConnection.isStopped() && mInternalStatusManager.isReconnectNeeded()) {
             mInternalStatusManager.onReconnecting();
-            startConnect(5000);
+            startConnect(this::reconnect, 5000);
+        } else if (!mConnection.isStopped()) {
+            mInternalStatusManager.onDisconnected("No reconnects pending", false);
         }
+    }
+
+    private void reconnect() {
+        mInternalStatusManager.incrementAttemptCount();
+        connect();
     }
 
     @Override
