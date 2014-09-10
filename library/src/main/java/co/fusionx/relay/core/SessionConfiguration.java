@@ -34,14 +34,16 @@ public class SessionConfiguration {
             mSettingsProvider = new DefaultSettingsProvider();
         }
 
-        public void setConnectionConfiguration(final ConnectionConfiguration configuration) {
+        public Builder setConnectionConfiguration(final ConnectionConfiguration configuration) {
             Preconditions.checkNotNull(configuration, "Configuration cannot be null");
             mConnectionConfiguration = configuration;
+            return this;
         }
 
-        public void setSettingsProvider(final SettingsProvider configuration) {
+        public Builder setSettingsProvider(final SettingsProvider configuration) {
             Preconditions.checkNotNull(configuration, "Configuration cannot be null");
             mSettingsProvider = configuration;
+            return this;
         }
 
         public SessionConfiguration build() {

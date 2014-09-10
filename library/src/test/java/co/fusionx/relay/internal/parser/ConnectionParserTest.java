@@ -12,10 +12,12 @@ import java.util.HashSet;
 
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.TestUtils;
 import co.fusionx.relay.internal.bus.FakeEventBus;
+import co.fusionx.relay.internal.core.DefaultSettingsProvider;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.sender.CapPacketSender;
 import co.fusionx.relay.internal.sender.InternalPacketSender;
@@ -45,13 +47,17 @@ public class ConnectionParserTest {
         final ConnectionConfiguration.Builder saslBuilder = TestUtils.getFreenodeBuilderSasl();
         final ConnectionConfiguration saslConfiguration = saslBuilder.build();
 
+        final SessionConfiguration configuration = new SessionConfiguration.Builder()
+                .setConnectionConfiguration(saslConfiguration).build();
+
         final PipedReader readerForTesting = new PipedReader();
         final PipedWriter writerForParser = new PipedWriter(readerForTesting);
 
         mBufferedReaderForTesting = new BufferedReader(readerForTesting);
         final BufferedWriter bufferedWriterForParser = new BufferedWriter(writerForParser);
 
-        final PacketSender packetSender = new PacketSender(newDirectExecutorService());
+        final PacketSender packetSender = new PacketSender(new DefaultSettingsProvider(),
+                newDirectExecutorService());
         packetSender.onOutputStreamCreated(bufferedWriterForParser);
 
         final ServerSender serverSender = new RelayServerSender(packetSender, null,
@@ -68,7 +74,7 @@ public class ConnectionParserTest {
         mSessionBus = new FakeEventBus<>();
         mCapabilities = new HashSet<>();
 
-        mServer = new RelayServer(mSessionBus, saslConfiguration, serverSender, mCapabilities);
+        mServer = new RelayServer(mSessionBus, configuration, serverSender, mCapabilities);
         mConnectionParser = new ConnectionParser(saslConfiguration,
                 mServer, internalSender, capPacketSender);
     }
