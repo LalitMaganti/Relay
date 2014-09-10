@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
 import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
@@ -16,9 +17,9 @@ import co.fusionx.relay.internal.packet.channel.ChannelTopicPacket;
 import co.fusionx.relay.internal.packet.server.ModePacket;
 import co.fusionx.relay.sender.ChannelSender;
 
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
-
 public class RelayChannelSender implements ChannelSender {
+
+    private final SettingsProvider mSettingsProvider;
 
     private final PacketSender mPacketSender;
 
@@ -26,7 +27,9 @@ public class RelayChannelSender implements ChannelSender {
 
     private Channel mChannel;
 
-    public RelayChannelSender(final PacketSender packetSender, final LibraryUser libraryUser) {
+    public RelayChannelSender(final SettingsProvider settingsProvider,
+            final PacketSender packetSender, final LibraryUser libraryUser) {
+        mSettingsProvider = settingsProvider;
         mPacketSender = packetSender;
         mUser = libraryUser;
     }
@@ -70,7 +73,7 @@ public class RelayChannelSender implements ChannelSender {
     }
 
     private void sendChannelSelfMessage(final Supplier<ChannelEvent> function) {
-        if (getPreferences().isSelfEventHidden()) {
+        if (mSettingsProvider.isSelfEventHidden()) {
             return;
         }
         mChannel.getBus().post(function.get());

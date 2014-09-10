@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.CapCapability;
-import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.internal.core.InternalServer;
@@ -17,7 +17,7 @@ import co.fusionx.relay.sender.ServerSender;
 public class RelayServer extends RelayAbstractConversation<ServerEvent>
         implements InternalServer {
 
-    private final ConnectionConfiguration mConfiguration;
+    private final SessionConfiguration mConfiguration;
 
     private final Set<CapCapability> mCapabilities;
 
@@ -25,7 +25,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent>
 
     @Inject
     public RelayServer(final GenericBus<Event> sessionBus,
-            final ConnectionConfiguration configuration, final ServerSender serverSender,
+            final SessionConfiguration configuration, final ServerSender serverSender,
             final Set<CapCapability> capCapabilities) {
         super(sessionBus);
 
@@ -49,11 +49,11 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent>
     // Server Interface
     @Override
     public String getTitle() {
-        return mConfiguration.getTitle();
+        return mConfiguration.getConnectionConfiguration().getTitle();
     }
 
     @Override
-    public ConnectionConfiguration getConfiguration() {
+    public SessionConfiguration getConfiguration() {
         return mConfiguration;
     }
 

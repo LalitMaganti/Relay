@@ -8,9 +8,9 @@ import javax.inject.Inject;
 
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.conversation.Server;
-import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.core.QueryUserGroup;
 import co.fusionx.relay.core.Session;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.core.UserChannelGroup;
 import co.fusionx.relay.dcc.DCCManager;
@@ -22,13 +22,13 @@ import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.dcc.RelayDCCManager;
 import dagger.ObjectGraph;
 
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
-
 public class RelaySession implements Session {
 
     private final ObjectGraph mObjectGraph;
 
     private final ScheduledExecutorService mScheduledExecutorService;
+
+    private final SessionConfiguration mConfiguration;
 
     @Inject
     InternalStatusManager mInternalStatusManager;
@@ -50,7 +50,9 @@ public class RelaySession implements Session {
 
     private RelayIRCConnection mConnection;
 
-    public RelaySession(final ConnectionConfiguration configuration) {
+    public RelaySession(final SessionConfiguration configuration) {
+        mConfiguration = configuration;
+
         mObjectGraph = ObjectGraph.create(new RelayModule(configuration));
         mObjectGraph.inject(this);
 
@@ -63,7 +65,7 @@ public class RelaySession implements Session {
 
             startConnect(this::connect, 0);
         } catch (final RuntimeException ex) {
-            getPreferences().handleException(ex);
+            mConfiguration.getSettingsProvider().handleFatalError(ex);
         }
     }
 

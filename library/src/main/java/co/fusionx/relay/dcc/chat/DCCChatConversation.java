@@ -3,15 +3,14 @@ package co.fusionx.relay.dcc.chat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.bus.GenericBus;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayAbstractConversation;
-import co.fusionx.relay.bus.GenericBus;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent> {
 
@@ -19,16 +18,16 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
 
     private final DCCChatConnection mDCCChatConnection;
 
-    private final ConnectionConfiguration mConnectionConfiguration;
+    private final SessionConfiguration mSessionConfiguration;
 
     private final DCCPendingConnection mPendingConnection;
 
     public DCCChatConversation(final GenericBus<Event> bus,
-            final ConnectionConfiguration connectionConfiguration,
+            final SessionConfiguration sessionConfiguration,
             final DCCPendingConnection pendingConnection) {
         super(bus);
 
-        mConnectionConfiguration = connectionConfiguration;
+        mSessionConfiguration = sessionConfiguration;
         mPendingConnection = pendingConnection;
 
         mDCCChatConnection = new DCCChatConnection(mPendingConnection, this);
@@ -42,7 +41,7 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
     public void sendMessage(final String message) {
         mExecutorService.submit(() -> mDCCChatConnection.writeLine(message));
 
-        if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
+        if (mSessionConfiguration.getSettingsProvider().isSelfEventHidden()) {
             return;
         }
         getBus().post(new DCCChatSelfMessageEvent(this, null, message));
@@ -52,7 +51,7 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
         final String line = String.format("\u0001ACTION %1$s\u0001", action);
         mExecutorService.submit(() -> mDCCChatConnection.writeLine(line));
 
-        if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
+        if (mSessionConfiguration.getSettingsProvider().isSelfEventHidden()) {
             return;
         }
         // TODO - this is wrong  fix it
@@ -79,14 +78,15 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
         }
 
         final DCCChatConversation that = (DCCChatConversation) o;
-        return mConnectionConfiguration.getTitle().equals(that.mConnectionConfiguration.getTitle())
+        return mSessionConfiguration.getConnectionConfiguration().getTitle()
+                .equals(that.mSessionConfiguration.getConnectionConfiguration().getTitle())
                 && mPendingConnection.getDccRequestNick()
                 .equals(that.mPendingConnection.getDccRequestNick());
     }
 
     @Override
     public int hashCode() {
-        int result = mConnectionConfiguration.getTitle().hashCode();
+        int result = mSessionConfiguration.getConnectionConfiguration().getTitle().hashCode();
         result = 31 * result + mPendingConnection.hashCode();
         return result;
     }

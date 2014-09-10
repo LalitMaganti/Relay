@@ -11,10 +11,9 @@ import java.util.Map;
 
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.core.Session;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.core.SessionManager;
 import co.fusionx.relay.core.SessionStatus;
-import co.fusionx.relay.interfaces.RelayConfiguration;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
 
 public class RelaySessionManager implements SessionManager {
 
@@ -24,31 +23,29 @@ public class RelaySessionManager implements SessionManager {
     }
 
     /**
-     * Returns a singleton connection manager which is lazily created
+     * Returns a session manager to manage multiple IRC sessions
      *
-     * @param preferences a concrete implementation of the
-     *                    {@link co.fusionx.relay.interfaces.RelayConfiguration} interface
      * @return the connection manager which was created
      */
-    public static SessionManager createSessionManager(final RelayConfiguration preferences) {
-        final RelaySessionManager sSessionManager = new RelaySessionManager();
-        RelayConfigurationProvider.onInterfaceReceived(preferences);
-        return sSessionManager;
+    public static SessionManager createSessionManager() {
+        return new RelaySessionManager();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Pair<Boolean, Session> requestConnection(final ConnectionConfiguration configuration) {
-        RelaySession session = mSessionMap.get(configuration.getTitle());
+    public Pair<Boolean, Session> requestConnection(final SessionConfiguration configuration) {
+        final ConnectionConfiguration connectionConfiguration = configuration
+                .getConnectionConfiguration();
+        RelaySession session = mSessionMap.get(connectionConfiguration.getTitle());
 
         final boolean exists = session != null;
         if (!exists) {
             session = new RelaySession(configuration);
             session.startSession();
 
-            mSessionMap.put(configuration.getTitle(), session);
+            mSessionMap.put(connectionConfiguration.getTitle(), session);
         }
         return new Pair<>(exists, session);
     }

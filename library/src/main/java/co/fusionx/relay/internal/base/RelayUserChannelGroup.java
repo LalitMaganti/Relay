@@ -9,17 +9,17 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import co.fusionx.relay.conversation.Channel;
-import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalLibraryUser;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.sender.RelayChannelSender;
 import co.fusionx.relay.internal.sender.PacketSender;
+import co.fusionx.relay.internal.sender.RelayChannelSender;
 import co.fusionx.relay.util.ParseUtils;
 
 public class RelayUserChannelGroup implements InternalUserChannelGroup {
@@ -30,20 +30,21 @@ public class RelayUserChannelGroup implements InternalUserChannelGroup {
 
     private final GenericBus<Event> mSessionBus;
 
-    private final ConnectionConfiguration mConfiguration;
+    private final SessionConfiguration mConfiguration;
 
     private final PacketSender mPacketSender;
 
     @Inject
     RelayUserChannelGroup(final GenericBus<Event> sessionBus,
-            final ConnectionConfiguration configuration,
+            final SessionConfiguration configuration,
             final PacketSender packetSender) {
         mSessionBus = sessionBus;
         mConfiguration = configuration;
         mPacketSender = packetSender;
 
         // Set the nick name to the first choice nick
-        mUser = new RelayLibraryUser(configuration.getNickStorage().getFirst());
+        mUser = new RelayLibraryUser(configuration.getConnectionConfiguration()
+                .getNickStorage().getFirst());
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);
@@ -88,7 +89,8 @@ public class RelayUserChannelGroup implements InternalUserChannelGroup {
      * @param channel the channel to add to the user
      */
     @Override
-    public void coupleUserAndChannel(final InternalChannelUser user, final InternalChannel channel) {
+    public void coupleUserAndChannel(final InternalChannelUser user,
+            final InternalChannel channel) {
         coupleUserAndChannel(user, channel, UserLevel.NONE);
     }
 
@@ -190,7 +192,8 @@ public class RelayUserChannelGroup implements InternalUserChannelGroup {
      * @param user    the user to remove the channel from or remove from the global list
      */
     @Override
-    public void removeChannelFromUser(final InternalChannel channel, final InternalChannelUser user) {
+    public void removeChannelFromUser(final InternalChannel channel,
+            final InternalChannelUser user) {
         final Collection<? extends Channel> setOfChannels = user.getChannels();
         user.removeChannel(channel);
 
@@ -223,9 +226,10 @@ public class RelayUserChannelGroup implements InternalUserChannelGroup {
 
     @Override
     public InternalChannel getNewChannel(final String channelName) {
-        final RelayChannelSender channelSender = new RelayChannelSender(mPacketSender, mUser);
-        final InternalChannel channel = new RelayChannel(mSessionBus, mConfiguration, channelSender,
-                channelName);
+        final RelayChannelSender channelSender = new RelayChannelSender(mConfiguration
+                .getSettingsProvider(), mPacketSender, mUser);
+        final InternalChannel channel = new RelayChannel(mSessionBus,
+                mConfiguration.getConnectionConfiguration(), channelSender, channelName);
 
         // Horrible but has to be done - see the comment on the method
         channelSender.setChannel(channel);

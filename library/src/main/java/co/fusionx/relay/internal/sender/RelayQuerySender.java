@@ -1,7 +1,8 @@
 package co.fusionx.relay.internal.sender;
 
-import android.text.TextUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
@@ -12,9 +13,9 @@ import co.fusionx.relay.internal.packet.query.QueryActionPacket;
 import co.fusionx.relay.internal.packet.query.QueryMessagePacket;
 import co.fusionx.relay.sender.QuerySender;
 
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
-
 public class RelayQuerySender implements QuerySender {
+
+    private final SettingsProvider mSettingsProvider;
 
     private final PacketSender mSender;
 
@@ -26,8 +27,9 @@ public class RelayQuerySender implements QuerySender {
 
     private InternalQueryUser mQueryUser;
 
-    public RelayQuerySender(final PacketSender sender, final LibraryUser user,
-            final InternalQueryUserGroup queryGroup) {
+    public RelayQuerySender(final SettingsProvider settingsProvider, final PacketSender sender,
+            final LibraryUser user, final InternalQueryUserGroup queryGroup) {
+        mSettingsProvider = settingsProvider;
         mSender = sender;
         mUser = user;
         mQueryGroup = queryGroup;
@@ -43,12 +45,12 @@ public class RelayQuerySender implements QuerySender {
 
     @Override
     public void sendAction(final String action) {
-        if (TextUtils.isEmpty(action)) {
+        if (StringUtils.isEmpty(action)) {
             return;
         }
         mSender.sendPacket(new QueryActionPacket(mQueryNick, action));
 
-        if (getPreferences().isSelfEventHidden()) {
+        if (mSettingsProvider.isSelfEventHidden()) {
             return;
         }
         mQueryUser.getBus().post(new QueryActionSelfEvent(mQueryUser, mUser, action));
@@ -56,12 +58,12 @@ public class RelayQuerySender implements QuerySender {
 
     @Override
     public void sendMessage(final String message) {
-        if (TextUtils.isEmpty(message)) {
+        if (StringUtils.isEmpty(message)) {
             return;
         }
         mSender.sendPacket(new QueryMessagePacket(mQueryNick, message));
 
-        if (getPreferences().isSelfEventHidden()) {
+        if (mSettingsProvider.isSelfEventHidden()) {
             return;
         }
         mQueryUser.getBus().post(new QueryMessageSelfEvent(mQueryUser, mUser, message));

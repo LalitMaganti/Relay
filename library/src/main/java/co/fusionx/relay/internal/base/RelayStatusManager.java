@@ -5,9 +5,8 @@ import com.google.common.collect.FluentIterable;
 import java.util.Collection;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
 import co.fusionx.relay.event.channel.ChannelDisconnectEvent;
@@ -28,11 +27,9 @@ import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.function.FluentIterables;
 
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
-
 public class RelayStatusManager implements InternalStatusManager {
 
-    private final ConnectionConfiguration mConfiguration;
+    private final SessionConfiguration mConfiguration;
 
     private final InternalServer mServer;
 
@@ -45,7 +42,7 @@ public class RelayStatusManager implements InternalStatusManager {
     private SessionStatus mStatus = SessionStatus.DISCONNECTED;
 
     @Inject
-    public RelayStatusManager(final ConnectionConfiguration configuration,
+    public RelayStatusManager(final SessionConfiguration configuration,
             final InternalServer server, final InternalUserChannelGroup userChannelGroup,
             final InternalQueryUserGroup queryUserGroup) {
         mConfiguration = configuration;
@@ -73,7 +70,7 @@ public class RelayStatusManager implements InternalStatusManager {
 
     @Override
     public boolean isReconnectNeeded() {
-        return mReconnectAttempts < getPreferences().getReconnectAttemptsCount();
+        return mReconnectAttempts < mConfiguration.getSettingsProvider().getReconnectAttempts();
     }
 
     @Override
@@ -103,14 +100,16 @@ public class RelayStatusManager implements InternalStatusManager {
         for (final InternalQueryUser user : mQueryUserGroup.getQueryUsers()) {
             user.getBus().post(new QueryConnectEvent(user));
         }
-        mServer.getBus().post(new ConnectEvent(mServer, mConfiguration.getUrl()));
+        mServer.getBus().post(new ConnectEvent(mServer,
+                mConfiguration.getConnectionConfiguration().getUrl()));
 
         // Since we are now connected we can try to rejoin the channels we had joined previously
         // or if we weren't joined to any channels previously then send a join for each of the
         // auto join channels
         final Collection<InternalChannel> channels = mUserChannelGroup.getUser().getChannels();
         final FluentIterable<String> channelNames = channels.isEmpty()
-                ? FluentIterable.from(mConfiguration.getAutoJoinChannels())
+                ? FluentIterable.from(mConfiguration.getConnectionConfiguration()
+                .getAutoJoinChannels())
                 : FluentIterable.from(channels).transform(InternalChannel::getName);
         FluentIterables.forEach(channelNames, mServer::sendJoin);
     }

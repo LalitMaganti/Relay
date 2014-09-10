@@ -9,14 +9,14 @@ import java.util.LinkedHashSet;
 import javax.inject.Inject;
 
 import co.fusionx.relay.bus.GenericBus;
-import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.core.LibraryUser;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.sender.RelayQuerySender;
 import co.fusionx.relay.internal.sender.PacketSender;
+import co.fusionx.relay.internal.sender.RelayQuerySender;
 
 public class RelayQueryUserGroup implements InternalQueryUserGroup {
 
@@ -26,13 +26,13 @@ public class RelayQueryUserGroup implements InternalQueryUserGroup {
 
     private final LibraryUser mUser;
 
-    private final ConnectionConfiguration mConfiguration;
+    private final SessionConfiguration mConfiguration;
 
     private final Collection<InternalQueryUser> mQueryUsers;
 
     @Inject
     public RelayQueryUserGroup(final GenericBus<Event> sessionBus,
-            final ConnectionConfiguration configuration, final PacketSender sender,
+            final SessionConfiguration configuration, final PacketSender sender,
             final InternalUserChannelGroup group) {
         mSessionBus = sessionBus;
         mConfiguration = configuration;
@@ -62,9 +62,10 @@ public class RelayQueryUserGroup implements InternalQueryUserGroup {
 
     @Override
     public InternalQueryUser addQueryUser(final String nick) {
-        final RelayQuerySender sender = new RelayQuerySender(mSender, mUser, this);
-        final InternalQueryUser user = new RelayQueryUser(mSessionBus, mConfiguration, sender,
-                nick);
+        final RelayQuerySender sender = new RelayQuerySender(mConfiguration.getSettingsProvider(),
+                mSender, mUser, this);
+        final InternalQueryUser user = new RelayQueryUser(mSessionBus,
+                mConfiguration.getConnectionConfiguration(), sender, nick);
 
         // Horrible but has to be done - see the comment on the method
         sender.setQueryUser(user);

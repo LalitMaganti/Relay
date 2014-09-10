@@ -52,7 +52,7 @@ public class ModeParser extends CommandParser {
         Optionals.run(optChannel, channel -> {
             // TODO - implement channel mode changes
             onUserModeInChannel(parsedArray, sendingUser, channel, mode);
-        }, () -> LogUtils.logOptionalBug(optChannel, mServer));
+        }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }
 
     private void onUserModeInChannel(final List<String> parsedArray, final String sendingNick,

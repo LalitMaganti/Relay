@@ -1,15 +1,11 @@
 package co.fusionx.relay.util;
 
-import com.google.common.base.Optional;
-
-import co.fusionx.relay.conversation.Server;
-import co.fusionx.relay.misc.RelayConfigurationProvider;
+import co.fusionx.relay.core.SessionConfiguration;
 
 public class LogUtils {
 
-    private static final String TAG = "Relay";
-
-    public static void logOptionalBug(final Optional<?> optional, final Server server) {
-        RelayConfigurationProvider.getPreferences().logMissingData(server);
+    public static void logOptionalBug(final SessionConfiguration configuration) {
+        configuration.getSettingsProvider().logNonFatalError(configuration
+                .getConnectionConfiguration().getUrl());
     }
 }

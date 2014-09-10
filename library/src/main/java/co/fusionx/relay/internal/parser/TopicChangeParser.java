@@ -22,14 +22,13 @@ public class TopicChangeParser extends CommandParser {
     }
 
     @Override
-    public void onParseCommand(List<String> parsedArray, String prefix) {
+    public void onParseCommand(final List<String> parsedArray, final String prefix) {
         final ChannelUser user = mUserChannelGroup.getUserFromPrefix(prefix);
         final Optional<InternalChannel> optChan = mUserChannelGroup.getChannel(parsedArray.get(0));
 
-        LogUtils.logOptionalBug(optChan, mServer);
-        Optionals.ifPresent(optChan, channel -> {
+        Optionals.run(optChan, channel -> {
             final String newTopic = parsedArray.get(1);
             channel.getBus().post(new ChannelTopicEvent(channel, user, newTopic));
-        });
+        }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }
 }

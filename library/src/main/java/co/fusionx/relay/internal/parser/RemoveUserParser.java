@@ -35,8 +35,8 @@ public abstract class RemoveUserParser extends CommandParser {
                 } else {
                     onUserRemoved(parsedArray, prefix, channel, user);
                 }
-            }, () -> LogUtils.logOptionalBug(optUser, mServer));
-        }, () -> LogUtils.logOptionalBug(optChannel, mServer));
+            }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
+        }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }
 
     abstract Optional<InternalChannelUser> getRemovedUser(final List<String> parsedArray,

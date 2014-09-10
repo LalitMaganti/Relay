@@ -10,11 +10,11 @@ public interface SessionManager {
     /**
      * Creates a connection with the IRC server and tries to connect to it
      *
-     * @param configuration the configuration you want to connect with
+     * @param configuration the configuration you want to use for the session
      * @return a pair of objects - the first item is a boolean which is true if the server already
      * exists in the manager. The second item is the connection created.
      */
-    Pair<Boolean, ? extends Session> requestConnection(ConnectionConfiguration configuration);
+    Pair<Boolean, Session> requestConnection(SessionConfiguration configuration);
 
     /**
      * Reconnect to the specified server

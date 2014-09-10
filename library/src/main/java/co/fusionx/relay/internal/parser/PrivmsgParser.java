@@ -63,8 +63,7 @@ public class PrivmsgParser extends CommandParser {
             final String rawMessage) {
         final Optional<InternalChannel> optChannel = mUserChannelGroup.getChannel(channelName);
 
-        LogUtils.logOptionalBug(optChannel, mServer);
-        Optionals.ifPresent(optChannel, channel -> {
+        Optionals.run(optChannel, channel -> {
             // TODO - actually parse the colours
             final String message = Utils.stripColorsFromMessage(rawMessage);
             final boolean mention = MentionParser.onMentionableCommand(message,
@@ -78,6 +77,6 @@ public class PrivmsgParser extends CommandParser {
                 event = new ChannelWorldMessageEvent(channel, message, sendingNick, mention);
             }
             channel.getBus().post(event);
-        });
+        }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }
 }

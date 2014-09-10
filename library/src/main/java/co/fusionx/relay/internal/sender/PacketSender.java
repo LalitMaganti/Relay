@@ -4,19 +4,22 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
+import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.internal.packet.Packet;
-
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class PacketSender {
 
     private final Object mLock = new Object();
 
+    private final SettingsProvider mSettingsProvider;
+
     private final ExecutorService mExecutorService;
 
     private BufferedWriter mBufferedWriter;
 
-    public PacketSender(final ExecutorService executorService) {
+    public PacketSender(final SettingsProvider settingsProvider,
+            final ExecutorService executorService) {
+        mSettingsProvider = settingsProvider;
         mExecutorService = executorService;
     }
 
@@ -40,7 +43,7 @@ public class PacketSender {
     private void sendLine(final String line) {
         synchronized (mLock) {
             if (mBufferedWriter == null) {
-                getPreferences().logServerLine(line);
+                mSettingsProvider.logNonFatalError(line);
                 return;
             }
 

@@ -14,7 +14,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.bus.GenericBus;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.dcc.DCCManager;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.event.file.DCCFileConversationStartedEvent;
@@ -24,9 +25,6 @@ import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.sender.PacketSender;
-import co.fusionx.relay.bus.GenericBus;
-
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 @Singleton
 public class RelayDCCManager implements DCCManager {
@@ -39,16 +37,16 @@ public class RelayDCCManager implements DCCManager {
 
     private final GenericBus<Event> mBus;
 
-    private final ConnectionConfiguration mConnectionConfiguration;
+    private final SessionConfiguration mSessionConfiguration;
 
     private final PacketSender mPacketSender;
 
     @Inject
     public RelayDCCManager(final GenericBus<Event> bus,
-            final ConnectionConfiguration connectionConfiguration,
+            final SessionConfiguration sessionConfiguration,
             final PacketSender packetSender) {
         mBus = bus;
-        mConnectionConfiguration = connectionConfiguration;
+        mSessionConfiguration = sessionConfiguration;
         mPacketSender = packetSender;
 
         mChatConversations = new HashMap<>();
@@ -78,7 +76,8 @@ public class RelayDCCManager implements DCCManager {
     public void acceptDCCConnection(final DCCPendingSendConnection connection, final File file) {
         if (!mPendingConnections.contains(connection)) {
             // TODO - Maybe send an event instead?
-            getPreferences().logServerLine("DCC Connection not managed by this server");
+            mSessionConfiguration.getSettingsProvider()
+                    .logNonFatalError("DCC Connection not managed by this server");
             return;
         }
         // This chat is no longer pending - remove it
@@ -91,7 +90,8 @@ public class RelayDCCManager implements DCCManager {
                 .first();
         // Get the conversation or a new one if it does not exist
         final DCCFileConversation conversation = optConversation
-                .or(() -> new DCCFileConversation(mBus, mConnectionConfiguration, mPacketSender,
+                .or(() -> new DCCFileConversation(mBus,
+                        mSessionConfiguration.getConnectionConfiguration(), mPacketSender,
                         connection.getDccRequestNick()));
 
         // If the conversation was not present add it
@@ -108,14 +108,15 @@ public class RelayDCCManager implements DCCManager {
     public void acceptDCCConnection(final DCCPendingChatConnection connection) {
         if (!mPendingConnections.contains(connection)) {
             // TODO - Maybe send an event instead?
-            getPreferences().logServerLine("DCC Connection not managed by this server");
+            mSessionConfiguration.getSettingsProvider()
+                    .logNonFatalError("DCC Connection not managed by this server");
             return;
         }
         // This chat is no longer pending - remove it
         mPendingConnections.remove(connection);
 
         final DCCChatConversation conversation = new DCCChatConversation(mBus,
-                mConnectionConfiguration, connection);
+                mSessionConfiguration, connection);
         mChatConversations.put(connection.getDccRequestNick(), conversation);
         conversation.startChat();
     }

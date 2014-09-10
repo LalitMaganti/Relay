@@ -13,6 +13,8 @@ import javax.inject.Singleton;
 import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.bus.EventBus;
 import co.fusionx.relay.internal.constants.CommandConstants;
@@ -75,16 +77,26 @@ import static co.fusionx.relay.internal.constants.CommandConstants.WALLOPS;
 })
 public class RelayModule {
 
-    private final ConnectionConfiguration mConfiguration;
+    private final SessionConfiguration mConfiguration;
 
-    public RelayModule(final ConnectionConfiguration connectionConfiguration) {
-        mConfiguration = connectionConfiguration;
+    public RelayModule(final SessionConfiguration sessionConfiguration) {
+        mConfiguration = sessionConfiguration;
     }
 
     // Base
     @Provides
-    public ConnectionConfiguration provideConfiguration() {
+    public SessionConfiguration provideConfiguration() {
         return mConfiguration;
+    }
+
+    @Provides
+    public SettingsProvider provideSettingsProvider(final SessionConfiguration configuration) {
+        return configuration.getSettingsProvider();
+    }
+
+    @Provides
+    public ConnectionConfiguration provideConnectionConfig(final SessionConfiguration config) {
+        return config.getConnectionConfiguration();
     }
 
     @Provides
@@ -126,8 +138,8 @@ public class RelayModule {
     // Sender
     @Singleton
     @Provides
-    public PacketSender provideBaseSender() {
-        return new PacketSender(Executors.newCachedThreadPool());
+    public PacketSender provideBaseSender(final SettingsProvider settingsProvider) {
+        return new PacketSender(settingsProvider, Executors.newCachedThreadPool());
     }
 
     @Provides

@@ -17,8 +17,8 @@ import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
-import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.CtcpResponsePacketSender;
+import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
@@ -60,7 +60,7 @@ public class CTCPParser {
             onAction(recipient, sendingNick, message);
         } else if (message.startsWith("FINGER")) {
             mCtcpResponseSender.sendFingerResponse(sendingNick,
-                    mServer.getConfiguration().getRealName());
+                    mServer.getConfiguration().getConnectionConfiguration().getRealName());
         } else if (message.startsWith("VERSION")) {
             mCtcpResponseSender.sendVersionResponse(sendingNick);
         } else if (message.startsWith("SOURCE")) {
@@ -101,8 +101,7 @@ public class CTCPParser {
             final String action) {
         final Optional<InternalChannel> optChannel = mUserChannelDao.getChannel(channelName);
 
-        LogUtils.logOptionalBug(optChannel, mServer);
-        Optionals.ifPresent(optChannel, channel -> {
+        Optionals.run(optChannel, channel -> {
             final Optional<InternalChannelUser> optUser = mUserChannelDao.getUser(sendingNick);
             final boolean mention = MentionParser.onMentionableCommand(action,
                     mUserChannelDao.getUser().getNick().getNickAsString());
@@ -114,7 +113,7 @@ public class CTCPParser {
                 event = new ChannelWorldActionEvent(channel, action, sendingNick, mention);
             }
             channel.getBus().post(event);
-        });
+        }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }
     // Commands End Here
 

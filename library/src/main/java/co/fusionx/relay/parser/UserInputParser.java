@@ -11,8 +11,6 @@ import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
 
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
-
 public class UserInputParser {
 
     public static void onParseChannelMessage(final Server server,
@@ -36,7 +34,8 @@ public class UserInputParser {
             case "/part":
             case "/p":
                 if (arrayLength == 0) {
-                    channel.sendPart(Optional.fromNullable(getPreferences().getPartReason()));
+                    // TODO - need to fix this
+                    channel.sendPart(Optional.fromNullable(null));
                     return;
                 }
                 break;

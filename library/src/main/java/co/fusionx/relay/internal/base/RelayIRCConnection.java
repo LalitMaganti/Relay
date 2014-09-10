@@ -10,24 +10,22 @@ import java.net.Socket;
 import javax.inject.Inject;
 
 import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.parser.ConnectionParser;
 import co.fusionx.relay.internal.parser.ServerLineParser;
-import co.fusionx.relay.internal.sender.InternalSender;
-import co.fusionx.relay.internal.sender.RelayServerSender;
 import co.fusionx.relay.internal.sender.CapPacketSender;
+import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;
+import co.fusionx.relay.internal.sender.RelayServerSender;
 import co.fusionx.relay.util.SocketUtils;
 import co.fusionx.relay.util.Utils;
 
 import static co.fusionx.relay.internal.parser.ConnectionParser.ConnectionLineParseStatus;
 import static co.fusionx.relay.internal.parser.ConnectionParser.ParseStatus;
-import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class RelayIRCConnection {
-
-    private final ConnectionConfiguration mConnectionConfiguration;
 
     private final InternalStatusManager mInternalStatusManager;
 
@@ -45,12 +43,17 @@ public class RelayIRCConnection {
 
     private final CapPacketSender mCapSender;
 
+    private final ConnectionConfiguration mConnectionConfiguration;
+
+    private final SettingsProvider mSettingsProvider;
+
     private Socket mSocket;
 
     private boolean mStopped;
 
     @Inject
     RelayIRCConnection(final ConnectionConfiguration connectionConfiguration,
+            final SettingsProvider settingsProvider,
             final InternalUserChannelGroup userChannelGroup,
             final InternalStatusManager internalStatusManager,
             final ConnectionParser connectionParser, final ServerLineParser lineParser,
@@ -58,6 +61,7 @@ public class RelayIRCConnection {
             final InternalSender internalSender,
             final CapPacketSender capPacketSender) {
         mConnectionConfiguration = connectionConfiguration;
+        mSettingsProvider = settingsProvider;
         mUserChannelGroup = userChannelGroup;
         mInternalStatusManager = internalStatusManager;
 
@@ -95,7 +99,7 @@ public class RelayIRCConnection {
 
     void disconnect() {
         mStopped = true;
-        mInternalSender.quitServer(getPreferences().getQuitReason());
+        mInternalSender.quitServer(mSettingsProvider.getQuitReason());
     }
 
     private void connectQuietly() throws IOException {
