@@ -62,7 +62,7 @@ public class ConnectionParserTest {
                     }
                 });
 
-        final CapPacketSender packetSender = new CapPacketSender(packetSender);
+        final CapPacketSender capPacketSender = new CapPacketSender(packetSender);
         final InternalSender internalSender = new InternalPacketSender(packetSender);
 
         mSessionBus = new FakeEventBus<>();
@@ -70,7 +70,7 @@ public class ConnectionParserTest {
 
         mServer = new RelayServer(mSessionBus, saslConfiguration, serverSender, mCapabilities);
         mConnectionParser = new ConnectionParser(saslConfiguration,
-                mServer, internalSender, packetSender);
+                mServer, internalSender, capPacketSender);
     }
 
     @Test
