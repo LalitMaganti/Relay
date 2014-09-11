@@ -2,9 +2,8 @@ package co.fusionx.relay.core;
 
 import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.dcc.DCCManager;
-import co.fusionx.relay.bus.GenericBus;
 
-public interface Session extends GenericBus {
+public interface Session extends Registerable {
 
     public SessionStatus getStatus();
 

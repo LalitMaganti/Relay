@@ -10,20 +10,20 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Singleton;
 
-import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.bus.DefaultBus;
-import co.fusionx.relay.internal.bus.PostableBus;
+import co.fusionx.relay.internal.bus.EventBus;
 import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
+import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.dcc.RelayDCCManager;
 import co.fusionx.relay.internal.parser.AccountParser;
 import co.fusionx.relay.internal.parser.AwayParser;
@@ -132,8 +132,13 @@ public class RelayModule {
     // Bus
     @Singleton
     @Provides
-    public PostableBus<Event> provideSessionBus() {
+    public EventBus<Event> provideSessionBus() {
         return new DefaultBus<>();
+    }
+
+    @Provides
+    public Postable<Event> providePostableSessionBus(final EventBus<Event> bus) {
+        return bus;
     }
 
     // Sender
@@ -195,9 +200,9 @@ public class RelayModule {
 
     @Provides
     @Singleton
-    public SparseArray<CodeParser> provideCodeParserMap(final PostableBus<Event> superBus,
-            final InternalServer server, final InternalUserChannelGroup dao,
-            final InternalQueryUserGroup queryManager, final PacketSender sender) {
+    public SparseArray<CodeParser> provideCodeParserMap(final InternalServer server,
+            final InternalUserChannelGroup dao, final InternalQueryUserGroup queryManager,
+            final PacketSender sender) {
         final SparseArray<CodeParser> parserMap = new SparseArray<>();
 
         final InitalTopicParser topicChangeParser = new InitalTopicParser(server, dao, null);

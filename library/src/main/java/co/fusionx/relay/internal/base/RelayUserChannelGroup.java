@@ -9,16 +9,15 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.conversation.Channel;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalLibraryUser;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
+import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.RelayChannelSender;
 import co.fusionx.relay.util.ParseUtils;
@@ -29,14 +28,14 @@ public class RelayUserChannelGroup implements InternalUserChannelGroup {
 
     private final InternalLibraryUser mUser;
 
-    private final PostableBus<Event> mSessionBus;
+    private final Postable<Event> mSessionBus;
 
     private final SessionConfiguration mConfiguration;
 
     private final PacketSender mPacketSender;
 
     @Inject
-    RelayUserChannelGroup(final PostableBus<Event> sessionBus,
+    RelayUserChannelGroup(final Postable<Event> sessionBus,
             final SessionConfiguration configuration,
             final PacketSender packetSender) {
         mSessionBus = sessionBus;
@@ -44,8 +43,8 @@ public class RelayUserChannelGroup implements InternalUserChannelGroup {
         mPacketSender = packetSender;
 
         // Set the nick name to the first choice nick
-        mUser = new RelayLibraryUser(configuration.getConnectionConfiguration()
-                .getNickStorage().getFirst());
+        mUser = new RelayLibraryUser(configuration.getConnectionConfiguration().
+                getNickStorage().getFirst());
 
         mUsers = new HashSet<>();
         mUsers.add(mUser);

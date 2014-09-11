@@ -13,9 +13,9 @@ import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.AbstractConversation;
-import co.fusionx.relay.internal.bus.PostableBus;
+import co.fusionx.relay.internal.bus.EventBus;
+import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.sender.PacketSender;
-import co.fusionx.relay.bus.GenericBus;
 
 public class DCCFileConversation extends AbstractConversation<DCCFileEvent> {
 
@@ -27,7 +27,7 @@ public class DCCFileConversation extends AbstractConversation<DCCFileEvent> {
 
     private final Map<String, DCCFileConnection> mConnectionList;
 
-    public DCCFileConversation(final PostableBus<Event> bus,
+    public DCCFileConversation(final Postable<Event> bus,
             final ConnectionConfiguration connectionConfiguration,
             final PacketSender packetSender, final String nick) {
         super(bus);

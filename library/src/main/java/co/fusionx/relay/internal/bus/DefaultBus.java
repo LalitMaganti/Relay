@@ -2,7 +2,10 @@ package co.fusionx.relay.internal.bus;
 
 import com.fusionx.bus.Bus;
 
-public class DefaultBus<T> implements PostableBus<T> {
+import co.fusionx.relay.internal.core.Postable;
+import co.fusionx.relay.core.Registerable;
+
+public class DefaultBus<T> implements EventBus<T> {
 
     private final Bus mBus;
 

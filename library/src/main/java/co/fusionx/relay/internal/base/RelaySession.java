@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.core.QueryUserGroup;
 import co.fusionx.relay.core.Session;
@@ -15,7 +14,8 @@ import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.core.UserChannelGroup;
 import co.fusionx.relay.dcc.DCCManager;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.bus.PostableBus;
+import co.fusionx.relay.internal.bus.EventBus;
+import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalStatusManager;
@@ -35,7 +35,7 @@ public class RelaySession implements Session {
     InternalStatusManager mInternalStatusManager;
 
     @Inject
-    PostableBus<Event> mSessionBus;
+    EventBus<Event> mSessionBus;
 
     @Inject
     InternalServer mServer;

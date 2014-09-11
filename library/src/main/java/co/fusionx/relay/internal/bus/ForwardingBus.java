@@ -2,15 +2,16 @@ package co.fusionx.relay.internal.bus;
 
 import com.fusionx.bus.Bus;
 
-import co.fusionx.relay.bus.GenericBus;
+import co.fusionx.relay.internal.core.Postable;
+import co.fusionx.relay.core.Registerable;
 
-public class ForwardingBus<T> implements PostableBus<T> {
+public class ForwardingBus<T> implements EventBus<T> {
 
     private final Bus mBus;
 
-    private final PostableBus<? super T> mForwardBus;
+    private final Postable<? super T> mForwardBus;
 
-    public ForwardingBus(final Bus bus, final PostableBus<? super T> forwardBus) {
+    public ForwardingBus(final Bus bus, final Postable<? super T> forwardBus) {
         mBus = bus;
         mForwardBus = forwardBus;
     }

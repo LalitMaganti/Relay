@@ -7,8 +7,8 @@ import java.util.List;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.bus.BufferingBus;
 import co.fusionx.relay.internal.bus.ForwardingBus;
-import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.core.InternalConversation;
+import co.fusionx.relay.internal.core.Postable;
 
 public abstract class AbstractConversation<T extends Event> implements InternalConversation<T> {
 
@@ -16,7 +16,7 @@ public abstract class AbstractConversation<T extends Event> implements InternalC
 
     private boolean mValid;
 
-    public AbstractConversation(final PostableBus<Event> sessionBus) {
+    public AbstractConversation(final Postable<Event> sessionBus) {
         mBus = new BufferingBus<>(new ForwardingBus<>(new Bus(), sessionBus));
         mValid = true;
     }

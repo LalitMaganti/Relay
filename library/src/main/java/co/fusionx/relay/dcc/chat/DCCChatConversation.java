@@ -4,7 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import co.fusionx.relay.internal.base.AbstractConversation;
-import co.fusionx.relay.internal.bus.PostableBus;
+import co.fusionx.relay.internal.bus.EventBus;
+import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
@@ -22,7 +23,7 @@ public class DCCChatConversation extends AbstractConversation<DCCChatEvent> {
 
     private final DCCPendingConnection mPendingConnection;
 
-    public DCCChatConversation(final PostableBus<Event> bus,
+    public DCCChatConversation(final Postable<Event> bus,
             final SessionConfiguration sessionConfiguration,
             final DCCPendingConnection pendingConnection) {
         super(bus);

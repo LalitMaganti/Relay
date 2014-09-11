@@ -3,13 +3,15 @@ package co.fusionx.relay.internal.bus;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BufferingBus<T> implements PostableBus<T> {
+import co.fusionx.relay.internal.core.Postable;
+
+public class BufferingBus<T> implements EventBus<T> {
 
     private final List<T> mBuffer;
 
-    private final PostableBus<T> mBus;
+    private final EventBus<T> mBus;
 
-    public BufferingBus(final PostableBus<T> bus) {
+    public BufferingBus(final EventBus<T> bus) {
         mBus = bus;
 
         mBuffer = new ArrayList<>();

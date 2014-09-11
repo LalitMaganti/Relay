@@ -9,7 +9,7 @@ import java.util.HashSet;
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
-import co.fusionx.relay.internal.bus.PostableBus;
+import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.sender.ChannelSender;
@@ -28,9 +28,9 @@ public class RelayChannel extends AbstractConversation<ChannelEvent> implements 
 
     private final ConnectionConfiguration mConfiguration;
 
-    RelayChannel(final PostableBus<Event> sessionBus, final ConnectionConfiguration configuration,
+    RelayChannel(final Postable<Event> postable, final ConnectionConfiguration configuration,
             final ChannelSender channelSender, final String channelName) {
-        super(sessionBus);
+        super(postable);
 
         mConfiguration = configuration;
         mChannelSender = channelSender;

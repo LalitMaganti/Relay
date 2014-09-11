@@ -1,6 +1,6 @@
-package co.fusionx.relay.bus;
+package co.fusionx.relay.core;
 
-public interface GenericBus {
+public interface Registerable {
 
     public void registerForEvents(final Object object);
 

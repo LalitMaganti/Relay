@@ -2,10 +2,9 @@ package co.fusionx.relay.internal.base;
 
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.core.Nick;
-import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.internal.bus.PostableBus;
+import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.sender.QuerySender;
 
@@ -18,7 +17,7 @@ public class RelayQueryUser extends AbstractConversation<QueryEvent>
 
     private final Nick mNick;
 
-    public RelayQueryUser(final PostableBus<Event> bus, final ConnectionConfiguration configuration,
+    public RelayQueryUser(final Postable<Event> bus, final ConnectionConfiguration configuration,
             final QuerySender querySender, final String nick) {
         super(bus);
 

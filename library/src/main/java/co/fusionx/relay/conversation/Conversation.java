@@ -2,10 +2,10 @@ package co.fusionx.relay.conversation;
 
 import java.util.List;
 
-import co.fusionx.relay.bus.GenericBus;
+import co.fusionx.relay.core.Registerable;
 import co.fusionx.relay.event.Event;
 
-public interface Conversation<E extends Event> extends GenericBus {
+public interface Conversation<E extends Event> extends Registerable {
 
     public String getId();
 
