@@ -15,6 +15,7 @@ import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.core.UserChannelGroup;
 import co.fusionx.relay.dcc.DCCManager;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalStatusManager;
@@ -34,7 +35,7 @@ public class RelaySession implements Session {
     InternalStatusManager mInternalStatusManager;
 
     @Inject
-    GenericBus<Event> mSessionBus;
+    PostableBus<Event> mSessionBus;
 
     @Inject
     InternalServer mServer;
@@ -104,8 +105,18 @@ public class RelaySession implements Session {
     }
 
     @Override
-    public GenericBus<Event> getSessionBus() {
-        return mSessionBus;
+    public void registerForEvents(final Object object) {
+        mSessionBus.registerForEvents(object);
+    }
+
+    @Override
+    public void registerForEvents(final Object object, final int priority) {
+        mSessionBus.registerForEvents(object, priority);
+    }
+
+    @Override
+    public void unregisterFromEvents(final Object object) {
+        mSessionBus.unregisterFromEvents(object);
     }
 
     @Override

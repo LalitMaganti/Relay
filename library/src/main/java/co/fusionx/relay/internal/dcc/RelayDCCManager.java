@@ -24,6 +24,7 @@ import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.sender.PacketSender;
 
 @Singleton
@@ -35,14 +36,14 @@ public class RelayDCCManager implements DCCManager {
 
     private final Set<DCCPendingConnection> mPendingConnections;
 
-    private final GenericBus<Event> mBus;
+    private final PostableBus<Event> mBus;
 
     private final SessionConfiguration mSessionConfiguration;
 
     private final PacketSender mPacketSender;
 
     @Inject
-    public RelayDCCManager(final GenericBus<Event> bus,
+    public RelayDCCManager(final PostableBus<Event> bus,
             final SessionConfiguration sessionConfiguration,
             final PacketSender packetSender) {
         mBus = bus;
@@ -102,7 +103,7 @@ public class RelayDCCManager implements DCCManager {
         conversation.getFile(connection, file);
 
         // The conversation has been started
-        mBus.post(new DCCFileConversationStartedEvent(conversation));
+        mBus.postEvent(new DCCFileConversationStartedEvent(conversation));
     }
 
     public void acceptDCCConnection(final DCCPendingChatConnection connection) {

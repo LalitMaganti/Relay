@@ -45,14 +45,14 @@ public class NickParser extends CommandParser {
             user.setNick(newNick);
 
             if (appUser) {
-                mServer.getBus().post(new ServerNickChangeEvent(mServer, oldNick, user));
+                mServer.postEvent(new ServerNickChangeEvent(mServer, oldNick, user));
             }
 
             for (final InternalChannel channel : user.getChannels()) {
                 final ChannelEvent event = appUser
                         ? new ChannelNickChangeEvent(channel, oldNick, mUserChannelGroup.getUser())
                         : new ChannelWorldNickChangeEvent(channel, oldNick, user);
-                channel.getBus().post(event);
+                channel.postEvent(event);
             }
         }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }

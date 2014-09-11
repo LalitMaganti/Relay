@@ -53,6 +53,6 @@ public class PartParser extends RemoveUserParser {
         for (final InternalChannelUser user : users) {
             mUserChannelGroup.removeChannelFromUser(channel, user);
         }
-        channel.getBus().post(new PartEvent(channel));
+        channel.postEvent(new PartEvent(channel));
     }
 }

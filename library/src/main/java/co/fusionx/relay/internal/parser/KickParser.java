@@ -14,12 +14,13 @@ import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.util.ParseUtils;
 
 public class KickParser extends RemoveUserParser {
 
-    public KickParser(final Server server,
+    public KickParser(final InternalServer server,
             final InternalUserChannelGroup ucmanager,
             final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);
@@ -72,6 +73,6 @@ public class KickParser extends RemoveUserParser {
         }
 
         final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
-        mServer.getBus().post(new KickEvent(mServer, channel, optKickUser, kickingNick, reason));
+        mServer.postEvent(new KickEvent(mServer, channel, optKickUser, kickingNick, reason));
     }
 }

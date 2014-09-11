@@ -15,6 +15,7 @@ import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
@@ -22,7 +23,7 @@ import co.fusionx.relay.util.ParseUtils;
 
 public class ModeParser extends CommandParser {
 
-    public ModeParser(final Server server,
+    public ModeParser(final InternalServer server,
             final InternalUserChannelGroup ucmanager,
             final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);
@@ -83,7 +84,7 @@ public class ModeParser extends CommandParser {
         } else {
             event = new ChannelModeEvent(channel, optSending, sendingNick, source, mode);
         }
-        channel.getBus().post(event);
+        channel.postEvent(event);
     }
 
     private UserLevel parseChannelUserModeChange(final String mode) {

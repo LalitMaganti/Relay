@@ -77,14 +77,14 @@ public class RelayStatusManager implements InternalStatusManager {
     public void onConnecting() {
         mStatus = SessionStatus.CONNECTING;
 
-        mServer.getBus().post(new ConnectingEvent(mServer));
+        mServer.postEvent(new ConnectingEvent(mServer));
     }
 
     @Override
     public void onReconnecting() {
         mStatus = SessionStatus.RECONNECTING;
 
-        mServer.getBus().post(new ReconnectEvent(mServer));
+        mServer.postEvent(new ReconnectEvent(mServer));
     }
 
     @Override
@@ -95,12 +95,12 @@ public class RelayStatusManager implements InternalStatusManager {
         mStatus = SessionStatus.CONNECTED;
 
         for (final InternalChannel channel : mUserChannelGroup.getUser().getChannels()) {
-            channel.getBus().post(new ChannelConnectEvent(channel));
+            channel.postEvent(new ChannelConnectEvent(channel));
         }
         for (final InternalQueryUser user : mQueryUserGroup.getQueryUsers()) {
-            user.getBus().post(new QueryConnectEvent(user));
+            user.postEvent(new QueryConnectEvent(user));
         }
-        mServer.getBus().post(new ConnectEvent(mServer,
+        mServer.postEvent(new ConnectEvent(mServer,
                 mConfiguration.getConnectionConfiguration().getUrl()));
 
         // Since we are now connected we can try to rejoin the channels we had joined previously
@@ -119,12 +119,12 @@ public class RelayStatusManager implements InternalStatusManager {
         mStatus = SessionStatus.DISCONNECTED;
 
         for (final InternalChannel channel : mUserChannelGroup.getUser().getChannels()) {
-            channel.getBus().post(new ChannelDisconnectEvent(channel, serverMessage));
+            channel.postEvent(new ChannelDisconnectEvent(channel, serverMessage));
         }
         for (final InternalQueryUser user : mQueryUserGroup.getQueryUsers()) {
-            user.getBus().post(new QueryDisconnectEvent(user, serverMessage));
+            user.postEvent(new QueryDisconnectEvent(user, serverMessage));
         }
-        mServer.getBus().post(new DisconnectEvent(mServer, serverMessage, retryPending));
+        mServer.postEvent(new DisconnectEvent(mServer, serverMessage, retryPending));
     }
 
     @Override
@@ -132,16 +132,16 @@ public class RelayStatusManager implements InternalStatusManager {
         mStatus = SessionStatus.STOPPED;
 
         for (final InternalChannel channel : mUserChannelGroup.getUser().getChannels()) {
-            channel.getBus().post(new ChannelStopEvent(channel));
+            channel.postEvent(new ChannelStopEvent(channel));
             channel.markInvalid();
         }
 
         for (final InternalQueryUser user : mQueryUserGroup.getQueryUsers()) {
-            user.getBus().post(new QueryStopEvent(user));
+            user.postEvent(new QueryStopEvent(user));
             user.markInvalid();
         }
 
-        mServer.getBus().post(new StopEvent(mServer));
+        mServer.postEvent(new StopEvent(mServer));
         mServer.markInvalid();
     }
 }

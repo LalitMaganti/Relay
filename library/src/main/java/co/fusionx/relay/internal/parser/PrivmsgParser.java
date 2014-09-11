@@ -54,9 +54,9 @@ public class PrivmsgParser extends CommandParser {
         final Optional<InternalQueryUser> optional = mQueryManager.getQueryUser(nick);
         final InternalQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
         if (!optional.isPresent()) {
-            mServer.getBus().post(new NewPrivateMessageEvent(mServer, user));
+            mServer.postEvent(new NewPrivateMessageEvent(mServer, user));
         }
-        user.getBus().post(new QueryMessageWorldEvent(user, message));
+        user.postEvent(new QueryMessageWorldEvent(user, message));
     }
 
     private void onParseChannelMessage(final String sendingNick, final String channelName,
@@ -76,7 +76,7 @@ public class PrivmsgParser extends CommandParser {
             } else {
                 event = new ChannelWorldMessageEvent(channel, message, sendingNick, mention);
             }
-            channel.getBus().post(event);
+            channel.postEvent(event);
         }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }
 }

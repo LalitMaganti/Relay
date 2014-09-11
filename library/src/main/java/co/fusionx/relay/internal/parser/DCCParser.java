@@ -10,17 +10,18 @@ import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.dcc.RelayDCCManager;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
 
 public class DCCParser {
 
-    private final Server mServer;
+    private final InternalServer mServer;
 
     private final RelayDCCManager mDCCManager;
 
-    public DCCParser(final Server server, final RelayDCCManager dccManager) {
+    public DCCParser(final InternalServer server, final RelayDCCManager dccManager) {
         mServer = server;
         mDCCManager = dccManager;
     }
@@ -77,7 +78,7 @@ public class DCCParser {
         // Send the event
         final DCCPendingChatConnection connection = new DCCPendingChatConnection(nick,
                 mDCCManager, ipAddress, port, "chat", 0);
-        mServer.getBus().post(new DCCChatRequestEvent(mServer, connection));
+        mServer.postEvent(new DCCChatRequestEvent(mServer, connection));
     }
 
     private void parseSendCommand(final String nick, final String fileName,
@@ -95,6 +96,6 @@ public class DCCParser {
         // Send the event
         final DCCPendingSendConnection connection = new DCCPendingSendConnection(nick,
                 mDCCManager, ipAddress, port, fileName, size);
-        mServer.getBus().post(new DCCSendRequestEvent(mServer, connection));
+        mServer.postEvent(new DCCSendRequestEvent(mServer, connection));
     }
 }

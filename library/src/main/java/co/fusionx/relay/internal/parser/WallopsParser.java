@@ -23,6 +23,6 @@ public class WallopsParser extends CommandParser {
         final String sendingNick = ParseUtils.getNickFromPrefix(prefix);
         final String message = parsedArray.get(0);
 
-        mServer.getBus().post(new WallopsEvent(mServer, message, sendingNick));
+        mServer.postEvent(new WallopsEvent(mServer, message, sendingNick));
     }
 }

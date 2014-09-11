@@ -37,7 +37,7 @@ public class RelayServerSender implements ServerSender {
         final InternalQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
         if (!optional.isPresent()) {
             final InternalServer server = mInternalServer.get();
-            server.getBus().post(new NewPrivateMessageEvent(server, user));
+            server.postEvent(new NewPrivateMessageEvent(server, user));
         }
         user.sendMessage(message);
     }

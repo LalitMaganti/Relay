@@ -5,12 +5,13 @@ import java.util.List;
 import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.util.ParseUtils;
 
 public class InviteParser extends CommandParser {
 
-    public InviteParser(final Server server,
+    public InviteParser(final InternalServer server,
             final InternalUserChannelGroup ucmanager,
             final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);
@@ -23,7 +24,7 @@ public class InviteParser extends CommandParser {
 
         if (mUserChannelGroup.getUser().isNickEqual(invitedNick)) {
             final String channelName = parsedArray.get(1);
-            mServer.getBus().post(new InviteEvent(mServer, channelName, invitingNick));
+            mServer.postEvent(new InviteEvent(mServer, channelName, invitingNick));
         } else {
             // This is impossible - breaks RFC if it occurs - just ignore it
         }

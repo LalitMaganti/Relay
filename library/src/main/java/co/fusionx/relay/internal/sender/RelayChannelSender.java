@@ -9,6 +9,7 @@ import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelMessageEvent;
+import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.packet.channel.ChannelActionPacket;
 import co.fusionx.relay.internal.packet.channel.ChannelKickPacket;
 import co.fusionx.relay.internal.packet.channel.ChannelMessagePacket;
@@ -25,7 +26,7 @@ public class RelayChannelSender implements ChannelSender {
 
     private final LibraryUser mUser;
 
-    private Channel mChannel;
+    private InternalChannel mChannel;
 
     public RelayChannelSender(final SettingsProvider settingsProvider,
             final PacketSender packetSender, final LibraryUser libraryUser) {
@@ -36,7 +37,7 @@ public class RelayChannelSender implements ChannelSender {
 
     // I tried very hard to avoid this but no matter how much I tried to abstract this away,
     // circular dependencies keep popping up due to having to send the channel in events
-    public void setChannel(final Channel channel) {
+    public void setChannel(final InternalChannel channel) {
         mChannel = channel;
     }
 
@@ -76,6 +77,6 @@ public class RelayChannelSender implements ChannelSender {
         if (mSettingsProvider.isSelfEventHidden()) {
             return;
         }
-        mChannel.getBus().post(function.get());
+        mChannel.postEvent(function.get());
     }
 }

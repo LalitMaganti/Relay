@@ -11,10 +11,11 @@ import co.fusionx.relay.constants.CapCapability;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.sender.ServerSender;
 
-public class RelayServer extends RelayAbstractConversation<ServerEvent>
+public class RelayServer extends AbstractConversation<ServerEvent>
         implements InternalServer {
 
     private final SessionConfiguration mConfiguration;
@@ -24,7 +25,7 @@ public class RelayServer extends RelayAbstractConversation<ServerEvent>
     private final ServerSender mServerSender;
 
     @Inject
-    public RelayServer(final GenericBus<Event> sessionBus,
+    public RelayServer(final PostableBus<Event> sessionBus,
             final SessionConfiguration configuration, final ServerSender serverSender,
             final Set<CapCapability> capCapabilities) {
         super(sessionBus);

@@ -3,16 +3,16 @@ package co.fusionx.relay.dcc.chat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.bus.GenericBus;
+import co.fusionx.relay.internal.base.AbstractConversation;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.base.RelayAbstractConversation;
 
-public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent> {
+public class DCCChatConversation extends AbstractConversation<DCCChatEvent> {
 
     private final ExecutorService mExecutorService;
 
@@ -22,7 +22,7 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
 
     private final DCCPendingConnection mPendingConnection;
 
-    public DCCChatConversation(final GenericBus<Event> bus,
+    public DCCChatConversation(final PostableBus<Event> bus,
             final SessionConfiguration sessionConfiguration,
             final DCCPendingConnection pendingConnection) {
         super(bus);
@@ -44,7 +44,7 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
         if (mSessionConfiguration.getSettingsProvider().isSelfEventHidden()) {
             return;
         }
-        getBus().post(new DCCChatSelfMessageEvent(this, null, message));
+        postEvent(new DCCChatSelfMessageEvent(this, null, message));
     }
 
     public void sendAction(final String action) {
@@ -55,7 +55,7 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
             return;
         }
         // TODO - this is wrong  fix it
-        getBus().post(new DCCChatSelfActionEvent(this, null, action));
+        postEvent(new DCCChatSelfActionEvent(this, null, action));
     }
 
     public void closeChat() {

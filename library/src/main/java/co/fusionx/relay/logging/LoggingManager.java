@@ -16,14 +16,11 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 
-/**
- * This class is NOT thread safe
- */
 public abstract class LoggingManager {
 
     private static final SimpleDateFormat sStaticFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    private final LoggingPreferences mLoggingPreferences;
+    private final LoggingSettingsProvider mLoggingSettingsProvider;
 
     private final Map<Session, LogHandler> mLoggingConnections;
 
@@ -31,33 +28,33 @@ public abstract class LoggingManager {
 
     private boolean mStarted;
 
-    protected LoggingManager(final LoggingPreferences preferences) {
-        mLoggingPreferences = preferences;
+    protected LoggingManager(final LoggingSettingsProvider preferences) {
+        mLoggingSettingsProvider = preferences;
         mLoggingConnections = new HashMap<>();
         mStarted = false;
     }
 
-    public void addConnectionToManager(final Session server) {
-        if (mLoggingConnections.containsKey(server)) {
-            throw new IllegalArgumentException("This server is already present in this manager");
+    public void addConnectionToManager(final Session session) {
+        if (mLoggingConnections.containsKey(session)) {
+            throw new IllegalArgumentException("This session is already present in this manager");
         }
-        final LogHandler logHandler = new LogHandler(server);
-        mLoggingConnections.put(server, logHandler);
+        final LogHandler logHandler = new LogHandler(session);
+        mLoggingConnections.put(session, logHandler);
 
         if (mStarted) {
             logHandler.startLogging();
         }
     }
 
-    public void removeConnectionFromManager(final Session server) {
-        final LogHandler handler = mLoggingConnections.get(server);
+    public void removeConnectionFromManager(final Session session) {
+        final LogHandler handler = mLoggingConnections.get(session);
         if (handler == null) {
-            throw new IllegalArgumentException("This server is not present in this manager");
+            throw new IllegalArgumentException("This session is not present in this manager");
         }
         if (mStarted) {
             handler.stopLogging();
         }
-        mLoggingConnections.remove(server);
+        mLoggingConnections.remove(session);
     }
 
     public void startLogging() {
@@ -97,7 +94,7 @@ public abstract class LoggingManager {
     }
 
     private String getServerPath(final Session connection) {
-        return String.format("%s/%s", mLoggingPreferences.getLoggingPath(),
+        return String.format("%s/%s", mLoggingSettingsProvider.getLoggingPath(),
                 connection.getServer().getTitle());
     }
 
@@ -114,18 +111,18 @@ public abstract class LoggingManager {
         }
 
         public void startLogging() {
-            mSession.getSessionBus().register(this, LOG_PRIORITY);
+            mSession.registerForEvents(this, LOG_PRIORITY);
         }
 
         public void stopLogging() {
-            mSession.getSessionBus().unregister(this);
+            mSession.unregisterFromEvents(this);
         }
 
         public void onEvent(final ServerEvent event) {
             if (shouldLogEvent(event)) {
                 final CharSequence sequence = getMessageFromEvent(mSession, event);
                 // If logging path is null then that's an issue
-                if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
+                if (sequence != null && mLoggingSettingsProvider.getLoggingPath() != null) {
                     mLoggingService.submit(new LoggingRunnable(mSession, event,
                             sequence.toString(), ""));
                 } else {
@@ -138,7 +135,7 @@ public abstract class LoggingManager {
             if (shouldLogEvent(event)) {
                 final CharSequence sequence = getMessageFromEvent(mSession, event);
                 // If logging path is null then that's an issue
-                if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
+                if (sequence != null && mLoggingSettingsProvider.getLoggingPath() != null) {
                     mLoggingService.submit(new LoggingRunnable(mSession, event,
                             sequence.toString(), event.conversation.getName()));
                 } else {
@@ -151,10 +148,9 @@ public abstract class LoggingManager {
             if (shouldLogEvent(event)) {
                 final CharSequence sequence = getMessageFromEvent(mSession, event);
                 // If logging path is null then that's an issue
-                if (sequence != null && mLoggingPreferences.getLoggingPath() != null) {
-                    mLoggingService
-                            .submit(new LoggingRunnable(mSession, event, sequence.toString(),
-                                    event.conversation.getNick().getNickAsString()));
+                if (sequence != null && mLoggingSettingsProvider.getLoggingPath() != null) {
+                    mLoggingService.submit(new LoggingRunnable(mSession, event,
+                            sequence.toString(), event.conversation.getNick().getNickAsString()));
                 } else {
                     // TODO - throw an exception
                 }
@@ -183,7 +179,7 @@ public abstract class LoggingManager {
         @Override
         public void run() {
             final String path = getServerPath(mSession);
-            final String line = mLoggingPreferences.shouldLogTimestamps()
+            final String line = mLoggingSettingsProvider.shouldLogTimestamps()
                     ? String.format("%s: %s", mEvent.timestamp.format("%H:%M:%S"), mLogString)
                     : mLogString;
             final File file = new File(String.format("%s/%s", path, mDirectory),

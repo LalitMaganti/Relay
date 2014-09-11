@@ -1,12 +1,10 @@
 package co.fusionx.relay.bus;
 
-public interface GenericBus<T> {
+public interface GenericBus {
 
-    public void register(final Object object);
+    public void registerForEvents(final Object object);
 
-    public void register(final Object object, int priority);
+    public void registerForEvents(final Object object, int priority);
 
-    public void unregister(final Object object);
-
-    public void post(final T event);
+    public void unregisterFromEvents(final Object object);
 }

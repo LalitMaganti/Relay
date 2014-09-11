@@ -10,13 +10,14 @@ import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.LogUtils;
 
 public abstract class RemoveUserParser extends CommandParser {
 
-    public RemoveUserParser(final Server server,
+    public RemoveUserParser(final InternalServer server,
             final InternalUserChannelGroup ucmanager,
             final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);
@@ -52,6 +53,6 @@ public abstract class RemoveUserParser extends CommandParser {
             final InternalChannel channel, final InternalChannelUser removedUser) {
         mUserChannelGroup.decoupleUserAndChannel(removedUser, channel);
 
-        channel.getBus().post(getEvent(parsedArray, rawSource, channel, removedUser));
+        channel.postEvent(getEvent(parsedArray, rawSource, channel, removedUser));
     }
 }

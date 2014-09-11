@@ -3,38 +3,36 @@ package co.fusionx.relay.internal.bus;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.bus.GenericBus;
-
-public class BufferingBus<T> implements GenericBus<T> {
+public class BufferingBus<T> implements PostableBus<T> {
 
     private final List<T> mBuffer;
 
-    private final GenericBus<T> mBus;
+    private final PostableBus<T> mBus;
 
-    public BufferingBus(final GenericBus<T> bus) {
+    public BufferingBus(final PostableBus<T> bus) {
         mBus = bus;
 
         mBuffer = new ArrayList<>();
     }
 
     @Override
-    public void register(final Object object) {
-        mBus.register(object);
+    public void registerForEvents(final Object object) {
+        mBus.registerForEvents(object);
     }
 
     @Override
-    public void register(final Object object, final int priority) {
-        mBus.register(object, priority);
+    public void registerForEvents(final Object object, final int priority) {
+        mBus.registerForEvents(object, priority);
     }
 
     @Override
-    public void unregister(final Object object) {
-        mBus.unregister(object);
+    public void unregisterFromEvents(final Object object) {
+        mBus.unregisterFromEvents(object);
     }
 
     @Override
-    public void post(final T event) {
-        mBus.post(event);
+    public void postEvent(final T event) {
+        mBus.postEvent(event);
         mBuffer.add(event);
     }
 

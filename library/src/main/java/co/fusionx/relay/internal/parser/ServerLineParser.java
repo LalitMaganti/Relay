@@ -104,10 +104,10 @@ public class ServerLineParser {
 
         if (ServerReplyCodes.genericCodes.contains(code)) {
             final String message = parsedArray.get(0);
-            mServer.getBus().post(new GenericServerEvent(mServer, message));
+            mServer.postEvent(new GenericServerEvent(mServer, message));
         } else if (ServerReplyCodes.whoisCodes.contains(code)) {
             final String response = IRCUtils.concatenateStringList(parsedArray);
-            mServer.getBus().post(new WhoisEvent(mServer, response));
+            mServer.postEvent(new WhoisEvent(mServer, response));
         } else if (ServerReplyCodes.doNothingCodes.contains(code)) {
             // Do nothing
         } else {

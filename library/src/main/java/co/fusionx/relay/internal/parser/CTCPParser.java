@@ -15,6 +15,7 @@ import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.internal.sender.CtcpResponsePacketSender;
@@ -24,7 +25,7 @@ import co.fusionx.relay.util.ParseUtils;
 
 public class CTCPParser {
 
-    private final Server mServer;
+    private final InternalServer mServer;
 
     private final InternalQueryUserGroup mQueryManager;
 
@@ -34,7 +35,7 @@ public class CTCPParser {
 
     private final CtcpResponsePacketSender mCtcpResponseSender;
 
-    public CTCPParser(final Server server, final InternalUserChannelGroup dao,
+    public CTCPParser(final InternalServer server, final InternalUserChannelGroup dao,
             final InternalQueryUserGroup queryManager, final PacketSender sender,
             final DCCParser dccParser) {
         mServer = server;
@@ -92,9 +93,9 @@ public class CTCPParser {
         final Optional<InternalQueryUser> optional = mQueryManager.getQueryUser(nick);
         final InternalQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
         if (!optional.isPresent()) {
-            mServer.getBus().post(new NewPrivateMessageEvent(mServer, user));
+            mServer.postEvent(new NewPrivateMessageEvent(mServer, user));
         }
-        user.getBus().post(new QueryActionWorldEvent(user, action));
+        user.postEvent(new QueryActionWorldEvent(user, action));
     }
 
     private void onParseChannelAction(final String channelName, final String sendingNick,
@@ -112,7 +113,7 @@ public class CTCPParser {
             } else {
                 event = new ChannelWorldActionEvent(channel, action, sendingNick, mention);
             }
-            channel.getBus().post(event);
+            channel.postEvent(event);
         }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }
     // Commands End Here
@@ -129,7 +130,7 @@ public class CTCPParser {
         } else if (message.startsWith("VERSION")) {
             final String nick = ParseUtils.getNickFromPrefix(prefix);
             final String version = message.replace("VERSION", "");
-            mServer.getBus().post(new VersionEvent(mServer, nick, version));
+            mServer.postEvent(new VersionEvent(mServer, nick, version));
         } else if (message.startsWith("SOURCE")) {
         } else if (message.startsWith("USERINFO")) {
         } else if (message.startsWith("ERRMSG")) {

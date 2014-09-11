@@ -16,7 +16,8 @@ import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.bus.EventBus;
+import co.fusionx.relay.internal.bus.DefaultBus;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
@@ -131,8 +132,8 @@ public class RelayModule {
     // Bus
     @Singleton
     @Provides
-    public GenericBus<Event> provideSessionBus() {
-        return new EventBus<>();
+    public PostableBus<Event> provideSessionBus() {
+        return new DefaultBus<>();
     }
 
     // Sender
@@ -194,7 +195,7 @@ public class RelayModule {
 
     @Provides
     @Singleton
-    public SparseArray<CodeParser> provideCodeParserMap(final GenericBus<Event> superBus,
+    public SparseArray<CodeParser> provideCodeParserMap(final PostableBus<Event> superBus,
             final InternalServer server, final InternalUserChannelGroup dao,
             final InternalQueryUserGroup queryManager, final PacketSender sender) {
         final SparseArray<CodeParser> parserMap = new SparseArray<>();

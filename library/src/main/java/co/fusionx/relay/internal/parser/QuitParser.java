@@ -49,13 +49,13 @@ public class QuitParser extends CommandParser {
             for (final InternalChannel channel : channels) {
                 final UserLevel level = user.getChannelPrivileges(channel);
                 mUserChannelGroup.removeUserFromChannel(channel, user);
-                channel.getBus().post(new ChannelWorldQuitEvent(channel, user, level, reason));
+                channel.postEvent(new ChannelWorldQuitEvent(channel, user, level, reason));
             }
         });
 
         final Optional<InternalQueryUser> optQuery = mQueryManager.getQueryUser(userNick);
         Optionals.ifPresent(optQuery,
-                queryUser -> queryUser.getBus().post(new QueryQuitWorldEvent(queryUser)));
+                queryUser -> queryUser.postEvent(new QueryQuitWorldEvent(queryUser)));
     }
 
     private void onQuit() {

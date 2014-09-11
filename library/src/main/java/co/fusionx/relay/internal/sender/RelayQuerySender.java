@@ -53,7 +53,7 @@ public class RelayQuerySender implements QuerySender {
         if (mSettingsProvider.isSelfEventHidden()) {
             return;
         }
-        mQueryUser.getBus().post(new QueryActionSelfEvent(mQueryUser, mUser, action));
+        mQueryUser.postEvent(new QueryActionSelfEvent(mQueryUser, mUser, action));
     }
 
     @Override
@@ -66,12 +66,12 @@ public class RelayQuerySender implements QuerySender {
         if (mSettingsProvider.isSelfEventHidden()) {
             return;
         }
-        mQueryUser.getBus().post(new QueryMessageSelfEvent(mQueryUser, mUser, message));
+        mQueryUser.postEvent(new QueryMessageSelfEvent(mQueryUser, mUser, message));
     }
 
     @Override
     public void close() {
         mQueryGroup.removeQueryUser(mQueryUser);
-        mQueryUser.getBus().post(new QueryClosedEvent(mQueryUser));
+        mQueryUser.postEvent(new QueryClosedEvent(mQueryUser));
     }
 }

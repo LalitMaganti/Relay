@@ -4,12 +4,13 @@ import java.util.List;
 
 import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.util.ParseUtils;
 
 public class AwayParser extends CommandParser {
 
-    public AwayParser(final Server server,
+    public AwayParser(final InternalServer server,
             final InternalUserChannelGroup ucmanager,
             final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);

@@ -108,7 +108,7 @@ public class ConnectionParser {
 
         // final String target = parsedArray.get(0);
         final String notice = parsedArray.get(1);
-        mServer.getBus().post(new NoticeEvent(mServer, sender, notice));
+        mServer.postEvent(new NoticeEvent(mServer, sender, notice));
     }
 
     private ConnectionLineParseStatus parseConnectionCode(final List<String> parsedArray,

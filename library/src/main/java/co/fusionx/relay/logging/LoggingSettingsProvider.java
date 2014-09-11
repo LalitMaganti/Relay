@@ -1,6 +1,6 @@
 package co.fusionx.relay.logging;
 
-public interface LoggingPreferences {
+public interface LoggingSettingsProvider {
 
     public boolean shouldLogTimestamps();
 

@@ -2,17 +2,12 @@ package co.fusionx.relay.internal.bus;
 
 import com.fusionx.bus.Bus;
 
-import co.fusionx.relay.bus.GenericBus;
-
-public class ForwardingBus<T> implements PostableBus<T> {
+public class DefaultBus<T> implements PostableBus<T> {
 
     private final Bus mBus;
 
-    private final PostableBus<? super T> mForwardBus;
-
-    public ForwardingBus(final Bus bus, final PostableBus<? super T> forwardBus) {
-        mBus = bus;
-        mForwardBus = forwardBus;
+    public DefaultBus() {
+        mBus = new Bus();
     }
 
     @Override
@@ -33,6 +28,5 @@ public class ForwardingBus<T> implements PostableBus<T> {
     @Override
     public void postEvent(final T event) {
         mBus.post(event);
-        mForwardBus.postEvent(event);
     }
 }

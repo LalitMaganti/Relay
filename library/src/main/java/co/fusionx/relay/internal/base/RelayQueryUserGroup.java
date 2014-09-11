@@ -12,6 +12,7 @@ import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
@@ -20,7 +21,7 @@ import co.fusionx.relay.internal.sender.RelayQuerySender;
 
 public class RelayQueryUserGroup implements InternalQueryUserGroup {
 
-    private final GenericBus<Event> mSessionBus;
+    private final PostableBus<Event> mSessionBus;
 
     private final PacketSender mSender;
 
@@ -31,7 +32,7 @@ public class RelayQueryUserGroup implements InternalQueryUserGroup {
     private final Collection<InternalQueryUser> mQueryUsers;
 
     @Inject
-    public RelayQueryUserGroup(final GenericBus<Event> sessionBus,
+    public RelayQueryUserGroup(final PostableBus<Event> sessionBus,
             final SessionConfiguration configuration, final PacketSender sender,
             final InternalUserChannelGroup group) {
         mSessionBus = sessionBus;

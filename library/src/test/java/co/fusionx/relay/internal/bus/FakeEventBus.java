@@ -7,17 +7,17 @@ public class FakeEventBus<T> implements GenericBus<T> {
     private T mLastEvent;
 
     @Override
-    public void register(final Object object) {
+    public void registerForEvents(final Object object) {
         // This is fake
     }
 
     @Override
-    public void register(final Object object, final int priority) {
+    public void registerForEvents(final Object object, final int priority) {
         // This is fake
     }
 
     @Override
-    public void unregister(final Object object) {
+    public void unregisterFromEvents(final Object object) {
         // This is fake
     }
 

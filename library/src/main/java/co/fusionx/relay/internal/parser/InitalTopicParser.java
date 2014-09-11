@@ -43,7 +43,7 @@ public class InitalTopicParser extends CodeParser {
         final Optional<InternalChannel> optional = mUserChannelInterface.getChannel(channelName);
 
         Optionals.run(optional, channel -> {
-            channel.getBus().post(new ChannelInitialTopicEvent(channel, nick, mTempTopic));
+            channel.postEvent(new ChannelInitialTopicEvent(channel, nick, mTempTopic));
             mTempTopic = null;
         }, () -> LogUtils.logOptionalBug(mServer.getConfiguration()));
     }

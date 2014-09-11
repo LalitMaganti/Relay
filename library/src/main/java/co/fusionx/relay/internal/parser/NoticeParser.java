@@ -50,11 +50,11 @@ public class NoticeParser extends CommandParser {
         final Optional<InternalChannel> optChannel = mUserChannelGroup.getChannel(channelName);
         if (optChannel.isPresent()) {
             final InternalChannel channel = optChannel.get();
-            channel.getBus().post(new ChannelNoticeEvent(channel, sendingNick, notice));
+            channel.postEvent(new ChannelNoticeEvent(channel, sendingNick, notice));
         } else {
             // If we're not in this channel then send the notice to the server instead
             // TODO - maybe figure out why this is happening
-            mServer.getBus().post(new NoticeEvent(mServer, sendingNick, notice));
+            mServer.postEvent(new NoticeEvent(mServer, sendingNick, notice));
         }
     }
 
@@ -62,9 +62,9 @@ public class NoticeParser extends CommandParser {
         final Optional<InternalQueryUser> optUser = mQueryManager.getQueryUser(sendingNick);
         if (optUser.isPresent()) {
             final InternalQueryUser user = optUser.get();
-            user.getBus().post(new QueryMessageWorldEvent(user, notice));
+            user.postEvent(new QueryMessageWorldEvent(user, notice));
         } else {
-            mServer.getBus().post(new NoticeEvent(mServer, sendingNick, notice));
+            mServer.postEvent(new NoticeEvent(mServer, sendingNick, notice));
         }
     }
 }

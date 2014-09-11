@@ -14,6 +14,7 @@ import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.conversation.Channel;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalLibraryUser;
@@ -28,14 +29,14 @@ public class RelayUserChannelGroup implements InternalUserChannelGroup {
 
     private final InternalLibraryUser mUser;
 
-    private final GenericBus<Event> mSessionBus;
+    private final PostableBus<Event> mSessionBus;
 
     private final SessionConfiguration mConfiguration;
 
     private final PacketSender mPacketSender;
 
     @Inject
-    RelayUserChannelGroup(final GenericBus<Event> sessionBus,
+    RelayUserChannelGroup(final PostableBus<Event> sessionBus,
             final SessionConfiguration configuration,
             final PacketSender packetSender) {
         mSessionBus = sessionBus;

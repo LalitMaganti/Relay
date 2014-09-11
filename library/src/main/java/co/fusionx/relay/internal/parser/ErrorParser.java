@@ -50,9 +50,9 @@ public class ErrorParser extends CodeParser {
         // If the user is null then this no such nick event happened for another reason
         if (optional.isPresent()) {
             final InternalQueryUser user = optional.get();
-            user.getBus().post(new QueryNoSuchNickEvent(user, message));
+            user.postEvent(new QueryNoSuchNickEvent(user, message));
         } else {
-            mServer.getBus().post(new GenericServerEvent(mServer, message));
+            mServer.postEvent(new GenericServerEvent(mServer, message));
         }
     }
 }

@@ -34,6 +34,6 @@ public class MotdParser extends CodeParser {
         } else {
             event = new MotdEvent(mServer, message);
         }
-        mServer.getBus().post(event);
+        mServer.postEvent(event);
     }
 }

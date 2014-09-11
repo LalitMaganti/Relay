@@ -29,7 +29,7 @@ class DCCChatConnection extends DCCConnection {
 
     @Override
     protected void connect() {
-        mConversation.getBus().post(new DCCChatStartedEvent(mConversation));
+        mConversation.postEvent(new DCCChatStartedEvent(mConversation));
 
         try {
             mSocket = new Socket(mPendingConnection.getIP(), mPendingConnection.getPort());
@@ -66,14 +66,14 @@ class DCCChatConnection extends DCCConnection {
         if (CTCPParser.isCtcp(line)) {
             parseCtcp(line);
         } else {
-            mConversation.getBus().post(new DCCChatWorldMessageEvent(mConversation, line));
+            mConversation.postEvent(new DCCChatWorldMessageEvent(mConversation, line));
         }
     }
 
     private void parseCtcp(final String line) {
         final String message = line.substring(1, line.length() - 1);
         final String action = message.replace("ACTION ", "");
-        mConversation.getBus().post(new DCCChatWorldActionEvent(mConversation, action));
+        mConversation.postEvent(new DCCChatWorldActionEvent(mConversation, action));
     }
 
     void writeLine(final String line) {

@@ -6,11 +6,12 @@ import java.util.List;
 
 import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 
 public class AccountParser extends CommandParser {
 
-    public AccountParser(final Server server,
+    public AccountParser(final InternalServer server,
             final InternalUserChannelGroup ucmanager,
             final InternalQueryUserGroup queryManager) {
         super(server, ucmanager, queryManager);

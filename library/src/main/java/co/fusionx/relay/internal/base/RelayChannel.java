@@ -7,15 +7,14 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import co.fusionx.relay.core.ConnectionConfiguration;
-import co.fusionx.relay.bus.GenericBus;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.sender.ChannelSender;
 
-public class RelayChannel extends RelayAbstractConversation<ChannelEvent>
-        implements InternalChannel {
+public class RelayChannel extends AbstractConversation<ChannelEvent> implements InternalChannel {
 
     // As set out in RFC2812
     private final static ImmutableList<Character> CHANNEL_PREFIXES = ImmutableList.of('#', '&',
@@ -29,7 +28,7 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent>
 
     private final ConnectionConfiguration mConfiguration;
 
-    RelayChannel(final GenericBus<Event> sessionBus, final ConnectionConfiguration configuration,
+    RelayChannel(final PostableBus<Event> sessionBus, final ConnectionConfiguration configuration,
             final ChannelSender channelSender, final String channelName) {
         super(sessionBus);
 

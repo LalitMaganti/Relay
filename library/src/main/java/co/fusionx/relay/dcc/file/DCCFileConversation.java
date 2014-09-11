@@ -12,11 +12,12 @@ import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.base.RelayAbstractConversation;
+import co.fusionx.relay.internal.base.AbstractConversation;
+import co.fusionx.relay.internal.bus.PostableBus;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.bus.GenericBus;
 
-public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent> {
+public class DCCFileConversation extends AbstractConversation<DCCFileEvent> {
 
     private final ConnectionConfiguration mConnectionConfiguration;
 
@@ -26,7 +27,7 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
 
     private final Map<String, DCCFileConnection> mConnectionList;
 
-    public DCCFileConversation(final GenericBus<Event> bus,
+    public DCCFileConversation(final PostableBus<Event> bus,
             final ConnectionConfiguration connectionConfiguration,
             final PacketSender packetSender, final String nick) {
         super(bus);
@@ -48,7 +49,7 @@ public class DCCFileConversation extends RelayAbstractConversation<DCCFileEvent>
         mConnectionList.put(connection.getArgument(), getConnection);
         getConnection.startConnection();
 
-        getBus().post(new DCCFileGetStartedEvent(this, getConnection));
+        postEvent(new DCCFileGetStartedEvent(this, getConnection));
     }
 
     public Collection<DCCFileConnection> getFileConnections() {

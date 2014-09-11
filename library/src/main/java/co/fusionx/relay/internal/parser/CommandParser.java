@@ -4,6 +4,7 @@ import java.util.List;
 
 import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
+import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 
 public abstract class CommandParser {
@@ -12,9 +13,9 @@ public abstract class CommandParser {
 
     final InternalQueryUserGroup mQueryManager;
 
-    final Server mServer;
+    final InternalServer mServer;
 
-    CommandParser(final Server server, final InternalUserChannelGroup dao,
+    CommandParser(final InternalServer server, final InternalUserChannelGroup dao,
             final InternalQueryUserGroup queryManager) {
         mServer = server;
         mUserChannelGroup = dao;

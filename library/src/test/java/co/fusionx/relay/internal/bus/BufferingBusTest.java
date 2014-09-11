@@ -20,7 +20,7 @@ public class BufferingBusTest {
     @Test
     public void testBuffering() {
         final String event = "Test post";
-        mBufferingBus.post(event);
+        mBufferingBus.postEvent(event);
 
         assertThat(mBufferingBus.getBuffer()).containsExactly(event);
     }
@@ -28,7 +28,7 @@ public class BufferingBusTest {
     @Test
     public void testForwarding() {
         final String event = "Test post";
-        mBufferingBus.post(event);
+        mBufferingBus.postEvent(event);
 
         assertThat(mInternalBus.lastEvent()).isEqualTo(event);
     }
