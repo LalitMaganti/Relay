@@ -1,27 +1,27 @@
-package co.fusionx.relay.dcc.chat;
+package co.fusionx.relay.internal.dcc.base;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.Socket;
 
-import co.fusionx.relay.dcc.DCCConnection;
+import co.fusionx.relay.dcc.event.chat.DCCChatWorldActionEvent;
+import co.fusionx.relay.internal.dcc.core.DCCConnection;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
-import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.internal.parser.CTCPParser;
 import co.fusionx.relay.util.SocketUtils;
 
-class DCCChatConnection extends DCCConnection {
+class RelayDCCChatConnection extends DCCConnection {
 
-    private final DCCChatConversation mConversation;
+    private final RelayDCCChatConversation mConversation;
 
     protected BufferedReader mBufferedReader;
 
     protected BufferedWriter mBufferedWriter;
 
-    public DCCChatConnection(final DCCPendingConnection pendingConversation,
-            final DCCChatConversation conversation) {
+    public RelayDCCChatConnection(final RelayDCCPendingConnection pendingConversation,
+            final RelayDCCChatConversation conversation) {
         super(pendingConversation);
 
         mConversation = conversation;

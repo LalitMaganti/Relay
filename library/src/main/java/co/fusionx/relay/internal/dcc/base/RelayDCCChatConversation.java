@@ -1,64 +1,72 @@
-package co.fusionx.relay.dcc.chat;
+package co.fusionx.relay.internal.dcc.base;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.internal.base.AbstractConversation;
-import co.fusionx.relay.internal.bus.EventBus;
-import co.fusionx.relay.internal.core.Postable;
+import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
-import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.base.AbstractConversation;
+import co.fusionx.relay.internal.core.Postable;
+import co.fusionx.relay.internal.dcc.core.InternalDCCChatConversation;
 
-public class DCCChatConversation extends AbstractConversation<DCCChatEvent> {
+public class RelayDCCChatConversation extends AbstractConversation<DCCChatEvent>
+        implements InternalDCCChatConversation {
 
     private final ExecutorService mExecutorService;
 
-    private final DCCChatConnection mDCCChatConnection;
+    private final RelayDCCChatConnection mRelayDCCChatConnection;
 
     private final SessionConfiguration mSessionConfiguration;
 
-    private final DCCPendingConnection mPendingConnection;
+    private final RelayDCCPendingConnection mPendingConnection;
 
-    public DCCChatConversation(final Postable<Event> bus,
+    private final LibraryUser mLibraryUser;
+
+    public RelayDCCChatConversation(final Postable<Event> bus,
             final SessionConfiguration sessionConfiguration,
-            final DCCPendingConnection pendingConnection) {
+            final RelayDCCPendingConnection pendingConnection,
+            final LibraryUser libraryUser) {
         super(bus);
 
         mSessionConfiguration = sessionConfiguration;
         mPendingConnection = pendingConnection;
+        mLibraryUser = libraryUser;
 
-        mDCCChatConnection = new DCCChatConnection(mPendingConnection, this);
-        mExecutorService = Executors.newCachedThreadPool();
+        mRelayDCCChatConnection = new RelayDCCChatConnection(mPendingConnection, this);
+        mExecutorService = Executors.newSingleThreadExecutor();
     }
 
+    @Override
     public void startChat() {
-        mDCCChatConnection.startConnection();
+        mRelayDCCChatConnection.startConnection();
     }
 
+    @Override
     public void sendMessage(final String message) {
-        mExecutorService.submit(() -> mDCCChatConnection.writeLine(message));
+        mExecutorService.submit(() -> mRelayDCCChatConnection.writeLine(message));
 
         if (mSessionConfiguration.getSettingsProvider().isSelfEventHidden()) {
             return;
         }
-        postEvent(new DCCChatSelfMessageEvent(this, null, message));
+        postEvent(new DCCChatSelfMessageEvent(this, mLibraryUser, message));
     }
 
+    @Override
     public void sendAction(final String action) {
         final String line = String.format("\u0001ACTION %1$s\u0001", action);
-        mExecutorService.submit(() -> mDCCChatConnection.writeLine(line));
+        mExecutorService.submit(() -> mRelayDCCChatConnection.writeLine(line));
 
         if (mSessionConfiguration.getSettingsProvider().isSelfEventHidden()) {
             return;
         }
-        // TODO - this is wrong  fix it
-        postEvent(new DCCChatSelfActionEvent(this, null, action));
+        postEvent(new DCCChatSelfActionEvent(this, mLibraryUser, action));
     }
 
+    @Override
     public void closeChat() {
 
     }
@@ -74,11 +82,11 @@ public class DCCChatConversation extends AbstractConversation<DCCChatEvent> {
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof DCCChatConversation)) {
+        } else if (!(o instanceof RelayDCCChatConversation)) {
             return false;
         }
 
-        final DCCChatConversation that = (DCCChatConversation) o;
+        final RelayDCCChatConversation that = (RelayDCCChatConversation) o;
         return mSessionConfiguration.getConnectionConfiguration().getTitle()
                 .equals(that.mSessionConfiguration.getConnectionConfiguration().getTitle())
                 && mPendingConnection.getDccRequestNick()

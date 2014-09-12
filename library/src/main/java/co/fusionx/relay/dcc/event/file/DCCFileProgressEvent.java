@@ -1,7 +1,7 @@
 package co.fusionx.relay.dcc.event.file;
 
-import co.fusionx.relay.dcc.DCCConnection;
-import co.fusionx.relay.dcc.file.DCCFileConversation;
+import co.fusionx.relay.internal.dcc.base.RelayDCCFileConversation;
+import co.fusionx.relay.internal.dcc.core.DCCConnection;
 
 public class DCCFileProgressEvent extends DCCFileEvent {
 
@@ -9,7 +9,7 @@ public class DCCFileProgressEvent extends DCCFileEvent {
 
     public final long progress;
 
-    public DCCFileProgressEvent(final DCCFileConversation fileConversation,
+    public DCCFileProgressEvent(final RelayDCCFileConversation fileConversation,
             final DCCConnection connection, final long progress) {
         super(fileConversation);
 

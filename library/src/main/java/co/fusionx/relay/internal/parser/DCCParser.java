@@ -2,16 +2,15 @@ package co.fusionx.relay.internal.parser;
 
 import java.util.List;
 
-import co.fusionx.relay.conversation.Server;
-import co.fusionx.relay.dcc.file.DCCFileConnection;
-import co.fusionx.relay.dcc.file.DCCFileConversation;
-import co.fusionx.relay.dcc.file.DCCGetConnection;
-import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
-import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.internal.core.InternalServer;
-import co.fusionx.relay.internal.dcc.RelayDCCManager;
+import co.fusionx.relay.internal.dcc.base.RelayDCCFileConnection;
+import co.fusionx.relay.internal.dcc.base.RelayDCCFileConversation;
+import co.fusionx.relay.internal.dcc.base.RelayDCCGetConnection;
+import co.fusionx.relay.internal.dcc.base.RelayDCCPendingSendConnection;
+import co.fusionx.relay.internal.dcc.base.RelayRelayDCCPendingChatConnection;
+import co.fusionx.relay.internal.dcc.core.InternalDCCManager;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
 
@@ -19,9 +18,9 @@ public class DCCParser {
 
     private final InternalServer mServer;
 
-    private final RelayDCCManager mDCCManager;
+    private final InternalDCCManager mDCCManager;
 
-    public DCCParser(final InternalServer server, final RelayDCCManager dccManager) {
+    public DCCParser(final InternalServer server, final InternalDCCManager dccManager) {
         mServer = server;
         mDCCManager = dccManager;
     }
@@ -60,9 +59,9 @@ public class DCCParser {
         final int port = Integer.parseInt(parsedArray.remove(0));
         final long position = Long.parseLong(parsedArray.remove(0));
 
-        final DCCFileConversation conversation = mDCCManager.getFileConversation(nick);
-        final DCCFileConnection connection = conversation.getFileConnection(fileName);
-        final DCCGetConnection getConnection = (DCCGetConnection) connection;
+        final RelayDCCFileConversation conversation = mDCCManager.getFileConversation(nick);
+        final RelayDCCFileConnection connection = conversation.getFileConnection(fileName);
+        final RelayDCCGetConnection getConnection = (RelayDCCGetConnection) connection;
 
         getConnection.onResumeAccepted();
     }
@@ -76,7 +75,8 @@ public class DCCParser {
         final String ipAddress = IRCUtils.ipDecimalToString(ipDecimal);
 
         // Send the event
-        final DCCPendingChatConnection connection = new DCCPendingChatConnection(nick,
+        final RelayRelayDCCPendingChatConnection
+                connection = new RelayRelayDCCPendingChatConnection(nick,
                 mDCCManager, ipAddress, port, "chat", 0);
         mServer.postEvent(new DCCChatRequestEvent(mServer, connection));
     }
@@ -94,7 +94,7 @@ public class DCCParser {
         final long size = parsedArray.size() > 0 ? Long.parseLong(parsedArray.remove(0)) : 0;
 
         // Send the event
-        final DCCPendingSendConnection connection = new DCCPendingSendConnection(nick,
+        final RelayDCCPendingSendConnection connection = new RelayDCCPendingSendConnection(nick,
                 mDCCManager, ipAddress, port, fileName, size);
         mServer.postEvent(new DCCSendRequestEvent(mServer, connection));
     }

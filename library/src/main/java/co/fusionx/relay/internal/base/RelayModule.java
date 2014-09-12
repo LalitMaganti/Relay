@@ -24,7 +24,8 @@ import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.core.Postable;
-import co.fusionx.relay.internal.dcc.RelayDCCManager;
+import co.fusionx.relay.internal.dcc.base.RelayDCCManager;
+import co.fusionx.relay.internal.dcc.core.InternalDCCManager;
 import co.fusionx.relay.internal.parser.AccountParser;
 import co.fusionx.relay.internal.parser.AwayParser;
 import co.fusionx.relay.internal.parser.CTCPParser;
@@ -53,7 +54,6 @@ import co.fusionx.relay.internal.sender.InternalPacketSender;
 import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
-import co.fusionx.relay.parser.UserInputParser;
 import co.fusionx.relay.sender.ServerSender;
 import dagger.Module;
 import dagger.Provides;
@@ -130,6 +130,12 @@ public class RelayModule {
         return group;
     }
 
+    @Provides
+    @Singleton
+    public InternalDCCManager provideDCCManager(final RelayDCCManager dccManager) {
+        return dccManager;
+    }
+
     // Bus
     @Singleton
     @Provides
@@ -164,7 +170,7 @@ public class RelayModule {
     @Singleton
     public Map<String, CommandParser> provideCommandParserMap(final InternalServer server,
             final InternalUserChannelGroup dao, final PacketSender sender,
-            final RelayDCCManager dccManager, final InternalQueryUserGroup queryManager) {
+            final InternalDCCManager dccManager, final InternalQueryUserGroup queryManager) {
         final DCCParser dccParser = new DCCParser(server, dccManager);
         final CTCPParser ctcpParser = new CTCPParser(server, dao, queryManager, sender, dccParser);
 

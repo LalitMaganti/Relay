@@ -1,4 +1,4 @@
-package co.fusionx.relay.dcc.file;
+package co.fusionx.relay.internal.dcc.base;
 
 import com.google.common.collect.ImmutableList;
 
@@ -10,14 +10,12 @@ import java.util.Map;
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
-import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.AbstractConversation;
-import co.fusionx.relay.internal.bus.EventBus;
 import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.sender.PacketSender;
 
-public class DCCFileConversation extends AbstractConversation<DCCFileEvent> {
+public class RelayDCCFileConversation extends AbstractConversation<DCCFileEvent> {
 
     private final ConnectionConfiguration mConnectionConfiguration;
 
@@ -25,9 +23,9 @@ public class DCCFileConversation extends AbstractConversation<DCCFileEvent> {
 
     private final String mNick;
 
-    private final Map<String, DCCFileConnection> mConnectionList;
+    private final Map<String, RelayDCCFileConnection> mConnectionList;
 
-    public DCCFileConversation(final Postable<Event> bus,
+    public RelayDCCFileConversation(final Postable<Event> bus,
             final ConnectionConfiguration connectionConfiguration,
             final PacketSender packetSender, final String nick) {
         super(bus);
@@ -39,12 +37,12 @@ public class DCCFileConversation extends AbstractConversation<DCCFileEvent> {
         mConnectionList = new HashMap<>();
     }
 
-    public DCCFileConnection getFileConnection(final String fileName) {
+    public RelayDCCFileConnection getFileConnection(final String fileName) {
         return mConnectionList.get(fileName);
     }
 
-    public void getFile(final DCCPendingSendConnection connection, final File file) {
-        final DCCGetConnection getConnection = new DCCGetConnection(connection, mPacketSender, this,
+    public void getFile(final RelayDCCPendingSendConnection connection, final File file) {
+        final RelayDCCGetConnection getConnection = new RelayDCCGetConnection(connection, mPacketSender, this,
                 file);
         mConnectionList.put(connection.getArgument(), getConnection);
         getConnection.startConnection();
@@ -52,7 +50,7 @@ public class DCCFileConversation extends AbstractConversation<DCCFileEvent> {
         postEvent(new DCCFileGetStartedEvent(this, getConnection));
     }
 
-    public Collection<DCCFileConnection> getFileConnections() {
+    public Collection<RelayDCCFileConnection> getFileConnections() {
         return ImmutableList.copyOf(mConnectionList.values());
     }
 
@@ -67,11 +65,11 @@ public class DCCFileConversation extends AbstractConversation<DCCFileEvent> {
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof DCCFileConversation)) {
+        } else if (!(o instanceof RelayDCCFileConversation)) {
             return false;
         }
 
-        final DCCFileConversation that = (DCCFileConversation) o;
+        final RelayDCCFileConversation that = (RelayDCCFileConversation) o;
         return mConnectionConfiguration.getTitle().equals(that.mConnectionConfiguration.getTitle())
                 && mNick.equals(that.mNick);
     }

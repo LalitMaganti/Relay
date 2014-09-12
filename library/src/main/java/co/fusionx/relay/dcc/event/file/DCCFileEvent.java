@@ -1,11 +1,11 @@
 package co.fusionx.relay.dcc.event.file;
 
+import co.fusionx.relay.internal.dcc.base.RelayDCCFileConversation;
 import co.fusionx.relay.dcc.event.DCCEvent;
-import co.fusionx.relay.dcc.file.DCCFileConversation;
 
-public class DCCFileEvent extends DCCEvent<DCCFileConversation, DCCFileEvent> {
+public class DCCFileEvent extends DCCEvent<RelayDCCFileConversation, DCCFileEvent> {
 
-    public DCCFileEvent(final DCCFileConversation fileConversation) {
+    public DCCFileEvent(final RelayDCCFileConversation fileConversation) {
         super(fileConversation);
     }
 }

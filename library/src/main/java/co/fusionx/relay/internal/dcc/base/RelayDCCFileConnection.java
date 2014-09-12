@@ -1,17 +1,16 @@
-package co.fusionx.relay.dcc.file;
+package co.fusionx.relay.internal.dcc.base;
 
-import co.fusionx.relay.dcc.DCCConnection;
+import co.fusionx.relay.internal.dcc.core.DCCConnection;
 import co.fusionx.relay.dcc.event.file.DCCFileProgressEvent;
-import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 
-public abstract class DCCFileConnection extends DCCConnection {
+public abstract class RelayDCCFileConnection extends DCCConnection {
 
-    protected final DCCFileConversation mFileConversation;
+    protected final RelayDCCFileConversation mFileConversation;
 
     protected long mBytesTransferred;
 
-    public DCCFileConnection(final DCCPendingConnection pendingConnection,
-            final DCCFileConversation fileConversation) {
+    public RelayDCCFileConnection(final RelayDCCPendingConnection pendingConnection,
+            final RelayDCCFileConversation fileConversation) {
         super(pendingConnection);
 
         mFileConversation = fileConversation;

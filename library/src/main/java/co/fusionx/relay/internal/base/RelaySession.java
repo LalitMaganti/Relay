@@ -12,14 +12,14 @@ import co.fusionx.relay.core.Session;
 import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.core.UserChannelGroup;
-import co.fusionx.relay.dcc.DCCManager;
+import co.fusionx.relay.dcc.core.DCCManager;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.bus.EventBus;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.dcc.RelayDCCManager;
+import co.fusionx.relay.internal.dcc.core.InternalDCCManager;
 import co.fusionx.relay.parser.UserInputParser;
 import dagger.ObjectGraph;
 
@@ -50,7 +50,7 @@ public class RelaySession implements Session {
     UserInputParser mUserInputParser;
 
     @Inject
-    RelayDCCManager mDCCManager;
+    InternalDCCManager mDCCManager;
 
     private RelayIRCConnection mConnection;
 

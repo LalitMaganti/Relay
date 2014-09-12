@@ -1,19 +1,19 @@
 package co.fusionx.relay.dcc.event.chat;
 
-import co.fusionx.relay.core.ChannelUser;
-import co.fusionx.relay.dcc.chat.DCCChatConversation;
+import co.fusionx.relay.core.LibraryUser;
+import co.fusionx.relay.dcc.core.DCCChatConversation;
 
 public class DCCChatSelfActionEvent extends DCCChatEvent {
 
-    public final ChannelUser mainUser;
+    public final LibraryUser user;
 
     public final String action;
 
-    public DCCChatSelfActionEvent(final DCCChatConversation dccConnection,
-            final ChannelUser mainUser, final String action) {
-        super(dccConnection);
+    public DCCChatSelfActionEvent(final DCCChatConversation conversation,
+            final LibraryUser user, final String action) {
+        super(conversation);
 
-        this.mainUser = mainUser;
+        this.user = user;
         this.action = action;
     }
 }

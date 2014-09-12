@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.dcc;
+package co.fusionx.relay.internal.dcc.base;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
@@ -12,41 +12,40 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
+import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.core.SessionConfiguration;
-import co.fusionx.relay.dcc.DCCManager;
-import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.event.file.DCCFileConversationStartedEvent;
-import co.fusionx.relay.dcc.file.DCCFileConversation;
-import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
-import co.fusionx.relay.dcc.pending.DCCPendingConnection;
-import co.fusionx.relay.dcc.pending.DCCPendingSendConnection;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.core.Postable;
+import co.fusionx.relay.internal.dcc.core.InternalDCCManager;
 import co.fusionx.relay.internal.sender.PacketSender;
 
-@Singleton
-public class RelayDCCManager implements DCCManager {
+public class RelayDCCManager implements InternalDCCManager {
 
-    private final Map<String, DCCChatConversation> mChatConversations;
+    private final Map<String, RelayDCCChatConversation> mChatConversations;
 
-    private final Map<String, DCCFileConversation> mFileConversations;
+    private final Map<String, RelayDCCFileConversation> mFileConversations;
 
-    private final Set<DCCPendingConnection> mPendingConnections;
+    private final Set<RelayDCCPendingConnection> mPendingConnections;
 
     private final Postable<Event> mPostable;
 
     private final SessionConfiguration mSessionConfiguration;
+
+    private final LibraryUser mLibraryUser;
 
     private final PacketSender mPacketSender;
 
     @Inject
     public RelayDCCManager(final Postable<Event> bus,
             final SessionConfiguration sessionConfiguration,
+            final InternalUserChannelGroup userGroup,
             final PacketSender packetSender) {
         mPostable = bus;
         mSessionConfiguration = sessionConfiguration;
+        mLibraryUser = userGroup.getUser();
         mPacketSender = packetSender;
 
         mChatConversations = new HashMap<>();
@@ -54,26 +53,29 @@ public class RelayDCCManager implements DCCManager {
         mPendingConnections = new HashSet<>();
     }
 
-    public void addPendingConnection(final DCCPendingConnection pendingConnection) {
+    @Override
+    public void addPendingConnection(final RelayDCCPendingConnection pendingConnection) {
         mPendingConnections.add(pendingConnection);
     }
 
     @Override
-    public Collection<DCCChatConversation> getChatConversations() {
+    public Collection<RelayDCCChatConversation> getChatConversations() {
         return ImmutableSet.copyOf(mChatConversations.values());
     }
 
     @Override
-    public Collection<DCCFileConversation> getFileConversations() {
+    public Collection<RelayDCCFileConversation> getFileConversations() {
         return ImmutableSet.copyOf(mFileConversations.values());
     }
 
     @Override
-    public Collection<DCCPendingConnection> getPendingConnections() {
+    public Collection<RelayDCCPendingConnection> getPendingConnections() {
         return ImmutableSet.copyOf(mPendingConnections);
     }
 
-    public void acceptDCCConnection(final DCCPendingSendConnection connection, final File file) {
+    @Override
+    public void acceptDCCConnection(final RelayDCCPendingSendConnection connection,
+            final File file) {
         if (!mPendingConnections.contains(connection)) {
             // TODO - Maybe send an event instead?
             mSessionConfiguration.getSettingsProvider()
@@ -84,13 +86,13 @@ public class RelayDCCManager implements DCCManager {
         mPendingConnections.remove(connection);
 
         // Check if we have an existing conversation
-        final Optional<DCCFileConversation> optConversation = FluentIterable
+        final Optional<RelayDCCFileConversation> optConversation = FluentIterable
                 .from(mFileConversations.values())
                 .filter(f -> f.getId().equals(connection.getDccRequestNick()))
                 .first();
         // Get the conversation or a new one if it does not exist
-        final DCCFileConversation conversation = optConversation
-                .or(() -> new DCCFileConversation(mPostable,
+        final RelayDCCFileConversation conversation = optConversation
+                .or(() -> new RelayDCCFileConversation(mPostable,
                         mSessionConfiguration.getConnectionConfiguration(), mPacketSender,
                         connection.getDccRequestNick()));
 
@@ -105,7 +107,8 @@ public class RelayDCCManager implements DCCManager {
         mPostable.postEvent(new DCCFileConversationStartedEvent(conversation));
     }
 
-    public void acceptDCCConnection(final DCCPendingChatConnection connection) {
+    @Override
+    public void acceptDCCConnection(final RelayRelayDCCPendingChatConnection connection) {
         if (!mPendingConnections.contains(connection)) {
             // TODO - Maybe send an event instead?
             mSessionConfiguration.getSettingsProvider()
@@ -115,17 +118,19 @@ public class RelayDCCManager implements DCCManager {
         // This chat is no longer pending - remove it
         mPendingConnections.remove(connection);
 
-        final DCCChatConversation conversation = new DCCChatConversation(mPostable,
-                mSessionConfiguration, connection);
+        final RelayDCCChatConversation conversation = new RelayDCCChatConversation(mPostable,
+                mSessionConfiguration, connection, mLibraryUser);
         mChatConversations.put(connection.getDccRequestNick(), conversation);
         conversation.startChat();
     }
 
-    public void declineDCCConnection(final DCCPendingConnection connection) {
+    @Override
+    public void declineDCCConnection(final RelayDCCPendingConnection connection) {
         mPendingConnections.remove(connection);
     }
 
-    public DCCFileConversation getFileConversation(final String nick) {
+    @Override
+    public RelayDCCFileConversation getFileConversation(final String nick) {
         return mFileConversations.get(nick);
     }
 }

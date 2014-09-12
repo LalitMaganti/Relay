@@ -1,4 +1,4 @@
-package co.fusionx.relay.dcc.file;
+package co.fusionx.relay.internal.dcc.base;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.DCCPacketSender;
 import co.fusionx.relay.util.DCCUtils;
@@ -17,7 +16,7 @@ import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
 
-public class DCCGetConnection extends DCCFileConnection {
+public class RelayDCCGetConnection extends RelayDCCFileConnection {
 
     private final File mFile;
 
@@ -25,8 +24,9 @@ public class DCCGetConnection extends DCCFileConnection {
 
     private CountDownLatch mCountDownLatch;
 
-    public DCCGetConnection(final DCCPendingConnection pendingConnection,
-            final PacketSender packetSender, final DCCFileConversation conversation, final File file) {
+    public RelayDCCGetConnection(final RelayDCCPendingConnection pendingConnection,
+            final PacketSender packetSender, final RelayDCCFileConversation conversation,
+            final File file) {
         super(pendingConnection, conversation);
 
         mDCCPacketSender = new DCCPacketSender(packetSender);

@@ -1,19 +1,19 @@
-package co.fusionx.relay.dcc;
+package co.fusionx.relay.internal.dcc.core;
 
 import java.io.IOException;
 import java.net.Socket;
 
-import co.fusionx.relay.dcc.pending.DCCPendingConnection;
+import co.fusionx.relay.internal.dcc.base.RelayDCCPendingConnection;
 
 public abstract class DCCConnection {
 
-    protected final DCCPendingConnection mPendingConnection;
+    protected final RelayDCCPendingConnection mPendingConnection;
 
     protected Socket mSocket;
 
     private Thread mThread;
 
-    public DCCConnection(final DCCPendingConnection pendingConnection) {
+    public DCCConnection(final RelayDCCPendingConnection pendingConnection) {
         mPendingConnection = pendingConnection;
     }
 

@@ -1,11 +1,11 @@
-package co.fusionx.relay.dcc.pending;
+package co.fusionx.relay.internal.dcc.base;
 
-import co.fusionx.relay.dcc.DCCManager;
-import co.fusionx.relay.internal.dcc.RelayDCCManager;
+import co.fusionx.relay.dcc.core.DCCManager;
+import co.fusionx.relay.internal.dcc.core.InternalDCCManager;
 
-public class DCCPendingConnection {
+public class RelayDCCPendingConnection {
 
-    protected final RelayDCCManager mManager;
+    protected final InternalDCCManager mManager;
 
     protected final String mIP;
 
@@ -17,7 +17,7 @@ public class DCCPendingConnection {
 
     private final String mDccRequestNick;
 
-    public DCCPendingConnection(final String dccRequestNick, final RelayDCCManager manager,
+    public RelayDCCPendingConnection(final String dccRequestNick, final InternalDCCManager manager,
             final String ip, final int port, final String argument, final long size) {
         mDccRequestNick = dccRequestNick;
         mManager = manager;
@@ -61,11 +61,11 @@ public class DCCPendingConnection {
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof DCCPendingConnection)) {
+        } else if (!(o instanceof RelayDCCPendingConnection)) {
             return false;
         }
 
-        final DCCPendingConnection that = (DCCPendingConnection) o;
+        final RelayDCCPendingConnection that = (RelayDCCPendingConnection) o;
         return mPort == that.mPort && mDccRequestNick.equals(that.mDccRequestNick)
                 && mIP.equals(that.mIP) && mManager.equals(that.mManager);
     }

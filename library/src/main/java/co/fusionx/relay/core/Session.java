@@ -1,7 +1,7 @@
 package co.fusionx.relay.core;
 
 import co.fusionx.relay.conversation.Server;
-import co.fusionx.relay.dcc.DCCManager;
+import co.fusionx.relay.dcc.core.DCCManager;
 import co.fusionx.relay.parser.UserInputParser;
 
 public interface Session extends Registerable {

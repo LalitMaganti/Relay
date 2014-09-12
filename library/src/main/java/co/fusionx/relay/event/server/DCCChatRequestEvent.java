@@ -1,17 +1,17 @@
 package co.fusionx.relay.event.server;
 
 import co.fusionx.relay.conversation.Server;
-import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
+import co.fusionx.relay.internal.dcc.base.RelayRelayDCCPendingChatConnection;
 
 public class DCCChatRequestEvent extends DCCRequestEvent {
 
     public DCCChatRequestEvent(final Server server,
-            final DCCPendingChatConnection pendingConnection) {
+            final RelayRelayDCCPendingChatConnection pendingConnection) {
         super(server, pendingConnection);
     }
 
     @Override
-    public DCCPendingChatConnection getPendingConnection() {
-        return (DCCPendingChatConnection) pendingConnection;
+    public RelayRelayDCCPendingChatConnection getPendingConnection() {
+        return (RelayRelayDCCPendingChatConnection) pendingConnection;
     }
 }
