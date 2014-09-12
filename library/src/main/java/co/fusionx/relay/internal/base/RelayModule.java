@@ -53,6 +53,7 @@ import co.fusionx.relay.internal.sender.InternalPacketSender;
 import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
+import co.fusionx.relay.parser.UserInputParser;
 import co.fusionx.relay.sender.ServerSender;
 import dagger.Module;
 import dagger.Provides;

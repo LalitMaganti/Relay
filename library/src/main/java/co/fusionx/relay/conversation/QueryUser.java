@@ -6,6 +6,5 @@ import co.fusionx.relay.sender.QuerySender;
 
 public interface QueryUser extends Conversation<QueryEvent>, QuerySender {
 
-    // Nick delegates
     public Nick getNick();
 }

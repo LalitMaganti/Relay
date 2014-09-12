@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import java.util.Collection;
 
 import co.fusionx.relay.conversation.QueryUser;
+import co.fusionx.relay.internal.core.InternalQueryUser;
 
 public interface QueryUserGroup {
 
@@ -20,4 +21,12 @@ public interface QueryUserGroup {
      * @return an optional possibly containing the query user matching the specified nick
      */
     public Optional<? extends QueryUser> getQueryUser(final String nick);
+
+    /**
+     * Start a query with the specified user or gets an existing query if it exists
+     *
+     * @param nick the nick to start the query
+     * @return the query user created
+     */
+    public InternalQueryUser getOrAddQueryUser(final String nick);
 }

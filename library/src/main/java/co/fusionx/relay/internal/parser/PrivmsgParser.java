@@ -51,11 +51,7 @@ public class PrivmsgParser extends CommandParser {
     }
 
     private void onParsePrivateMessage(final String nick, final String message) {
-        final Optional<InternalQueryUser> optional = mQueryManager.getQueryUser(nick);
-        final InternalQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
-        if (!optional.isPresent()) {
-            mServer.postEvent(new NewPrivateMessageEvent(mServer, user));
-        }
+        final InternalQueryUser user = mQueryManager.getOrAddQueryUser(nick);
         user.postEvent(new QueryMessageWorldEvent(user, message));
     }
 

@@ -15,12 +15,12 @@ import co.fusionx.relay.core.UserChannelGroup;
 import co.fusionx.relay.dcc.DCCManager;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.bus.EventBus;
-import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.dcc.RelayDCCManager;
+import co.fusionx.relay.parser.UserInputParser;
 import dagger.ObjectGraph;
 
 public class RelaySession implements Session {
@@ -41,10 +41,13 @@ public class RelaySession implements Session {
     InternalServer mServer;
 
     @Inject
-    InternalUserChannelGroup mDao;
+    InternalUserChannelGroup mUserChannelGroup;
 
     @Inject
     InternalQueryUserGroup mQueryManager;
+
+    @Inject
+    UserInputParser mUserInputParser;
 
     @Inject
     RelayDCCManager mDCCManager;
@@ -125,8 +128,13 @@ public class RelaySession implements Session {
     }
 
     @Override
+    public UserInputParser getInputParser() {
+        return mUserInputParser;
+    }
+
+    @Override
     public UserChannelGroup getUserChannelManager() {
-        return mDao;
+        return mUserChannelGroup;
     }
 
     @Override

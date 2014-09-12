@@ -1,15 +1,8 @@
 package co.fusionx.relay.util;
 
 import java.util.Collection;
-import java.util.List;
 
 public class IRCUtils {
-
-    public static void removeFirstElementFromList(final List<String> list, final int noOfTimes) {
-        for (int i = 1; i <= noOfTimes; i++) {
-            list.remove(0);
-        }
-    }
 
     public static String concatenateStringList(final Collection<String> list) {
         final StringBuilder builder = new StringBuilder();
@@ -29,7 +22,7 @@ public class IRCUtils {
     public static String ipDecimalToString(final long ip) {
         // if ip is bigger than 255.255.255.255 or smaller than 0.0.0.0
         if (ip > 4294967295l || ip < 0) {
-            throw new IllegalArgumentException("invalid ip");
+            throw new IllegalArgumentException("Invalid IP Address");
         }
         final StringBuilder ipAddress = new StringBuilder();
         for (int i = 3; i >= 0; i--) {
@@ -41,5 +34,4 @@ public class IRCUtils {
         }
         return ipAddress.toString();
     }
-
 }

@@ -8,11 +8,11 @@ import co.fusionx.relay.core.QueryUserGroup;
 
 public interface InternalQueryUserGroup extends QueryUserGroup {
 
+    @Override
     public Collection<InternalQueryUser> getQueryUsers();
 
+    @Override
     public Optional<InternalQueryUser> getQueryUser(final String nick);
 
-    public InternalQueryUser addQueryUser(String nick);
-
-    public void removeQueryUser(InternalQueryUser user);
+    public void removeQueryUser(final InternalQueryUser user);
 }

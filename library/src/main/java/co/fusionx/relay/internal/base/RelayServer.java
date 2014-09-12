@@ -80,11 +80,6 @@ public class RelayServer extends AbstractConversation<ServerEvent>
 
     // ServerSender interface
     @Override
-    public void sendQuery(final String nick, final String message) {
-        mServerSender.sendQuery(nick, message);
-    }
-
-    @Override
     public void sendJoin(final String channelName) {
         mServerSender.sendJoin(channelName);
     }

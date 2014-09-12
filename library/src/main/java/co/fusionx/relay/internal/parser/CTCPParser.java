@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
@@ -90,11 +89,7 @@ public class CTCPParser {
     }
 
     private void onParseUserAction(final String nick, final String action) {
-        final Optional<InternalQueryUser> optional = mQueryManager.getQueryUser(nick);
-        final InternalQueryUser user = optional.or(mQueryManager.addQueryUser(nick));
-        if (!optional.isPresent()) {
-            mServer.postEvent(new NewPrivateMessageEvent(mServer, user));
-        }
+        final InternalQueryUser user = mQueryManager.getOrAddQueryUser(nick);
         user.postEvent(new QueryActionWorldEvent(user, action));
     }
 

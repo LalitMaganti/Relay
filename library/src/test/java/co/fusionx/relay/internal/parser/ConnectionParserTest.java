@@ -25,7 +25,6 @@ import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
 import co.fusionx.relay.sender.ServerSender;
-import dagger.Lazy;
 
 import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,13 +59,8 @@ public class ConnectionParserTest {
                 newDirectExecutorService());
         packetSender.onOutputStreamCreated(bufferedWriterForParser);
 
-        final ServerSender serverSender = new RelayServerSender(packetSender, null,
-                new Lazy<InternalServer>() {
-                    @Override
-                    public InternalServer get() {
-                        return mServer;
-                    }
-                });
+        final ServerSender serverSender = new RelayServerSender(packetSender
+        );
 
         final CapPacketSender capPacketSender = new CapPacketSender(packetSender);
         final InternalSender internalSender = new InternalPacketSender(packetSender);
