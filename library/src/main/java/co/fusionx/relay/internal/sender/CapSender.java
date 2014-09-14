@@ -9,12 +9,12 @@ import co.fusionx.relay.internal.packet.server.cap.CAPRequestSASLPacket;
 import co.fusionx.relay.internal.packet.server.cap.CapRequestCapabilitiesPacket;
 import co.fusionx.relay.internal.packet.server.cap.SaslRequestPlainAuthPacket;
 
-public class CapPacketSender {
+public class CapSender {
 
     private final PacketSender mSender;
 
     @Inject
-    public CapPacketSender(final PacketSender sender) {
+    public CapSender(final PacketSender sender) {
         mSender = sender;
     }
 

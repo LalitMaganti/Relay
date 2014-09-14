@@ -47,7 +47,7 @@ public class ParseUtils {
         return stringParts;
     }
 
-    public static String extractAndRemovePrefix(final List<String> parsedArray) {
+    public static String consumePrefixIfPresent(final List<String> parsedArray) {
         if (parsedArray.size() == 0) {
             return "";
         }

@@ -8,12 +8,12 @@ import co.fusionx.relay.internal.packet.server.UserPacket;
 import co.fusionx.relay.internal.packet.server.internal.PongPacket;
 import co.fusionx.relay.internal.packet.server.internal.ServerPasswordPacket;
 
-public class InternalPacketSender implements InternalSender {
+public class RelayInternalSender implements InternalSender {
 
     private final PacketSender mPacketSender;
 
     @Inject
-    public InternalPacketSender(final PacketSender packetSender) {
+    public RelayInternalSender(final PacketSender packetSender) {
         mPacketSender = packetSender;
     }
 

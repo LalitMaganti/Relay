@@ -50,7 +50,7 @@ import co.fusionx.relay.internal.parser.PrivmsgParser;
 import co.fusionx.relay.internal.parser.QuitParser;
 import co.fusionx.relay.internal.parser.TopicChangeParser;
 import co.fusionx.relay.internal.parser.WallopsParser;
-import co.fusionx.relay.internal.sender.InternalPacketSender;
+import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
@@ -156,7 +156,7 @@ public class RelayModule {
     }
 
     @Provides
-    public InternalSender provideInternalSender(final InternalPacketSender packetSender) {
+    public InternalSender provideInternalSender(final RelayInternalSender packetSender) {
         return packetSender;
     }
 

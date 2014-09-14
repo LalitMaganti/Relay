@@ -13,7 +13,7 @@ import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.internal.constants.CommandConstants;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.core.InternalServer;
-import co.fusionx.relay.internal.sender.CapPacketSender;
+import co.fusionx.relay.internal.sender.CapSender;
 import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.misc.NickStorage;
 import co.fusionx.relay.util.ParseUtils;
@@ -35,12 +35,12 @@ public class ConnectionParser {
     @Inject
     public ConnectionParser(final ConnectionConfiguration configuration,
             final InternalServer server, final InternalSender internalSender,
-            final CapPacketSender capPacketSender) {
+            final CapSender capSender) {
         mConfiguration = configuration;
         mServer = server;
         mInternalSender = internalSender;
 
-        mCapParser = new CapParser(configuration, server, capPacketSender);
+        mCapParser = new CapParser(configuration, server, capSender);
 
         mIndex = 1;
         mSuffix = 1;
@@ -64,7 +64,7 @@ public class ConnectionParser {
         }
 
         final List<String> parsedArray = ParseUtils.splitRawLine(line, true);
-        final String prefix = ParseUtils.extractAndRemovePrefix(parsedArray);
+        final String prefix = ParseUtils.consumePrefixIfPresent(parsedArray);
         final String command = parsedArray.remove(0);
 
         if (ParseUtils.isCommandCode(command)) {

@@ -19,8 +19,8 @@ import co.fusionx.relay.internal.base.TestUtils;
 import co.fusionx.relay.internal.bus.FakePostable;
 import co.fusionx.relay.internal.core.DefaultSettingsProvider;
 import co.fusionx.relay.internal.core.InternalServer;
-import co.fusionx.relay.internal.sender.CapPacketSender;
-import co.fusionx.relay.internal.sender.InternalPacketSender;
+import co.fusionx.relay.internal.sender.CapSender;
+import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
@@ -62,15 +62,15 @@ public class ConnectionParserTest {
         final ServerSender serverSender = new RelayServerSender(packetSender
         );
 
-        final CapPacketSender capPacketSender = new CapPacketSender(packetSender);
-        final InternalSender internalSender = new InternalPacketSender(packetSender);
+        final CapSender capSender = new CapSender(packetSender);
+        final InternalSender internalSender = new RelayInternalSender(packetSender);
 
         mSessionBus = new FakePostable<>();
         mCapabilities = new HashSet<>();
 
         mServer = new RelayServer(mSessionBus, configuration, serverSender, mCapabilities);
         mConnectionParser = new ConnectionParser(saslConfiguration,
-                mServer, internalSender, capPacketSender);
+                mServer, internalSender, capSender);
     }
 
     @Test

@@ -7,7 +7,7 @@ import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;
-import co.fusionx.relay.internal.sender.InternalPacketSender;
+import co.fusionx.relay.internal.sender.RelayInternalSender;
 
 public class PingParser extends CommandParser {
 
@@ -18,7 +18,7 @@ public class PingParser extends CommandParser {
             final InternalQueryUserGroup queryManager, final PacketSender packetSender) {
         super(server, ucmanager, queryManager);
 
-        mInternalSender = new InternalPacketSender(packetSender);
+        mInternalSender = new RelayInternalSender(packetSender);
     }
 
     @Override

@@ -14,8 +14,8 @@ import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.parser.ConnectionParser;
-import co.fusionx.relay.internal.parser.ServerLineParser;
-import co.fusionx.relay.internal.sender.CapPacketSender;
+import co.fusionx.relay.internal.parser.InputParser;
+import co.fusionx.relay.internal.sender.CapSender;
 import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
@@ -33,7 +33,7 @@ public class RelayIRCConnection {
 
     private final ConnectionParser mConnectionParser;
 
-    private final ServerLineParser mLineParser;
+    private final InputParser mLineParser;
 
     private final RelayServerSender mServerSender;
 
@@ -41,7 +41,7 @@ public class RelayIRCConnection {
 
     private final InternalSender mInternalSender;
 
-    private final CapPacketSender mCapSender;
+    private final CapSender mCapSender;
 
     private final ConnectionConfiguration mConnectionConfiguration;
 
@@ -56,10 +56,10 @@ public class RelayIRCConnection {
             final SettingsProvider settingsProvider,
             final InternalUserChannelGroup userChannelGroup,
             final InternalStatusManager internalStatusManager,
-            final ConnectionParser connectionParser, final ServerLineParser lineParser,
+            final ConnectionParser connectionParser, final InputParser lineParser,
             final PacketSender sender, final RelayServerSender serverSender,
             final InternalSender internalSender,
-            final CapPacketSender capPacketSender) {
+            final CapSender capSender) {
         mConnectionConfiguration = connectionConfiguration;
         mSettingsProvider = settingsProvider;
         mUserChannelGroup = userChannelGroup;
@@ -71,7 +71,7 @@ public class RelayIRCConnection {
         mPacketSender = sender;
         mServerSender = serverSender;
         mInternalSender = internalSender;
-        mCapSender = capPacketSender;
+        mCapSender = capSender;
     }
 
     public boolean isStopped() {

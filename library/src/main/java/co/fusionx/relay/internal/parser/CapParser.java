@@ -21,7 +21,7 @@ import co.fusionx.relay.internal.constants.CapCommand;
 import co.fusionx.relay.internal.constants.ServerReplyCodes;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.function.Consumer;
-import co.fusionx.relay.internal.sender.CapPacketSender;
+import co.fusionx.relay.internal.sender.CapSender;
 import co.fusionx.relay.util.ParseUtils;
 
 import static co.fusionx.relay.constants.CapCapability.SASL;
@@ -35,13 +35,13 @@ public class CapParser {
 
     private final ConnectionConfiguration mConnectionConfiguration;
 
-    private final CapPacketSender mCapSender;
+    private final CapSender mCapSender;
 
     private Set<ModifiedCapability> mPossibleCapabilities;
 
     @Inject
     public CapParser(final ConnectionConfiguration configuration, final InternalServer server,
-            final CapPacketSender sender) {
+            final CapSender sender) {
         mServer = server;
         mConnectionConfiguration = configuration;
         mCapSender = sender;
