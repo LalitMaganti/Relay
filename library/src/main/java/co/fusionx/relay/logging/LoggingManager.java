@@ -34,7 +34,7 @@ public abstract class LoggingManager {
         mStarted = false;
     }
 
-    public void addConnectionToManager(final Session session) {
+    public void addSessionToManager(final Session session) {
         if (mLoggingConnections.containsKey(session)) {
             throw new IllegalArgumentException("This session is already present in this manager");
         }

@@ -17,13 +17,13 @@ public interface SessionManager {
     Pair<Boolean, Session> requestConnection(SessionConfiguration configuration);
 
     /**
-     * Reconnect to the specified server
+     * Reconnect to the specified session
      *
-     * @param server the connection to reconnect
-     * @throws IllegalArgumentException if the server is not in this manager or if the server is
+     * @param session the connection to reconnect
+     * @throws IllegalArgumentException if the session is not in this manager or if the session is
      *                                  not in the ConnectionStatus.Disconnected state
      */
-    void requestReconnection(Session server);
+    void requestReconnection(Session session);
 
     /**
      * Disconnect from the server with the specified name and removes it from this manager
@@ -49,10 +49,10 @@ public interface SessionManager {
      *
      * Only use this if you know what you're doing
      *
-     * @param serverName the name of the server you're wanting to get
+     * @param sessionTitle the name of the server you're wanting to get
      * @return the server with the required title if it exists - this may be null
      */
-    Optional<Session> getConnectionIfExists(String serverName);
+    Optional<Session> getSessionIfExists(String sessionTitle);
 
     /**
      * Returns the number of servers which are currently managed by this manager
@@ -66,5 +66,5 @@ public interface SessionManager {
      *
      * @return an immutable copy of the servers which are managed by this manager
      */
-    public ImmutableSet<? extends Session> sessions();
+    public ImmutableSet<? extends Session> sessionSet();
 }

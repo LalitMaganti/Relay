@@ -22,8 +22,6 @@ public class ServerLineParser {
 
     private final InternalServer mServer;
 
-    // private final RelayInternalSender mInternalSender;
-
     private final Map<String, CommandParser> mCommandParserMap;
 
     private final SparseArray<CodeParser> mCodeParser;
@@ -43,8 +41,7 @@ public class ServerLineParser {
      *
      * @param reader the reader associated with the server stream
      */
-    public void parseMain(final BufferedReader reader)
-            throws IOException {
+    public void parseMain(final BufferedReader reader) throws IOException {
         String line;
         while ((line = reader.readLine()) != null) {
             final boolean quit = parseLine(line);

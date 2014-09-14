@@ -96,8 +96,8 @@ public class RelaySessionManager implements SessionManager {
      * {@inheritDoc}
      */
     @Override
-    public Optional<Session> getConnectionIfExists(final String serverName) {
-        final RelaySession connection = mSessionMap.get(serverName);
+    public Optional<Session> getSessionIfExists(final String sessionTitle) {
+        final RelaySession connection = mSessionMap.get(sessionTitle);
         return Optional.fromNullable(connection);
     }
 
@@ -113,7 +113,7 @@ public class RelaySessionManager implements SessionManager {
      * {@inheritDoc}
      */
     @Override
-    public ImmutableSet<? extends Session> sessions() {
+    public ImmutableSet<? extends Session> sessionSet() {
         return FluentIterable.from(mSessionMap.values()).toSet();
     }
 }
