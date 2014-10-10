@@ -1,4 +1,3 @@
-include ':bus-library', ':relay-library'
+include ':bus-library', ':relay-core', ':relay-parser', ':relay-dcc', ':relay-android'
 
 project(':bus-library').projectDir = new File('libraries/bus/library')
-project(':relay-library').projectDir = new File('library')
