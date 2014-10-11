@@ -10,13 +10,14 @@ import java.io.PipedReader;
 import java.io.PipedWriter;
 import java.util.HashSet;
 
-import co.fusionx.relay.constant.CapCapability;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.ConnectionConfiguration;
+import co.fusionx.relay.constant.Capability;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.TestUtils;
 import co.fusionx.relay.internal.bus.FakePostable;
-import co.fusionx.relay.internal.core.DefaultSettingsProvider;
+import co.fusionx.relay.provider.DefaultSettingsProvider;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.sender.CapSender;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
@@ -38,12 +39,12 @@ public class ConnectionParserTest {
 
     private FakePostable<Event> mSessionBus;
 
-    private HashSet<CapCapability> mCapabilities;
+    private HashSet<Capability> mCapabilities;
 
     @Before
     public void setup() throws IOException {
-        final co.fusionx.relay.core.ConnectionConfiguration.Builder saslBuilder = TestUtils.getFreenodeBuilderSasl();
-        final co.fusionx.relay.core.ConnectionConfiguration saslConfiguration = saslBuilder.build();
+        final ConnectionConfiguration.Builder saslBuilder = TestUtils.getFreenodeBuilderSasl();
+        final ConnectionConfiguration saslConfiguration = saslBuilder.build();
 
         final SessionConfiguration configuration = new SessionConfiguration.Builder()
                 .setConnectionConfiguration(saslConfiguration).build();
@@ -58,18 +59,14 @@ public class ConnectionParserTest {
                 newDirectExecutorService());
         packetSender.onOutputStreamCreated(bufferedWriterForParser);
 
-        final ServerSender serverSender = new RelayServerSender(packetSender
-        );
-
-        final CapSender capSender = new CapSender(packetSender);
+        final ServerSender serverSender = new RelayServerSender(packetSender);
         final InternalSender internalSender = new RelayInternalSender(packetSender);
 
         mSessionBus = new FakePostable<>();
         mCapabilities = new HashSet<>();
 
         mServer = new RelayServer(mSessionBus, configuration, serverSender, mCapabilities);
-        mConnectionParser = new ConnectionParser(saslConfiguration,
-                mServer, internalSender, capSender);
+        mConnectionParser = new ConnectionParser(saslConfiguration, mServer, internalSender);
     }
 
     @Test
@@ -80,7 +77,7 @@ public class ConnectionParserTest {
                 .isEqualTo("CAP REQ :multi-prefix");
 
         mConnectionParser.parseLine("CAP * ACK :multi-prefix");
-        assertThat(mCapabilities).contains(CapCapability.MULTIPREFIX);
+        assertThat(mCapabilities).contains(Capability.MULTIPREFIX);
     }
 
     @Test

@@ -1,12 +1,10 @@
-package co.fusionx.relay.core;
+package co.fusionx.relay.configuration;
 
 import java.util.List;
 
 import co.fusionx.relay.provider.NickProvider;
 
 public interface ConnectionConfiguration {
-
-    int describeContents();
 
     // Helper methods
     boolean shouldSendSasl();

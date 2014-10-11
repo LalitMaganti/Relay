@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.event.file.DCCFileEvent;
 import co.fusionx.relay.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.event.Event;
@@ -16,7 +17,7 @@ import co.fusionx.relay.internal.sender.PacketSender;
 
 public class RelayDCCFileConversation extends AbstractConversation<DCCFileEvent> {
 
-    private final co.fusionx.relay.core.ConnectionConfiguration mConnectionConfiguration;
+    private final ConnectionConfiguration mConnectionConfiguration;
 
     private final PacketSender mPacketSender;
 
@@ -25,7 +26,7 @@ public class RelayDCCFileConversation extends AbstractConversation<DCCFileEvent>
     private final Map<String, RelayDCCFileConnection> mConnectionList;
 
     public RelayDCCFileConversation(final Postable<Event> bus,
-            final co.fusionx.relay.core.ConnectionConfiguration connectionConfiguration,
+            final ConnectionConfiguration connectionConfiguration,
             final PacketSender packetSender, final String nick) {
         super(bus);
 

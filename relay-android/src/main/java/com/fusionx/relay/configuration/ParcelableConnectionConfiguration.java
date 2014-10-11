@@ -10,7 +10,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.provider.NickProvider;
 
 public class ParcelableConnectionConfiguration implements Parcelable, ConnectionConfiguration {

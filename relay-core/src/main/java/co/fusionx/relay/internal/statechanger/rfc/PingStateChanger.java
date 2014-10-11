@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.statechanger;
+package co.fusionx.relay.internal.statechanger.rfc;
 
 import co.fusionx.relay.internal.sender.InternalSender;
 import co.fusionx.relay.internal.sender.PacketSender;

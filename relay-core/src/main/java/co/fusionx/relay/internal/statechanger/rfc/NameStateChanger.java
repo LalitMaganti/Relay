@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.statechanger;
+package co.fusionx.relay.internal.statechanger.rfc;
 
 import org.apache.commons.lang3.tuple.Pair;
 

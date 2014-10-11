@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.provider.DefaultNickProvider;
 import co.fusionx.relay.provider.NickProvider;
 
@@ -110,11 +109,6 @@ public class DefaultConnectionConfiguration implements ConnectionConfiguration {
         mNickservPassword = builder.getNickservPassword();
 
         mAutoJoinChannels = builder.getAutoJoinChannels();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     // Helper methods

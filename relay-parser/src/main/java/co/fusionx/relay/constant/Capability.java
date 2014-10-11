@@ -1,6 +1,6 @@
 package co.fusionx.relay.constant;
 
-public enum CapCapability {
+public enum Capability {
     ACCOUNTNOTIFY("account-notify"),
     AWAYNOTIFY("away-notify"),
     EXTENDEDJOIN("extended-join"),
@@ -9,12 +9,12 @@ public enum CapCapability {
 
     private final String mCapability;
 
-    private CapCapability(final String capability) {
+    private Capability(final String capability) {
         mCapability = capability;
     }
 
-    public static CapCapability getCapabilityFromString(final String string) {
-        for (final CapCapability capability : CapCapability.values()) {
+    public static Capability parseCapability(final String string) {
+        for (final Capability capability : Capability.values()) {
             if (capability.getCapabilityString().equals(string)) {
                 return capability;
             }

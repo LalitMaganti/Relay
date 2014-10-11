@@ -15,18 +15,18 @@ import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.function.Optionals;
+import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
-public class ModeStateChanger implements CommandParser {
+public class ModeParser implements CommandParser {
 
     private final InternalServer mServer;
 
     private final InternalUserChannelGroup mUserChannelGroup;
 
-    public ModeStateChanger(final InternalServer server,
+    public ModeParser(final InternalServer server,
             final InternalUserChannelGroup userChannelGroup) {
         mServer = server;
         mUserChannelGroup = userChannelGroup;

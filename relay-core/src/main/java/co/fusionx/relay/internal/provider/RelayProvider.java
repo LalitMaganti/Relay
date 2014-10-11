@@ -6,8 +6,9 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Singleton;
 
-import co.fusionx.relay.constant.CapCapability;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.ConnectionConfiguration;
+import co.fusionx.relay.constant.Capability;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.base.RelayIRCConnection;
 import co.fusionx.relay.internal.base.RelayQueryUserGroup;
@@ -27,7 +28,7 @@ import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.RelayInternalSender;
 import co.fusionx.relay.internal.sender.RelayServerSender;
 import co.fusionx.relay.parser.InputParser;
-import co.fusionx.relay.parser.ParserFactory;
+import co.fusionx.relay.parser.ParserProvider;
 import co.fusionx.relay.provider.SettingsProvider;
 import co.fusionx.relay.sender.ServerSender;
 import dagger.Module;
@@ -57,13 +58,13 @@ public class RelayProvider {
     }
 
     @Provides
-    public co.fusionx.relay.core.ConnectionConfiguration provideConnectionConfig(
+    public ConnectionConfiguration provideConnectionConfig(
             final SessionConfiguration config) {
         return config.getConnectionConfiguration();
     }
 
     @Provides
-    public Set<CapCapability> provideCapabilitySet() {
+    public Set<Capability> provideCapabilitySet() {
         return new HashSet<>();
     }
 
@@ -122,13 +123,13 @@ public class RelayProvider {
 
     // Parser
     @Provides
-    public ParserFactory provideParserFactory(final ParserObserverProvider provider) {
-        return new CoreParserFactory(provider);
+    public ParserProvider provideParserFactory(final ParserObserverProvider provider) {
+        return new CoreParserProvider(provider);
     }
 
     @Provides
-    public InputParser provideInputParser(final ParserFactory parserFactory) {
-        return new InputParser(parserFactory);
+    public InputParser provideInputParser(final ParserProvider parserProvider) {
+        return new InputParser(parserProvider);
     }
 
     /*@Provides

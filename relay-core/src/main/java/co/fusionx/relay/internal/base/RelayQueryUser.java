@@ -1,5 +1,6 @@
 package co.fusionx.relay.internal.base;
 
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.core.Nick;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.query.QueryEvent;
@@ -10,13 +11,13 @@ import co.fusionx.relay.sender.QuerySender;
 public class RelayQueryUser extends AbstractConversation<QueryEvent>
         implements InternalQueryUser {
 
-    private final co.fusionx.relay.core.ConnectionConfiguration mConfiguration;
+    private final ConnectionConfiguration mConfiguration;
 
     private final QuerySender mQuerySender;
 
     private final Nick mNick;
 
-    public RelayQueryUser(final Postable<Event> bus, final co.fusionx.relay.core.ConnectionConfiguration configuration,
+    public RelayQueryUser(final Postable<Event> bus, final ConnectionConfiguration configuration,
             final QuerySender querySender, final String nick) {
         super(bus);
 

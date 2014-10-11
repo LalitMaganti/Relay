@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.function;
+package co.fusionx.relay.function;
 
 import com.google.common.collect.FluentIterable;
 

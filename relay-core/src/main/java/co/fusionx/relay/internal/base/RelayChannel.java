@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import java.util.Collection;
 import java.util.HashSet;
 
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.internal.core.Postable;
@@ -20,9 +21,9 @@ public class RelayChannel extends AbstractConversation<ChannelEvent> implements 
 
     private final Collection<InternalChannelUser> mUsers;
 
-    private final co.fusionx.relay.core.ConnectionConfiguration mConfiguration;
+    private final ConnectionConfiguration mConfiguration;
 
-    RelayChannel(final Postable<Event> postable, final co.fusionx.relay.core.ConnectionConfiguration configuration,
+    RelayChannel(final Postable<Event> postable, final ConnectionConfiguration configuration,
             final ChannelSender channelSender, final String channelName) {
         super(postable);
 

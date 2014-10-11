@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 
 import co.fusionx.relay.core.InternalDCCChatConversation;
 import co.fusionx.relay.core.LibraryUser;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.chat.DCCChatEvent;
 import co.fusionx.relay.event.chat.DCCChatSelfActionEvent;

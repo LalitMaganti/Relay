@@ -1,7 +1,10 @@
 package co.fusionx.relay.parser.rfc;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 
+import co.fusionx.relay.constant.ReplyCodes;
 import co.fusionx.relay.parser.ReplyCodeParser;
 
 public class MotdParser implements ReplyCodeParser {
@@ -17,6 +20,12 @@ public class MotdParser implements ReplyCodeParser {
         final String message = parsedArray.get(0);
 
         mMotdObserver.onMotd(code, message);
+    }
+
+    @Override
+    public List<Integer> parsableCodes() {
+        return ImmutableList.of(ReplyCodes.RPL_MOTDSTART, ReplyCodes.RPL_MOTD,
+                ReplyCodes.RPL_ENDOFMOTD);
     }
 
     public static interface MotdObserver {

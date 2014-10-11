@@ -9,8 +9,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.HashMap;
 import java.util.Map;
 
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.core.Session;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.core.SessionManager;
 import co.fusionx.relay.core.SessionStatus;
 
@@ -35,7 +36,7 @@ public class RelaySessionManager implements SessionManager {
      */
     @Override
     public Pair<Boolean, RelaySession> requestConnection(final SessionConfiguration configuration) {
-        final co.fusionx.relay.core.ConnectionConfiguration connectionConfiguration = configuration
+        final ConnectionConfiguration connectionConfiguration = configuration
                 .getConnectionConfiguration();
         RelaySession session = mSessionMap.get(connectionConfiguration.getTitle());
 

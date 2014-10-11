@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.function;
+package co.fusionx.relay.function;
 
 public interface Consumer<T> {
 

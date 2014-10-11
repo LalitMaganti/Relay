@@ -8,12 +8,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.constant.ReplyCodes;
 import co.fusionx.relay.event.server.NoticeEvent;
 import co.fusionx.relay.internal.constants.Commands;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.sender.CapSender;
 import co.fusionx.relay.internal.sender.InternalSender;
+import co.fusionx.relay.parser.ircv3.CapParser;
 import co.fusionx.relay.provider.NickProvider;
 import co.fusionx.relay.util.ParseUtils;
 
@@ -21,25 +23,20 @@ public class ConnectionParser {
 
     private final InternalServer mServer;
 
-    private final co.fusionx.relay.core.ConnectionConfiguration mConfiguration;
+    private final ConnectionConfiguration mConfiguration;
 
     private final InternalSender mInternalSender;
-
-    private final CapParser mCapParser;
 
     private int mIndex;
 
     private int mSuffix;
 
     @Inject
-    public ConnectionParser(final co.fusionx.relay.core.ConnectionConfiguration configuration,
-            final InternalServer server, final InternalSender internalSender,
-            final CapSender capSender) {
+    public ConnectionParser(final ConnectionConfiguration configuration,
+            final InternalServer server, final InternalSender internalSender) {
         mConfiguration = configuration;
         mServer = server;
         mInternalSender = internalSender;
-
-        mCapParser = new CapParser(configuration, server, capSender);
 
         mIndex = 1;
         mSuffix = 1;
@@ -86,12 +83,6 @@ public class ConnectionParser {
             case Commands.NOTICE:
                 parseNotice(parsedArray, prefix);
                 break;
-            case Commands.CAP:
-                mCapParser.parseCAP(parsedArray);
-                break;
-            case Commands.AUTHENTICATE:
-                mCapParser.parseAuthenticate(parsedArray);
-                break;
         }
         return new ConnectionLineParseStatus(ParseStatus.OTHER, null);
     }
@@ -123,9 +114,6 @@ public class ConnectionParser {
             case ReplyCodes.ERR_NONICKNAMEGIVEN:
                 mServer.sendNick(mConfiguration.getNickProvider().getFirst());
                 break;
-        }
-        if (ReplyCodes.saslCodes.contains(code)) {
-            mCapParser.parseCode(code, parsedArray);
         }
         return new ConnectionLineParseStatus(ParseStatus.OTHER, null);
     }

@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableSet;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import co.fusionx.relay.configuration.SessionConfiguration;
+
 public interface SessionManager {
 
     /**

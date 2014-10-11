@@ -1,6 +1,4 @@
-package co.fusionx.relay.internal.core;
-
-import co.fusionx.relay.provider.SettingsProvider;
+package co.fusionx.relay.provider;
 
 public class DefaultSettingsProvider implements SettingsProvider {
 

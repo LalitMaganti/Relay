@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
 import co.fusionx.relay.event.channel.ChannelDisconnectEvent;
@@ -25,7 +25,7 @@ import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.function.FluentIterables;
+import co.fusionx.relay.function.FluentIterables;
 
 public class RelayStatusManager implements InternalStatusManager {
 

@@ -66,6 +66,11 @@ public class NickPrefixNameParser implements ReplyCodeParser, NameParser.NameObs
         mNameParser.parseReplyCode(parsedArray, code);
     }
 
+    @Override
+    public List<Integer> parsableCodes() {
+        return mNameParser.parsableCodes();
+    }
+
     public static interface NickPrefixNameObserver {
 
         public void onNameReply(final ChannelType type, final String channelName,

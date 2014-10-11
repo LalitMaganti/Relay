@@ -5,9 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.Map;
 
-import co.fusionx.relay.parser.CommandParser;
-import co.fusionx.relay.parser.ParserFactory;
-import co.fusionx.relay.parser.ReplyCodeParser;
 import co.fusionx.relay.util.ParseUtils;
 
 public class InputParser {
@@ -18,9 +15,9 @@ public class InputParser {
 
     private String mLine;
 
-    public InputParser(final ParserFactory parserFactory) {
-        mCommandParsers = parserFactory.getCommandParsers();
-        mReplyCodeParsers = parserFactory.getReplyCodeParsers();
+    public InputParser(final ParserProvider parserProvider) {
+        mCommandParsers = parserProvider.getCommandParsers();
+        mReplyCodeParsers = parserProvider.getReplyCodeParsers();
     }
 
     public void parseLine(final String line) {

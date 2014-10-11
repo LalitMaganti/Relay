@@ -1,6 +1,6 @@
 package co.fusionx.relay.util;
 
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 
 public class LogUtils {
 

@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import javax.inject.Inject;
 
 import co.fusionx.relay.core.LibraryUser;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.internal.core.InternalQueryUser;

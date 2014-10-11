@@ -10,9 +10,7 @@ import org.robolectric.annotation.Config;
 
 import android.os.Parcel;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.internal.base.TestUtils;
-import co.fusionx.relay.provider.DefaultNickProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;

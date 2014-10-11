@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.core.QueryUserGroup;
 import co.fusionx.relay.core.Session;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.core.UserChannelGroup;
 import co.fusionx.relay.event.Event;

@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.statechanger;
+package co.fusionx.relay.internal.statechanger.rfc;
 
 import com.google.common.base.Optional;
 

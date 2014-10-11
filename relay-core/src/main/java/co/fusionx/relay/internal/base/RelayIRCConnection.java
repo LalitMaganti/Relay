@@ -9,6 +9,7 @@ import java.net.Socket;
 
 import javax.inject.Inject;
 
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.provider.SettingsProvider;
 import co.fusionx.relay.internal.core.InternalStatusManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
@@ -42,7 +43,7 @@ public class RelayIRCConnection {
 
     private final CapSender mCapSender;
 
-    private final co.fusionx.relay.core.ConnectionConfiguration mConnectionConfiguration;
+    private final ConnectionConfiguration mConnectionConfiguration;
 
     private final SettingsProvider mSettingsProvider;
 
@@ -51,7 +52,7 @@ public class RelayIRCConnection {
     private boolean mStopped;
 
     @Inject
-    RelayIRCConnection(final co.fusionx.relay.core.ConnectionConfiguration connectionConfiguration,
+    RelayIRCConnection(final ConnectionConfiguration connectionConfiguration,
             final SettingsProvider settingsProvider,
             final InternalUserChannelGroup userChannelGroup,
             final InternalStatusManager internalStatusManager,

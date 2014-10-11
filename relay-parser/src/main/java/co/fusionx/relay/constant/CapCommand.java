@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.constants;
+package co.fusionx.relay.constant;
 
 public enum CapCommand {
     LS("LS"),

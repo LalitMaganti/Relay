@@ -1,5 +1,7 @@
 package co.fusionx.relay.parser.rfc;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 
 import co.fusionx.relay.constant.ChannelType;
@@ -22,6 +24,11 @@ public class NameParser implements ReplyCodeParser {
         } else {
             parseNameFinished();
         }
+    }
+
+    @Override
+    public List<Integer> parsableCodes() {
+        return ImmutableList.of(ReplyCodes.RPL_NAMREPLY, ReplyCodes.RPL_ENDOFNAMES);
     }
 
     private void parseNameReply(final List<String> parsedArray) {

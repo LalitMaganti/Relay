@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.statechanger;
+package co.fusionx.relay.internal.statechanger.rfc;
 
 import com.google.common.base.Optional;
 
@@ -13,7 +13,7 @@ import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.function.Optionals;
+import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.parser.rfc.PartParser;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;

@@ -6,8 +6,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import co.fusionx.relay.constant.CapCapability;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.constant.Capability;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.internal.core.Postable;
@@ -19,14 +19,14 @@ public class RelayServer extends AbstractConversation<ServerEvent>
 
     private final SessionConfiguration mConfiguration;
 
-    private final Set<CapCapability> mCapabilities;
+    private final Set<Capability> mCapabilities;
 
     private final ServerSender mServerSender;
 
     @Inject
     public RelayServer(final Postable<Event> sessionBus,
             final SessionConfiguration configuration, final ServerSender serverSender,
-            final Set<CapCapability> capCapabilities) {
+            final Set<Capability> capCapabilities) {
         super(sessionBus);
 
         mConfiguration = configuration;
@@ -36,7 +36,7 @@ public class RelayServer extends AbstractConversation<ServerEvent>
 
     // Internal methods
     @Override
-    public void addCapability(final CapCapability capability) {
+    public void addCapability(final Capability capability) {
         mCapabilities.add(capability);
     }
 
@@ -58,7 +58,7 @@ public class RelayServer extends AbstractConversation<ServerEvent>
     }
 
     @Override
-    public ImmutableSet<CapCapability> getCapabilities() {
+    public ImmutableSet<Capability> getCapabilities() {
         return ImmutableSet.copyOf(mCapabilities);
     }
 

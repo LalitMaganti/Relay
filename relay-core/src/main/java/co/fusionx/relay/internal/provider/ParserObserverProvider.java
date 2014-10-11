@@ -5,23 +5,26 @@ import javax.inject.Inject;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.statechanger.InviteStateChanger;
-import co.fusionx.relay.internal.statechanger.PartStateChanger;
-import co.fusionx.relay.internal.statechanger.PingStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.InviteStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.MotdStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.PartStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.PingStateChanger;
 import co.fusionx.relay.internal.sender.PacketSender;
-import co.fusionx.relay.internal.statechanger.JoinStateChanger;
-import co.fusionx.relay.internal.statechanger.NameStateChanger;
-import co.fusionx.relay.internal.statechanger.NickStateChanger;
-import co.fusionx.relay.internal.statechanger.QuitStateChanger;
-import co.fusionx.relay.internal.statechanger.TopicStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.JoinStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.NameStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.NickStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.QuitStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.TopicCodeStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.TopicStateChanger;
 import co.fusionx.relay.parser.ircv3.NickPrefixNameParser;
 import co.fusionx.relay.parser.rfc.InviteParser;
-import co.fusionx.relay.parser.rfc.NameParser;
+import co.fusionx.relay.parser.rfc.MotdParser;
 import co.fusionx.relay.parser.rfc.JoinParser;
 import co.fusionx.relay.parser.rfc.NickParser;
 import co.fusionx.relay.parser.rfc.PartParser;
 import co.fusionx.relay.parser.rfc.PingParser;
 import co.fusionx.relay.parser.rfc.QuitParser;
+import co.fusionx.relay.parser.rfc.TopicCodeParser;
 import co.fusionx.relay.parser.rfc.TopicParser;
 
 public class ParserObserverProvider {
@@ -53,10 +56,6 @@ public class ParserObserverProvider {
         return new JoinStateChanger(mInternalServer, mUserChannelGroup);
     }
 
-    public NickPrefixNameParser.NickPrefixNameObserver getNickPrefixNameObserver() {
-        return new NameStateChanger(mUserChannelGroup);
-    }
-
     public NickParser.NickObserver getNickProvider() {
         return new NickStateChanger(mInternalServer, mUserChannelGroup);
     }
@@ -75,5 +74,18 @@ public class ParserObserverProvider {
 
     public QuitParser.QuitObserver getQuitObserver() {
         return new QuitStateChanger(mUserChannelGroup, mQueryUserGroup);
+    }
+
+    // Reply code parser observers
+    public MotdParser.MotdObserver getMotdObserver() {
+        return new MotdStateChanger(mInternalServer);
+    }
+
+    public NickPrefixNameParser.NickPrefixNameObserver getNickPrefixNameObserver() {
+        return new NameStateChanger(mUserChannelGroup);
+    }
+
+    public TopicCodeParser.TopicCodeObserver getTopicCodeObserver() {
+        return new TopicCodeStateChanger(mInternalServer, mUserChannelGroup);
     }
 }

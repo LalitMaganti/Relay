@@ -1,8 +1,8 @@
-package co.fusionx.relay.core;
+package co.fusionx.relay.configuration;
 
 import com.google.common.base.Preconditions;
 
-import co.fusionx.relay.internal.core.DefaultSettingsProvider;
+import co.fusionx.relay.provider.DefaultSettingsProvider;
 import co.fusionx.relay.provider.SettingsProvider;
 
 public class SessionConfiguration {

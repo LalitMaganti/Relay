@@ -1,5 +1,7 @@
 package co.fusionx.relay.parser.rfc;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 
 import co.fusionx.relay.constant.ReplyCodes;
@@ -21,6 +23,11 @@ public class TopicCodeParser implements ReplyCodeParser {
         } else if (code == ReplyCodes.RPL_TOPICWHOTIME) {
             onTopicInfo(parsedArray);
         }
+    }
+
+    @Override
+    public List<Integer> parsableCodes() {
+        return ImmutableList.of(ReplyCodes.RPL_TOPIC, ReplyCodes.RPL_TOPICWHOTIME);
     }
 
     private void onTopic(final List<String> parsedArray) {

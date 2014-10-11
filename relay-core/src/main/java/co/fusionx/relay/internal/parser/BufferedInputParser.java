@@ -5,13 +5,14 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.parser.InputParser;
 import co.fusionx.relay.provider.NickProvider;
 
 public class BufferedInputParser {
 
-    private final co.fusionx.relay.core.ConnectionConfiguration mConfiguration;
+    private final ConnectionConfiguration mConfiguration;
 
     private final InputParser mInputParser;
 
@@ -22,7 +23,7 @@ public class BufferedInputParser {
     private String mLine;
 
     @Inject
-    public BufferedInputParser(final co.fusionx.relay.core.ConnectionConfiguration configuration,
+    public BufferedInputParser(final ConnectionConfiguration configuration,
             final InputParser inputParser,
             final InternalServer server) {
         mConfiguration = configuration;
@@ -160,13 +161,13 @@ public class BufferedInputParser {
 
     private static class NickGenerator {
 
-        private final co.fusionx.relay.core.ConnectionConfiguration mConfiguration;
+        private final ConnectionConfiguration mConfiguration;
 
         private int mSuffix = 1;
 
         private int mIndex = 1;
 
-        public NickGenerator(final co.fusionx.relay.core.ConnectionConfiguration configuration) {
+        public NickGenerator(final ConnectionConfiguration configuration) {
             mConfiguration = configuration;
         }
 

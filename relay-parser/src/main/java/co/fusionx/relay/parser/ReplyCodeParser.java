@@ -14,5 +14,12 @@ public interface ReplyCodeParser {
      *                    keyword of the command itself)
      * @param code contains the code this parser was matched with
      */
-    public abstract void parseReplyCode(final List<String> parsedArray, final int code);
+    public void parseReplyCode(final List<String> parsedArray, final int code);
+
+    /**
+     * Returns the list of codes this parser can parse
+     *
+     * @return the list of codes it can parse
+     */
+    public List<Integer> parsableCodes();
 }

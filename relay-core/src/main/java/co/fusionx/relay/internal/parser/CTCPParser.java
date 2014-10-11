@@ -15,7 +15,7 @@ import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.function.Optionals;
+import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.internal.sender.CtcpResponsePacketSender;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.util.LogUtils;

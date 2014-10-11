@@ -24,5 +24,4 @@ public class WallopsParser implements CommandParser {
 
         mServer.postEvent(new WallopsEvent(mServer, message, sendingNick));
     }
-
 }

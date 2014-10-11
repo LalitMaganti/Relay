@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 import co.fusionx.relay.constant.UserLevel;
 import co.fusionx.relay.conversation.Channel;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;

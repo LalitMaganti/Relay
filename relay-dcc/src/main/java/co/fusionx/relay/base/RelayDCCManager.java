@@ -16,7 +16,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import co.fusionx.relay.core.LibraryUser;
-import co.fusionx.relay.core.SessionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.file.DCCFileConversationStartedEvent;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;

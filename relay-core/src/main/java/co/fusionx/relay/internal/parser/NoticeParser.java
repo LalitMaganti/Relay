@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.statechanger;
+package co.fusionx.relay.internal.parser;
 
 import com.google.common.base.Optional;
 
@@ -18,7 +18,7 @@ import co.fusionx.relay.internal.parser.CTCPParser;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.util.ParseUtils;
 
-public class NoticeStateChanger implements CommandParser {
+public class NoticeParser implements CommandParser {
 
     private final InternalServer mServer;
 
@@ -28,7 +28,7 @@ public class NoticeStateChanger implements CommandParser {
 
     private final CTCPParser mCTCPParser;
 
-    public NoticeStateChanger(final InternalServer server,
+    public NoticeParser(final InternalServer server,
             final InternalUserChannelGroup userChannelGroup,
             final InternalQueryUserGroup queryManager, final CTCPParser ctcpParser) {
         mServer = server;
