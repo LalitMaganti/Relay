@@ -1,6 +1,7 @@
 package co.fusionx.relay.internal.parser;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
@@ -39,6 +40,11 @@ public class ErrorReplyCodeParser implements ReplyCodeParser {
                 onNickInUse(parsedArray);
                 break;
         }
+    }
+
+    @Override
+    public List<Integer> parsableCodes() {
+        return ImmutableList.of(ReplyCodes.ERR_NOSUCHNICK, ReplyCodes.ERR_NICKNAMEINUSE);
     }
 
     // TODO - implement this

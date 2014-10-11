@@ -25,8 +25,7 @@ public class DefaultConnectionConfigurationTest {
 
     public static ParcelableConnectionConfiguration.Builder getFreenodeBuilder() {
         final ParcelableConnectionConfiguration.Builder builder
-                = new ParcelableConnectionConfiguration
-                .Builder();
+                = new ParcelableConnectionConfiguration.Builder();
         builder.setTitle("Freenode");
         builder.setUrl("irc.freenode.net");
         builder.setPort(6667);

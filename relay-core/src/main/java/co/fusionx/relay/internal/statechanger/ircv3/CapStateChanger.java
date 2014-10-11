@@ -6,18 +6,14 @@ import com.google.common.collect.Iterables;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 
 import co.fusionx.relay.configuration.ConnectionConfiguration;
-import co.fusionx.relay.constant.CapCommand;
 import co.fusionx.relay.constant.Capability;
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.sender.CapSender;
 import co.fusionx.relay.parser.ircv3.CapParser;
@@ -39,6 +35,8 @@ public class CapStateChanger implements CapParser.CapObserver {
     @Inject
     public CapStateChanger(final ConnectionConfiguration configuration, final InternalServer server,
             final CapSender sender) {
+        mPossibleCapabilities = new HashSet<>();
+
         mServer = server;
         mConnectionConfiguration = configuration;
         mCapSender = sender;
@@ -102,7 +100,8 @@ public class CapStateChanger implements CapParser.CapObserver {
             final Set<CapParser.ModifiedCapability> capabilities) {
         if (capabilities.size() == 1) {
             final CapParser.ModifiedCapability modCap = Iterables.getLast(capabilities);
-            if (modCap.getCapability() == SASL && modCap.getModifier() == null) {
+            if (modCap.getCapability() == Capability.SASL &&
+                    modCap.getModifier() != CapParser.Modifier.DISABLE) {
                 mCapSender.sendPlainAuthenticationRequest();
                 return;
             }

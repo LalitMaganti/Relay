@@ -24,7 +24,7 @@ public class CapParser implements CommandParser {
         mCapObserver = capObserver;
 
         mCapCommandMap = new HashMap<>();
-        initalizeCommandMap(mCapCommandMap);
+        initializeCommandMap(mCapCommandMap);
     }
 
     public static Set<ModifiedCapability> parseCapabilities(final String caps) {
@@ -43,7 +43,7 @@ public class CapParser implements CommandParser {
         return capabilitySet;
     }
 
-    private void initalizeCommandMap(final Map<CapCommand, DualConsumer<String,
+    private void initializeCommandMap(final Map<CapCommand, DualConsumer<String,
             List<String>>> map) {
         map.put(CapCommand.LS, new DualConsumer<String, List<String>>() {
             @Override
@@ -78,36 +78,6 @@ public class CapParser implements CommandParser {
         parser.apply(target, parsedArray);
     }
 
-    /*
-    private String joinNonSaslCapabilities(final Set<ModifiedCapability> capabilities) {
-        return FluentIterable.from(capabilities)
-                .filter(new Predicate<ModifiedCapability>() {
-                    @Override
-                    public boolean apply(final ModifiedCapability c) {
-                        return c.getCapability() != SASL;
-                    }
-                })
-                .transform(new Function<ModifiedCapability, String>() {
-                    @Override
-                    public String apply(final ModifiedCapability c) {
-                        return c.getCapability().getCapabilityString();
-                    }
-                })
-                .join(Joiner.on(' '));
-    }
-    */
-
-    /*
-    public boolean serverHasCapability(final Capability capability) {
-        for (final ModifiedCapability modifiedCapability : mPossibleCapabilities) {
-            if (modifiedCapability.getCapability() == capability) {
-                return true;
-            }
-        }
-        return false;
-    }
-    */
-
     private void parseLs(final String target, final List<String> parsedArray) {
         final String rawCapabilities = parsedArray.get(0);
         final String colonLessCapabilities = ParseUtils.removeInitialColonIfExists(rawCapabilities);
@@ -115,19 +85,6 @@ public class CapParser implements CommandParser {
                 = parseCapabilities(colonLessCapabilities);
 
         mCapObserver.onCapabilitiesLsResponse(target, possibleCapabilities);
-        /*
-        final boolean hasSasl = serverHasCapability(SASL);
-
-        // We attempt to request every CAP capability we know about (with the exception of SASL)
-        // before we try anything else
-        if (possibleCapabilities.size() > 1 || possibleCapabilities.size() > 0 && !hasSasl) {
-            mCapSender.sendRequestCapabilities(joinNonSaslCapabilities(possibleCapabilities));
-        } else if (hasSasl && mConnectionConfiguration.shouldSendSasl()) {
-            mCapSender.sendRequestSasl();
-        } else {
-            mCapSender.sendEnd();
-        }
-        */
     }
 
     private void parseAck(final String target, final List<String> parsedArray) {
@@ -136,26 +93,6 @@ public class CapParser implements CommandParser {
         final Set<ModifiedCapability> capabilities = parseCapabilities(colonLessCapabilities);
 
         mCapObserver.onCapabilitiesAccepted(target, capabilities);
-        /*
-        if (capabilities.size() == 1) {
-            final ModifiedCapability modCap = Iterables.getLast(capabilities);
-            if (modCap.getCapability() == SASL && modCap.getModifier() == null) {
-                mCapSender.sendPlainAuthenticationRequest();
-                return;
-            }
-        }
-
-        for (final ModifiedCapability capability : capabilities) {
-            mServer.addCapability(capability.getCapability());
-        }
-
-        final boolean hasSasl = serverHasCapability(SASL);
-        if (hasSasl && mConnectionConfiguration.shouldSendSasl()) {
-            mCapSender.sendRequestSasl();
-        } else {
-            mCapSender.sendEnd();
-        }
-        */
     }
 
     private void parseNak(final String prefix, final List<String> parsedArray) {
@@ -223,14 +160,12 @@ public class CapParser implements CommandParser {
             }
 
             final ModifiedCapability that = (ModifiedCapability) o;
-            return mCapability == that.mCapability && mModifier == that.mModifier;
+            return mCapability == that.mCapability;
         }
 
         @Override
         public int hashCode() {
-            int result = mModifier != null ? mModifier.hashCode() : 0;
-            result = 31 * result + (mCapability != null ? mCapability.hashCode() : 0);
-            return result;
+            return mCapability != null ? mCapability.hashCode() : 0;
         }
     }
 }

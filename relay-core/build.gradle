@@ -15,8 +15,18 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    provided
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+}
+
 dependencies {
-    compile 'com.squareup.dagger:dagger-compiler:1.2.2'
+    provided 'com.squareup.dagger:dagger-compiler:1.2.2'
 
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'com.google.guava:guava:18.0'
