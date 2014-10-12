@@ -2,12 +2,12 @@ package co.fusionx.relay.parser;
 
 import java.util.List;
 
-import co.fusionx.relay.base.RelayDCCFileConnection;
-import co.fusionx.relay.base.RelayDCCFileConversation;
-import co.fusionx.relay.base.RelayDCCGetConnection;
-import co.fusionx.relay.base.RelayDCCPendingSendConnection;
-import co.fusionx.relay.base.RelayRelayDCCPendingChatConnection;
-import co.fusionx.relay.core.InternalDCCManager;
+import co.fusionx.relay.internal.base.RelayDCCFileConnection;
+import co.fusionx.relay.internal.base.RelayDCCFileConversation;
+import co.fusionx.relay.internal.base.RelayDCCGetConnection;
+import co.fusionx.relay.internal.base.RelayDCCPendingSendConnection;
+import co.fusionx.relay.internal.base.RelayRelayDCCPendingChatConnection;
+import co.fusionx.relay.internal.core.InternalDCCManager;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.internal.core.InternalServer;

@@ -1,4 +1,4 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.internal.base;
 
 import co.fusionx.relay.core.DCCConnection;
 import co.fusionx.relay.event.file.DCCFileProgressEvent;

@@ -1,6 +1,6 @@
 package co.fusionx.relay.parser.ircv3;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.FluentIterable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,38 +9,33 @@ import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.constant.CapCommand;
-import co.fusionx.relay.constant.Capability;
+import co.fusionx.relay.constant.PrefixedCapability;
+import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.function.DualConsumer;
+import co.fusionx.relay.function.FluentIterables;
 import co.fusionx.relay.parser.CommandParser;
-import co.fusionx.relay.util.ParseUtils;
+import co.fusionx.relay.util.CapUtils;
 
 public class CapParser implements CommandParser {
 
     private final Map<CapCommand, DualConsumer<String, List<String>>> mCapCommandMap;
 
-    private final CapObserver mCapObserver;
+    private final Set<CapObserver> mCapObservers;
 
-    public CapParser(final CapObserver capObserver) {
-        mCapObserver = capObserver;
+    public CapParser() {
+        mCapObservers = new HashSet<>();
 
         mCapCommandMap = new HashMap<>();
         initializeCommandMap(mCapCommandMap);
     }
 
-    public static Set<ModifiedCapability> parseCapabilities(final String caps) {
-        final Set<ModifiedCapability> capabilitySet = new HashSet<>();
-        final List<String> capabilities = ParseUtils.splitRawLine(caps, false);
+    public CapParser addObserver(final CapObserver observer) {
+        mCapObservers.add(observer);
+        return this;
+    }
 
-        for (final String capability : capabilities) {
-            final Pair<String, Modifier> pair = Modifier.consumeModifier(capability);
-            final Capability cap = Capability.parseCapability(pair.getLeft());
-            if (cap == null) {
-                continue;
-            }
-            capabilitySet.add(new ModifiedCapability(pair.getRight(), cap));
-        }
-
-        return capabilitySet;
+    private void notifyObservers(final Consumer<CapObserver> consumer) {
+        FluentIterables.forEach(FluentIterable.from(mCapObservers), consumer);
     }
 
     private void initializeCommandMap(final Map<CapCommand, DualConsumer<String,
@@ -80,92 +75,39 @@ public class CapParser implements CommandParser {
 
     private void parseLs(final String target, final List<String> parsedArray) {
         final String rawCapabilities = parsedArray.get(0);
-        final String colonLessCapabilities = ParseUtils.removeInitialColonIfExists(rawCapabilities);
-        final Set<ModifiedCapability> possibleCapabilities
-                = parseCapabilities(colonLessCapabilities);
+        final Set<PrefixedCapability> possibleCapabilities = CapUtils.parseCapabilities(
+                rawCapabilities);
 
-        mCapObserver.onCapabilitiesLsResponse(target, possibleCapabilities);
+        notifyObservers(new Consumer<CapObserver>() {
+            @Override
+            public void apply(final CapObserver capObserver) {
+                capObserver.onCapabilitiesLsResponse(target, possibleCapabilities);
+            }
+        });
     }
 
     private void parseAck(final String target, final List<String> parsedArray) {
         final String rawCapabilities = parsedArray.get(0);
-        final String colonLessCapabilities = ParseUtils.removeInitialColonIfExists(rawCapabilities);
-        final Set<ModifiedCapability> capabilities = parseCapabilities(colonLessCapabilities);
+        final Set<PrefixedCapability> capabilities = CapUtils.parseCapabilities(rawCapabilities);
 
-        mCapObserver.onCapabilitiesAccepted(target, capabilities);
+        notifyObservers(new Consumer<CapObserver>() {
+            @Override
+            public void apply(final CapObserver capObserver) {
+                capObserver.onCapabilitiesAccepted(target, capabilities);
+            }
+        });
     }
 
     private void parseNak(final String prefix, final List<String> parsedArray) {
         // TODO - this needs to be done
     }
 
-    public static enum Modifier {
-        DISABLE('-'),
-        ACK('~'),
-        STICKY('=');
-
-        private final char mModifier;
-
-        private Modifier(final char modifier) {
-            mModifier = modifier;
-        }
-
-        public static Pair<String, Modifier> consumeModifier(final String modifiedString) {
-            for (final Modifier modifier : Modifier.values()) {
-                if (modifiedString.charAt(0) == modifier.getModifier()) {
-                    return Pair.of(modifiedString.substring(1), modifier);
-                }
-            }
-            return Pair.of(modifiedString, null);
-        }
-
-        public char getModifier() {
-            return mModifier;
-        }
-    }
-
     public static interface CapObserver {
 
         public void onCapabilitiesLsResponse(final String target,
-                final Set<ModifiedCapability> capabilities);
+                final Set<PrefixedCapability> capabilities);
 
-        public void onCapabilitiesAccepted(String target, Set<ModifiedCapability> capabilities);
-    }
-
-    public static final class ModifiedCapability {
-
-        private final Modifier mModifier;
-
-        private final Capability mCapability;
-
-        public ModifiedCapability(final Modifier modifier, final Capability capability) {
-            mModifier = modifier;
-            mCapability = capability;
-        }
-
-        public Modifier getModifier() {
-            return mModifier;
-        }
-
-        public Capability getCapability() {
-            return mCapability;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            } else if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            final ModifiedCapability that = (ModifiedCapability) o;
-            return mCapability == that.mCapability;
-        }
-
-        @Override
-        public int hashCode() {
-            return mCapability != null ? mCapability.hashCode() : 0;
-        }
+        public void onCapabilitiesAccepted(final String target,
+                final Set<PrefixedCapability> capabilities);
     }
 }

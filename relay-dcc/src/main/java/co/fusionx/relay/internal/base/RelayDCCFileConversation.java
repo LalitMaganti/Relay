@@ -1,4 +1,4 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.internal.base;
 
 import com.google.common.collect.ImmutableList;
 
@@ -11,7 +11,6 @@ import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.event.file.DCCFileEvent;
 import co.fusionx.relay.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.event.Event;
-import co.fusionx.relay.internal.base.AbstractConversation;
 import co.fusionx.relay.internal.core.Postable;
 import co.fusionx.relay.internal.sender.PacketSender;
 

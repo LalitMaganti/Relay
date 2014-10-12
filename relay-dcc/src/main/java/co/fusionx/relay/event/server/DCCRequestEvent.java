@@ -1,8 +1,7 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.base.RelayDCCPendingConnection;
+import co.fusionx.relay.internal.base.RelayDCCPendingConnection;
 import co.fusionx.relay.conversation.Server;
-import co.fusionx.relay.event.Event;
 
 public abstract class DCCRequestEvent extends ServerEvent {
 

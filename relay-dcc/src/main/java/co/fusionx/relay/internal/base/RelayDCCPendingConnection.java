@@ -1,7 +1,7 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.internal.base;
 
 import co.fusionx.relay.core.DCCManager;
-import co.fusionx.relay.core.InternalDCCManager;
+import co.fusionx.relay.internal.core.InternalDCCManager;
 
 public class RelayDCCPendingConnection {
 

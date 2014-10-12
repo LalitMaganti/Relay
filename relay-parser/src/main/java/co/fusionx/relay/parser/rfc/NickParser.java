@@ -15,6 +15,7 @@ public class NickParser implements CommandParser {
     @Override
     public void parseCommand(final List<String> parsedArray, final String prefix) {
         final String newNick = parsedArray.get(0);
+
         mNickObserver.onNick(prefix, newNick);
     }
 

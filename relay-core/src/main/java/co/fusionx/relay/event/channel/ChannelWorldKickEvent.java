@@ -11,19 +11,19 @@ public class ChannelWorldKickEvent extends ChannelWorldUserEvent {
 
     public final UserLevel level;
 
-    public final Nick kickingNick;
+    public final Optional<? extends ChannelUser> kickingUser;
 
     public final String kickingNickString;
 
-    public final String reason;
+    public final Optional<String> reason;
 
     public ChannelWorldKickEvent(final Channel channel, final ChannelUser kickedUser,
             final UserLevel level, final Optional<? extends ChannelUser> optKickingUser,
-            final String kickingNickString, final String reason) {
+            final String kickingNickString, final Optional<String> reason) {
         super(channel, kickedUser);
 
         this.level = level;
-        this.kickingNick = optKickingUser.transform(ChannelUser::getNick).orNull();
+        this.kickingUser = optKickingUser;
         this.kickingNickString = kickingNickString;
         this.reason = reason;
     }

@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.base.RelayRelayDCCPendingChatConnection;
+import co.fusionx.relay.internal.base.RelayRelayDCCPendingChatConnection;
 import co.fusionx.relay.conversation.Server;
 
 public class DCCChatRequestEvent extends DCCRequestEvent {

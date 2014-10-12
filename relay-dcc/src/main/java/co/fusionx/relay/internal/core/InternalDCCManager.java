@@ -1,11 +1,12 @@
-package co.fusionx.relay.core;
+package co.fusionx.relay.internal.core;
 
 import java.io.File;
 
-import co.fusionx.relay.base.RelayDCCFileConversation;
-import co.fusionx.relay.base.RelayDCCPendingConnection;
-import co.fusionx.relay.base.RelayDCCPendingSendConnection;
-import co.fusionx.relay.base.RelayRelayDCCPendingChatConnection;
+import co.fusionx.relay.core.DCCManager;
+import co.fusionx.relay.internal.base.RelayDCCFileConversation;
+import co.fusionx.relay.internal.base.RelayDCCPendingConnection;
+import co.fusionx.relay.internal.base.RelayDCCPendingSendConnection;
+import co.fusionx.relay.internal.base.RelayRelayDCCPendingChatConnection;
 
 public interface InternalDCCManager extends DCCManager {
 

@@ -1,7 +1,7 @@
 package co.fusionx.relay.event.file;
 
-import co.fusionx.relay.base.RelayDCCFileConversation;
-import co.fusionx.relay.base.RelayDCCGetConnection;
+import co.fusionx.relay.internal.base.RelayDCCFileConversation;
+import co.fusionx.relay.internal.base.RelayDCCGetConnection;
 
 public class DCCFileGetStartedEvent extends DCCFileEvent {
 

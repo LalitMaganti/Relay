@@ -4,23 +4,17 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import co.fusionx.relay.configuration.ConnectionConfiguration;
+import co.fusionx.relay.constant.CapModifier;
 import co.fusionx.relay.constant.Capability;
+import co.fusionx.relay.constant.PrefixedCapability;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.sender.CapSender;
+import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.parser.ircv3.CapParser;
-import co.fusionx.relay.util.ParseUtils;
-
-import static co.fusionx.relay.constant.Capability.SASL;
-import static co.fusionx.relay.constant.Capability.parseCapability;
 
 public class CapStateChanger implements CapParser.CapObserver {
 
@@ -30,57 +24,23 @@ public class CapStateChanger implements CapParser.CapObserver {
 
     private final CapSender mCapSender;
 
-    private Set<CapParser.ModifiedCapability> mPossibleCapabilities;
+    private Set<PrefixedCapability> mPossibleCapabilities;
 
-    @Inject
     public CapStateChanger(final ConnectionConfiguration configuration, final InternalServer server,
-            final CapSender sender) {
-        mPossibleCapabilities = new HashSet<>();
-
+            final PacketSender sender) {
         mServer = server;
         mConnectionConfiguration = configuration;
-        mCapSender = sender;
-    }
 
-    public static Set<CapParser.ModifiedCapability> parseCapabilities(final String caps) {
-        final Set<CapParser.ModifiedCapability> capabilitySet = new HashSet<>();
-        final List<String> capabilities = ParseUtils.splitRawLine(caps, false);
-
-        for (final String capability : capabilities) {
-            final Pair<String, CapParser.Modifier> pair = CapParser.Modifier
-                    .consumeModifier(capability);
-            final Capability capCapability = parseCapability(pair.getLeft());
-            if (capCapability == null) {
-                continue;
-            }
-            capabilitySet.add(new CapParser.ModifiedCapability(pair.getRight(), capCapability));
-        }
-
-        return capabilitySet;
-    }
-
-    public boolean serverHasCapability(final Capability capability) {
-        for (final CapParser.ModifiedCapability modifiedCapability : mPossibleCapabilities) {
-            if (modifiedCapability.getCapability() == capability) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private String joinNonSaslCapabilities(final Set<CapParser.ModifiedCapability> capabilities) {
-        return FluentIterable.from(capabilities)
-                .filter(c -> c.getCapability() != SASL)
-                .transform(c -> c.getCapability().getCapabilityString())
-                .join(Joiner.on(' '));
+        mPossibleCapabilities = new HashSet<>();
+        mCapSender = new CapSender(sender);
     }
 
     @Override
     public void onCapabilitiesLsResponse(final String target,
-            final Set<CapParser.ModifiedCapability> capabilities) {
+            final Set<PrefixedCapability> capabilities) {
         mPossibleCapabilities.addAll(capabilities);
 
-        final boolean hasSasl = serverHasCapability(SASL);
+        final boolean hasSasl = isCapabilityPossible(Capability.SASL);
 
         // We attempt to request every CAP capability we know about (with the exception of SASL)
         // before we try anything else
@@ -97,21 +57,28 @@ public class CapStateChanger implements CapParser.CapObserver {
     // - fix in the future
     @Override
     public void onCapabilitiesAccepted(final String target,
-            final Set<CapParser.ModifiedCapability> capabilities) {
+            final Set<PrefixedCapability> capabilities) {
         if (capabilities.size() == 1) {
-            final CapParser.ModifiedCapability modCap = Iterables.getLast(capabilities);
+            final PrefixedCapability modCap = Iterables.getLast(capabilities);
             if (modCap.getCapability() == Capability.SASL &&
-                    modCap.getModifier() != CapParser.Modifier.DISABLE) {
+                    modCap.getCapModifier() != CapModifier.DISABLE) {
+                // If there is only one capability and it's SASL which isn't being disabled,
+                // then send a plain SASL request
                 mCapSender.sendPlainAuthenticationRequest();
                 return;
             }
         }
 
-        for (final CapParser.ModifiedCapability capability : capabilities) {
-            mServer.addCapability(capability.getCapability());
+        for (final PrefixedCapability capability : capabilities) {
+            if (capability.getCapModifier() != CapModifier.DISABLE) {
+                // For every capability which is not disabled, add the capability to the server
+                mServer.addCapability(capability.getCapability());
+            }
         }
 
-        final boolean hasSasl = serverHasCapability(SASL);
+        // If the server can SASL and we can send it, then request it.  Otherwise end capability
+        // negotiation
+        final boolean hasSasl = isCapabilityPossible(Capability.SASL);
         if (hasSasl && mConnectionConfiguration.shouldSendSasl()) {
             mCapSender.sendRequestSasl();
         } else {
@@ -119,37 +86,19 @@ public class CapStateChanger implements CapParser.CapObserver {
         }
     }
 
-    /*
-    @Override
-    public void parseCommand(final List<String> parsedArray, final String prefix) {
-        final String argument = parsedArray.get(0);
-        switch (argument) {
-            case "+":
-                final String username = mConnectionConfiguration.getSaslUsername();
-                final String password = mConnectionConfiguration.getSaslPassword();
-                mCapSender.sendSaslPlainAuthentication(username, password);
-                break;
+    public boolean isCapabilityPossible(final Capability capability) {
+        for (final PrefixedCapability prefixedCapability : mPossibleCapabilities) {
+            if (prefixedCapability.getCapability() == capability) {
+                return true;
+            }
         }
+        return false;
     }
 
-    @Override
-    public void parseReplyCode(final List<String> parsedArray, final int code) {
-        switch (code) {
-            case ReplyCodes.RPL_SASL_LOGGED_IN:
-                final String loginMessage = parsedArray.get(2);
-                mServer.postEvent(new GenericServerEvent(mServer, loginMessage));
-                break;
-            case ReplyCodes.RPL_SASL_SUCCESSFUL:
-                final String successful = parsedArray.get(0);
-                mServer.postEvent(new GenericServerEvent(mServer, successful));
-                break;
-            case ReplyCodes.ERR_SASL_FAIL:
-            case ReplyCodes.ERR_SASL_TOO_LONG:
-                final String error = parsedArray.get(0);
-                mServer.postEvent(new GenericServerEvent(mServer, error));
-                break;
-        }
-        mCapSender.sendEnd();
+    private String joinNonSaslCapabilities(final Set<PrefixedCapability> capabilities) {
+        return FluentIterable.from(capabilities)
+                .filter(c -> c.getCapability() != Capability.SASL)
+                .transform(c -> c.getCapability().getCapabilityString())
+                .join(Joiner.on(' '));
     }
-    */
 }

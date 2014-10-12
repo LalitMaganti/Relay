@@ -2,24 +2,31 @@ package co.fusionx.relay.internal.provider;
 
 import javax.inject.Inject;
 
+import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.statechanger.rfc.InviteStateChanger;
-import co.fusionx.relay.internal.statechanger.rfc.MotdStateChanger;
-import co.fusionx.relay.internal.statechanger.rfc.PartStateChanger;
-import co.fusionx.relay.internal.statechanger.rfc.PingStateChanger;
 import co.fusionx.relay.internal.sender.PacketSender;
+import co.fusionx.relay.internal.statechanger.ircv3.CapStateChanger;
+import co.fusionx.relay.internal.statechanger.ircv3.SaslStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.InviteStateChanger;
 import co.fusionx.relay.internal.statechanger.rfc.JoinStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.KickStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.MotdStateChanger;
 import co.fusionx.relay.internal.statechanger.rfc.NameStateChanger;
 import co.fusionx.relay.internal.statechanger.rfc.NickStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.PartStateChanger;
+import co.fusionx.relay.internal.statechanger.rfc.PingStateChanger;
 import co.fusionx.relay.internal.statechanger.rfc.QuitStateChanger;
 import co.fusionx.relay.internal.statechanger.rfc.TopicCodeStateChanger;
 import co.fusionx.relay.internal.statechanger.rfc.TopicStateChanger;
+import co.fusionx.relay.parser.ircv3.CapParser;
 import co.fusionx.relay.parser.ircv3.NickPrefixNameParser;
+import co.fusionx.relay.parser.ircv3.SaslParser;
 import co.fusionx.relay.parser.rfc.InviteParser;
-import co.fusionx.relay.parser.rfc.MotdParser;
 import co.fusionx.relay.parser.rfc.JoinParser;
+import co.fusionx.relay.parser.rfc.KickParser;
+import co.fusionx.relay.parser.rfc.MotdParser;
 import co.fusionx.relay.parser.rfc.NickParser;
 import co.fusionx.relay.parser.rfc.PartParser;
 import co.fusionx.relay.parser.rfc.PingParser;
@@ -37,6 +44,9 @@ public class ParserObserverProvider {
 
     private final PacketSender mPacketSender;
 
+    // Derived fields
+    private final ConnectionConfiguration mConnectionConfiguration;
+
     @Inject
     public ParserObserverProvider(final InternalServer internalServer,
             final InternalUserChannelGroup userChannelGroup,
@@ -46,6 +56,8 @@ public class ParserObserverProvider {
         mUserChannelGroup = userChannelGroup;
         mQueryUserGroup = queryUserGroup;
         mPacketSender = packetSender;
+
+        mConnectionConfiguration = internalServer.getConfiguration().getConnectionConfiguration();
     }
 
     public InviteParser.InviteObserver getInviteObserver() {
@@ -54,6 +66,10 @@ public class ParserObserverProvider {
 
     public JoinParser.JoinObserver getJoinObserver() {
         return new JoinStateChanger(mInternalServer, mUserChannelGroup);
+    }
+
+    public KickParser.KickObserver getKickObserver() {
+        return new KickStateChanger(mInternalServer, mUserChannelGroup);
     }
 
     public NickParser.NickObserver getNickProvider() {
@@ -87,5 +103,14 @@ public class ParserObserverProvider {
 
     public TopicCodeParser.TopicCodeObserver getTopicCodeObserver() {
         return new TopicCodeStateChanger(mInternalServer, mUserChannelGroup);
+    }
+
+    // IRCv3 observers
+    public CapParser.CapObserver getCapObserver() {
+        return new CapStateChanger(mConnectionConfiguration, mInternalServer, mPacketSender);
+    }
+
+    public SaslParser.SaslObserver getSaslObserver() {
+        return new SaslStateChanger(mConnectionConfiguration, mInternalServer, mPacketSender);
     }
 }

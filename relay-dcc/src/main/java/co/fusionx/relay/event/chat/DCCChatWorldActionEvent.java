@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.chat;
 
-import co.fusionx.relay.base.RelayDCCChatConversation;
+import co.fusionx.relay.internal.base.RelayDCCChatConversation;
 
 public class DCCChatWorldActionEvent extends DCCChatEvent {
 

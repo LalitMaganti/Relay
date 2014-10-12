@@ -1,8 +1,8 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.internal.base;
 
 import java.io.File;
 
-import co.fusionx.relay.core.InternalDCCManager;
+import co.fusionx.relay.internal.core.InternalDCCManager;
 
 public class RelayDCCPendingSendConnection extends RelayDCCPendingConnection {
 

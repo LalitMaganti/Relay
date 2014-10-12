@@ -1,4 +1,4 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.internal.base;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

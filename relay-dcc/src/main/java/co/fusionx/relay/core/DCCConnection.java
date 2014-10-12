@@ -3,7 +3,7 @@ package co.fusionx.relay.core;
 import java.io.IOException;
 import java.net.Socket;
 
-import co.fusionx.relay.base.RelayDCCPendingConnection;
+import co.fusionx.relay.internal.base.RelayDCCPendingConnection;
 
 public abstract class DCCConnection {
 

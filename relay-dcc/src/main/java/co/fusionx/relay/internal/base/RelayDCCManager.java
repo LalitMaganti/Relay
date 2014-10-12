@@ -1,4 +1,4 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.internal.base;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -19,9 +19,9 @@ import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.file.DCCFileConversationStartedEvent;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.internal.core.InternalDCCManager;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.core.Postable;
-import co.fusionx.relay.core.InternalDCCManager;
 import co.fusionx.relay.internal.sender.PacketSender;
 
 public class RelayDCCManager implements InternalDCCManager {

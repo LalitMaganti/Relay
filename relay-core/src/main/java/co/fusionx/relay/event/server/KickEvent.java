@@ -14,11 +14,11 @@ public class KickEvent extends ServerEvent {
 
     public final String kickingNickString;
 
-    public final String reason;
+    public final Optional<String> reason;
 
     public KickEvent(final Server server, final Channel channel,
             final Optional<? extends ChannelUser> optKickingUser, final String kickingNickString,
-            final String reason) {
+            final Optional<String> reason) {
         super(server);
 
         this.channel = channel;

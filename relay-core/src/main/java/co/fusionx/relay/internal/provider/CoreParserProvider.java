@@ -8,9 +8,12 @@ import co.fusionx.relay.internal.constants.Commands;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ParserProvider;
 import co.fusionx.relay.parser.ReplyCodeParser;
+import co.fusionx.relay.parser.ircv3.CapParser;
 import co.fusionx.relay.parser.ircv3.NickPrefixNameParser;
+import co.fusionx.relay.parser.ircv3.SaslParser;
 import co.fusionx.relay.parser.rfc.InviteParser;
 import co.fusionx.relay.parser.rfc.JoinParser;
+import co.fusionx.relay.parser.rfc.KickParser;
 import co.fusionx.relay.parser.rfc.MotdParser;
 import co.fusionx.relay.parser.rfc.NickParser;
 import co.fusionx.relay.parser.rfc.PartParser;
@@ -31,13 +34,21 @@ public class CoreParserProvider implements ParserProvider {
     public Map<String, CommandParser> getCommandParsers() {
         final HashMap<String, CommandParser> map = new HashMap<>();
 
+        // RFC
         map.put(Commands.INVITE, new InviteParser(mParserObserverProvider.getInviteObserver()));
         map.put(Commands.JOIN, new JoinParser(mParserObserverProvider.getJoinObserver()));
+        map.put(Commands.KICK, new KickParser()
+                .addObserver(mParserObserverProvider.getKickObserver()));
         map.put(Commands.NICK, new NickParser(mParserObserverProvider.getNickProvider()));
         map.put(Commands.PART, new PartParser(mParserObserverProvider.getPartObserver()));
         map.put(Commands.PING, new PingParser(mParserObserverProvider.getPingObserver()));
         map.put(Commands.TOPIC, new TopicParser(mParserObserverProvider.getTopicObserver()));
         map.put(Commands.QUIT, new QuitParser(mParserObserverProvider.getQuitObserver()));
+
+        // IRCv3
+        map.put(Commands.CAP, new CapParser()
+                .addObserver(mParserObserverProvider.getCapObserver()));
+        map.put(Commands.AUTHENTICATE, new SaslParser(mParserObserverProvider.getSaslObserver()));
 
         return map;
     }

@@ -2,9 +2,9 @@ package co.fusionx.relay.core;
 
 import java.util.Collection;
 
-import co.fusionx.relay.base.RelayDCCChatConversation;
-import co.fusionx.relay.base.RelayDCCFileConversation;
-import co.fusionx.relay.base.RelayDCCPendingConnection;
+import co.fusionx.relay.internal.base.RelayDCCChatConversation;
+import co.fusionx.relay.internal.base.RelayDCCFileConversation;
+import co.fusionx.relay.internal.base.RelayDCCPendingConnection;
 
 public interface DCCManager {
 

@@ -1,16 +1,15 @@
-package co.fusionx.relay.base;
+package co.fusionx.relay.internal.base;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.core.InternalDCCChatConversation;
+import co.fusionx.relay.internal.core.InternalDCCChatConversation;
 import co.fusionx.relay.core.LibraryUser;
 import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.chat.DCCChatEvent;
 import co.fusionx.relay.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.event.chat.DCCChatSelfMessageEvent;
-import co.fusionx.relay.internal.base.AbstractConversation;
 import co.fusionx.relay.internal.core.Postable;
 
 public class RelayDCCChatConversation extends AbstractConversation<DCCChatEvent>
