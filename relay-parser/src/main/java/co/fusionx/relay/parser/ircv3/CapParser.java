@@ -1,9 +1,7 @@
 package co.fusionx.relay.parser.ircv3;
 
-import com.google.common.collect.FluentIterable;
-
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,30 +10,29 @@ import co.fusionx.relay.constant.CapCommand;
 import co.fusionx.relay.constant.PrefixedCapability;
 import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.function.DualConsumer;
-import co.fusionx.relay.function.FluentIterables;
 import co.fusionx.relay.parser.CommandParser;
+import co.fusionx.relay.parser.ObserverHelper;
 import co.fusionx.relay.util.CapUtils;
 
 public class CapParser implements CommandParser {
 
-    private final Map<CapCommand, DualConsumer<String, List<String>>> mCapCommandMap;
+    private final Map<CapCommand, DualConsumer<String, List<String>>> mCapCommandMap
+            = new HashMap<>();
 
-    private final Set<CapObserver> mCapObservers;
+    private final ObserverHelper<CapObserver> mObserverHelper = new ObserverHelper<>();
 
     public CapParser() {
-        mCapObservers = new HashSet<>();
-
-        mCapCommandMap = new HashMap<>();
         initializeCommandMap(mCapCommandMap);
     }
 
     public CapParser addObserver(final CapObserver observer) {
-        mCapObservers.add(observer);
+        mObserverHelper.addObserver(observer);
         return this;
     }
 
-    private void notifyObservers(final Consumer<CapObserver> consumer) {
-        FluentIterables.forEach(FluentIterable.from(mCapObservers), consumer);
+    public CapParser addObservers(final Collection<? extends CapObserver> observers) {
+        mObserverHelper.addObservers(observers);
+        return this;
     }
 
     private void initializeCommandMap(final Map<CapCommand, DualConsumer<String,
@@ -78,7 +75,7 @@ public class CapParser implements CommandParser {
         final Set<PrefixedCapability> possibleCapabilities = CapUtils.parseCapabilities(
                 rawCapabilities);
 
-        notifyObservers(new Consumer<CapObserver>() {
+        mObserverHelper.notifyObservers(new Consumer<CapObserver>() {
             @Override
             public void apply(final CapObserver capObserver) {
                 capObserver.onCapabilitiesLsResponse(target, possibleCapabilities);
@@ -90,7 +87,7 @@ public class CapParser implements CommandParser {
         final String rawCapabilities = parsedArray.get(0);
         final Set<PrefixedCapability> capabilities = CapUtils.parseCapabilities(rawCapabilities);
 
-        notifyObservers(new Consumer<CapObserver>() {
+        mObserverHelper.notifyObservers(new Consumer<CapObserver>() {
             @Override
             public void apply(final CapObserver capObserver) {
                 capObserver.onCapabilitiesAccepted(target, capabilities);

@@ -2,18 +2,26 @@ package co.fusionx.relay.parser.rfc;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.constant.ReplyCodes;
+import co.fusionx.relay.function.Consumer;
+import co.fusionx.relay.parser.ObserverHelper;
 import co.fusionx.relay.parser.ReplyCodeParser;
-import co.fusionx.relay.util.ParseUtils;
 
 public class TopicCodeParser implements ReplyCodeParser {
 
-    private final TopicCodeObserver mTopicCodeObserver;
+    public final ObserverHelper<TopicCodeObserver> mObserverHelper = new ObserverHelper<>();
 
-    public TopicCodeParser(final TopicCodeObserver topicCodeObserver) {
-        mTopicCodeObserver = topicCodeObserver;
+    public TopicCodeParser addObserver(final TopicCodeObserver wallopsObserver) {
+        mObserverHelper.addObserver(wallopsObserver);
+        return this;
+    }
+
+    public TopicCodeParser addObservers(final Collection<? extends TopicCodeObserver> observers) {
+        mObserverHelper.addObservers(observers);
+        return this;
     }
 
     @Override
@@ -34,7 +42,12 @@ public class TopicCodeParser implements ReplyCodeParser {
         final String channelName = parsedArray.get(0);
         final String topic = parsedArray.get(1);
 
-        mTopicCodeObserver.onTopic(channelName, topic);
+        mObserverHelper.notifyObservers(new Consumer<TopicCodeObserver>() {
+            @Override
+            public void apply(final TopicCodeObserver observer) {
+                observer.onTopic(channelName, topic);
+            }
+        });
     }
 
     private void onTopicInfo(final List<String> parsedArray) {
@@ -42,7 +55,12 @@ public class TopicCodeParser implements ReplyCodeParser {
         final String topicSetterPrefix = parsedArray.get(1);
         final String epochTime = parsedArray.get(2);
 
-        mTopicCodeObserver.onTopicInfo(channelName, topicSetterPrefix, epochTime);
+        mObserverHelper.notifyObservers(new Consumer<TopicCodeObserver>() {
+            @Override
+            public void apply(final TopicCodeObserver observer) {
+                observer.onTopicInfo(channelName, topicSetterPrefix, epochTime);
+            }
+        });
     }
 
     public static interface TopicCodeObserver {

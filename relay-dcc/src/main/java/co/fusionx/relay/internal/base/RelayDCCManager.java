@@ -120,7 +120,7 @@ public class RelayDCCManager implements InternalDCCManager {
     }
 
     @Override
-    public void acceptDCCConnection(final RelayRelayDCCPendingChatConnection connection) {
+    public void acceptDCCConnection(final RelayDCCPendingChatConnection connection) {
         if (!mPendingConnections.contains(connection)) {
             // TODO - Maybe send an event instead?
             mSessionConfiguration.getSettingsProvider()

@@ -2,6 +2,7 @@ package co.fusionx.relay.parser;
 
 import com.google.common.collect.FluentIterable;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +15,10 @@ public class ObserverHelper<T> {
 
     public void addObserver(final T observer) {
         mObservers.add(observer);
+    }
+
+    public void addObservers(final Collection<? extends T> observers) {
+        mObservers.addAll(observers);
     }
 
     public void notifyObservers(final Consumer<T> consumer) {

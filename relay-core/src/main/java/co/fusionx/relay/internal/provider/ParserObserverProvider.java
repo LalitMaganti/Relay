@@ -1,5 +1,9 @@
 package co.fusionx.relay.internal.provider;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+
 import javax.inject.Inject;
 
 import co.fusionx.relay.configuration.ConnectionConfiguration;
@@ -60,57 +64,59 @@ public class ParserObserverProvider {
         mConnectionConfiguration = internalServer.getConfiguration().getConnectionConfiguration();
     }
 
-    public InviteParser.InviteObserver getInviteObserver() {
-        return new InviteStateChanger(mInternalServer);
+    public List<? extends InviteParser.InviteObserver> getInviteObservers() {
+        return ImmutableList.of(new InviteStateChanger(mInternalServer));
     }
 
-    public JoinParser.JoinObserver getJoinObserver() {
-        return new JoinStateChanger(mInternalServer, mUserChannelGroup);
+    public List<? extends JoinParser.JoinObserver> getJoinObservers() {
+        return ImmutableList.of(new JoinStateChanger(mInternalServer, mUserChannelGroup));
     }
 
-    public KickParser.KickObserver getKickObserver() {
-        return new KickStateChanger(mInternalServer, mUserChannelGroup);
+    public List<? extends KickParser.KickObserver> getKickObservers() {
+        return ImmutableList.of(new KickStateChanger(mInternalServer, mUserChannelGroup));
     }
 
-    public NickParser.NickObserver getNickProvider() {
-        return new NickStateChanger(mInternalServer, mUserChannelGroup);
+    public List<? extends NickParser.NickObserver> getNickObservers() {
+        return ImmutableList.of(new NickStateChanger(mInternalServer, mUserChannelGroup));
     }
 
-    public PartParser.PartObserver getPartObserver() {
-        return new PartStateChanger(mInternalServer, mUserChannelGroup);
+    public List<? extends PartParser.PartObserver> getPartObservers() {
+        return ImmutableList.of(new PartStateChanger(mInternalServer, mUserChannelGroup));
     }
 
-    public PingParser.PingObserver getPingObserver() {
-        return new PingStateChanger(mPacketSender);
+    public List<? extends PingParser.PingObserver> getPingObservers() {
+        return ImmutableList.of(new PingStateChanger(mPacketSender));
     }
 
-    public TopicParser.TopicObserver getTopicObserver() {
-        return new TopicStateChanger(mInternalServer, mUserChannelGroup);
+    public List<? extends TopicParser.TopicObserver> getTopicObservers() {
+        return ImmutableList.of(new TopicStateChanger(mInternalServer, mUserChannelGroup));
     }
 
-    public QuitParser.QuitObserver getQuitObserver() {
-        return new QuitStateChanger(mUserChannelGroup, mQueryUserGroup);
+    public List<? extends QuitParser.QuitObserver> getQuitObservers() {
+        return ImmutableList.of(new QuitStateChanger(mUserChannelGroup, mQueryUserGroup));
     }
 
     // Reply code parser observers
-    public MotdParser.MotdObserver getMotdObserver() {
-        return new MotdStateChanger(mInternalServer);
+    public List<? extends MotdParser.MotdObserver> getMotdObservers() {
+        return ImmutableList.of(new MotdStateChanger(mInternalServer));
     }
 
-    public NickPrefixNameParser.NickPrefixNameObserver getNickPrefixNameObserver() {
-        return new NameStateChanger(mUserChannelGroup);
+    public List<? extends NickPrefixNameParser.NickPrefixNameObserver> getNickPrefixNameObservers() {
+        return ImmutableList.of(new NameStateChanger(mUserChannelGroup));
     }
 
-    public TopicCodeParser.TopicCodeObserver getTopicCodeObserver() {
-        return new TopicCodeStateChanger(mInternalServer, mUserChannelGroup);
+    public List<? extends TopicCodeParser.TopicCodeObserver> getTopicCodeObservers() {
+        return ImmutableList.of(new TopicCodeStateChanger(mInternalServer, mUserChannelGroup));
     }
 
     // IRCv3 observers
-    public CapParser.CapObserver getCapObserver() {
-        return new CapStateChanger(mConnectionConfiguration, mInternalServer, mPacketSender);
+    public List<? extends CapParser.CapObserver> getCapObservers() {
+        return ImmutableList.of(new CapStateChanger(mConnectionConfiguration, mInternalServer,
+                mPacketSender));
     }
 
-    public SaslParser.SaslObserver getSaslObserver() {
-        return new SaslStateChanger(mConnectionConfiguration, mInternalServer, mPacketSender);
+    public List<? extends SaslParser.SaslObserver> getSaslObservers() {
+        return ImmutableList.of(new SaslStateChanger(mConnectionConfiguration, mInternalServer,
+                mPacketSender));
     }
 }

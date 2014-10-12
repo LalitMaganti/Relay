@@ -2,18 +2,27 @@ package co.fusionx.relay.parser.ircv3;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.constant.ReplyCodes;
+import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
+import co.fusionx.relay.parser.ObserverHelper;
 import co.fusionx.relay.parser.ReplyCodeParser;
 
 public class SaslParser implements CommandParser, ReplyCodeParser {
 
-    private final SaslParser.SaslObserver mSaslObserver;
+    public final ObserverHelper<SaslObserver> mObserverHelper = new ObserverHelper<>();
 
-    public SaslParser(final SaslObserver saslObserver) {
-        mSaslObserver = saslObserver;
+    public SaslParser addObserver(final SaslObserver observer) {
+        mObserverHelper.addObserver(observer);
+        return this;
+    }
+
+    public SaslParser addObservers(final Collection<? extends SaslObserver> observers) {
+        mObserverHelper.addObservers(observers);
+        return this;
     }
 
     @Override
@@ -21,7 +30,12 @@ public class SaslParser implements CommandParser, ReplyCodeParser {
         final String argument = parsedArray.get(0);
         switch (argument) {
             case "+":
-                mSaslObserver.onAuthenticatePlus();
+                mObserverHelper.notifyObservers(new Consumer<SaslObserver>() {
+                    @Override
+                    public void apply(final SaslObserver observer) {
+                        observer.onAuthenticatePlus();
+                    }
+                });
                 break;
         }
     }
@@ -31,16 +45,31 @@ public class SaslParser implements CommandParser, ReplyCodeParser {
         switch (code) {
             case ReplyCodes.RPL_SASL_LOGGED_IN:
                 final String loginMessage = parsedArray.get(2);
-                mSaslObserver.onLoggedIn(loginMessage);
+                mObserverHelper.notifyObservers(new Consumer<SaslObserver>() {
+                    @Override
+                    public void apply(final SaslObserver observer) {
+                        observer.onLoggedIn(loginMessage);
+                    }
+                });
                 break;
             case ReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String message = parsedArray.get(0);
-                mSaslObserver.onSuccess(message);
+                mObserverHelper.notifyObservers(new Consumer<SaslObserver>() {
+                    @Override
+                    public void apply(final SaslObserver observer) {
+                        observer.onSuccess(message);
+                    }
+                });
                 break;
             case ReplyCodes.ERR_SASL_FAIL:
             case ReplyCodes.ERR_SASL_TOO_LONG:
                 final String error = parsedArray.get(0);
-                mSaslObserver.onError(error);
+                mObserverHelper.notifyObservers(new Consumer<SaslObserver>() {
+                    @Override
+                    public void apply(final SaslObserver observer) {
+                        observer.onError(error);
+                    }
+                });
                 break;
         }
     }

@@ -35,20 +35,28 @@ public class CoreParserProvider implements ParserProvider {
         final HashMap<String, CommandParser> map = new HashMap<>();
 
         // RFC
-        map.put(Commands.INVITE, new InviteParser(mParserObserverProvider.getInviteObserver()));
-        map.put(Commands.JOIN, new JoinParser(mParserObserverProvider.getJoinObserver()));
-        map.put(Commands.KICK, new KickParser()
-                .addObserver(mParserObserverProvider.getKickObserver()));
-        map.put(Commands.NICK, new NickParser(mParserObserverProvider.getNickProvider()));
-        map.put(Commands.PART, new PartParser(mParserObserverProvider.getPartObserver()));
-        map.put(Commands.PING, new PingParser(mParserObserverProvider.getPingObserver()));
-        map.put(Commands.TOPIC, new TopicParser(mParserObserverProvider.getTopicObserver()));
-        map.put(Commands.QUIT, new QuitParser(mParserObserverProvider.getQuitObserver()));
+        map.put(Commands.INVITE,
+                new InviteParser().addObservers(mParserObserverProvider.getInviteObservers()));
+        map.put(Commands.JOIN,
+                new JoinParser().addObservers(mParserObserverProvider.getJoinObservers()));
+        map.put(Commands.KICK,
+                new KickParser().addObservers(mParserObserverProvider.getKickObservers()));
+        map.put(Commands.NICK,
+                new NickParser().addObservers(mParserObserverProvider.getNickObservers()));
+        map.put(Commands.PART,
+                new PartParser().addObservers(mParserObserverProvider.getPartObservers()));
+        map.put(Commands.PING,
+                new PingParser().addObservers(mParserObserverProvider.getPingObservers()));
+        map.put(Commands.TOPIC,
+                new TopicParser().addObservers(mParserObserverProvider.getTopicObservers()));
+        map.put(Commands.QUIT,
+                new QuitParser().addObservers(mParserObserverProvider.getQuitObservers()));
 
         // IRCv3
-        map.put(Commands.CAP, new CapParser()
-                .addObserver(mParserObserverProvider.getCapObserver()));
-        map.put(Commands.AUTHENTICATE, new SaslParser(mParserObserverProvider.getSaslObserver()));
+        map.put(Commands.CAP,
+                new CapParser().addObservers(mParserObserverProvider.getCapObservers()));
+        map.put(Commands.AUTHENTICATE,
+                new SaslParser().addObservers(mParserObserverProvider.getSaslObservers()));
 
         return map;
     }
@@ -57,18 +65,19 @@ public class CoreParserProvider implements ParserProvider {
     public Map<Integer, ReplyCodeParser> getReplyCodeParsers() {
         final HashMap<Integer, ReplyCodeParser> map = new HashMap<>();
 
-        final MotdParser motdParser = new MotdParser(mParserObserverProvider.getMotdObserver());
+        final MotdParser motdParser = new MotdParser()
+                .addObservers(mParserObserverProvider.getMotdObservers());
         map.put(ReplyCodes.RPL_MOTDSTART, motdParser);
         map.put(ReplyCodes.RPL_MOTD, motdParser);
         map.put(ReplyCodes.RPL_ENDOFMOTD, motdParser);
 
-        final NickPrefixNameParser nameParser = new NickPrefixNameParser(
-                mParserObserverProvider.getNickPrefixNameObserver());
+        final NickPrefixNameParser nameParser = new NickPrefixNameParser()
+                .addObservers(mParserObserverProvider.getNickPrefixNameObservers());
         map.put(ReplyCodes.RPL_NAMREPLY, nameParser);
         map.put(ReplyCodes.RPL_ENDOFNAMES, nameParser);
 
-        final TopicCodeParser topicCodeParser = new TopicCodeParser(mParserObserverProvider
-                .getTopicCodeObserver());
+        final TopicCodeParser topicCodeParser = new TopicCodeParser()
+                .addObservers(mParserObserverProvider.getTopicCodeObservers());
         map.put(ReplyCodes.RPL_TOPIC, topicCodeParser);
         map.put(ReplyCodes.RPL_TOPICWHOTIME, topicCodeParser);
 

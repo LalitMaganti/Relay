@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.parser;
+package co.fusionx.relay.internal.statechanger.rfc;
 
 import com.google.common.base.Optional;
 
@@ -8,7 +8,6 @@ import co.fusionx.relay.constant.ChannelPrefix;
 import co.fusionx.relay.event.channel.ChannelNoticeEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 import co.fusionx.relay.event.server.NoticeEvent;
-import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
@@ -16,9 +15,10 @@ import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.internal.parser.CTCPParser;
 import co.fusionx.relay.parser.CommandParser;
+import co.fusionx.relay.parser.rfc.NoticeParser;
 import co.fusionx.relay.util.ParseUtils;
 
-public class NoticeParser implements CommandParser {
+public class NoticeStateChanger implements NoticeParser.NoticeObserver {
 
     private final InternalServer mServer;
 
@@ -26,33 +26,22 @@ public class NoticeParser implements CommandParser {
 
     private final InternalQueryUserGroup mQueryManager;
 
-    private final CTCPParser mCTCPParser;
-
-    public NoticeParser(final InternalServer server,
+    public NoticeStateChanger(final InternalServer server,
             final InternalUserChannelGroup userChannelGroup,
-            final InternalQueryUserGroup queryManager, final CTCPParser ctcpParser) {
+            final InternalQueryUserGroup queryManager) {
         mServer = server;
         mUserChannelGroup = userChannelGroup;
         mQueryManager = queryManager;
-        mCTCPParser = ctcpParser;
     }
 
     @Override
-    public void parseCommand(final List<String> parsedArray, final String prefix) {
-        final String notice = parsedArray.get(1);
+    public void onNotice(final String prefix, final String recipient, final String notice) {
+        final String sendingNick = ParseUtils.getNickFromPrefix(prefix);
 
-        // Notices can be CTCP replies
-        if (CTCPParser.isCtcp(notice)) {
-            mCTCPParser.onParseReply(parsedArray, prefix);
-        } else {
-            final String sendingNick = ParseUtils.getNickFromPrefix(prefix);
-            final String recipient = parsedArray.get(0);
-
-            if (ChannelPrefix.isPrefix(recipient.charAt(0))) {
-                onParseChannelNotice(recipient, notice, sendingNick);
-            } else if (recipient.equals(mUserChannelGroup.getUser().getNick().getNickAsString())) {
-                onParseUserNotice(sendingNick, notice);
-            }
+        if (ChannelPrefix.isPrefix(recipient.charAt(0))) {
+            onParseChannelNotice(recipient, notice, sendingNick);
+        } else if (recipient.equals(mUserChannelGroup.getUser().getNick().getNickAsString())) {
+            onParseUserNotice(sendingNick, notice);
         }
     }
 

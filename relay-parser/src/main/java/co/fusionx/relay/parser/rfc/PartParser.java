@@ -2,16 +2,25 @@ package co.fusionx.relay.parser.rfc;
 
 import com.google.common.base.Optional;
 
+import java.util.Collection;
 import java.util.List;
 
+import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
+import co.fusionx.relay.parser.ObserverHelper;
 
 public class PartParser implements CommandParser {
 
-    private final PartObserver mPartObserver;
+    public final ObserverHelper<PartObserver> mObserverHelper = new ObserverHelper<>();
 
-    public PartParser(final PartObserver partObserver) {
-        mPartObserver = partObserver;
+    public PartParser addObserver(final PartObserver wallopsObserver) {
+        mObserverHelper.addObserver(wallopsObserver);
+        return this;
+    }
+
+    public PartParser addObservers(final Collection<? extends PartObserver> observers) {
+        mObserverHelper.addObservers(observers);
+        return this;
     }
 
     @Override
@@ -21,7 +30,12 @@ public class PartParser implements CommandParser {
 
         final Optional<String> optionalReason = Optional.fromNullable(reason);
 
-        mPartObserver.onPart(prefix, channelName, optionalReason);
+        mObserverHelper.notifyObservers(new Consumer<PartObserver>() {
+            @Override
+            public void apply(final PartObserver observer) {
+                observer.onPart(prefix, channelName, optionalReason);
+            }
+        });
     }
 
     public static interface PartObserver {

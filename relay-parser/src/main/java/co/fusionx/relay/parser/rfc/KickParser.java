@@ -2,6 +2,7 @@ package co.fusionx.relay.parser.rfc;
 
 import com.google.common.base.Optional;
 
+import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.function.Consumer;
@@ -14,6 +15,11 @@ public class KickParser implements CommandParser {
 
     public KickParser addObserver(final KickObserver wallopsObserver) {
         mObserverHelper.addObserver(wallopsObserver);
+        return this;
+    }
+
+    public KickParser addObservers(final Collection<? extends KickObserver> observers) {
+        mObserverHelper.addObservers(observers);
         return this;
     }
 

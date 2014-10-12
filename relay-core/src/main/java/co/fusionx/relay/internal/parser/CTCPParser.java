@@ -94,8 +94,8 @@ public class CTCPParser {
 
         Optionals.run(optChannel, channel -> {
             final Optional<InternalChannelUser> optUser = mUserChannelDao.getUser(sendingNick);
-            final boolean mention = MentionParser.onMentionableCommand(action,
-                    mUserChannelDao.getUser().getNick().getNickAsString());
+            final boolean mention = false;//MentionParser.onMentionableCommand(action,
+                    //mUserChannelDao.getUser().getNick().getNickAsString());
 
             final ChannelEvent event;
             if (optUser.isPresent()) {

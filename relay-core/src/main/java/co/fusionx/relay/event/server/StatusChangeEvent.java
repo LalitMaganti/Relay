@@ -4,7 +4,7 @@ import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.event.Event;
 
 // Empty class
-public class StatusChangeEvent extends Event<Server, ServerEvent> {
+public class StatusChangeEvent extends ServerEvent {
 
     public StatusChangeEvent(final Server server) {
         super(server);

@@ -2,16 +2,25 @@ package co.fusionx.relay.parser.rfc;
 
 import com.google.common.base.Optional;
 
+import java.util.Collection;
 import java.util.List;
 
+import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
+import co.fusionx.relay.parser.ObserverHelper;
 
 public class QuitParser implements CommandParser {
 
-    private final QuitObserver mQuitObserver;
+    public final ObserverHelper<QuitObserver> mObserverHelper = new ObserverHelper<>();
 
-    public QuitParser(final QuitObserver quitObserver) {
-        mQuitObserver = quitObserver;
+    public QuitParser addObserver(final QuitObserver observer) {
+        mObserverHelper.addObserver(observer);
+        return this;
+    }
+
+    public QuitParser addObservers(final Collection<? extends QuitObserver> observers) {
+        mObserverHelper.addObservers(observers);
+        return this;
     }
 
     @Override
@@ -20,7 +29,12 @@ public class QuitParser implements CommandParser {
 
         final Optional<String> optionalReason = Optional.fromNullable(reason);
 
-        mQuitObserver.onQuit(prefix, optionalReason);
+        mObserverHelper.notifyObservers(new Consumer<QuitObserver>() {
+            @Override
+            public void apply(final QuitObserver observer) {
+                observer.onQuit(prefix, optionalReason);
+            }
+        });
     }
 
     public static interface QuitObserver {

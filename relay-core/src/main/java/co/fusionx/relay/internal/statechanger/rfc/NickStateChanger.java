@@ -37,7 +37,7 @@ public class NickStateChanger implements CommandParser, NickParser.NickObserver 
 
         // This is intentionally not injected since JoinParser is so straightforward and adds
         // more boilerplate than should be needed
-        mNickParser = new NickParser(this);
+        mNickParser = new NickParser().addObserver(this);
     }
 
     @Override

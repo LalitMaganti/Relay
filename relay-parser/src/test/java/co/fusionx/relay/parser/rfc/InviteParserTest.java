@@ -18,15 +18,16 @@ public class InviteParserTest {
         final String channel = "#relay";
 
         final List<String> list = ImmutableList.of(invited, channel);
-        final InviteParser inviteParser = new InviteParser(new InviteParser.InviteObserver() {
-            @Override
-            public void onInvite(final String invitingPrefix, final String invitedNick,
-                    final String channelName) {
-                assertThat(invitingPrefix).isEqualTo(PREFIX);
-                assertThat(invitedNick).isEqualTo(invited);
-                assertThat(channelName).isEqualTo(channel);
-            }
-        });
+        final InviteParser inviteParser = new InviteParser()
+                .addObserver(new InviteParser.InviteObserver() {
+                    @Override
+                    public void onInvite(final String invitingPrefix, final String invitedNick,
+                            final String channelName) {
+                        assertThat(invitingPrefix).isEqualTo(PREFIX);
+                        assertThat(invitedNick).isEqualTo(invited);
+                        assertThat(channelName).isEqualTo(channel);
+                    }
+                });
         inviteParser.parseCommand(list, PREFIX);
     }
 }

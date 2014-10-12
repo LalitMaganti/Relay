@@ -33,7 +33,7 @@ public class JoinStateChanger implements JoinParser.JoinObserver, CommandParser 
 
         // This is intentionally not injected since JoinParser is so straightforward and adds
         // more boilerplate than should be needed
-        mJoinParser = new JoinParser(this);
+        mJoinParser = new JoinParser().addObserver(this);
     }
 
     @Override

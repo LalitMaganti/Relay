@@ -13,19 +13,22 @@ public class InputParser {
 
     private final Map<Integer, ReplyCodeParser> mReplyCodeParsers;
 
-    private String mLine;
-
     public InputParser(final ParserProvider parserProvider) {
         mCommandParsers = parserProvider.getCommandParsers();
         mReplyCodeParsers = parserProvider.getReplyCodeParsers();
     }
 
+    /**
+     * Parses a line sent from an IRC server. This can be a code, command or something else - if
+     * it was sent by the server, this will attempt to parse it according to RFC2812.
+     *
+     * @param line the line to parse
+     */
     public void parseLine(final String line) {
         // RFC2812 states that an empty line should be silently ignored
         if (StringUtils.isEmpty(line)) {
             return;
         }
-        mLine = line;
 
         // Split the line
         final List<String> parsedArray = ParseUtils.splitRawLine(line, true);
@@ -33,7 +36,7 @@ public class InputParser {
         // Get the prefix if it exists
         final String prefix = ParseUtils.consumePrefixIfPresent(parsedArray);
 
-        // Get the command
+        // Remove the command
         final String command = parsedArray.remove(0);
 
         // Check if the command is a numeric code
@@ -58,9 +61,14 @@ public class InputParser {
     }
 
     private void parseServerCode(final List<String> parsedArray, final int code) {
-        final String target = parsedArray.remove(0); // Remove the target of the reply - ourselves
+        // Remove the target of the reply - ourselves
+        final String target = parsedArray.remove(0);
 
         final ReplyCodeParser parser = mReplyCodeParsers.get(code);
+        if (parser == null) {
+            // Silently fail if the parser is null - just ignore this line
+            return;
+        }
         parser.parseReplyCode(parsedArray, code);
     }
 }

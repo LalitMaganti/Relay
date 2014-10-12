@@ -4,9 +4,11 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.13.0'
+        classpath 'me.tatarka:gradle-retrolambda:2.2.3'
     }
 }
 apply plugin: 'java'
+apply plugin: 'retrolambda'
 
 repositories {
     mavenCentral()
@@ -20,4 +22,10 @@ dependencies {
 
     testCompile 'junit:junit:4.12-beta-2'
     testCompile 'org.assertj:assertj-core:1.7.0'
+}
+
+retrolambda {
+    jdk System.getenv("JAVA8_HOME")
+    oldJdk System.getenv("JAVA_HOME")
+    javaVersion JavaVersion.VERSION_1_7
 }

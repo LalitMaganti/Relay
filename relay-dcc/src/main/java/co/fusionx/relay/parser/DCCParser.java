@@ -5,8 +5,8 @@ import java.util.List;
 import co.fusionx.relay.internal.base.RelayDCCFileConnection;
 import co.fusionx.relay.internal.base.RelayDCCFileConversation;
 import co.fusionx.relay.internal.base.RelayDCCGetConnection;
+import co.fusionx.relay.internal.base.RelayDCCPendingChatConnection;
 import co.fusionx.relay.internal.base.RelayDCCPendingSendConnection;
-import co.fusionx.relay.internal.base.RelayRelayDCCPendingChatConnection;
 import co.fusionx.relay.internal.core.InternalDCCManager;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
@@ -75,8 +75,8 @@ public class DCCParser {
         final String ipAddress = DCCUtils.ipDecimalToString(ipDecimal);
 
         // Send the event
-        final RelayRelayDCCPendingChatConnection
-                connection = new RelayRelayDCCPendingChatConnection(nick,
+        final RelayDCCPendingChatConnection
+                connection = new RelayDCCPendingChatConnection(nick,
                 mDCCManager, ipAddress, port, "chat", 0);
         mServer.postEvent(new DCCChatRequestEvent(mServer, connection));
     }

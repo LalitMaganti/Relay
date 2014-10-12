@@ -1,22 +1,36 @@
 package co.fusionx.relay.parser.rfc;
 
+import java.util.Collection;
 import java.util.List;
 
+import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
+import co.fusionx.relay.parser.ObserverHelper;
 
 public class NickParser implements CommandParser {
 
-    private final NickObserver mNickObserver;
+    public final ObserverHelper<NickObserver> mObserverHelper = new ObserverHelper<>();
 
-    public NickParser(final NickObserver nickObserver) {
-        mNickObserver = nickObserver;
+    public NickParser addObserver(final NickObserver wallopsObserver) {
+        mObserverHelper.addObserver(wallopsObserver);
+        return this;
+    }
+
+    public NickParser addObservers(final Collection<? extends NickObserver> observers) {
+        mObserverHelper.addObservers(observers);
+        return this;
     }
 
     @Override
     public void parseCommand(final List<String> parsedArray, final String prefix) {
         final String newNick = parsedArray.get(0);
 
-        mNickObserver.onNick(prefix, newNick);
+        mObserverHelper.notifyObservers(new Consumer<NickObserver>() {
+            @Override
+            public void apply(final NickObserver observer) {
+                observer.onNick(prefix, newNick);
+            }
+        });
     }
 
     public static interface NickObserver {

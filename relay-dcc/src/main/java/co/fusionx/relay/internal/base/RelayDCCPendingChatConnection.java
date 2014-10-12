@@ -2,9 +2,9 @@ package co.fusionx.relay.internal.base;
 
 import co.fusionx.relay.internal.core.InternalDCCManager;
 
-public class RelayRelayDCCPendingChatConnection extends RelayDCCPendingConnection {
+public class RelayDCCPendingChatConnection extends RelayDCCPendingConnection {
 
-    public RelayRelayDCCPendingChatConnection(final String dccRequestNick,
+    public RelayDCCPendingChatConnection(final String dccRequestNick,
             final InternalDCCManager manager,
             final String ip, final int port, final String argument, final long size) {
         super(dccRequestNick, manager, ip, port, argument, size);

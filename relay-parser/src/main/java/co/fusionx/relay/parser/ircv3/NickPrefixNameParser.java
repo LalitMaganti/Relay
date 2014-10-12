@@ -6,23 +6,23 @@ import com.google.common.collect.FluentIterable;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.constant.ChannelType;
 import co.fusionx.relay.constant.UserLevel;
-import co.fusionx.relay.parser.CommandParser;
+import co.fusionx.relay.function.Consumer;
+import co.fusionx.relay.parser.ObserverHelper;
 import co.fusionx.relay.parser.ReplyCodeParser;
 import co.fusionx.relay.parser.rfc.NameParser;
 
 public class NickPrefixNameParser implements ReplyCodeParser, NameParser.NameObserver {
 
-    private final NickPrefixNameObserver mObserver;
+    public final ObserverHelper<NickPrefixNameObserver> mObserverHelper = new ObserverHelper<>();
 
     private final NameParser mNameParser;
 
-    public NickPrefixNameParser(final NickPrefixNameObserver observer) {
-        mObserver = observer;
-
+    public NickPrefixNameParser() {
         mNameParser = new NameParser(this);
     }
 
@@ -40,6 +40,17 @@ public class NickPrefixNameParser implements ReplyCodeParser, NameParser.NameObs
         return null;
     }
 
+    public NickPrefixNameParser addObserver(final NickPrefixNameObserver observer) {
+        mObserverHelper.addObserver(observer);
+        return this;
+    }
+
+    public NickPrefixNameParser addObservers(
+            final Collection<? extends NickPrefixNameObserver> observers) {
+        mObserverHelper.addObservers(observers);
+        return this;
+    }
+
     @Override
     public void onNameReply(final ChannelType type, final String channelName,
             final List<String> nickList) {
@@ -53,12 +64,22 @@ public class NickPrefixNameParser implements ReplyCodeParser, NameParser.NameObs
                 })
                 .copyInto(nickLevelList);
 
-        mObserver.onNameReply(type, channelName, nickLevelList);
+        mObserverHelper.notifyObservers(new Consumer<NickPrefixNameObserver>() {
+            @Override
+            public void apply(final NickPrefixNameObserver observer) {
+                observer.onNameReply(type, channelName, nickLevelList);
+            }
+        });
     }
 
     @Override
     public void onNameFinished() {
-        mObserver.onNameFinished();
+        mObserverHelper.notifyObservers(new Consumer<NickPrefixNameObserver>() {
+            @Override
+            public void apply(final NickPrefixNameObserver observer) {
+                observer.onNameFinished();
+            }
+        });
     }
 
     @Override

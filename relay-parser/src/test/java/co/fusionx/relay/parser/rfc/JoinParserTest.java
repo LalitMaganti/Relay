@@ -17,7 +17,7 @@ public class JoinParserTest {
         final String channelName = "#relay";
 
         final List<String> list = ImmutableList.of(channelName);
-        final JoinParser joinParser = new JoinParser(new JoinParser.JoinObserver() {
+        final JoinParser joinParser = new JoinParser().addObserver(new JoinParser.JoinObserver() {
             @Override
             public void onJoin(final String prefix, final String channelName) {
                 assertThat(prefix).isEqualTo(PREFIX);
