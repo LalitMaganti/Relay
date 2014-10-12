@@ -1,6 +1,5 @@
 package co.fusionx.relay.parser.ircv3;
 
-import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -11,7 +10,6 @@ import java.util.List;
 
 import co.fusionx.relay.constant.ChannelType;
 import co.fusionx.relay.constant.UserLevel;
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.ObserverHelper;
 import co.fusionx.relay.parser.ReplyCodeParser;
 import co.fusionx.relay.parser.rfc.NameParser;
@@ -56,30 +54,16 @@ public class NickPrefixNameParser implements ReplyCodeParser, NameParser.NameObs
             final List<String> nickList) {
         final List<Pair<String, UserLevel>> nickLevelList = new ArrayList<>();
         FluentIterable.from(nickList)
-                .transform(new Function<String, Pair<String, UserLevel>>() {
-                    @Override
-                    public Pair<String, UserLevel> apply(final String n) {
-                        return consumeNickPrefixes(n);
-                    }
-                })
+                .transform(NickPrefixNameParser::consumeNickPrefixes)
                 .copyInto(nickLevelList);
 
-        mObserverHelper.notifyObservers(new Consumer<NickPrefixNameObserver>() {
-            @Override
-            public void apply(final NickPrefixNameObserver observer) {
-                observer.onNameReply(type, channelName, nickLevelList);
-            }
-        });
+        mObserverHelper.notifyObservers(
+                observer -> observer.onNameReply(type, channelName, nickLevelList));
     }
 
     @Override
     public void onNameFinished() {
-        mObserverHelper.notifyObservers(new Consumer<NickPrefixNameObserver>() {
-            @Override
-            public void apply(final NickPrefixNameObserver observer) {
-                observer.onNameFinished();
-            }
-        });
+        mObserverHelper.notifyObservers(NickPrefixNameObserver::onNameFinished);
     }
 
     @Override

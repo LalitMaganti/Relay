@@ -3,8 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.0'
-        classpath 'me.tatarka:gradle-retrolambda:2.2.3'
+        classpath 'me.tatarka:gradle-retrolambda:2.4.0'
     }
 }
 apply plugin: 'java'
@@ -19,6 +18,7 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
 
     compile project(':relay-core')
+    compile project(':relay-parser')
 
     testCompile 'junit:junit:4.12-beta-2'
     testCompile 'org.assertj:assertj-core:1.7.0'

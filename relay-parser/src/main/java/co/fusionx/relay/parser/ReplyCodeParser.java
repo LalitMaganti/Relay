@@ -12,7 +12,7 @@ public interface ReplyCodeParser {
      *
      * @param parsedArray the data in the command (this excludes any possible prefix and the
      *                    keyword of the command itself)
-     * @param code contains the code this parser was matched with
+     * @param code        contains the code this parser was matched with
      */
     public void parseReplyCode(final List<String> parsedArray, final int code);
 

@@ -20,12 +20,6 @@ public class PrivmsgParser implements CommandParser {
         final String recipient = parsedArray.get(0);
         final String message = parsedArray.get(1);
 
-        // PRIVMSGs can be CTCP commands
-        /*if (CTCPParser.isCtcp(message)) {
-            mCTCPParser.onParseCommand(prefix, recipient, message);
-        } else {
-        }*/
-
         mObserverHelper.notifyObservers(new Consumer<PrivmsgObserver>() {
             @Override
             public void apply(final PrivmsgObserver observer) {

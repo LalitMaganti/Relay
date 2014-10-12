@@ -8,7 +8,6 @@ import java.util.Set;
 
 import co.fusionx.relay.constant.CapCommand;
 import co.fusionx.relay.constant.PrefixedCapability;
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.function.DualConsumer;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ObserverHelper;
@@ -37,24 +36,9 @@ public class CapParser implements CommandParser {
 
     private void initializeCommandMap(final Map<CapCommand, DualConsumer<String,
             List<String>>> map) {
-        map.put(CapCommand.LS, new DualConsumer<String, List<String>>() {
-            @Override
-            public void apply(final String target, final List<String> list) {
-                parseLs(target, list);
-            }
-        });
-        map.put(CapCommand.ACK, new DualConsumer<String, List<String>>() {
-            @Override
-            public void apply(final String target, final List<String> list) {
-                parseAck(target, list);
-            }
-        });
-        map.put(CapCommand.NAK, new DualConsumer<String, List<String>>() {
-            @Override
-            public void apply(final String target, final List<String> list) {
-                parseNak(target, list);
-            }
-        });
+        map.put(CapCommand.LS, this::parseLs);
+        map.put(CapCommand.ACK, this::parseAck);
+        map.put(CapCommand.NAK, this::parseNak);
     }
 
     @Override
@@ -75,24 +59,16 @@ public class CapParser implements CommandParser {
         final Set<PrefixedCapability> possibleCapabilities = CapUtils.parseCapabilities(
                 rawCapabilities);
 
-        mObserverHelper.notifyObservers(new Consumer<CapObserver>() {
-            @Override
-            public void apply(final CapObserver capObserver) {
-                capObserver.onCapabilitiesLsResponse(target, possibleCapabilities);
-            }
-        });
+        mObserverHelper.notifyObservers(
+                capObserver -> capObserver.onCapabilitiesLsResponse(target, possibleCapabilities));
     }
 
     private void parseAck(final String target, final List<String> parsedArray) {
         final String rawCapabilities = parsedArray.get(0);
         final Set<PrefixedCapability> capabilities = CapUtils.parseCapabilities(rawCapabilities);
 
-        mObserverHelper.notifyObservers(new Consumer<CapObserver>() {
-            @Override
-            public void apply(final CapObserver capObserver) {
-                capObserver.onCapabilitiesAccepted(target, capabilities);
-            }
-        });
+        mObserverHelper.notifyObservers(
+                capObserver -> capObserver.onCapabilitiesAccepted(target, capabilities));
     }
 
     private void parseNak(final String prefix, final List<String> parsedArray) {

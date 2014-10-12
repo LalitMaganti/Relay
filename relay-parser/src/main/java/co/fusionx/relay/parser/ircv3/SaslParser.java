@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.constant.ReplyCodes;
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ObserverHelper;
 import co.fusionx.relay.parser.ReplyCodeParser;
@@ -30,12 +29,7 @@ public class SaslParser implements CommandParser, ReplyCodeParser {
         final String argument = parsedArray.get(0);
         switch (argument) {
             case "+":
-                mObserverHelper.notifyObservers(new Consumer<SaslObserver>() {
-                    @Override
-                    public void apply(final SaslObserver observer) {
-                        observer.onAuthenticatePlus();
-                    }
-                });
+                mObserverHelper.notifyObservers(SaslObserver::onAuthenticatePlus);
                 break;
         }
     }
@@ -45,31 +39,16 @@ public class SaslParser implements CommandParser, ReplyCodeParser {
         switch (code) {
             case ReplyCodes.RPL_SASL_LOGGED_IN:
                 final String loginMessage = parsedArray.get(2);
-                mObserverHelper.notifyObservers(new Consumer<SaslObserver>() {
-                    @Override
-                    public void apply(final SaslObserver observer) {
-                        observer.onLoggedIn(loginMessage);
-                    }
-                });
+                mObserverHelper.notifyObservers(observer -> observer.onLoggedIn(loginMessage));
                 break;
             case ReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String message = parsedArray.get(0);
-                mObserverHelper.notifyObservers(new Consumer<SaslObserver>() {
-                    @Override
-                    public void apply(final SaslObserver observer) {
-                        observer.onSuccess(message);
-                    }
-                });
+                mObserverHelper.notifyObservers(observer -> observer.onSuccess(message));
                 break;
             case ReplyCodes.ERR_SASL_FAIL:
             case ReplyCodes.ERR_SASL_TOO_LONG:
                 final String error = parsedArray.get(0);
-                mObserverHelper.notifyObservers(new Consumer<SaslObserver>() {
-                    @Override
-                    public void apply(final SaslObserver observer) {
-                        observer.onError(error);
-                    }
-                });
+                mObserverHelper.notifyObservers(observer -> observer.onError(error));
                 break;
         }
     }

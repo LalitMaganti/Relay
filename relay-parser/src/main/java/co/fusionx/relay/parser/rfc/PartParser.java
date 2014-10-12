@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ObserverHelper;
 
@@ -30,12 +29,8 @@ public class PartParser implements CommandParser {
 
         final Optional<String> optionalReason = Optional.fromNullable(reason);
 
-        mObserverHelper.notifyObservers(new Consumer<PartObserver>() {
-            @Override
-            public void apply(final PartObserver observer) {
-                observer.onPart(prefix, channelName, optionalReason);
-            }
-        });
+        mObserverHelper.notifyObservers(
+                observer -> observer.onPart(prefix, channelName, optionalReason));
     }
 
     public static interface PartObserver {

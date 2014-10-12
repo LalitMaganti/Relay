@@ -2,7 +2,6 @@ package co.fusionx.relay.parser.rfc;
 
 import java.util.List;
 
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ObserverHelper;
 
@@ -19,12 +18,7 @@ public class WallopsParser implements CommandParser {
     public void parseCommand(final List<String> parsedArray, final String prefix) {
         final String message = parsedArray.get(0);
 
-        mObserverHelper.notifyObservers(new Consumer<WallopsObserver>() {
-            @Override
-            public void apply(final WallopsObserver object) {
-                object.onWallops(prefix, message);
-            }
-        });
+        mObserverHelper.notifyObservers(object -> object.onWallops(prefix, message));
     }
 
     public static interface WallopsObserver {

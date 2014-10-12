@@ -9,7 +9,8 @@ import co.fusionx.relay.event.chat.DCCChatWorldActionEvent;
 import co.fusionx.relay.core.DCCConnection;
 import co.fusionx.relay.event.chat.DCCChatStartedEvent;
 import co.fusionx.relay.event.chat.DCCChatWorldMessageEvent;
-import co.fusionx.relay.internal.parser.CTCPParser;
+import co.fusionx.relay.parser.ctcp.CTCPCommandParser;
+import co.fusionx.relay.util.ParseUtils;
 import co.fusionx.relay.util.SocketUtils;
 
 class RelayDCCChatConnection extends DCCConnection {
@@ -63,7 +64,7 @@ class RelayDCCChatConnection extends DCCConnection {
     }
 
     private void parseLine(final String line) {
-        if (CTCPParser.isCtcp(line)) {
+        if (ParseUtils.isCtcpMessage(line)) {
             parseCtcp(line);
         } else {
             mConversation.postEvent(new DCCChatWorldMessageEvent(mConversation, line));

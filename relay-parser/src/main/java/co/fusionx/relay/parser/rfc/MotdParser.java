@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.constant.ReplyCodes;
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.ObserverHelper;
 import co.fusionx.relay.parser.ReplyCodeParser;
 
@@ -28,12 +27,7 @@ public class MotdParser implements ReplyCodeParser {
     public void parseReplyCode(final List<String> parsedArray, final int code) {
         final String message = parsedArray.get(0);
 
-        mObserverHelper.notifyObservers(new Consumer<MotdObserver>() {
-            @Override
-            public void apply(final MotdObserver observer) {
-                observer.onMotd(code, message);
-            }
-        });
+        mObserverHelper.notifyObservers(observer -> observer.onMotd(code, message));
     }
 
     @Override

@@ -3,8 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.0'
-        classpath 'me.tatarka:gradle-retrolambda:2.2.3'
+        classpath 'me.tatarka:gradle-retrolambda:2.4.0'
     }
 }
 
@@ -40,7 +39,6 @@ dependencies {
 
     compile 'com.squareup.dagger:dagger:1.2.2'
 
-    // compile project(':bus-library')
     compile project(':relay-parser')
 
     testCompile 'junit:junit:4.12-beta-1'

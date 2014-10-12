@@ -13,6 +13,10 @@ public class ParseUtils {
 
     private static final Pattern QUOTE_SPLIT_PATTERN = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
 
+    public static boolean isCtcpMessage(final String message) {
+        return message.startsWith("\u0001") && message.endsWith("\u0001");
+    }
+
     public static String removeInitialColonIfExists(final String line) {
         return line.charAt(0) == ':' ? line.substring(1) : line;
     }

@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ObserverHelper;
 
@@ -31,12 +30,8 @@ public class KickParser implements CommandParser {
 
         final Optional<String> optionalReason = Optional.fromNullable(reason);
 
-        mObserverHelper.notifyObservers(new Consumer<KickObserver>() {
-            @Override
-            public void apply(final KickObserver observer) {
-                observer.onKick(prefix, channelName, kickedNick, optionalReason);
-            }
-        });
+        mObserverHelper.notifyObservers(
+                observer -> observer.onKick(prefix, channelName, kickedNick, optionalReason));
     }
 
     public static interface KickObserver {

@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.parser;
+package co.fusionx.relay.internal.statechanger.ctcp;
 
 import com.google.common.base.Optional;
 
@@ -9,19 +9,19 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.server.VersionEvent;
+import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.internal.core.InternalChannel;
 import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.internal.sender.CtcpResponsePacketSender;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
-public class CTCPParser {
+public class CTCPStateChanger {
 
     private final InternalServer mServer;
 
@@ -31,17 +31,14 @@ public class CTCPParser {
 
     private final CtcpResponsePacketSender mCtcpResponseSender;
 
-    public CTCPParser(final InternalServer server, final InternalUserChannelGroup dao,
+    public CTCPStateChanger(final InternalServer server,
+            final InternalUserChannelGroup userChannelGroup,
             final InternalQueryUserGroup queryManager, final PacketSender sender) {
         mServer = server;
         mQueryManager = queryManager;
-        mUserChannelDao = dao;
+        mUserChannelDao = userChannelGroup;
 
         mCtcpResponseSender = new CtcpResponsePacketSender(sender);
-    }
-
-    public static boolean isCtcp(final String message) {
-        return message.startsWith("\u0001") && message.endsWith("\u0001");
     }
 
     // Commands start here
@@ -70,7 +67,7 @@ public class CTCPParser {
             mCtcpResponseSender.sendTimeResponse(sendingNick);
         } else if (message.startsWith("DCC")) {
             final List<String> parsedDcc = ParseUtils.splitRawLineWithQuote(message);
-           //  mDCCParser.onParseCommand(parsedDcc, prefix);
+            //  mDCCParser.onParseCommand(parsedDcc, prefix);
         }
     }
 
@@ -95,7 +92,7 @@ public class CTCPParser {
         Optionals.run(optChannel, channel -> {
             final Optional<InternalChannelUser> optUser = mUserChannelDao.getUser(sendingNick);
             final boolean mention = false;//MentionParser.onMentionableCommand(action,
-                    //mUserChannelDao.getUser().getNick().getNickAsString());
+            //mUserChannelDao.getUser().getNick().getNickAsString());
 
             final ChannelEvent event;
             if (optUser.isPresent()) {

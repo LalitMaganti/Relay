@@ -3,7 +3,6 @@ package co.fusionx.relay.parser.rfc;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ObserverHelper;
 
@@ -25,13 +24,7 @@ public class PingParser implements CommandParser {
     public void parseCommand(final List<String> parsedArray, final String prefix) {
         final String serverHostname = parsedArray.get(0);
 
-
-        mObserverHelper.notifyObservers(new Consumer<PingObserver>() {
-            @Override
-            public void apply(final PingObserver observer) {
-                observer.onPing(serverHostname);
-            }
-        });
+        mObserverHelper.notifyObservers(observer -> observer.onPing(serverHostname));
     }
 
     public static interface PingObserver {

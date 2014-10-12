@@ -5,10 +5,12 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:0.13.0'
         classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.5.0'
+        classpath 'me.tatarka:gradle-retrolambda:2.4.0'
     }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'retrolambda'
 
 repositories {
     mavenCentral()
@@ -25,8 +27,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 apply plugin: 'android-unit-test'
@@ -43,17 +45,8 @@ dependencies {
     testCompile 'org.assertj:assertj-core:1.7.0'
 }
 
-android.libraryVariants.all { variant ->
-    task("generate${variant.name}Javadoc", type: Javadoc) {
-        title = "$name $version API"
-        description "Generates Javadoc for $variant.name."
-        source = variant.javaCompile.source
-        ext.androidJar =
-                "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
-        options.links("http://docs.oracle.com/javase/7/docs/api/");
-        options.links("http://d.android.com/reference/");
-        exclude '**/BuildConfig.java'
-        exclude '**/R.java'
-    }
+retrolambda {
+    jdk System.getenv("JAVA8_HOME")
+    oldJdk System.getenv("JAVA_HOME")
+    javaVersion JavaVersion.VERSION_1_7
 }

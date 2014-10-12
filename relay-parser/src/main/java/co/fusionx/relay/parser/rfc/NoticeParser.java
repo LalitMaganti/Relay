@@ -21,7 +21,7 @@ public class NoticeParser implements CommandParser {
         final String notice = parsedArray.get(1);
 
         // Notices can be CTCP replies
-        /*if (CTCPParser.isCtcp(notice)) {
+        /*if (CTCPParser.isCtcpMessage(notice)) {
             mCTCPParser.onParseReply(parsedArray, prefix);
         } else {
         }*/

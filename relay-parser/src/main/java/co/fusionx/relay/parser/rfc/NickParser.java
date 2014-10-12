@@ -3,7 +3,6 @@ package co.fusionx.relay.parser.rfc;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ObserverHelper;
 
@@ -25,12 +24,7 @@ public class NickParser implements CommandParser {
     public void parseCommand(final List<String> parsedArray, final String prefix) {
         final String newNick = parsedArray.get(0);
 
-        mObserverHelper.notifyObservers(new Consumer<NickObserver>() {
-            @Override
-            public void apply(final NickObserver observer) {
-                observer.onNick(prefix, newNick);
-            }
-        });
+        mObserverHelper.notifyObservers(observer -> observer.onNick(prefix, newNick));
     }
 
     public static interface NickObserver {

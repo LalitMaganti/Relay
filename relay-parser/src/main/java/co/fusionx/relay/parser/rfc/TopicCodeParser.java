@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.constant.ReplyCodes;
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.ObserverHelper;
 import co.fusionx.relay.parser.ReplyCodeParser;
 
@@ -42,12 +41,7 @@ public class TopicCodeParser implements ReplyCodeParser {
         final String channelName = parsedArray.get(0);
         final String topic = parsedArray.get(1);
 
-        mObserverHelper.notifyObservers(new Consumer<TopicCodeObserver>() {
-            @Override
-            public void apply(final TopicCodeObserver observer) {
-                observer.onTopic(channelName, topic);
-            }
-        });
+        mObserverHelper.notifyObservers(observer -> observer.onTopic(channelName, topic));
     }
 
     private void onTopicInfo(final List<String> parsedArray) {
@@ -55,12 +49,8 @@ public class TopicCodeParser implements ReplyCodeParser {
         final String topicSetterPrefix = parsedArray.get(1);
         final String epochTime = parsedArray.get(2);
 
-        mObserverHelper.notifyObservers(new Consumer<TopicCodeObserver>() {
-            @Override
-            public void apply(final TopicCodeObserver observer) {
-                observer.onTopicInfo(channelName, topicSetterPrefix, epochTime);
-            }
-        });
+        mObserverHelper.notifyObservers(
+                observer -> observer.onTopicInfo(channelName, topicSetterPrefix, epochTime));
     }
 
     public static interface TopicCodeObserver {

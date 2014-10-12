@@ -2,8 +2,6 @@ package co.fusionx.relay.constant;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import co.fusionx.relay.parser.ircv3.CapParser;
-
 public enum CapModifier {
     DISABLE('-'),
     ACK('~'),

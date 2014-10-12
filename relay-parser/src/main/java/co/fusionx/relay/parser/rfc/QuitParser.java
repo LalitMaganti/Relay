@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.function.Consumer;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.ObserverHelper;
 
@@ -29,12 +28,7 @@ public class QuitParser implements CommandParser {
 
         final Optional<String> optionalReason = Optional.fromNullable(reason);
 
-        mObserverHelper.notifyObservers(new Consumer<QuitObserver>() {
-            @Override
-            public void apply(final QuitObserver observer) {
-                observer.onQuit(prefix, optionalReason);
-            }
-        });
+        mObserverHelper.notifyObservers(observer -> observer.onQuit(prefix, optionalReason));
     }
 
     public static interface QuitObserver {

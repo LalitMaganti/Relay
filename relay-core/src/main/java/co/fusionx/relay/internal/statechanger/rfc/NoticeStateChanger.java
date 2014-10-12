@@ -2,8 +2,6 @@ package co.fusionx.relay.internal.statechanger.rfc;
 
 import com.google.common.base.Optional;
 
-import java.util.List;
-
 import co.fusionx.relay.constant.ChannelPrefix;
 import co.fusionx.relay.event.channel.ChannelNoticeEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
@@ -13,8 +11,6 @@ import co.fusionx.relay.internal.core.InternalQueryUser;
 import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
-import co.fusionx.relay.internal.parser.CTCPParser;
-import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.rfc.NoticeParser;
 import co.fusionx.relay.util.ParseUtils;
 
