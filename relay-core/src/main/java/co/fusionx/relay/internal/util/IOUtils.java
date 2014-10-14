@@ -1,4 +1,4 @@
-package co.fusionx.relay.util;
+package co.fusionx.relay.internal.util;
 
 import java.io.Closeable;
 import java.io.IOException;

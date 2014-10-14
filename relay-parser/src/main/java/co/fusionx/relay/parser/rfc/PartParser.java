@@ -10,7 +10,7 @@ import co.fusionx.relay.parser.ObserverHelper;
 
 public class PartParser implements CommandParser {
 
-    public final ObserverHelper<PartObserver> mObserverHelper = new ObserverHelper<>();
+    private final ObserverHelper<PartObserver> mObserverHelper = new ObserverHelper<>();
 
     public PartParser addObserver(final PartObserver wallopsObserver) {
         mObserverHelper.addObserver(wallopsObserver);

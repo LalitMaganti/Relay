@@ -67,8 +67,8 @@ public class NickPrefixNameParser implements ReplyCodeParser, NameParser.NameObs
     }
 
     @Override
-    public void parseReplyCode(final List<String> parsedArray, final int code) {
-        mNameParser.parseReplyCode(parsedArray, code);
+    public void parseReplyCode(final String target, final List<String> parsedArray, final int code) {
+        mNameParser.parseReplyCode(target, parsedArray, code);
     }
 
     @Override

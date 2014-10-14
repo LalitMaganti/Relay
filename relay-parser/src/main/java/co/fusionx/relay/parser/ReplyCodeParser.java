@@ -10,11 +10,11 @@ public interface ReplyCodeParser {
     /**
      * Parses a line containing a reply from the server
      *
-     * @param parsedArray the data in the command (this excludes any possible prefix and the
-     *                    keyword of the command itself)
+     * @param target      the target of the code
+     * @param parsedArray the data after the target of the code
      * @param code        contains the code this parser was matched with
      */
-    public void parseReplyCode(final List<String> parsedArray, final int code);
+    public void parseReplyCode(final String target, final List<String> parsedArray, final int code);
 
     /**
      * Returns the list of codes this parser can parse

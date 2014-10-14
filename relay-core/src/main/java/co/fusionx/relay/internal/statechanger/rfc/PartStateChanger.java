@@ -15,7 +15,7 @@ import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.parser.rfc.PartParser;
-import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.internal.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
 public class PartStateChanger implements PartParser.PartObserver {

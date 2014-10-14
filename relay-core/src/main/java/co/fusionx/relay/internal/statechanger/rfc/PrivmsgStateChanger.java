@@ -14,9 +14,9 @@ import co.fusionx.relay.internal.core.InternalQueryUserGroup;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.parser.rfc.PrivmsgParser;
-import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.internal.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
-import co.fusionx.relay.util.Utils;
+import co.fusionx.relay.internal.util.Utils;
 
 public class PrivmsgStateChanger implements PrivmsgParser.PrivmsgObserver {
 

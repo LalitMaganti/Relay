@@ -8,10 +8,6 @@ public class DefaultSettingsProvider implements SettingsProvider {
     }
 
     @Override
-    public void logNonFatalError(final String nonFatalError) {
-    }
-
-    @Override
     public String getPartReason() {
         return null;
     }
@@ -19,11 +15,6 @@ public class DefaultSettingsProvider implements SettingsProvider {
     @Override
     public String getQuitReason() {
         return null;
-    }
-
-    @Override
-    public void handleFatalError(final RuntimeException ex) {
-
     }
 
     @Override

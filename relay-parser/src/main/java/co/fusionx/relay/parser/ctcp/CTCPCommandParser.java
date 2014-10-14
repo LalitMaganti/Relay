@@ -11,8 +11,8 @@ public class CTCPCommandParser implements PrivmsgParser.PrivmsgObserver {
 
     private final ObserverHelper<CTCPExtender> mExtenderHelper = new ObserverHelper<>();
 
-    public CTCPCommandParser addObserver(final CTCPObserver wallopsObserver) {
-        mObserverHelper.addObserver(wallopsObserver);
+    public CTCPCommandParser addObserver(final CTCPObserver observer) {
+        mObserverHelper.addObserver(observer);
         return this;
     }
 

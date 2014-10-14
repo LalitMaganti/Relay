@@ -1,4 +1,4 @@
-package co.fusionx.relay.util;
+package co.fusionx.relay.internal.util;
 
 import org.apache.commons.lang3.StringUtils;
 

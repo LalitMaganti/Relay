@@ -7,8 +7,11 @@ import javax.inject.Inject;
 import co.fusionx.relay.configuration.ConnectionConfiguration;
 import co.fusionx.relay.internal.sender.CapSender;
 import co.fusionx.relay.internal.sender.InternalSender;
+import co.fusionx.relay.internal.sender.PacketSender;
+import co.fusionx.relay.internal.sender.RelayInternalSender;
+import co.fusionx.relay.internal.sender.RelayServerSender;
 import co.fusionx.relay.sender.ServerSender;
-import co.fusionx.relay.util.Utils;
+import co.fusionx.relay.internal.util.Utils;
 
 public class RegistrationFacade {
 
@@ -22,12 +25,12 @@ public class RegistrationFacade {
 
     @Inject
     public RegistrationFacade(final ConnectionConfiguration connectionConfiguration,
-            final InternalSender internalSender, final CapSender capSender,
-            final ServerSender serverSender) {
+            final PacketSender packetSender) {
         mConnectionConfiguration = connectionConfiguration;
-        mInternalSender = internalSender;
-        mCapSender = capSender;
-        mServerSender = serverSender;
+
+        mInternalSender = new RelayInternalSender(packetSender);
+        mCapSender = new CapSender(packetSender);
+        mServerSender = new RelayServerSender(packetSender);
     }
 
     public void registerConnection() {

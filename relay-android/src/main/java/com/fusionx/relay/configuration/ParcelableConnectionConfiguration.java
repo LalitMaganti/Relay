@@ -158,12 +158,6 @@ public class ParcelableConnectionConfiguration implements Parcelable, Connection
         return 0;
     }
 
-    // Helper methods
-    @Override
-    public boolean shouldSendSasl() {
-        return StringUtils.isNotEmpty(mSaslUsername) && StringUtils.isNotEmpty(mSaslPassword);
-    }
-
     public void writeToParcel(final Parcel out, final int flags) {
         out.writeString(mTitle);
         out.writeString(mUrl);
@@ -559,7 +553,7 @@ public class ParcelableConnectionConfiguration implements Parcelable, Connection
         }
 
         @Override
-        public ConnectionConfiguration.Builder setNickStorage(final NickProvider nickProvider) {
+        public ConnectionConfiguration.Builder setNickProvider(final NickProvider nickProvider) {
             if (nickProvider instanceof Parcelable) {
                 mNickProvider = nickProvider;
                 return this;

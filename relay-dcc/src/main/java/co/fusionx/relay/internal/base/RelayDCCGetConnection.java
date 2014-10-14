@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import co.fusionx.relay.internal.sender.PacketSender;
 import co.fusionx.relay.internal.sender.DCCPacketSender;
 import co.fusionx.relay.util.DCCUtils;
-import co.fusionx.relay.util.IOUtils;
+import co.fusionx.relay.internal.util.IOUtils;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;

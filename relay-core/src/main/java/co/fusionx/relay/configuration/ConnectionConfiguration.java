@@ -71,7 +71,7 @@ public interface ConnectionConfiguration {
 
         NickProvider getNickProvider();
 
-        Builder setNickStorage(NickProvider nickProvider);
+        Builder setNickProvider(NickProvider nickProvider);
 
         String getRealName();
 

@@ -35,7 +35,7 @@ public class SaslParser implements CommandParser, ReplyCodeParser {
     }
 
     @Override
-    public void parseReplyCode(final List<String> parsedArray, final int code) {
+    public void parseReplyCode(final String target, final List<String> parsedArray, final int code) {
         switch (code) {
             case ReplyCodes.RPL_SASL_LOGGED_IN:
                 final String loginMessage = parsedArray.get(2);

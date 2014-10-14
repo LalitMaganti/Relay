@@ -4,6 +4,10 @@ import co.fusionx.relay.parser.rfc.NoticeParser;
 
 public class CTCPReplyParser implements NoticeParser.NoticeObserver {
 
+    public void CTCPReplyParser(final NoticeParser noticeParser) {
+        noticeParser.addObserver(this);
+    }
+
     @Override
     public void onNotice(final String prefix, final String recipient, final String rawNotice) {
         final String message = rawNotice.substring(1, rawNotice.length() - 1);

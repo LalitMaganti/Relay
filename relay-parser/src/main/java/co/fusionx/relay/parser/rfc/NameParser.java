@@ -18,7 +18,7 @@ public class NameParser implements ReplyCodeParser {
     }
 
     @Override
-    public void parseReplyCode(final List<String> parsedArray, final int code) {
+    public void parseReplyCode(final String target, final List<String> parsedArray, final int code) {
         if (code == ReplyCodes.RPL_NAMREPLY) {
             parseNameReply(parsedArray);
         } else {

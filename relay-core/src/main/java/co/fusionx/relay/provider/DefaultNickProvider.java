@@ -1,6 +1,5 @@
 package co.fusionx.relay.provider;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,12 +35,7 @@ public class DefaultNickProvider implements NickProvider {
     }
 
     private void addAll(final FluentIterable<String> fluentIterable) {
-        fluentIterable.filter(new Predicate<String>() {
-            @Override
-            public boolean apply(final String input) {
-                return StringUtils.isNotEmpty(input);
-            }
-        }).copyInto(mNicks);
+        fluentIterable.filter(StringUtils::isNotEmpty).copyInto(mNicks);
     }
 
     @Override

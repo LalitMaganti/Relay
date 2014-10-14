@@ -16,7 +16,7 @@ public class TestUtils {
         builder.setTitle("Freenode");
         builder.setUrl("irc.freenode.net");
         builder.setPort(6667);
-        builder.setNickStorage(
+        builder.setNickProvider(
                 new DefaultNickProvider("holoirctester", "holoirctester", "holoirctester"));
         builder.setServerUserName("holoirctester");
         return builder;

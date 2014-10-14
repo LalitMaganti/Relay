@@ -9,7 +9,7 @@ public interface Session extends Registerable {
 
     public Server getServer();
 
-    public UserInputParser getInputParser();
+    public UserInputParser getUserInputParser();
 
     public UserChannelGroup getUserChannelManager();
 

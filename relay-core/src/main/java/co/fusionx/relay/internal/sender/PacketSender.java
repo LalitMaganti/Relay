@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
+import co.fusionx.relay.provider.DebuggingProvider;
 import co.fusionx.relay.provider.SettingsProvider;
 import co.fusionx.relay.internal.packet.Packet;
 
@@ -11,15 +12,15 @@ public class PacketSender {
 
     private final Object mLock = new Object();
 
-    private final SettingsProvider mSettingsProvider;
+    private final DebuggingProvider mDebuggingProvider;
 
     private final ExecutorService mExecutorService;
 
     private BufferedWriter mBufferedWriter;
 
-    public PacketSender(final SettingsProvider settingsProvider,
+    public PacketSender(final DebuggingProvider debuggingProvider,
             final ExecutorService executorService) {
-        mSettingsProvider = settingsProvider;
+        mDebuggingProvider = debuggingProvider;
         mExecutorService = executorService;
     }
 
@@ -28,7 +29,7 @@ public class PacketSender {
         mExecutorService.submit(() -> sendLine(line));
     }
 
-    public void onOutputStreamCreated(final BufferedWriter writer) {
+    public void updateBufferedWriter(final BufferedWriter writer) {
         synchronized (mLock) {
             mBufferedWriter = writer;
         }
@@ -43,9 +44,10 @@ public class PacketSender {
     private void sendLine(final String line) {
         synchronized (mLock) {
             if (mBufferedWriter == null) {
-                mSettingsProvider.logNonFatalError(line);
+                mDebuggingProvider.logNonFatalError(line);
                 return;
             }
+            mDebuggingProvider.logLineToServer(line);
 
             try {
                 mBufferedWriter.write(String.format("%s\r\n", line));

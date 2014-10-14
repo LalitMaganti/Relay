@@ -69,6 +69,6 @@ public class InputParser {
             // Silently fail if the parser is null - just ignore this line
             return;
         }
-        parser.parseReplyCode(parsedArray, code);
+        parser.parseReplyCode(target, parsedArray, code);
     }
 }

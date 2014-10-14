@@ -4,9 +4,11 @@ import co.fusionx.relay.internal.packet.Packet;
 
 public class ChannelTopicPacket implements Packet {
 
-    private final String mTopic;
+    public static final String TOPIC = "TOPIC %s %s";
 
     private final String mChannelName;
+
+    private final String mTopic;
 
     public ChannelTopicPacket(String channelName, String newTopic) {
         mChannelName = channelName;
@@ -15,6 +17,6 @@ public class ChannelTopicPacket implements Packet {
 
     @Override
     public String getLine() {
-        return String.format("TOPIC %s %s", mChannelName, mTopic);
+        return String.format(TOPIC, mChannelName, mTopic);
     }
 }

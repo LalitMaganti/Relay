@@ -31,7 +31,7 @@ public class RelaySession implements Session {
     private final SessionConfiguration mConfiguration;
 
     @Inject
-    InternalStatusManager mInternalStatusManager;
+    InternalStatusManager mStatusManager;
 
     @Inject
     EventBus<Event> mSessionBus;
@@ -48,7 +48,7 @@ public class RelaySession implements Session {
     @Inject
     UserInputParser mUserInputParser;
 
-    private RelayIRCConnection mConnection;
+    private IRCConnection mConnection;
 
     public RelaySession(final SessionConfiguration configuration) {
         mConfiguration = configuration;
@@ -61,11 +61,11 @@ public class RelaySession implements Session {
 
     public void startSession() {
         try {
-            mInternalStatusManager.resetAttemptCount();
+            mStatusManager.resetAttemptCount();
 
             startConnect(this::connect, 0);
         } catch (final RuntimeException ex) {
-            mConfiguration.getSettingsProvider().handleFatalError(ex);
+            mConfiguration.getDebuggingProvider().handleFatalError(ex);
         }
     }
 
@@ -82,25 +82,42 @@ public class RelaySession implements Session {
     }
 
     private void connect() {
-        mConnection = mObjectGraph.get(RelayIRCConnection.class);
-        mConnection.connect();
+        // Create the connection from the object graph
+        mConnection = mObjectGraph.get(IRCConnection.class);
 
-        if (!mConnection.isStopped() && mInternalStatusManager.isReconnectNeeded()) {
-            mInternalStatusManager.onReconnecting();
+        // We are now in the phase where we can say we are connecting to the server
+        mStatusManager.onConnecting();
+
+        // Attempt to connect to the server - returns a possible message related to disconnection
+        final String disconnectMessage = mConnection.connect();
+
+        if (mConnection.isStopped()) {
+            mStatusManager.onStopped();
+            mConnection.close();
+            return;
+        } else {
+            mStatusManager.onDisconnected(disconnectMessage,
+                    mStatusManager.isReconnectNeeded());
+            mConnection.close();
+            mUserChannelGroup.onConnectionTerminated();
+        }
+
+        if (mStatusManager.isReconnectNeeded()) {
+            mStatusManager.onReconnecting();
             startConnect(this::reconnect, 5000);
-        } else if (!mConnection.isStopped()) {
-            mInternalStatusManager.onDisconnected("No reconnects pending", false);
+        } else {
+            mStatusManager.onDisconnected("No reconnects pending", false);
         }
     }
 
     private void reconnect() {
-        mInternalStatusManager.incrementAttemptCount();
+        mStatusManager.incrementAttemptCount();
         connect();
     }
 
     @Override
     public SessionStatus getStatus() {
-        return mInternalStatusManager.getStatus();
+        return mStatusManager.getStatus();
     }
 
     @Override
@@ -124,7 +141,7 @@ public class RelaySession implements Session {
     }
 
     @Override
-    public UserInputParser getInputParser() {
+    public UserInputParser getUserInputParser() {
         return mUserInputParser;
     }
 

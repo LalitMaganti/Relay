@@ -15,7 +15,7 @@ import co.fusionx.relay.internal.core.InternalChannelUser;
 import co.fusionx.relay.internal.core.InternalServer;
 import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.parser.rfc.KickParser;
-import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.internal.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
 public class KickStateChanger implements KickParser.KickObserver {

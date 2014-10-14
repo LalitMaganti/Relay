@@ -2,19 +2,17 @@ package co.fusionx.relay.parser.rfc;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 
 import co.fusionx.relay.constant.ChannelPrefix;
 import co.fusionx.relay.parser.CommandParser;
+import co.fusionx.relay.parser.ObserverHelper;
 
 public class ModeParser implements CommandParser {
 
-    private final ModeObserver mModeObserver;
-
-    public ModeParser(final ModeObserver modeObserver) {
-        mModeObserver = modeObserver;
-    }
+    private final ObserverHelper<ModeObserver> mObserverHelper = new ObserverHelper<>();
 
     private static List<ModeChange> parseModeString(final List<String> parsedArray) {
         final List<ModeChange> modeChanges = new ArrayList<>();
@@ -43,6 +41,16 @@ public class ModeParser implements CommandParser {
         return modeChanges;
     }
 
+    public ModeParser addObserver(final ModeObserver observer) {
+        mObserverHelper.addObserver(observer);
+        return this;
+    }
+
+    public ModeParser addObservers(final Collection<? extends ModeObserver> observers) {
+        mObserverHelper.addObservers(observers);
+        return this;
+    }
+
     @Override
     public void parseCommand(final List<String> parsedArray, final String prefix) {
         final String recipient = parsedArray.remove(0);
@@ -60,14 +68,14 @@ public class ModeParser implements CommandParser {
             final String channelName) {
         final List<ModeChange> modeChanges = ModeParser.parseModeString(parsedArray);
 
-        mModeObserver.onChannelMode(prefix, channelName, modeChanges);
+        mObserverHelper.notifyObservers(o -> o.onChannelMode(prefix, channelName, modeChanges));
     }
 
     private void parseUserModeCommand(final List<String> parsedArray, final String prefix,
             final String recipient) {
         final List<ModeChange> modeChanges = ModeParser.parseModeString(parsedArray);
 
-        mModeObserver.onUserMode(prefix, recipient, modeChanges);
+        mObserverHelper.notifyObservers(o -> o.onUserMode(prefix, recipient, modeChanges));
     }
 
     public interface ModeObserver {

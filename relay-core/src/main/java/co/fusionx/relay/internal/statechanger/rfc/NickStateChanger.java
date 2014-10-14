@@ -18,7 +18,7 @@ import co.fusionx.relay.internal.core.InternalUserChannelGroup;
 import co.fusionx.relay.function.Optionals;
 import co.fusionx.relay.parser.CommandParser;
 import co.fusionx.relay.parser.rfc.NickParser;
-import co.fusionx.relay.util.LogUtils;
+import co.fusionx.relay.internal.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
 
 public class NickStateChanger implements CommandParser, NickParser.NickObserver {

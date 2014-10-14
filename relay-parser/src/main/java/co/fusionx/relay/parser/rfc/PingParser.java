@@ -8,7 +8,7 @@ import co.fusionx.relay.parser.ObserverHelper;
 
 public class PingParser implements CommandParser {
 
-    public final ObserverHelper<PingObserver> mObserverHelper = new ObserverHelper<>();
+    private final ObserverHelper<PingObserver> mObserverHelper = new ObserverHelper<>();
 
     public PingParser addObserver(final PingObserver wallopsObserver) {
         mObserverHelper.addObserver(wallopsObserver);

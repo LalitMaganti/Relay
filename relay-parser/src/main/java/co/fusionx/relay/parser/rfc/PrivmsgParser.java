@@ -1,5 +1,6 @@
 package co.fusionx.relay.parser.rfc;
 
+import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.function.Consumer;
@@ -8,10 +9,15 @@ import co.fusionx.relay.parser.ObserverHelper;
 
 public class PrivmsgParser implements CommandParser {
 
-    public final ObserverHelper<PrivmsgObserver> mObserverHelper = new ObserverHelper<>();
+    private final ObserverHelper<PrivmsgObserver> mObserverHelper = new ObserverHelper<>();
 
-    public PrivmsgParser addObserver(final PrivmsgObserver wallopsObserver) {
-        mObserverHelper.addObserver(wallopsObserver);
+    public PrivmsgParser addObserver(final PrivmsgObserver observer) {
+        mObserverHelper.addObserver(observer);
+        return this;
+    }
+
+    public PrivmsgParser addObservers(final Collection<? extends PrivmsgObserver> observers) {
+        mObserverHelper.addObservers(observers);
         return this;
     }
 
@@ -20,12 +26,7 @@ public class PrivmsgParser implements CommandParser {
         final String recipient = parsedArray.get(0);
         final String message = parsedArray.get(1);
 
-        mObserverHelper.notifyObservers(new Consumer<PrivmsgObserver>() {
-            @Override
-            public void apply(final PrivmsgObserver observer) {
-                observer.onPrivmsg(prefix, recipient, message);
-            }
-        });
+        mObserverHelper.notifyObservers(observer -> observer.onPrivmsg(prefix, recipient, message));
     }
 
     public static interface PrivmsgObserver {

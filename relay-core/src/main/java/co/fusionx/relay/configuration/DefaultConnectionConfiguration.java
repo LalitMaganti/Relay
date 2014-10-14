@@ -418,7 +418,7 @@ public class DefaultConnectionConfiguration implements ConnectionConfiguration {
         }
 
         @Override
-        public ConnectionConfiguration.Builder setNickStorage(NickProvider nickProvider) {
+        public ConnectionConfiguration.Builder setNickProvider(NickProvider nickProvider) {
             mNickProvider = nickProvider;
             return this;
         }

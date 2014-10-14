@@ -1,4 +1,4 @@
-package co.fusionx.relay.util;
+package co.fusionx.relay.internal.util;
 
 import com.google.common.io.Files;
 
@@ -33,11 +33,12 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import co.fusionx.relay.configuration.ConnectionConfiguration;
+import co.fusionx.relay.util.StringUtils;
 
 public class SocketUtils {
 
-    public static Socket openSocketConnection(final ConnectionConfiguration configuration) throws
-            IOException {
+    public static Socket openSocketConnection(final ConnectionConfiguration configuration)
+            throws IOException {
         final Socket socket;
         final InetSocketAddress address = new InetSocketAddress(configuration.getUrl(),
                 configuration.getPort());

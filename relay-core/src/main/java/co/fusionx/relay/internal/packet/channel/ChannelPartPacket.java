@@ -21,7 +21,8 @@ public class ChannelPartPacket implements Packet {
 
     @Override
     public String getLine() {
-        return mOptReason.transform(this::partWithReason).or(String.format(PART, mChannelName));
+        return mOptReason.transform(this::partWithReason)
+                .or(String.format(PART, mChannelName));
     }
 
     private String partWithReason(final String reason) {

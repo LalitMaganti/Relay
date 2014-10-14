@@ -10,7 +10,7 @@ import co.fusionx.relay.parser.ObserverHelper;
 
 public class QuitParser implements CommandParser {
 
-    public final ObserverHelper<QuitObserver> mObserverHelper = new ObserverHelper<>();
+    private final ObserverHelper<QuitObserver> mObserverHelper = new ObserverHelper<>();
 
     public QuitParser addObserver(final QuitObserver observer) {
         mObserverHelper.addObserver(observer);

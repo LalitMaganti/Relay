@@ -7,6 +7,12 @@ public final class ReplyCodes {
 
     public static final int RPL_WELCOME = 1;
 
+    public static final int RPL_YOURHOST = 2;
+
+    public static final int RPL_CREATED = 3;
+
+    public static final int RPL_MYINFO = 4;
+
     public static final int RPL_TRACELINK = 200;
 
     public static final int RPL_TRACECONNECTING = 201;
@@ -359,12 +365,6 @@ public final class ReplyCodes {
     public static final ImmutableSet<Integer> saslCodes = ImmutableSet.of(RPL_SASL_LOGGED_IN,
             RPL_SASL_SUCCESSFUL, ERR_SASL_FAIL, ERR_SASL_TOO_LONG, ERR_SASL_ABORTED,
             ERR_SASL_ALREADY, RPL_SASL_MECHS);
-
-    private static final int RPL_YOURHOST = 2;
-
-    private static final int RPL_CREATED = 3;
-
-    private static final int RPL_MYINFO = 4;
 
     private static final int RPL_PROTOCTL = 5;
 

@@ -24,7 +24,7 @@ public class MotdParser implements ReplyCodeParser {
     }
 
     @Override
-    public void parseReplyCode(final List<String> parsedArray, final int code) {
+    public void parseReplyCode(final String target, final List<String> parsedArray, final int code) {
         final String message = parsedArray.get(0);
 
         mObserverHelper.notifyObservers(observer -> observer.onMotd(code, message));

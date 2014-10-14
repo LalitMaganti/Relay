@@ -8,7 +8,7 @@ import co.fusionx.relay.parser.ObserverHelper;
 
 public class InviteParser implements CommandParser {
 
-    public final ObserverHelper<InviteObserver> mObserverHelper = new ObserverHelper<>();
+    private final ObserverHelper<InviteObserver> mObserverHelper = new ObserverHelper<>();
 
     public InviteParser addObserver(final InviteObserver wallopsObserver) {
         mObserverHelper.addObserver(wallopsObserver);
@@ -29,7 +29,7 @@ public class InviteParser implements CommandParser {
                 observer -> observer.onInvite(prefix, invitedNick, channelName));
     }
 
-    public interface InviteObserver {
+    public static interface InviteObserver {
 
         public void onInvite(final String invitingPrefix, final String invitedNick,
                 final String channelName);
