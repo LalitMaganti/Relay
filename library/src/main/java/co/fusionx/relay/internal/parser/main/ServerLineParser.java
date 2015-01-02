@@ -69,7 +69,6 @@ public class ServerLineParser {
             return false;
         }
         mLine = line;
-        Log.e("Relay", line);
 
         // Split the line
         final List<String> parsedArray = ParseUtils.splitRawLine(line, true);
