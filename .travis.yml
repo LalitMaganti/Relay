@@ -1,16 +1,25 @@
 notifications:
   email: false
-  webhooks: http://n.tkte.ch/h/2560/u51lpT2YLz1Qrzqh_lTUdRLa
+
 branches:
   only:
     - develop
+
 language: android
+
 android:
   components:
-    - build-tools-20.0.0
+    - platform-tools
+    - tools
+    - build-tools-22.0.0
+    - android-22
+    - extra-android-support
+    - extra-android-m2repository
+
 before_install:
   - export JAVA_HOME=/usr/lib/jvm/java-7-oracle
   - export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
   - mkdir libraries
   - git clone https://github.com/tilal6991/Bus.git libraries/bus -b develop
+
 script: ./gradlew test
