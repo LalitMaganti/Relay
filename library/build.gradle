@@ -4,7 +4,6 @@ buildscript {
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:2.4.1'
-        classpath 'com.github.jcandksolutions.gradle:android-unit-test:2.1.1'
     }
 }
 
@@ -16,8 +15,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '21.1.2'
+    compileSdkVersion 22
+    buildToolsVersion '22.0.0'
 
     defaultConfig {
         minSdkVersion 9
@@ -33,7 +32,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-apply plugin: 'android-unit-test'
 
 dependencies {
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
@@ -52,7 +50,7 @@ dependencies {
 
     compile project(':bus-library')
 
-    testCompile 'junit:junit:4.12-beta-1'
+    testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:2.3'
     testCompile 'org.assertj:assertj-core:1.6.1'
 }
