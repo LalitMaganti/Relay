@@ -1,5 +1,7 @@
 package co.fusionx.relay.internal.parser.main.command;
 
+import android.text.TextUtils;
+
 import com.google.common.base.Optional;
 
 import java.util.List;
@@ -63,8 +65,9 @@ public class PrivmsgParser extends CommandParser {
         Optionals.ifPresent(optChannel, channel -> {
             // TODO - actually parse the colours
             final String message = Utils.stripColorsFromMessage(rawMessage);
-            final boolean mention = MentionParser.onMentionableCommand(message,
-                    mServer.getUser().getNick().getNickAsString());
+            final String ownNick = mServer.getUser().getNick().getNickAsString();
+            final boolean mention = !TextUtils.equals(sendingNick, ownNick)
+                    ? MentionParser.onMentionableCommand(message, ownNick) : false;
 
             final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
             final ChannelEvent event;
