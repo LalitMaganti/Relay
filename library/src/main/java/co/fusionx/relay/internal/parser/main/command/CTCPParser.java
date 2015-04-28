@@ -1,5 +1,7 @@
 package co.fusionx.relay.internal.parser.main.command;
 
+import android.text.TextUtils;
+
 import com.google.common.base.Optional;
 
 import java.util.List;
@@ -100,8 +102,9 @@ public class CTCPParser {
         LogUtils.logOptionalBug(optChannel, mServer);
         Optionals.ifPresent(optChannel, channel -> {
             final Optional<RelayChannelUser> optUser = mUserChannelInterface.getUser(sendingNick);
-            final boolean mention = MentionParser.onMentionableCommand(action,
-                    mServer.getUser().getNick().getNickAsString());
+            final String ownNick = mServer.getUser().getNick().getNickAsString();
+            final boolean mention = !TextUtils.equals(sendingNick, ownNick)
+                    ? MentionParser.onMentionableCommand(action, ownNick) : false;
 
             final ChannelEvent event;
             if (optUser.isPresent()) {
