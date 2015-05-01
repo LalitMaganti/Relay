@@ -53,7 +53,7 @@ class ModeParser extends CommandParser {
 
     private void onUserModeInChannel(final List<String> parsedArray, final String sendingNick,
             final RelayChannel channel, final String mode) {
-        final String source = parsedArray.get(2);
+        final String source = parsedArray.size() > 2 ? parsedArray.get(2) : "";
         final String nick = ParseUtils.getNickFromPrefix(source);
         final boolean appUser = mServer.getUser().isNickEqual(nick);
 
