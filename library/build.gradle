@@ -3,24 +3,24 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:2.4.1'
+        classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta4'
     }
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'retrolambda'
+apply plugin: 'me.tatarka.retrolambda'
 
 repositories {
     jcenter()
 }
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion '22.0.1'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 19
+        targetSdkVersion 23
     }
 
     packagingOptions {
