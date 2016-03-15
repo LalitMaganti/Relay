@@ -18,7 +18,7 @@ public class RelayChannelTest {
     }
 
     public static RelayChannel getTestChannel(final String channelName) {
-        return new RelayChannel(TestUtils.getFreenodeServer(), channelName);
+        return null;
     }
 
     public static void populateTestChannel(final Channel channel) {

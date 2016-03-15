@@ -14,6 +14,7 @@ import java.io.PipedWriter;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.internal.base.TestUtils;
+import co.fusionx.relay.internal.sender.RelayBaseSender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -34,7 +35,9 @@ public class ConnectionParserTest {
             final BufferedWriter bufferedWriterForParser = new BufferedWriter(writerForParser);
             server.onOutputStreamCreated(bufferedWriterForParser);
 
-            final ConnectionParser connectionParser = new ConnectionParser(server);
+            final RelayBaseSender sender = new RelayBaseSender();
+
+            final ConnectionParser connectionParser = new ConnectionParser(server, sender);
             connectionParser.parseLine(":test.server CAP * LS :sasl");
 
             if (!bufferedReaderForTesting.ready()) {

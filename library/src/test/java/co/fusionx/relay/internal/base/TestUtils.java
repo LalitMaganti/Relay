@@ -5,6 +5,7 @@ import android.util.Log;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.interfaces.RelayConfiguration;
+import co.fusionx.relay.internal.sender.RelayBaseSender;
 import co.fusionx.relay.misc.NickStorage;
 
 public class TestUtils {
@@ -31,7 +32,7 @@ public class TestUtils {
     }
 
     public static RelayIRCConnection getConnection(final ServerConfiguration configuration) {
-        return new RelayIRCConnection(configuration);
+        return new RelayIRCConnection(configuration, getFreenodeServer(), new RelayBaseSender());
     }
 
     public static RelayServer getServerFromConnection(final RelayIRCConnection connection) {
