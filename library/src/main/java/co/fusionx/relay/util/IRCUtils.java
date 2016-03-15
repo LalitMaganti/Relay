@@ -1,62 +1,9 @@
 package co.fusionx.relay.util;
 
-import com.google.common.base.CharMatcher;
-
-import org.apache.commons.lang3.StringUtils;
-
-import android.text.TextUtils;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class IRCUtils {
-
-    private static final Pattern QUOTE_SPLIT_PATTERN = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
-
-    public static String getNickFromRaw(final String rawSource) {
-        String nick;
-        if (rawSource.contains("!") && rawSource.contains("@")) {
-            nick = StringUtils.substringBefore(rawSource, "!");
-        } else {
-            nick = rawSource;
-        }
-        return nick;
-    }
-
-    /**
-     * Split the line received from the server into it's components
-     *
-     * @param input          the line received from the server
-     * @param colonDelimiter whether a colon means the rest of the line should be added in one go
-     * @return the parsed list
-     */
-    public static List<String> splitRawLine(final String input, final boolean colonDelimiter) {
-        final List<String> stringParts = new ArrayList<>();
-        if (TextUtils.isEmpty(input)) {
-            return stringParts;
-        }
-
-        final String colonLessLine = input.charAt(0) == ':' ? input.substring(1) : input;
-        // Heavily optimized version string split by space with all characters after :
-        // added as a single entry. Under benchmarks, its faster than StringTokenizer,
-        // String.split, toCharArray, and charAt
-        String trimmedInput = CharMatcher.WHITESPACE.trimFrom(colonLessLine);
-        int pos = 0, end;
-        while ((end = trimmedInput.indexOf(' ', pos)) >= 0) {
-            stringParts.add(trimmedInput.substring(pos, end));
-            pos = end + 1;
-            if (trimmedInput.charAt(pos) == ':' && colonDelimiter) {
-                stringParts.add(trimmedInput.substring(pos + 1));
-                return stringParts;
-            }
-        }
-        // No more spaces, add last part of line
-        stringParts.add(trimmedInput.substring(pos));
-        return stringParts;
-    }
 
     public static void removeFirstElementFromList(final List<String> list, final int noOfTimes) {
         for (int i = 1; i <= noOfTimes; i++) {
@@ -71,7 +18,6 @@ public class IRCUtils {
         }
         return builder.toString().trim();
     }
-
 
     /**
      * Returns the 32bit dotted format of the provided long ip.
@@ -96,12 +42,4 @@ public class IRCUtils {
         return ipAddress.toString();
     }
 
-    public static List<String> splitRawLineWithQuote(final String input) {
-        final List<String> list = new ArrayList<>();
-        final Matcher m = QUOTE_SPLIT_PATTERN.matcher(input);
-        while (m.find()) {
-            list.add(m.group(1).replace("\"", ""));
-        }
-        return list;
-    }
 }

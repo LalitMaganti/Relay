@@ -1,6 +1,6 @@
 package co.fusionx.relay.event.server;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Server;
 
 // Empty class
 public class StatusChangeEvent extends ServerEvent {

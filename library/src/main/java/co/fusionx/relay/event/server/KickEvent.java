@@ -2,14 +2,14 @@ package co.fusionx.relay.event.server;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.Nick;
-import co.fusionx.relay.RelayChannelUser;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.internal.base.RelayChannelUser;
 
 public class KickEvent extends ServerEvent {
 
-    public final String channelName;
+    public final Channel channel;
 
     public final Nick kickingNick;
 
@@ -20,7 +20,8 @@ public class KickEvent extends ServerEvent {
     public KickEvent(final Channel channel, final Optional<RelayChannelUser> optKickingUser,
             final String kickingNickString, final String reason) {
         super(channel.getServer());
-        this.channelName = channel.getName();
+
+        this.channel = channel;
         this.kickingNick = optKickingUser.transform(ChannelUser::getNick).orNull();
         this.kickingNickString = kickingNickString;
         this.reason = reason;

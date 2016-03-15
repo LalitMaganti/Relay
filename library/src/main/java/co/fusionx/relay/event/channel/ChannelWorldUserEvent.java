@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.Nick;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
 
 public abstract class ChannelWorldUserEvent extends ChannelEvent {
 
@@ -36,16 +36,7 @@ public abstract class ChannelWorldUserEvent extends ChannelEvent {
         this.userNickString = user.getNick().getNickAsString();
     }
 
-    ChannelWorldUserEvent(final Channel channel, final Nick nick) {
-        super(channel);
-
-        this.user = null;
-        this.userNick = nick;
-        this.userMentioned = false;
-        this.userNickString = nick.getNickAsString();
-    }
-
-    public ChannelWorldUserEvent(final Channel channel, final String nick, final boolean mention) {
+    ChannelWorldUserEvent(final Channel channel, final String nick, final boolean mention) {
         super(channel);
 
         this.user = null;

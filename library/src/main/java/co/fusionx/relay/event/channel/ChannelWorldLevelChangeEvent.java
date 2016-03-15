@@ -2,8 +2,8 @@ package co.fusionx.relay.event.channel;
 
 import com.google.common.base.Optional;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.constants.UserLevel;
 
 public class ChannelWorldLevelChangeEvent extends ChannelWorldUserEvent {
@@ -14,16 +14,19 @@ public class ChannelWorldLevelChangeEvent extends ChannelWorldUserEvent {
 
     public final String changingNick;
 
-    public final UserLevel level;
+    public final UserLevel oldLevel;
+
+    public final UserLevel newLevel;
 
     public ChannelWorldLevelChangeEvent(final Channel channel, String rawMode,
-            final ChannelUser user, final UserLevel level,
+            final ChannelUser user, final UserLevel oldLevel, final UserLevel newLevel,
             final Optional<? extends ChannelUser> changingUser,
             final String changingNick) {
         super(channel, user);
 
         this.rawMode = rawMode;
-        this.level = level;
+        this.oldLevel = oldLevel;
+        this.newLevel = newLevel;
         this.changingUser = changingUser;
         this.changingNick = changingNick;
     }

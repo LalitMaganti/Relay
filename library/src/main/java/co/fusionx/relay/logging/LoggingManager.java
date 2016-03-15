@@ -5,16 +5,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.ServerEvent;
-import gnu.trove.map.hash.THashMap;
 
 /**
  * This class is NOT thread safe
@@ -33,7 +33,7 @@ public abstract class LoggingManager {
 
     protected LoggingManager(final LoggingPreferences preferences) {
         mLoggingPreferences = preferences;
-        mLoggingServers = new THashMap<>();
+        mLoggingServers = new HashMap<>();
         mStarted = false;
     }
 
@@ -112,11 +112,11 @@ public abstract class LoggingManager {
         }
 
         public void startLogging() {
-            mServer.getServerEventBus().register(this, LOG_PRIORITY);
+            mServer.getServerWideBus().register(this, LOG_PRIORITY);
         }
 
         public void stopLogging() {
-            mServer.getServerEventBus().unregister(this);
+            mServer.getServerWideBus().unregister(this);
         }
 
         public void onEvent(final ServerEvent event) {

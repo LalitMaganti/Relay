@@ -1,6 +1,6 @@
 package co.fusionx.relay.interfaces;
 
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Server;
 
 public interface RelayConfiguration {
 
@@ -17,4 +17,6 @@ public interface RelayConfiguration {
     public void logMissingData(final Server server);
 
     public void logServerLine(final String line);
+
+    public void handleException(Exception ex);
 }

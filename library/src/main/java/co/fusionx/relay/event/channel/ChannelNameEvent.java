@@ -2,8 +2,8 @@ package co.fusionx.relay.event.channel;
 
 import java.util.Collection;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
 
 public class ChannelNameEvent extends ChannelEvent {
 

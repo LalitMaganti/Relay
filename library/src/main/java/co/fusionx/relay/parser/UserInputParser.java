@@ -4,18 +4,19 @@ import com.google.common.base.Optional;
 
 import java.util.List;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.QueryUser;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.dcc.connection.DCCChatConnection;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.base.Server;
+import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
 public class UserInputParser {
 
     public static void onParseChannelMessage(final Channel channel, final String message) {
-        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 
@@ -70,7 +71,7 @@ public class UserInputParser {
     }
 
     public static void onParseUserMessage(final QueryUser queryUser, final String message) {
-        final List<String> parsedArray = IRCUtils.splitRawLine(message, false);
+        final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 
@@ -113,7 +114,7 @@ public class UserInputParser {
     }
 
     private static void onParseServerCommand(final Server server, final String rawLine) {
-        final List<String> parsedArray = IRCUtils.splitRawLine(rawLine, false);
+        final List<String> parsedArray = ParseUtils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
         final int arrayLength = parsedArray.size();
 
@@ -175,8 +176,32 @@ public class UserInputParser {
         // server.getServerCallBus().sendUnknownEvent(rawLine + " is not a valid command");
     }
 
-    public static void onParseDCCChatEvent(final DCCChatConnection chatConnection,
+    public static void onParseDCCChatEvent(final DCCChatConversation chatConnection,
             final String message) {
-        chatConnection.sendMessage(message);
+        final List<String> parsedArray = ParseUtils.splitRawLine(message, false);
+        final String command = parsedArray.remove(0);
+        final int arrayLength = parsedArray.size();
+
+        if (!command.startsWith("/")) {
+            chatConnection.sendMessage(message);
+            return;
+        }
+        switch (command) {
+            case "/me":
+                final String action = IRCUtils.concatenateStringList(parsedArray);
+                chatConnection.sendAction(action);
+                return;
+            case "/close":
+            case "/c":
+                if (arrayLength == 0) {
+                    chatConnection.closeChat();
+                    return;
+                }
+                break;
+            default:
+                onParseServerCommand(chatConnection.getServer(), message);
+                return;
+        }
+        onUnknownEvent(chatConnection.getServer(), message);
     }
 }

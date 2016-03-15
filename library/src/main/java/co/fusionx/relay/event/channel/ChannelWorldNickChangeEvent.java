@@ -1,8 +1,8 @@
 package co.fusionx.relay.event.channel;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.Nick;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
 
 public class ChannelWorldNickChangeEvent extends ChannelWorldUserEvent {
 
