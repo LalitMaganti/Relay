@@ -23,6 +23,7 @@ import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.query.QueryStopEvent;
 import co.fusionx.relay.event.server.ConnectEvent;
 import co.fusionx.relay.event.server.ConnectingEvent;
+import co.fusionx.relay.event.server.RegisteringEvent;
 import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.ReconnectEvent;
 import co.fusionx.relay.event.server.ServerEvent;
@@ -92,6 +93,7 @@ public class RelayIRCConnection {
     }
 
     private void connectToServer() {
+        onConnecting();
         connect();
 
         for (mReconnectAttempts = 0; !mStopped && isReconnectNeeded(); mReconnectAttempts++) {
@@ -152,8 +154,8 @@ public class RelayIRCConnection {
         final BufferedWriter socketWriter = SocketUtils.getSocketBufferedWriter(mSocket);
         mServer.onOutputStreamCreated(socketWriter);
 
-        // We are now in the phase where we can say we are connecting to the server
-        onConnecting();
+        // We are now in the phase where we can say we are registering to the server
+        onRegistering();
 
         // Send the registration messages to the server
         sendInitialMessages();
@@ -217,6 +219,12 @@ public class RelayIRCConnection {
         mServer.updateStatus(ConnectionStatus.CONNECTING);
 
         mServer.postAndStoreEvent(new ConnectingEvent(mServer));
+    }
+
+    private void onRegistering() {
+        mServer.updateStatus(ConnectionStatus.REGISTERING);
+
+        mServer.postAndStoreEvent(new RegisteringEvent(mServer));
     }
 
     private void onReconnecting() {
