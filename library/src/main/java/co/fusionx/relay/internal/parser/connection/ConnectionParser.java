@@ -120,6 +120,8 @@ public class ConnectionParser {
             case ServerReplyCodes.ERR_NONICKNAMEGIVEN:
                 mServer.sendNick(mConfiguration.getNickStorage().getFirst());
                 break;
+            case ServerReplyCodes.ERR_PASSWDMISMATCH:
+                return new ConnectionLineParseStatus(ParseStatus.ERROR, parsedArray.get(0));
         }
         if (ServerReplyCodes.saslCodes.contains(code)) {
             mCapParser.parseCode(code, parsedArray);
@@ -151,15 +153,19 @@ public class ConnectionParser {
 
         private final ParseStatus mStatus;
 
-        private final String mNick;
+        private final String mData;
 
-        public ConnectionLineParseStatus(final ParseStatus status, final String nick) {
+        public ConnectionLineParseStatus(final ParseStatus status, final String data) {
             mStatus = status;
-            mNick = nick;
+            mData = data;
         }
 
         public String getNick() {
-            return mNick;
+            return mStatus == ParseStatus.NICK ? mData : null;
+        }
+
+        public String getErrorMessage() {
+            return mStatus == ParseStatus.ERROR ? mData : null;
         }
 
         public ParseStatus getStatus() {

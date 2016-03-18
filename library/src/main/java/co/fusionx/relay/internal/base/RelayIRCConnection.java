@@ -55,6 +55,7 @@ public class RelayIRCConnection {
     private Socket mSocket;
 
     private int mReconnectAttempts;
+    private boolean mConnectionError;
 
     private boolean mStopped;
 
@@ -92,6 +93,7 @@ public class RelayIRCConnection {
     }
 
     private void connectToServer() {
+        mConnectionError = false;
         connect();
 
         for (mReconnectAttempts = 0; !mStopped && isReconnectNeeded(); mReconnectAttempts++) {
@@ -106,10 +108,9 @@ public class RelayIRCConnection {
             }
             connect();
         }
-        if (mStopped) {
-            return;
+        if (!mStopped && !mConnectionError) {
+            onDisconnected("No reconnect pending.", false);
         }
-        onDisconnected("Disconnected from server (no reconnect pending).", false);
     }
 
     private void closeSocket() {
@@ -130,6 +131,9 @@ public class RelayIRCConnection {
         String disconnectMessage = "";
         try {
             initializeConnection();
+        } catch (final ServerConnectionErrorException ex) {
+            disconnectMessage = ex.getMessage();
+            mConnectionError = true;
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
@@ -145,7 +149,7 @@ public class RelayIRCConnection {
         mServer.onConnectionTerminated();
     }
 
-    private void initializeConnection() throws IOException {
+    private void initializeConnection() throws IOException, ServerConnectionErrorException {
         mSocket = SocketUtils.openSocketConnection(mServerConfiguration);
 
         final BufferedReader socketReader = SocketUtils.getSocketBufferedReader(mSocket);
@@ -167,6 +171,8 @@ public class RelayIRCConnection {
         // If the nick is null then we have no hope of progressing
         if (status.getStatus() == ParseStatus.NICK && Utils.isNotEmpty(status.getNick())) {
             onStartParsing(status.getNick(), socketReader);
+        } else if (status.getStatus() == ParseStatus.ERROR) {
+            throw new ServerConnectionErrorException(status.getErrorMessage());
         }
     }
 
@@ -187,6 +193,7 @@ public class RelayIRCConnection {
     private void onStartParsing(final String nick, final BufferedReader reader) throws IOException {
         // Since we are now connected, reset the reconnect attempts
         mReconnectAttempts = 0;
+        mConnectionError = false;
         mServer.getUser().setNick(nick);
         onConnected();
 
@@ -274,11 +281,18 @@ public class RelayIRCConnection {
     }
 
     private boolean isReconnectNeeded() {
-        return mReconnectAttempts < getPreferences().getReconnectAttemptsCount();
+        return !mConnectionError
+                && mReconnectAttempts < getPreferences().getReconnectAttemptsCount();
     }
 
     // Getters
     RelayServer getServer() {
         return mServer;
+    }
+
+    private static class ServerConnectionErrorException extends Exception {
+        public ServerConnectionErrorException(String message) {
+            super(message);
+        }
     }
 }
