@@ -1,10 +1,13 @@
 package co.fusionx.relay.internal.parser.main.command;
 
+import android.util.Pair;
+
 import com.google.common.base.Optional;
 
 import java.util.Collection;
 import java.util.List;
 
+import co.fusionx.relay.base.FormatSpanInfo;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
 import co.fusionx.relay.internal.base.RelayQueryUser;
@@ -14,6 +17,7 @@ import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.query.QueryQuitWorldEvent;
 import co.fusionx.relay.internal.function.Optionals;
 import co.fusionx.relay.util.ParseUtils;
+import co.fusionx.relay.util.Utils;
 
 public class QuitParser extends CommandParser {
 
@@ -42,10 +46,13 @@ public class QuitParser extends CommandParser {
         Optionals.ifPresent(optUser, user -> {
             final Collection<RelayChannel> channels = mUserChannelInterface.removeUser(user);
             final String reason = parsed.size() == 2 ? parsed.get(1).replace("\"", "") : "";
+            final Pair<String, List<FormatSpanInfo>> reasonAndColors =
+                    Utils.parseAndStripColorsFromMessage(reason);
             for (final RelayChannel channel : channels) {
                 final UserLevel level = user.getChannelPrivileges(channel);
                 mUserChannelInterface.removeUserFromChannel(channel, user);
-                channel.postAndStoreEvent(new ChannelWorldQuitEvent(channel, user, level, reason));
+                channel.postAndStoreEvent(new ChannelWorldQuitEvent(channel,
+                        user, level, reasonAndColors.first, reasonAndColors.second));
             }
         });
 

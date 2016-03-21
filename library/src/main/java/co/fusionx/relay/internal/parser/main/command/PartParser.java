@@ -1,11 +1,14 @@
 package co.fusionx.relay.internal.parser.main.command;
 
+import android.util.Pair;
+
 import com.google.common.base.Optional;
 
 import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.FormatSpanInfo;
 import co.fusionx.relay.internal.base.RelayChannel;
 import co.fusionx.relay.internal.base.RelayChannelUser;
 import co.fusionx.relay.internal.base.RelayServer;
@@ -14,6 +17,7 @@ import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.util.ParseUtils;
+import co.fusionx.relay.util.Utils;
 
 public class PartParser extends RemoveUserParser {
 
@@ -33,7 +37,10 @@ public class PartParser extends RemoveUserParser {
             final RelayChannel channel, final ChannelUser user) {
         final UserLevel level = user.getChannelPrivileges(channel);
         final String reason = parsedArray.size() == 2 ? parsedArray.get(1).replace("\"", "") : "";
-        return new ChannelWorldPartEvent(channel, user, level, reason);
+        final Pair<String, List<FormatSpanInfo>> reasonAndColors =
+                Utils.parseAndStripColorsFromMessage(reason);
+        return new ChannelWorldPartEvent(channel, user, level,
+                reasonAndColors.first, reasonAndColors.second);
     }
 
     @Override
