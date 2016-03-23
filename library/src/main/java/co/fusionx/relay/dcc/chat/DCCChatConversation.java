@@ -2,7 +2,11 @@ package co.fusionx.relay.dcc.chat;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Pair;
 
+import java.util.List;
+
+import co.fusionx.relay.base.FormatSpanInfo;
 import co.fusionx.relay.internal.base.RelayAbstractConversation;
 import co.fusionx.relay.internal.base.RelayServer;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
@@ -10,6 +14,7 @@ import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.misc.RelayConfigurationProvider;
+import co.fusionx.relay.util.Utils;
 
 public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent> {
 
@@ -42,7 +47,10 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
         if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new DCCChatSelfMessageEvent(this, message));
+        final Pair<String, List<FormatSpanInfo>> messageAndColors =
+                Utils.parseAndStripColorsFromMessage(message);
+        postAndStoreEvent(new DCCChatSelfMessageEvent(this,
+                messageAndColors.first, messageAndColors.second));
     }
 
     public void sendAction(final String action) {
@@ -52,7 +60,10 @@ public class DCCChatConversation extends RelayAbstractConversation<DCCChatEvent>
         if (RelayConfigurationProvider.getPreferences().isSelfEventHidden()) {
             return;
         }
-        postAndStoreEvent(new DCCChatSelfActionEvent(this, action));
+        final Pair<String, List<FormatSpanInfo>> actionAndColors =
+                Utils.parseAndStripColorsFromMessage(action);
+        postAndStoreEvent(new DCCChatSelfActionEvent(this,
+                actionAndColors.first, actionAndColors.second));
     }
 
     public void closeChat() {

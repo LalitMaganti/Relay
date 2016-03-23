@@ -1,16 +1,21 @@
 package co.fusionx.relay.dcc.chat;
 
+import android.util.Pair;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
+import co.fusionx.relay.base.FormatSpanInfo;
 import co.fusionx.relay.dcc.DCCConnection;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingConnection;
 import co.fusionx.relay.internal.parser.main.command.CTCPParser;
 import co.fusionx.relay.util.SocketUtils;
+import co.fusionx.relay.util.Utils;
 
 class DCCChatConnection extends DCCConnection {
 
@@ -69,14 +74,20 @@ class DCCChatConnection extends DCCConnection {
         if (CTCPParser.isCtcp(line)) {
             parseCtcp(line);
         } else {
-            mConversation.postAndStoreEvent(new DCCChatWorldMessageEvent(mConversation, line));
+            final Pair<String, List<FormatSpanInfo>> messageAndColors =
+                    Utils.parseAndStripColorsFromMessage(line);
+            mConversation.postAndStoreEvent(new DCCChatWorldMessageEvent(mConversation,
+                    messageAndColors.first, messageAndColors.second));
         }
     }
 
     private void parseCtcp(final String line) {
         final String message = line.substring(1, line.length() - 1);
         final String action = message.replace("ACTION ", "");
-        mConversation.postAndStoreEvent(new DCCChatWorldActionEvent(mConversation, action));
+        final Pair<String, List<FormatSpanInfo>> actionAndColors =
+                Utils.parseAndStripColorsFromMessage(action);
+        mConversation.postAndStoreEvent(new DCCChatWorldActionEvent(mConversation,
+                actionAndColors.first, actionAndColors.second));
     }
 
     void writeLine(final String line) {
