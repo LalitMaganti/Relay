@@ -32,7 +32,7 @@ class KickParser extends RemoveUserParser {
     @Override
     public Optional<RelayChannelUser> getRemovedUser(final List<String> parsedArray,
             final String rawSource) {
-        final String kickedNick = parsedArray.get(3);
+        final String kickedNick = parsedArray.get(1);
         return mUserChannelInterface.getUser(kickedNick);
     }
 
@@ -42,7 +42,7 @@ class KickParser extends RemoveUserParser {
         final UserLevel level = kickedUser.getChannelPrivileges(channel);
         final String kickingNick = ParseUtils.getNickFromPrefix(rawSource);
         final Optional<RelayChannelUser> optKickUser = mUserChannelInterface.getUser(kickingNick);
-        final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
+        final String reason = parsedArray.size() == 3 ? parsedArray.get(2).replace("\"", "") : "";
 
         return new ChannelWorldKickEvent(channel, kickedUser, level, optKickUser, kickingNick,
                 reason);
@@ -67,7 +67,7 @@ class KickParser extends RemoveUserParser {
             mUserChannelInterface.removeChannelFromUser(channel, user);
         }
 
-        final String reason = parsedArray.size() == 5 ? parsedArray.get(4).replace("\"", "") : "";
+        final String reason = parsedArray.size() == 3 ? parsedArray.get(2).replace("\"", "") : "";
         mServer.postAndStoreEvent(new KickEvent(channel, optKickUser, kickingNick, reason));
     }
 }
