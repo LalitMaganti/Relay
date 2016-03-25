@@ -1,11 +1,13 @@
 package co.fusionx.relay.internal.parser.main.command;
 
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.google.common.base.Optional;
 
 import java.util.List;
 
+import co.fusionx.relay.base.FormatSpanInfo;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
@@ -22,6 +24,7 @@ import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayCtcpResponseSender;
 import co.fusionx.relay.util.LogUtils;
 import co.fusionx.relay.util.ParseUtils;
+import co.fusionx.relay.util.Utils;
 
 public class CTCPParser {
 
@@ -79,24 +82,28 @@ public class CTCPParser {
 
     private void onAction(final String recipient, final String sendingNick, final String message) {
         final String action = message.replace("ACTION ", "");
+        final Pair<String, List<FormatSpanInfo>> actionAndColors =
+                Utils.parseAndStripColorsFromMessage(action);
         if (RelayChannel.isChannelPrefix(recipient.charAt(0))) {
-            onParseChannelAction(recipient, sendingNick, action);
+            onParseChannelAction(recipient, sendingNick,
+                    actionAndColors.first, actionAndColors.second);
         } else {
-            onParseUserAction(recipient, action);
+            onParseUserAction(recipient, actionAndColors.first, actionAndColors.second);
         }
     }
 
-    private void onParseUserAction(final String nick, final String action) {
+    private void onParseUserAction(final String nick, final String action,
+            final List<FormatSpanInfo> formats) {
         final Optional<RelayQueryUser> optional = mUserChannelInterface.getQueryUser(nick);
         final RelayQueryUser user = optional.or(mUserChannelInterface.addQueryUser(nick));
         if (!optional.isPresent()) {
             mServer.postAndStoreEvent(new NewPrivateMessageEvent(user));
         }
-        user.postAndStoreEvent(new QueryActionWorldEvent(user, action));
+        user.postAndStoreEvent(new QueryActionWorldEvent(user, action, formats));
     }
 
     private void onParseChannelAction(final String channelName, final String sendingNick,
-            final String action) {
+            final String action, final List<FormatSpanInfo> formats) {
         final Optional<RelayChannel> optChannel = mUserChannelInterface.getChannel(channelName);
 
         LogUtils.logOptionalBug(optChannel, mServer);
@@ -108,9 +115,10 @@ public class CTCPParser {
 
             final ChannelEvent event;
             if (optUser.isPresent()) {
-                event = new ChannelWorldActionEvent(channel, action, optUser.get(), mention);
+                event = new ChannelWorldActionEvent(channel, action,
+                        optUser.get(), mention, formats);
             } else {
-                event = new ChannelWorldActionEvent(channel, action, sendingNick, mention);
+                event = new ChannelWorldActionEvent(channel, action, sendingNick, mention, formats);
             }
             channel.postAndStoreEvent(event);
         });

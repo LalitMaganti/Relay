@@ -1,13 +1,17 @@
 package co.fusionx.relay.internal.base;
 
+import android.util.Pair;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.FormatSpanInfo;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.UserChannelInterface;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
@@ -16,6 +20,7 @@ import co.fusionx.relay.event.channel.ChannelMessageEvent;
 import co.fusionx.relay.internal.sender.BaseSender;
 import co.fusionx.relay.internal.sender.RelayChannelSender;
 import co.fusionx.relay.sender.ChannelSender;
+import co.fusionx.relay.util.Utils;
 
 import static co.fusionx.relay.misc.RelayConfigurationProvider.getPreferences;
 
@@ -120,7 +125,10 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
     @Override
     public void sendAction(final String action) {
         mChannelSender.sendAction(action);
-        sendChannelSelfMessage(() -> new ChannelActionEvent(this, action, mUser));
+        final Pair<String, List<FormatSpanInfo>> actionAndColors =
+                Utils.parseAndStripColorsFromMessage(action);
+        sendChannelSelfMessage(() -> new ChannelActionEvent(this,
+                actionAndColors.first, actionAndColors.second, mUser));
     }
 
     @Override
@@ -131,7 +139,10 @@ public class RelayChannel extends RelayAbstractConversation<ChannelEvent> implem
     @Override
     public void sendMessage(final String message) {
         mChannelSender.sendMessage(message);
-        sendChannelSelfMessage(() -> new ChannelMessageEvent(this, message, mUser));
+        final Pair<String, List<FormatSpanInfo>> messageAndColors =
+                Utils.parseAndStripColorsFromMessage(message);
+        sendChannelSelfMessage(() -> new ChannelMessageEvent(this,
+                messageAndColors.first, messageAndColors.second, mUser));
     }
 
     @Override
