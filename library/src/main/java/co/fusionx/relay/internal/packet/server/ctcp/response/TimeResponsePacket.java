@@ -16,6 +16,6 @@ public class TimeResponsePacket extends CTCPResponsePacket {
     @Override
     public String getResponse() {
         final Date date = new Date();
-        return String.format("TIME :%s", SIMPLE_DATE_FORMAT.format(date));
+        return String.format("TIME %s", SIMPLE_DATE_FORMAT.format(date));
     }
 }
