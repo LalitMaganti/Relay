@@ -12,7 +12,7 @@ public abstract class CTCPResponsePacket implements Packet {
 
     @Override
     public String getLine() {
-        return String.format("NOTICE %s \u0001%s\u0001", mRecipient, getResponse());
+        return String.format("NOTICE %s :\u0001%s\u0001", mRecipient, getResponse());
     }
 
     public abstract String getResponse();
