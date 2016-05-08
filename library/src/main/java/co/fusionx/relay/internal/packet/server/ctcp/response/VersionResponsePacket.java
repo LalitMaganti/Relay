@@ -8,6 +8,6 @@ public class VersionResponsePacket extends CTCPResponsePacket {
 
     @Override
     public String getResponse() {
-        return String.format("VERSION :%s", "Relay:1.0:Android");
+        return String.format("VERSION %s", "Relay:1.0:Android");
     }
 }
