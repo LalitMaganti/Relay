@@ -12,6 +12,6 @@ public class FingerResponsePacket extends CTCPResponsePacket {
 
     @Override
     public String getResponse() {
-        return String.format("FINGER :%s", mFingerResponse);
+        return String.format("FINGER %s", mFingerResponse);
     }
 }
